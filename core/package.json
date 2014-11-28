@@ -1,0 +1,12 @@
+{
+  "name": "GraphTool",
+  "version": "0.1.0",
+  "description": "图形处理工具",
+  "main": "index.html",
+  "window": {
+    "width": 820,
+    "height": 620,
+    "toolbar": true,
+    "as_desktop": true
+  }
+}
