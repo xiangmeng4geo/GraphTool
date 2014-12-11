@@ -2,14 +2,21 @@
   -webkit-user-select: none;
   cursor: default;
 }
+html,body{
+	height: 100%
+}
 body {
 	padding: 0px;
 	margin: 0px;
 	border: 0;
-	font: 14px/1.6 "Microsoft Yahei", "SimSun", "宋体", "Arial", "HELVETICA", "sans-serif", "Tahoma";
 	background-color: #fff;
 	color: #252525;
 	-webkit-font-smoothing: antialiased
+}
+/*对表单元素进行中文处理*/
+body,
+input, textarea, select, button{
+	font: 14px/1.6 "Microsoft Yahei", "SimSun", "宋体", "Arial", "HELVETICA", "sans-serif", "Tahoma";
 }
 ul,ol{
 	/*

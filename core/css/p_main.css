@@ -1,0 +1,57 @@
+#main{
+	height: 100%;
+}
+#c_top{
+	border-bottom: 1px solid #bbb;
+	overflow: hidden;
+	height: 40px;
+}
+#c_top ul{
+	overflow: hidden;
+	padding-left: 10%;
+	position: absolute;
+}
+#c_top li{
+	min-width: 80px;
+	text-align: center;
+	height: 38px;
+	line-height: 38px;
+	float: left;
+	border: 1px solid #bbb;
+	border-bottom: none;
+	border-radius: 5px 5px 0 0;
+	margin-right: 3px;
+	margin-top: 2px;
+}
+#c_top li.on{
+	margin-top: 0px;
+	height: 40px;
+	line-height: 40px;
+	background-color: #ccc;
+}
+
+#btn_quite{
+	float: right;
+	margin-right: 5%;
+}
+.c_bottom{
+	overflow: hidden;
+	position: relative;
+	height: 100%;
+}
+#c_left{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 300px;
+	height: 100%;
+	overflow: auto;
+	background-color: #ccc;
+}
+#c_right{
+	padding-left: 300px;
+}
+
+#tree{
+	margin: 10px 0;
+}

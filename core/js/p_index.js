@@ -1,8 +1,8 @@
 !function(){
-	var utilConf = require('conf');
+	var core = require('core');
 	/*初始化Tab导航*/
 	function initTab(){
-		var sys_conf = utilConf.getSysConf();
+		var sys_conf = core.conf.getSys();
 
 		var tab_html = '<ul class="tab">';
 		var subtab_html = '<div class="sub_tabs">';
@@ -103,8 +103,6 @@
 	    })
 	}
 	testTree();
-	
-	$('#result').text(utilConf.getChinese().name);
 
-	
+	require('nw.gui').Window.get().emit('inited',true);
 }();

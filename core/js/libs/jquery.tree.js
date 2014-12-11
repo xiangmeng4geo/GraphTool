@@ -50,6 +50,8 @@
 	 	             * @param {Object} item Ndde item clicked on.
 	               */
                 onnodeclick: false,
+                /*右键事件*/
+                onnodecontextmenu: false,
                 /**
                  * @description {Config} cascadecheck  
                  * {Boolean} Whether node being seleted leads to parent/sub node being selected.  
@@ -401,6 +403,15 @@
             }, function() {
                 $(this).removeClass("bbit-tree-node-over");
             }).click(nodeclick)
+            .on('contextmenu',function(e){
+                e.preventDefault();
+                var path = $(this).attr("tpath");
+                var item = getItem(path);
+                if(dfop.onnodecontextmenu){
+                    dfop.onnodecontextmenu.call(this,e,item)
+                }
+                return false;
+            })
              .find("img.bbit-tree-ec-icon").each(function(e) {
                  if (!$(this).hasClass("bbit-tree-elbow")) {
                      $(this).hover(function() {
@@ -495,6 +506,9 @@
                     id = itemOrItemId.id;
                 }
                 reflash(id);
+            },
+            getTreeNodes: function(){
+                return treenodes;
             }
         };
         return me;
@@ -523,6 +537,11 @@
             return this[0].t.reflash(ItemOrItemId);
         }
     };
+    $.fn.getTreeNodes = function(){
+        if (this[0].t) {
+            return this[0].t.getTreeNodes();
+        }
+    }
     var src = $('script').last().attr('src');
     Core.Style.addLink(Core.Path.resolve('../../css/jquery.tree/tree.css',src));
 })(jQuery);
