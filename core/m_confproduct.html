@@ -1,1 +1,101 @@
-confproduct
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" type="text/css" href="css/reset.css">
+		<link rel="stylesheet" type="text/css" href="css/p_m_confproduct.css">
+		<style>
+		</style>
+	</head>
+	<body>
+		<div id="main">
+			<div id="c_top">
+				<ul>
+					<li class="on">文件选定</li>
+					<li>标题设置</li>
+					<li>图例设置</li>
+					<li>输入输出设置</li>
+					<li>其它设置</li>
+				</ul>
+			</div>
+			<div id="c_bottom">
+				<fieldset class="on">
+				    <legend>文件选定</legend>
+				    <div>
+				    	<div>
+				    		数据目录：
+					    	<div class="file_directory">
+					    		<input type="file" nwdirectory class="file_dir_nw"/>
+					    		<div>
+						    		<input type="text" class="text_file_dir" id="text_file_dir"/>
+						    		<input type="button" value="浏览" class="file_dir"/>
+					    		</div>
+					    	</div>
+					    </div>
+					    <fieldset id="fieldset_file_rule">
+				    		<legend>文件名</legend>
+				    		<ul>
+				    			<li>
+				    				<div class="file_rule_prefix"><input type="radio" checked name="file_rule" id="radio_file_rule_common"/><label for="radio_file_rule_common">普通规则</label></div>
+				    				<div id="file_rule_1">
+								    	<input type="text" value="" id="text_file_rule_common_prefix"/>
+								    	<select id="select_file_rule_common_date">
+								    		<option>yyMMddhh</option>
+								    		<option>yyyyMMddhh</option>
+								    	</select>
+								    	<input type="text" value="" id="text_file_rule_common_postfix"/>
+								    	<span>.</span>
+								    	<select id="select_file_rule_common_postfix">
+								    		<option>000</option>
+								    		<option>012</option>
+								    		<option>024</option>
+								    	</select>
+								    </div>
+				    			</li>
+				    			<li>
+				    				<div class="file_rule_prefix"><input type="radio" name="file_rule" id="radio_file_rule_custom"/><label for="radio_file_rule_custom">自定义规则</label></div>
+				    				<div id="file_rule_2">
+								    	<input type="text" id="text_file_rule_custom"/>
+								    </div>
+				    			</li>
+				    		</ul>
+				    	</fieldset>
+					    
+						    
+					    <div id="file_rule_example">
+					    	文件名样例:  <span></span>
+					    </div>
+				    </div>
+				</fieldset>
+				<fieldset id="fieldset_title">
+					<legend>标题设置</legend>
+					<div>
+						<input type="checkbox" checked/>
+						<label>主标题</label>
+						<textarea>最高气温预报示意图</textarea>
+						<input type="button" value="设置样式"/>
+					</div>
+					<div>
+						<input type="checkbox" checked/>
+						<label>副标题</label>
+						<textarea>mm月dd日hh时-dd日hh时</textarea>
+						<input type="button" value="设置样式"/>
+					</div>
+					<div>
+						<input type="checkbox" checked/>
+						<label>三级标题</label>
+						<textarea>mm月dd日hh时发布</textarea>
+						<input type="button" value="设置样式"/>
+					</div>
+				</fieldset>
+			</div>
+			<div class="btns">
+				<input type="button" value="保存" id="btn_save"/>
+				<input type="button" value="取消" id="btn_cancel"/>
+			</div>
+		</div>
+		<script type="text/javascript" src="./js/libs/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="./js/core.js"></script>
+		<script type="text/javascript" src="./js/p_m_confproduct.js"></script>
+	</body>
+</html>

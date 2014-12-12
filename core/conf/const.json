@@ -1,0 +1,26 @@
+{
+	"msgType": {
+		"ADD_PRODUCT": "addProduct"
+	},
+	"productType": {
+		"TYPE": {
+			"n": "分类",
+			"v": 1
+		},
+		"PRODUCT": {
+			"n": "产品",
+			"v": 2
+		}
+	},
+	"fileRule": {
+		"time_rule": [
+			"yyyyMMddhh",
+			"yyMMddhh",
+			"yyMMdd",
+			"MMddhh"
+		],
+		"file_postfix": [
+			"000","006","012","024","048","072","084","096","108","120","132","144","156","168","dat"
+		]
+	}
+}

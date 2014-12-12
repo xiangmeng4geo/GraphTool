@@ -3,56 +3,82 @@
 	var conf = nwrequire('core').conf;
 	var Core = {};
 
-	var DIRNAME_RE = /[^?#]*\//
-	function dirname(path) {
-	  return path.match(DIRNAME_RE)[0]
-	}
-	
-	var DOT_RE = /\/\.\//g;
-	var DOUBLE_DOT_RE = /\/[^/]+\/\.\.\//;
-	function realpath(path) {
-	  // /a/b/./c/./d ==> /a/b/c/d
-	  path = path.replace(DOT_RE, "/")
-
-	  // a/b/c/../../d  ==>  a/b/../d  ==>  a/d
-	  while (path.match(DOUBLE_DOT_RE)) {
-	    path = path.replace(DOUBLE_DOT_RE, "/")
-	  }
-
-	  return path
-	}
-
-	var ABSOLUTE_RE = /^\/\/.|:\//;
-	var ROOT_DIR_RE = /^.*?\/\/.*?\//;
-	// 得到相对路径
-	function resolve(id,refUri){
-		var ret
-		var first = id.charAt(0)
-
-		// Absolute
-		if (ABSOLUTE_RE.test(id)) {
-			ret = id
+	!function(){
+		var DIRNAME_RE = /[^?#]*\//
+		function dirname(path) {
+		  return path.match(DIRNAME_RE)[0]
 		}
-		// Relative
-		else if (first === ".") {
-			ret = realpath((refUri ? dirname(refUri) : data.cwd) + id)
-		}
-		// Root
-		else if (first === "/") {
-			var m = data.cwd.match(ROOT_DIR_RE)
-			ret = m ? m[0] + id.substring(1) : id
-		}
-		// Top-level
-		else {
-			ret = data.base + id
+		
+		var DOT_RE = /\/\.\//g;
+		var DOUBLE_DOT_RE = /\/[^/]+\/\.\.\//;
+		function realpath(path) {
+		  // /a/b/./c/./d ==> /a/b/c/d
+		  path = path.replace(DOT_RE, "/")
+
+		  // a/b/c/../../d  ==>  a/b/../d  ==>  a/d
+		  while (path.match(DOUBLE_DOT_RE)) {
+		    path = path.replace(DOUBLE_DOT_RE, "/")
+		  }
+
+		  return path
 		}
 
-		return ret
-	}
-	Core.Path = {
-		dirname: dirname,
-		realpath: realpath,
-		resolve: resolve
+		var ABSOLUTE_RE = /^\/\/.|:\//;
+		var ROOT_DIR_RE = /^.*?\/\/.*?\//;
+		// 得到相对路径
+		function resolve(id,refUri){
+			var ret
+			var first = id.charAt(0)
+
+			// Absolute
+			if (ABSOLUTE_RE.test(id)) {
+				ret = id
+			}
+			// Relative
+			else if (first === ".") {
+				ret = realpath((refUri ? dirname(refUri) : data.cwd) + id)
+			}
+			// Root
+			else if (first === "/") {
+				var m = data.cwd.match(ROOT_DIR_RE)
+				ret = m ? m[0] + id.substring(1) : id
+			}
+			// Top-level
+			else {
+				ret = data.base + id
+			}
+
+			return ret
+		}
+		Core.Path = {
+			dirname: dirname,
+			realpath: realpath,
+			resolve: resolve
+		}
+	}();
+
+	/*时间格式化*/
+	Date.prototype.format = function(format){
+		format || (format = 'yyyy-MM-dd hh:mm:ss');
+		var o = {
+			"M+" : this.getMonth()+1, //month
+			"d+" : this.getDate(),    //day
+			"h+" : this.getHours(),   //hour
+			"m+" : this.getMinutes(), //minute
+			"s+" : this.getSeconds(), //second
+			"q+" : Math.floor((this.getMonth()+3)/3),  //quarter
+			"S" : this.getMilliseconds() //millisecond
+		}
+		if(/(y+)/.test(format)){
+			format = format.replace(RegExp.$1,(this.getFullYear()+"").substr(4 - RegExp.$1.length));
+		} 
+		for(var k in o){
+			if(new RegExp("("+ k +")").test(format)){
+				format = format.replace(RegExp.$1,RegExp.$1.length==1 ? o[k] :("00"+ o[k]).substr((""+ o[k]).length));
+			}
+		}
+		
+		return format;
 	}
 	var $header = $('head');
 	// 可以解决模块依赖css问题
@@ -109,6 +135,7 @@
 		return _localstorage;
 	})();
 	Core.Store = Store;
+	/*自定义系统级错误*/
 	!function(){
 		var fn_error = function(e){
 			console.log('sysErr',e.stack);
@@ -129,9 +156,12 @@
 	var gui = nwrequire('nw.gui'),
 		Window = gui.Window,
 		win = Window.get();
+	win.focus();
+	
+	var conf_gui_window = gui.App.manifest.window;
 	/*按指定文件加载页面*/
 	function _open(page_name){
-		var win = Window.open('./'+page_name+'.html',conf.get('view_'+page_name));
+		var win = Window.open('./'+page_name+'.html',$.extend({},conf_gui_window,conf.get('view_'+page_name)));
 		win.on('close',function(){
 			win.emit('beforeclose');
 			win.removeAllListeners();
@@ -139,6 +169,7 @@
 		})
 		return win;
 	}
+	/*保证只打开一个相同名的窗体*/
 	var _open_only_win = (function (){
 		var _win_cache = {};
 		return function(name){
@@ -156,6 +187,7 @@
 			return _win;
 		}
 	})();
+	/*窗体页面相关操作*/
 	Core.Page = {
 		inited: function(data){
 			win.emit('inited',data);
@@ -165,6 +197,9 @@
 			win.close();
 			return win_login;
 		},
+		main: function(){
+			return _open_only_win('main');
+		},
 		addProduct: function(){
 			return _open_only_win('m_addproduct');
 		},
@@ -173,23 +208,13 @@
 		},
 		setting: function(){
 			return _open_only_win('m_setting');
-		}
-	}
-	Core.Const = {
-		msgType: {
-			ADD_PRODUCT: 'addProduct'
 		},
-		productType: {
-			TYPE: {
-				n: '分类',
-				v: 1
-			},
-			PRODUCT: {
-				n: '产品',
-				v: 2
-			}
+		textStyle: function(){
+			return _open_only_win('m_text_style');
 		}
 	}
+	/*常量*/
+	Core.Const = conf.get('const');
 	var $doc = $(document);
 	var message_listeners = [];
 	
@@ -244,6 +269,7 @@
 			});
 		}
 	}
+	/*窗体关闭的时候清空相关数据及事件*/
 	win.on('close',function(){
 		this.hide(); // Pretend to be closed already
 		CoreWindow.offMessage();

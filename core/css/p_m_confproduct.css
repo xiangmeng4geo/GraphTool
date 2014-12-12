@@ -1,0 +1,132 @@
+#main{
+	height: 100%;
+}
+#c_top{
+	overflow: hidden;
+	height: 32px;
+	width: 98%;
+	margin: 0 auto;
+}
+#c_top ul{
+	overflow: hidden;
+	padding-left: 5%;
+	position: absolute;
+	top: 1px;
+}
+#c_top li{
+	padding: 0 5px;
+	min-width: 80px;
+	text-align: center;
+	height: 28px;
+	line-height: 28px;
+	float: left;
+	border: 1px solid #bbb;
+	border-radius: 5px 5px 0 0;
+	margin-right: 3px;
+	margin-top: 2px;
+	background-color: #eee;
+}
+#c_top li:hover{
+	background-color: #eed;
+}
+#c_top li.on{
+	margin-top: 0px;
+	height: 30px;
+	line-height: 30px;
+	border-bottom: 1px solid white;
+	background-color: white;
+}
+
+#c_bottom{
+	width: 98%;
+	margin: 0 auto;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	padding-bottom: 10px;
+	height: 350px;
+}
+#c_bottom>fieldset{
+	width: 90%;
+	margin: 0 auto;
+	display: none;
+}
+#c_bottom>fieldset.on{
+	display: block;
+}
+fieldset {
+	padding:10px;
+	margin:10px;
+	color:#333; 
+	border:#ccc solid 1px;
+	border-radius: 3px;
+} 
+
+.file_directory{
+	position: relative;
+	display: inline-block;
+	height: 30px;
+	width: 630px;
+}
+.file_directory input[type=file]{
+	visibility: none;
+	opacity: 0;
+	width: 100%;
+}
+.file_directory div{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+#text_file_dir{
+	width: 570px;
+}
+
+#fieldset_file_rule{
+	width: 92%;
+}
+#fieldset_file_rule li{
+	overflow: hidden;
+	margin: 5px 0;
+}
+.file_rule_prefix{
+	float: left;
+}
+.file_rule_prefix label{
+	width: 80px;
+	display: inline-block;
+}
+#file_rule_1 input[type=text]{
+	width: 30px;
+}
+#file_rule_example{
+	margin-left: 5px;
+}
+#file_rule_example span{
+	text-decoration: underline;
+}
+
+.btns{
+	width: 300px;
+	margin: 0 auto;
+	text-align: center;
+	margin-top: 30px;
+}
+.btns input{
+	width: 100px;
+	margin: 0 20px;
+}
+
+#fieldset_title input{
+	vertical-align: top;
+}
+#fieldset_title label{
+	vertical-align: top;
+	display: inline-block;
+	width: 70px;
+}
+#fieldset_title textarea{
+	width: 400px;
+}
