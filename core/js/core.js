@@ -1,8 +1,10 @@
 !function(global){
 	var nwrequire = require;
-	var conf = nwrequire('core').conf;
+	var lib_core = nwrequire('core');
+	var conf = lib_core.conf;
 	var Core = {};
-
+	Core.require = nwrequire;
+	Core.Lib = lib_core;
 	!function(){
 		var DIRNAME_RE = /[^?#]*\//
 		function dirname(path) {
@@ -172,16 +174,29 @@
 	/*保证只打开一个相同名的窗体*/
 	var _open_only_win = (function (){
 		var _win_cache = {};
-		return function(name){
+		return function(name,callback){
 			var _win = _win_cache[name];
 			if(_win){
+				_win.focus_flag = true;
 				_win.focus();
 			}else{
 				_win = _open(name);
+				if(callback){
+					_win.on('loaded',callback);
+					_win.on('focus',function(){
+						if(_win.focus_flag){
+							_win.focus_flag = false;
+							callback.call(_win,e);
+						}
+					});
+				}
+				
 				_win.on('beforeclose',function(){
-					_win = null;
 					delete _win_cache[name];
+					_win.removeAllListeners();
+					_win = null;
 				});
+				
 				_win_cache[name] = _win;
 			}
 			return _win;
@@ -191,26 +206,26 @@
 	Core.Page = {
 		inited: function(data){
 			win.emit('inited',data);
-		},logout: function(){
+		},logout: function(callback){
 			Store.rm('user_pwd');
-			var win_login = _open('login');
+			var win_login = _open('login',callback);
 			win.close();
 			return win_login;
 		},
-		main: function(){
-			return _open_only_win('main');
+		main: function(callback){
+			return _open_only_win('main',callback);
 		},
-		addProduct: function(){
-			return _open_only_win('m_addproduct');
+		addProduct: function(callback){
+			return _open_only_win('m_addproduct',callback);
 		},
-		confProduct: function(){
-			return _open_only_win('m_confproduct');
+		confProduct: function(callback){
+			return _open_only_win('m_confproduct',callback);
 		},
-		setting: function(){
-			return _open_only_win('m_setting');
+		setting: function(callback){
+			return _open_only_win('m_setting',callback);
 		},
-		textStyle: function(){
-			return _open_only_win('m_text_style');
+		textStyle: function(callback){
+			return _open_only_win('m_text_style',callback);
 		}
 	}
 	/*常量*/
@@ -258,8 +273,12 @@
 		/*向指定window发送消息,
 			用法： Core.Window.sendMsg.call(window,'msg')
 		*/
-		sendMsg: function(data){
-			this.postMessage(data,location.origin);
+		sendMsg: function(type,data,_win){
+			_win || (_win = this);
+			_win.postMessage({
+				type: type,
+				data: data
+			},location.origin);
 		},
 		onKeyEnter: function(onKeyEnter){
 			$doc.off('keypress').on('keypress',function(e){
@@ -276,5 +295,40 @@
 		this.close(true);
 	});
 	Core.Window = CoreWindow;
+
+	/*颜色转换*/
+	!function(){
+		var REG_RGB = /rgb\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)/;
+		function to16(num){
+			var str16 = Number(num).toString(16);
+			return (str16.length == 1? '0':'')+str16;
+		}
+		function color_rgb2normal(color_rgb){
+			if(color_rgb){
+				var m = REG_RGB.exec(color_rgb);
+				if(m){
+					return '#'+to16(m[1])+to16(m[2])+to16(m[3]);
+				}
+			}
+		}
+		var REG_HTML = /#([\da-f]{2})([\da-f]{2})([\da-f]{2})/
+		function color_normal2rgb(color_html,isReturnArray){
+			if(color_html){
+				var m = REG_HTML.exec(color_html);
+				if(m){
+					var arr = [parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)];
+
+					if(isReturnArray){
+						return arr;
+					}
+					return 'rgb('+(arr.join(','))+')';
+				}
+			}
+		}
+		Core.Color = {
+			toRGB: color_normal2rgb,
+			toHTML: color_rgb2normal
+		}
+	}();
 	global.Core = Core;
 }(this);

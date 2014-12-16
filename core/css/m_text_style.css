@@ -1,0 +1,61 @@
+body{background-color: #F0F0F0;}
+#main{
+	width: 280px;
+	margin: 0 auto;
+	padding: 20px 0;
+}
+label{
+	width: 40px;
+	display: inline-block;
+	vertical-align: top;
+}
+textarea{
+	width: 220px;
+	height: 60px;
+	line-height: normal;
+}
+.font_size{
+	margin-left: 24px;
+}
+#input_font_size{
+	width: 70px;
+}
+input[type=color]{
+	position: absolute;
+	left: -2000px;
+}
+#cb_is_bg_color{
+	margin-left: 58px;
+}
+.mt10{
+	margin-top: 10px;
+}
+.mt20{
+	margin-top: 20px;
+}
+label[for]{
+	width: auto;
+	margin-right: 10px;
+}
+label[for=cb_font_weight]{
+	font-weight: bold;
+}
+label[for=cb_font_italic]{
+	font-style: italic;
+}
+label[for=cb_text_through]{
+	text-decoration: line-through;
+}
+label[for=cb_text_underline]{
+	text-decoration: underline;
+}
+.btns{
+	margin-top: 30px;
+}
+.btns input{
+	width: 60px;
+	text-align: center;
+}
+#btn_cancel{
+	margin-left: 147px;
+}

@@ -29,6 +29,12 @@ textarea{
 	height: 20px;
 	line-height: 20px;
 }
+input[type=text],
+input[type=number],
+input[type=password]{
+	padding-left: 3px;
+	padding-right: 3px;
+}
 input[type=text]:focus{
 	border: 1px solid #ccc;
 }
@@ -38,12 +44,16 @@ select{
 	height: 24px;
 	line-height: 24px;
 }
+input[type=checkbox],
 input[type=radio]{
 	vertical-align: -2px;
 }
 input[type=text]:hover, textarea:hover{
 	cursor: text;
 }
+/*去掉得到焦点时的黄色边框*/
+.no_outline,
+input,button,select,textarea{outline:none}
 /*不可放大缩小*/
 textarea{resize:none}
 ul,ol{
@@ -54,4 +64,14 @@ ul,ol{
 	list-style:outside none none;
 	padding: 0;
 	margin: 0;
+}
+.clear{
+	clear: both;
+	overflow: hidden;
+}
+.admin{
+	display: none;
+}
+.mt10{
+	margin-top: 10px;
 }

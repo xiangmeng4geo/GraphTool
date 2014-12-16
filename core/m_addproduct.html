@@ -49,8 +49,8 @@
 		<script type="text/javascript">
 		Core.safe(function(){
 			var CoreWindow = Core.Window;
-			function send(data){
-				CoreWindow.sendMsg.call(opener,data);
+			function send(type,data){
+				CoreWindow.sendMsg(type,data,opener);
 			}
 			var $product_type = $('#product_type'),
 				$product_name = $('#product_name');
@@ -65,15 +65,11 @@
 				if(!product_name){
 					return alert('请输入名称！');
 				}
-
-				var data = {
-					type: Core.Const.msgType.ADD_PRODUCT,
-					data: {
-						type: $product_type.val(),
-						name: product_name
-					}
-				}
-				send(data);
+				
+				send(Core.Const.msgType.ADD_PRODUCT,{
+					type: $product_type.val(),
+					name: product_name
+				});
 				$btn_cancel.click();
 			});
 			CoreWindow.onKeyEnter(function(){

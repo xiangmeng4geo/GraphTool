@@ -7,10 +7,10 @@ Core.safe(function(){
 	var coreWindow = Core.Window;
 	var win = coreWindow.get();
 
-	/*测试 ｛*/
-	win.close();
-	return Core.Page.confProduct();
-	/*} 测试*/
+	// /*测试 ｛*/
+	// win.close();
+	// return Core.Page.confProduct();
+	// /*} 测试*/
 
 	$('#btn_cancel').click(function(){
 		win.close();

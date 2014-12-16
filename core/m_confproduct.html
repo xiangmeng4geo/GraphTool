@@ -12,22 +12,36 @@
 			<div id="c_top">
 				<ul>
 					<li class="on">文件选定</li>
+					<li>输入输出设置</li>
 					<li>标题设置</li>
 					<li>图例设置</li>
-					<li>输入输出设置</li>
 					<li>其它设置</li>
 				</ul>
 			</div>
 			<div id="c_bottom">
-				<fieldset class="on">
-				    <legend>文件选定</legend>
+				<fieldset class="on" id="fieldset_file_select">
+					<legend>文件选定</legend>
+					<div class="row">
+						<label>开始时间</label><input type="date" value="2014-10-21" disabled id="date_start"/>
+					</div>
+					<div class="row">
+						<label>结束时间</label><input type="date" value="2014-10-21" disabled id="date_end"/>
+					</div>
+					<div class="row">
+						<input type="checkbox" id="cb_is_newest" checked/><label for="cb_is_newest">最新时间</label>
+						<label class="label_newest_days">之前天数</label>
+						<input type="number" value="1" min=1 id="number_newest_days"/>
+					</div>
+				</fieldset>
+				<fieldset>
+				    <legend>输入输出设置</legend>
 				    <div>
 				    	<div>
 				    		数据目录：
 					    	<div class="file_directory">
 					    		<input type="file" nwdirectory class="file_dir_nw"/>
 					    		<div>
-						    		<input type="text" class="text_file_dir" id="text_file_dir"/>
+						    		<input type="text" class="text_file_dir" id="text_file_dir_in"/>
 						    		<input type="button" value="浏览" class="file_dir"/>
 					    		</div>
 					    	</div>
@@ -36,56 +50,103 @@
 				    		<legend>文件名</legend>
 				    		<ul>
 				    			<li>
-				    				<div class="file_rule_prefix"><input type="radio" checked name="file_rule" id="radio_file_rule_common"/><label for="radio_file_rule_common">普通规则</label></div>
+				    				<div class="file_rule_prefix">
+				    					<input type="radio" checked name="file_rule" id="radio_file_rule_common" value="1"/>
+				    					<label for="radio_file_rule_common">普通规则</label>
+				    				</div>
 				    				<div id="file_rule_1">
 								    	<input type="text" value="" id="text_file_rule_common_prefix"/>
 								    	<select id="select_file_rule_common_date">
-								    		<option>yyMMddhh</option>
-								    		<option>yyyyMMddhh</option>
 								    	</select>
 								    	<input type="text" value="" id="text_file_rule_common_postfix"/>
 								    	<span>.</span>
 								    	<select id="select_file_rule_common_postfix">
-								    		<option>000</option>
-								    		<option>012</option>
-								    		<option>024</option>
 								    	</select>
 								    </div>
 				    			</li>
 				    			<li>
-				    				<div class="file_rule_prefix"><input type="radio" name="file_rule" id="radio_file_rule_custom"/><label for="radio_file_rule_custom">自定义规则</label></div>
+				    				<div class="file_rule_prefix">
+				    					<input type="radio" name="file_rule" id="radio_file_rule_custom" value="2"/>
+				    					<label for="radio_file_rule_custom">自定义规则</label>
+				    				</div>
 				    				<div id="file_rule_2">
 								    	<input type="text" id="text_file_rule_custom"/>
 								    </div>
 				    			</li>
 				    		</ul>
 				    	</fieldset>
-					    
-						    
 					    <div id="file_rule_example">
 					    	文件名样例:  <span></span>
+					    </div>
+					    <div>
+				    		输出目录：
+					    	<div class="file_directory">
+					    		<input type="file" nwdirectory class="file_dir_nw"/>
+					    		<div>
+						    		<input type="text" class="text_file_dir" id="text_file_dir_out"/>
+						    		<input type="button" value="浏览" class="file_dir"/>
+					    		</div>
+					    	</div>
 					    </div>
 				    </div>
 				</fieldset>
 				<fieldset id="fieldset_title">
 					<legend>标题设置</legend>
 					<div>
-						<input type="checkbox" checked/>
+						<input type="checkbox" checked id="cb_title_1"/>
 						<label>主标题</label>
-						<textarea>最高气温预报示意图</textarea>
+						<textarea id="textarea_title_1">最高气温预报示意图</textarea>
 						<input type="button" value="设置样式"/>
 					</div>
 					<div>
-						<input type="checkbox" checked/>
+						<input type="checkbox" checked id="cb_title_2"/>
 						<label>副标题</label>
-						<textarea>mm月dd日hh时-dd日hh时</textarea>
+						<textarea id="textarea_title_2">mm月dd日hh时-dd日hh时</textarea>
 						<input type="button" value="设置样式"/>
 					</div>
 					<div>
-						<input type="checkbox" checked/>
+						<input type="checkbox" checked id="cb_title_3"/>
 						<label>三级标题</label>
-						<textarea>mm月dd日hh时发布</textarea>
+						<textarea id="textarea_title_3">mm月dd日hh时发布</textarea>
 						<input type="button" value="设置样式"/>
+					</div>
+				</fieldset>
+				<fieldset id="fieldset_legend">
+					<legend>图例设置</legend>
+					<div class="legend_left">
+						<fieldset class="admin">
+							<legend>添加新的配色方案</legend>
+							<select id="select_legent_product">
+							</select>
+							<input type="button" value="添加" id="btn_add_new_legend"/>
+						</fieldset>
+					</div>
+					<fieldset>
+						<legend>其它设置</legend>
+						<label>单位</label>
+						<select id="select_legend_unit"></select>
+						<br/>
+						<input type="checkbox" checked id="cb_is_show_legend"/>图例显示<br/>
+						<input type="checkbox" checked id="cb_is_show_unit"/>单位显示<br/>
+						<input type="checkbox" id="cb_is_reverse"/>倒序显示<br/>
+						<input type="checkbox" checked id="cb_is_updown"/>上下显示
+					</fieldset>
+				</fieldset>
+				<fieldset id="other_setting">
+					<legend>其它设置</legend>
+					<div>
+						<label>Logo图片</label>
+						<div class="file_directory">
+				    		<input type="file" class="file_dir_nw" accept=".jpg,.png,.bmp"/>
+				    		<div>
+					    		<input type="text" class="text_file_dir" id="text_file_logo"/>
+					    		<input type="button" value="浏览" class="file_dir"/>
+				    		</div>
+				    	</div>
+			    	</div>
+			    	<div>
+						<label>背景颜色</label>
+						<input type="color" id="color_bg" value="#ffffff"/>
 					</div>
 				</fieldset>
 			</div>

@@ -44,6 +44,7 @@
 	border-radius: 3px;
 	padding-bottom: 10px;
 	height: 350px;
+	overflow: auto;
 }
 #c_bottom>fieldset{
 	width: 90%;
@@ -80,7 +81,7 @@ fieldset {
 	height: 100%;
 	overflow: hidden;
 }
-#text_file_dir{
+.text_file_dir{
 	width: 570px;
 }
 
@@ -103,6 +104,10 @@ fieldset {
 }
 #file_rule_example{
 	margin-left: 5px;
+	color: #bbb;
+	margin-bottom: 20px;
+	padding-bottom: 15px;
+	border-bottom: 1px dotted #ccc;
 }
 #file_rule_example span{
 	text-decoration: underline;
@@ -129,4 +134,64 @@ fieldset {
 }
 #fieldset_title textarea{
 	width: 400px;
+	height: 80px;
 }
+#text_file_rule_custom{
+	width: 260px;
+}
+#other_setting label{
+	width: 66px;
+	display: inline-block;
+}
+
+.row{
+	margin: 10px 0;
+}
+#fieldset_file_select label{
+	display: inline-block;
+	width: 70px;
+}
+.label_newest_days{
+	margin-left: 26px;
+}
+#number_newest_days{
+	width: 30px;
+}
+
+#fieldset_legend table{
+	width: 100%;
+	text-align: center;
+	margin-top: 20px;
+	border-radius: 5px;
+}
+
+#fieldset_legend tr:nth-child(2n+1){
+	background-color: #ccc;
+}
+#fieldset_legend tr:nth-child(2n){
+	background-color: #eee;
+}
+.legend_value label:first-child{
+	margin-left: 0;
+}
+.legend_value div label{
+	display: inline-block;
+	margin-right: 3px;
+	margin-left: 20px;
+}
+.legend_value input[type=number]{
+	width: 50px;
+}
+.btn_gen_colors{
+	margin-left: 20px;
+}
+.legend_left{
+	float: left;
+	width: 80%;
+}
+.btn_dele_lengend{
+	margin: 0 5px;
+}
+[contentEditable]:focus{
+	background-color: white;
+};

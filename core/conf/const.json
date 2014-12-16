@@ -1,6 +1,7 @@
 {
 	"msgType": {
-		"ADD_PRODUCT": "addProduct"
+		"ADD_PRODUCT": "addProduct",
+		"CONF_STYLE": "conf_style"
 	},
 	"productType": {
 		"TYPE": {
@@ -21,6 +22,16 @@
 		],
 		"file_postfix": [
 			"000","006","012","024","048","072","084","096","108","120","132","144","156","168","dat"
+		]
+	},
+	"legend": {
+		"unit": [
+			"厘米","cm","毫米","mm","摄氏度","°C"
+		],
+		"product": [
+			{"n": "雨","v": 26},
+			{"n": "雨夹雪","v": 24},
+			{"n": "雪","v": 23}
 		]
 	}
 }
