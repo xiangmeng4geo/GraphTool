@@ -164,6 +164,7 @@
 		var gui = CoreWindow.getGui(),
 			Menu = gui.Menu,
 			MenuItem = gui.MenuItem;
+		$('title').text(gui.App.manifest.description);
 		var menu_tree = new Menu();
 		if(is_admin){
 			var menu_manage = new Menu();

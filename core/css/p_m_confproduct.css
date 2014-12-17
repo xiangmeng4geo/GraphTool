@@ -1,7 +1,9 @@
 #main{
 	height: 100%;
+	margin-top: 10px;
 }
 #c_top{
+	position: relative;
 	overflow: hidden;
 	height: 32px;
 	width: 98%;
