@@ -182,7 +182,10 @@
 			}else{
 				_win = _open(name);
 				if(callback){
-					_win.on('loaded',callback);
+					_win.on('loaded',function(e){
+						console.log(name,'loaded');
+						callback.call(_win,e);
+					});
 					_win.on('focus',function(){
 						if(_win.focus_flag){
 							_win.focus_flag = false;

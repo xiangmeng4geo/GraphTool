@@ -7,7 +7,7 @@
     "position": "center",
     "width": 320,
     "height": 250,
-    "toolbar": false,
+    "toolbar": true,
     "as_desktop": true,
     "show": true,
     "resizable": false

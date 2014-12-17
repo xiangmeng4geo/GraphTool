@@ -1,10 +1,9 @@
 Core.safe(function(){
-	var product_name = '24小时降水';
+	var product_name = '';
 	var Conf_User = Core.Lib.conf.User;
-	var conf_product = Conf_User.get(product_name);
-
 	var CoreWindow = Core.Window;
 	var const_msgtype = Core.Const.msgType;
+	
 	$('.file_dir').click(function(){
 		$(this).parent().prev().click();
 	});
@@ -15,6 +14,7 @@ Core.safe(function(){
 	var $text_file_dir_in = $('#text_file_dir_in'),
 		$text_file_dir_out = $('#text_file_dir_out');
 	var current_textarea_title;
+	/*设置样式按钮*/
 	$('#fieldset_title input[type=button]').click(function(){
 		current_textarea_title = $(this).prev('textarea');
 		var win_textstyle = Core.Page.textStyle(function(e){
@@ -48,6 +48,13 @@ Core.safe(function(){
 				current_textarea_title.css('line-height',current_textarea_title.css('font-size'));
 			}
 			current_textarea_title = null;
+		}else if(const_msgtype.CONF_PRODUCT == type){
+			product_name = data.data;
+			if(product_name){
+				$('title').text(product_name);
+				var conf_product = Conf_User.get(product_name);
+				init(conf_product)
+			}
 		}
 	},true);
 	var $c_bottom_fieldset = $('#c_bottom > fieldset');
@@ -126,10 +133,18 @@ Core.safe(function(){
 		var const_legend_product = Core.Const.legend.product;
 		var show_product = const_legend_product.slice(0);
 		var $select_legent_product = $('#select_legent_product');
+		function isInShowProduct(v){
+			for(var i = 0,j=show_product.length;i<j;i++){
+				var val = show_product[i];
+				if(val.n == v.n && val.v == v.v){
+					return true;
+				}
+			}	
+		}
 		function initHtml(){
 			var html_legend_product = '';
 			$.each(const_legend_product,function(i,v){
-				if($.inArray(v,show_product) >-1){
+				if(isInShowProduct(v)){
 					html_legend_product += '<option value="'+v.v+'">'+v.n+'</option>';
 				}
 			});
@@ -137,17 +152,6 @@ Core.safe(function(){
 			$select_legent_product.html(html_legend_product);
 		}
 		initHtml();
-		// return function(delete_val){
-		// 	$select_legent_product.removeAttr('disabled');
-		// 	$btn_add_new_legend.removeAttr('disabled');
-		// 	if(!delete_val){
-				
-				
-		// 	}else{
-		// 		show_product.push(delete_val);
-		// 		initHtml();
-		// 	}
-		// }
 		return {
 			add: function(add_val){
 				if(add_val){
@@ -289,92 +293,91 @@ Core.safe(function(){
 		$text_file_logo = $('#text_file_logo'),
 		$color_bg = $('#color_bg'),
 		$fieldset_legend = $('#fieldset_legend');
-	!function(){
-		$('#btn_save').click(function(){
-			var save_data = {
-				'file': {
-					'time_start': $date_start.val(),
-					'time_end': $date_end.val(),
-					'is_newest': $cb_is_newest.prop('checked'),
-					'newest_days': $number_newest_days.val()
-				},
-				'in_out': {
-					'dir_in': $text_file_dir_in.val(),
-					'dir_out': $text_file_dir_out.val(),
-					'file_rule': {
-						'common': {
-							'prefix': $text_file_rule_common_prefix.val(),
-							'date_format': $select_file_rule_common_date.val(),
-							'postfix': $text_file_rule_common_postfix.val(),
-							'file_suffix': $select_file_rule_common_postfix.val() 
-						},
-						'custom': $text_file_rule_custom.val(),
-						'type': $('[name=file_rule]:checked').val()
-					}
-				},
-				'title': {
-					'title_1': {
-						'is_show': $cb_title_1.prop('checked'),
-						'text': $textarea_title_1.text(),
-						'style': $textarea_title_1.attr('style')||''
+	$('#btn_cancel').click(CoreWindow.close);
+	$('#btn_save').click(function(){
+		var save_data = {
+			'file': {
+				'time_start': $date_start.val(),
+				'time_end': $date_end.val(),
+				'is_newest': $cb_is_newest.prop('checked'),
+				'newest_days': $number_newest_days.val()
+			},
+			'in_out': {
+				'dir_in': $text_file_dir_in.val(),
+				'dir_out': $text_file_dir_out.val(),
+				'file_rule': {
+					'common': {
+						'prefix': $text_file_rule_common_prefix.val(),
+						'date_format': $select_file_rule_common_date.val(),
+						'postfix': $text_file_rule_common_postfix.val(),
+						'file_suffix': $select_file_rule_common_postfix.val() 
 					},
-					'title_2': {
-						'is_show': $cb_title_2.prop('checked'),
-						'text': $textarea_title_2.text(),
-						'style': $textarea_title_2.attr('style')||''
-					},
-					'title_3': {
-						'is_show': $cb_title_3.prop('checked'),
-						'text': $textarea_title_3.text(),
-						'style': $textarea_title_3.attr('style')||''
-					}
-				},
-				'legend': {
-					'unit': $select_legend_unit.val(),
-					'is_show_legend': $cb_is_show_legend.prop('checked'),
-					'is_show_unit': $cb_is_show_unit.prop('checked'),
-					'is_reverse': $cb_is_reverse.prop('checked'),
-					'is_updown': $cb_is_updown.prop('checked')
-				},
-				'other': {
-					'logo': $text_file_logo.val(),
-					'bg_color': $color_bg.val()
+					'custom': $text_file_rule_custom.val(),
+					'type': $('[name=file_rule]:checked').val()
 				}
-			};
-			var blendent = [];
-			$fieldset_legend.find('.fieldset_color').each(function(i,v){
-				var $this = $(this);
-				var data = {
-					'val': $this.data('val_c'),
-					'color_start': $this.find('.color_start').val(),
-					'color_end': $this.find('.color_end').val(),
-					'is_stripe': $this.find('.cb_is_stripe').prop('checked'),
-					'number_min': $this.find('.number_min').val(),
-					'number_max': $this.find('.number_max').val(),
-					'number_level': $this.find('.number_level').val()
+			},
+			'title': {
+				'title_1': {
+					'is_show': $cb_title_1.prop('checked'),
+					'text': $textarea_title_1.val(),
+					'style': $textarea_title_1.attr('style')||''
+				},
+				'title_2': {
+					'is_show': $cb_title_2.prop('checked'),
+					'text': $textarea_title_2.val(),
+					'style': $textarea_title_2.attr('style')||''
+				},
+				'title_3': {
+					'is_show': $cb_title_3.prop('checked'),
+					'text': $textarea_title_3.val(),
+					'style': $textarea_title_3.attr('style')||''
 				}
-				var colors = [];
-				$this.find('tr').each(function(tr_i,tr_v){
-					var $td = $(tr_v).find('td');
-					if($td.length == 3){
-						colors.push({
-							'color': $td.eq(0).find('input').val(),
-							'val': $td.eq(1).text().split('~'),
-							'text': $td.eq(2).text()
-						});
-					}
-				});
-				data.colors = colors;
-				blendent.push(data);
+			},
+			'legend': {
+				'unit': $select_legend_unit.val(),
+				'is_show_legend': $cb_is_show_legend.prop('checked'),
+				'is_show_unit': $cb_is_show_unit.prop('checked'),
+				'is_reverse': $cb_is_reverse.prop('checked'),
+				'is_updown': $cb_is_updown.prop('checked')
+			},
+			'other': {
+				'logo': $text_file_logo.val(),
+				'bg_color': $color_bg.val()
+			}
+		};
+		var blendent = [];
+		$fieldset_legend.find('.fieldset_color').each(function(i,v){
+			var $this = $(this);
+			var data = {
+				'val': $this.data('val_c'),
+				'color_start': $this.find('.color_start').val(),
+				'color_end': $this.find('.color_end').val(),
+				'is_stripe': $this.find('.cb_is_stripe').prop('checked'),
+				'number_min': $this.find('.number_min').val(),
+				'number_max': $this.find('.number_max').val(),
+				'number_level': $this.find('.number_level').val()
+			}
+			var colors = [];
+			$this.find('tr').each(function(tr_i,tr_v){
+				var $td = $(tr_v).find('td');
+				if($td.length == 3){
+					colors.push({
+						'color': $td.eq(0).find('input').val(),
+						'val': $td.eq(1).text().split('~'),
+						'text': $td.eq(2).text()
+					});
+				}
 			});
-			save_data.legend.blendent = blendent;
+			data.colors = colors;
+			blendent.push(data);
+		});
+		save_data.legend.blendent = blendent;
 
-			Conf_User.write(product_name,save_data,true);
-			CoreWindow.close();
-		});	
-	}();
+		Conf_User.write(product_name,save_data,true);
+		CoreWindow.close();
+	});	
 
-	!function(){
+	function init(conf_product){
 		function selected_option($select,val){
 			$select.find('option').each(function(i,v){
 				var $this = $(this);
@@ -453,6 +456,5 @@ Core.safe(function(){
 				$color_bg.val(conf_other.bg_color);
 			}
 		}
-	}();
-	
+	}
 });

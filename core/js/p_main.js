@@ -14,32 +14,6 @@
 	$('#btn_setting').click(Page.setting);
 
 	var Tree = (function(){
-		// var tree_data = [
-		// 	{
-		// 		name: '常用图形',
-		// 		childNodes: [
-		// 			{
-		// 				name: '降水',
-		// 				childNodes: [
-		// 					{
-		// 						name: '逐小时降水'
-		// 					},
-		// 					{
-		// 						name: '24小时降水'
-		// 					}
-		// 				]
-		// 			}
-		// 		]
-		// 	},
-		// 	{
-		// 		name: '雷达图形',
-		// 		childNodes: [
-		// 			{
-		// 				name: '基本反射率'
-		// 			}
-		// 		]
-		// 	}
-		// ];
 		var tree_data = nwConf.get(CONF_NAME_SYS_PRODUCT_TREE);
 		
 		function createNode(data,prefix){
@@ -204,10 +178,12 @@
 		}
 
 		var menu_conf = new MenuItem({ label: '产品配置' });
-		menu_conf.on('click',Page.confProduct);
+		menu_conf.on('click',function(){
+			var win_confproduct = Page.confProduct(function(){
+				CoreWindow.sendMsg(msgType.CONF_PRODUCT,contextmenu_item.text,win_confproduct.window);
+			});
+		});
 		menu_tree.append(menu_conf);
-		
-		
 	})();
 
 	Page.inited();

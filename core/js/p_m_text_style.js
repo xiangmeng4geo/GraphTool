@@ -118,5 +118,4 @@ Core.safe(function(){
 
 		setTimeout(init,100);
 	}
-	// init();
 });

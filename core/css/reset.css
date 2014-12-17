@@ -70,7 +70,7 @@ ul,ol{
 	overflow: hidden;
 }
 .admin{
-	display: none;
+	/*display: none;*/
 }
 .mt10{
 	margin-top: 10px;
