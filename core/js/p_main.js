@@ -1,8 +1,9 @@
 !function(){
+	// 引入amd模块加载器
+	Core.Html.addScript('./js/libs/esl.js',true);
 	var is_admin = true;
 	var CONF_NAME_SYS_PRODUCT_TREE = 'sys_product_tree';
-	var nwrequire = require;
-	var nwCore = nwrequire('core'),
+	var nwCore = Core.require('core'),
 		nwConf = nwCore.conf,
 		Page = Core.Page;
 

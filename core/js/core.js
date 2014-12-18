@@ -1,10 +1,9 @@
 !function(global){
-	var nwrequire = require;
-	var lib_core = nwrequire('core');
-	var conf = lib_core.conf;
+	var nwrequire = global.require;
 	var Core = {};
 	Core.require = nwrequire;
-	Core.Lib = lib_core;
+	Core.Lib = nwrequire('core');
+	var conf = Core.Lib.conf;
 	!function(){
 		var DIRNAME_RE = /[^?#]*\//
 		function dirname(path) {
@@ -84,9 +83,14 @@
 	}
 	var $header = $('head');
 	// 可以解决模块依赖css问题
-	Core.Style = {
+	Core.Html = {
 		addLink: function(link_src){
 			$('<link rel="stylesheet" type="text/css" href="'+link_src+'">').appendTo($header);
+		},
+		addScript: function(script_src,is_sync){
+			if(is_sync){
+				document.write('<script src="'+script_src+'"></'+'script>');
+			}
 		}
 	}
 
@@ -182,10 +186,7 @@
 			}else{
 				_win = _open(name);
 				if(callback){
-					_win.on('loaded',function(e){
-						console.log(name,'loaded');
-						callback.call(_win,e);
-					});
+					_win.on('loaded',callback);
 					_win.on('focus',function(){
 						if(_win.focus_flag){
 							_win.focus_flag = false;

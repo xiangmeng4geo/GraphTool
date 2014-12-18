@@ -56,3 +56,15 @@
 #tree{
 	margin: 10px 0;
 }
+#geomap{
+	width: 800px;
+	height: 800px;
+	border: 1px solid #333;
+	background-color: #71B7FD;
+	background-image: url(http://10.14.85.116/android/ChinaWeatherDecision_assets/assets/img/geomap/map.png);
+	/*background-image: url(../img/world.jpg);*/
+	background-position: -1076px -612px;
+	background-size: 2540px 2141px;
+	background-repeat: no-repeat;
+	float: left;
+}

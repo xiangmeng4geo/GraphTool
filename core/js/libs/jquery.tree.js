@@ -543,5 +543,5 @@
         }
     }
     var src = $('script').last().attr('src');
-    Core.Style.addLink(Core.Path.resolve('../../css/jquery.tree/tree.css',src));
+    Core.Html.addLink(Core.Path.resolve('../../css/jquery.tree/tree.css',src));
 })(jQuery);
