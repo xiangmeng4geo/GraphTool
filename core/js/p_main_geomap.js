@@ -78,8 +78,9 @@ Core.safe(function(){
 								strokeWeight: 1, 
 								strokeOpacity:1
 							},
-							zlevel: 11
+							zlevel: 1
 						});
+						console.log('add polygon');
 						gm.addOverlay(polygon,GeoMap.GROUP.SHAPE);   //增加面
 					});
 
@@ -99,7 +100,7 @@ Core.safe(function(){
 									strokeColor : 'blue',
 									lineWidth : 2,
 								},
-								zlevel: 11
+								zlevel: 1
 							});
 							gm.addOverlay(polyline,GeoMap.GROUP.SHAPE);   //增加折线
 						});

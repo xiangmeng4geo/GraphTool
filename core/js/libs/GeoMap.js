@@ -1,4 +1,10 @@
-define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender/shape/BrokenLine','zrender/Group','zrender/tool/util','zrender/shape/Circle'],function(Zrender,Base,Polygon,BrokenLine,Group,util,CircleShape){
+define('GeoMap',['zrender',
+	'zrender/shape/Base',
+	'zrender/shape/Polygon',
+	'zrender/shape/BrokenLine',
+	'zrender/Group',
+	'zrender/tool/util',
+	'zrender/shape/Text'],function(Zrender,Base,Polygon,BrokenLine,Group,util,TextShape){
 	var ZINDEX_MAP = 2,
 		ZINDEX_WEATHER = 1;
 
@@ -205,11 +211,11 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 		var _this = this;
 		var shape = overlay.draw(this);
 		var group = _this.groups[group_name];
-		if(group){
-			group.addChild(shape);
-		}else{
+		// if(group){
+		// 	group.addChild(shape);
+		// }else{
 			this.canvas.addShape(shape);
-		}
+		// }
 		
 		this.canvas.render();
 		return shape;
@@ -255,28 +261,33 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
         }
     }
     util.inherits(MyShape, Base);
+    function _doclip(ctx){
+		ctx.beginPath();
+		$.each(this.polygons,function(i_polygon,pointList){
+			if (pointList.length < 2) {
+                // 少于2个点就不画了~
+                return;
+            }
+            ctx.moveTo(pointList[0][0], pointList[0][1]);
+            for (var i = 1, l = pointList.length; i < l; i++) {
+                ctx.lineTo(pointList[i][0], pointList[i][1]);
+            }
+            ctx.lineTo(pointList[0][0], pointList[0][1]);
+		});
+		ctx.closePath();
+		ctx.clip();
+    }
 	GeoMapProp.addMask = function(polygons){
-		var options = {
-			style: {
-				maskColor: 'white',
-				brushType : 'both',
-		        lineWidth : 1,
-		        strokeColor : '#3D534E',
-		        color: '#ff0000',
-		        textColor: 'black',
-		        textPosition : 'inside'// default top
-			},
-			zlevel: ZINDEX_WEATHER,
-			is_lnglat: false,
-			hoverable: false,
-			is_show_mask: true
-		};
-		if(options.is_show_mask){
-			var shape_mask = new Mask(this,polygons,options);
-			// shape_mask.draw();
-			var group = this.groups[GeoMap.GROUP.SHAPE];
-			group.clipShape = shape_mask;
+		if(!polygons){
+			polygons = this.polygons;
+		}else{
+			this.polygons = polygons;
 		}
+		if(!polygons){
+			return;
+		}
+		var ctx = this.canvas.painter.getLayer(ZINDEX_WEATHER).ctx;
+		_doclip.call(this,ctx);
 	}
 	
 	function _createDom(id, type, painter) {
@@ -297,42 +308,106 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
     }
     /*得到绘制好的图片*/
 	GeoMapProp.toDataURL = function(type, backgroundColor, args){
-		var canvas = this.canvas;
-		var painter = canvas.painter;
-		var storage = painter.storage;
-		var shapeList = storage.getShapeList();
-		var maskShape;
-		for(var i = 0,j=shapeList.length;i<j;i++){
-			if(shapeList[i] instanceof Mask){
-				maskShape = shapeList[i];
-			}
-		}
-		if(maskShape){
-			storage.delRoot(maskShape.id);
-			var layers = painter._layers;
-			var mask_layer = layers[mask_zindex];
-			delete layers[mask_zindex];
-			var imgData = canvas.toDataURL(type, backgroundColor, args);
-			var img = $('<img>').attr('src',imgData).get(0);
-			var maskImageDom = _createDom('mask-image', 'canvas', painter);
-	        painter._bgDom.appendChild(maskImageDom);
-	        var ctx = maskImageDom.getContext('2d');
-	        devicePixelRatio != 1 
-	            && ctx.scale(devicePixelRatio, devicePixelRatio);
+		var painter = this.canvas.painter;
+		var width = painter._width;
+        var height = painter._height;
+		var maskImageDom = _createDom('mask-image', 'canvas', painter);
+		var ctx = maskImageDom.getContext('2d');
+	    devicePixelRatio != 1 && ctx.scale(devicePixelRatio, devicePixelRatio);
 
-			maskShape.brush(ctx);
-			ctx.drawImage(img,0,0);
-			var image = maskImageDom.toDataURL(type, args);
-			painter._bgDom.removeChild(maskImageDom);
-			ctx = null;
-			img = null;
+	    ctx.save();
+	    _doclip.call(this,ctx);
+	    this.canvas.storage.iterShape(
+            function (shape) {
+                if (!shape.invisible) {
+                    if (!shape.onbrush // 没有onbrush
+                        // 有onbrush并且调用执行返回false或undefined则继续粉刷
+                        || (shape.onbrush && !shape.onbrush(ctx, false))
+                    ) {
+                            shape.brush(ctx, false, self.updatePainter);
+                    }
+                }
+            },
+            { normal: 'up', update: true }
+        );
+        var img = ctx.getImageData(0,0,width,height);
+        var pixel = img.data;
+        for(var i = 0,j = pixel.length;i<j;i+=4){
+        	if(pixel[i] == 0 && pixel[i+1] == 0 && pixel[i+2] == 0){
+        		pixel[i] = pixel[i+1] = pixel[i+2] = '255';
+        	}
+        }
+        maskImageDom = null;
+        maskImageDom = _createDom('mask-image', 'canvas', painter);
+        ctx = maskImageDom.getContext('2d');
+	    devicePixelRatio != 1 && ctx.scale(devicePixelRatio, devicePixelRatio);
+        ctx.fillStyle = backgroundColor || '#f00';
+        ctx.fillRect(
+            0, 0, 
+            width,
+            height
+        );
+        ctx.putImageData(img,0,0);
 
-			storage._updateAndAddShape(maskShape);
-			layers[mask_zindex] = layers;
-			return image;
-		}else{
-			return canvas.toDataURL(type, backgroundColor, args);
-		}
+        return maskImageDom.toDataURL(type, args);
+        // var image = maskImageDom.toDataURL(type, args);
+
+        // var img = new Image();
+        // img.onload = function(){
+        // 	ctx.fillStyle = backgroundColor || '#fff';
+	       //  ctx.rect(
+	       //      0, 0, 
+	       //      width,
+	       //      height
+	       //  );
+	       //  ctx.fill();
+        // 	ctx.putImageData(img,0,0);
+        // 	image = maskImageDom.toDataURL(type, args);
+        // 	console.log(image);
+        // };
+        // img.src = image;
+        // console.log(image);
+        // // image = maskImageDom.toDataURL(type, args);
+        // // ctx = null;
+        // return image;
+		// this.addMask();
+		// return this.canvas.toDataURL(type, backgroundColor, args);
+		// var canvas = this.canvas;
+		// var painter = canvas.painter;
+		// var storage = painter.storage;
+		// var shapeList = storage.getShapeList();
+		// var maskShape;
+		// for(var i = 0,j=shapeList.length;i<j;i++){
+		// 	if(shapeList[i] instanceof Mask){
+		// 		maskShape = shapeList[i];
+		// 	}
+		// }
+		// if(maskShape){
+		// 	storage.delRoot(maskShape.id);
+		// 	var layers = painter._layers;
+		// 	var mask_layer = layers[mask_zindex];
+		// 	delete layers[mask_zindex];
+		// 	var imgData = canvas.toDataURL(type, backgroundColor, args);
+		// 	var img = $('<img>').attr('src',imgData).get(0);
+		// 	var maskImageDom = _createDom('mask-image', 'canvas', painter);
+	 //        painter._bgDom.appendChild(maskImageDom);
+	 //        var ctx = maskImageDom.getContext('2d');
+	 //        devicePixelRatio != 1 
+	 //            && ctx.scale(devicePixelRatio, devicePixelRatio);
+
+		// 	maskShape.brush(ctx);
+		// 	ctx.drawImage(img,0,0);
+		// 	var image = maskImageDom.toDataURL(type, args);
+		// 	painter._bgDom.removeChild(maskImageDom);
+		// 	ctx = null;
+		// 	img = null;
+
+		// 	storage._updateAndAddShape(maskShape);
+		// 	layers[mask_zindex] = layers;
+		// 	return image;
+		// }else{
+		// 	return canvas.toDataURL(type, backgroundColor, args);
+		// }
 	}
 
 	GeoMap.Point = function(lng,lat,is_not_lnglat){
@@ -361,7 +436,7 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 			hoverable: false
 		},options));
 	}
-	function drawPointList(map){
+	function _drawPointList(map){
 		var pointList = this.shape.style.pointList;
 		$.each(pointList,function(i,v){
 			var val = pointToOverlayPixel.call(map,v);
@@ -369,7 +444,7 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 		});
 	}
 	GeoMap.Polygon.prototype.draw = function(map){
-		drawPointList.call(this,map);
+		_drawPointList.call(this,map);
 		return this.shape;
 	}
 	GeoMap.Polygon.prototype.isCover = function(){
@@ -394,7 +469,7 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 		},options));
 	}
 	GeoMap.Polyline.prototype.draw = function(map){
-		drawPointList.call(this,map);
+		_drawPointList.call(this,map);
 		return this.shape;
 	}
 	GeoMap.Polyline.prototype.isCover = function(){
