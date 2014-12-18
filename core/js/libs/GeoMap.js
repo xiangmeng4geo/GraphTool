@@ -276,62 +276,7 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 			// shape_mask.draw();
 			var group = this.groups[GeoMap.GROUP.SHAPE];
 			group.clipShape = shape_mask;
-			return;
-			group.clipShape = new MyShape({
-                style: {
-                    maskColor: 'white',
-                    brushType : 'both',
-                    lineWidth : 1,
-                    strokeColor : '#3D534E',
-                    color: '#ff0000',
-                    textColor: 'black',
-                    textPosition : 'inside'// default top
-                },
-                zlevel: ZINDEX_WEATHER,
-                is_lnglat: true,
-                hoverable: false,
-                is_show_mask: false
-            });
-            return;
-            var _canvas = this.canvas;
-            // setTimeout(function(){
-	            var circleShape = new CircleShape({
-	                style: {
-	                    r: 200,
-	                    x: 0,
-	                    y: 0,
-	                    color: 'blue'
-	                },
-	                position: [200, 200]
-	            });
-	            circleShape.draw = function(){
-	            	return this;
-	            }
-	            // 多边形
-				var polygonShape = new Polygon({
-				    style : {
-				        pointList : [[310, 120], [360, 120], [348, 230], [250, 340], [146, 200]],
-				        brushType : 'both',
-				        color : 'green',
-				        // strokeColor : color.getColor(colorIdx++),
-				        lineWidth : 10,
-				        text : 'polygon',
-				        textPosition : 'inside'     // default top
-				    },
-				    draggable:true
-				});
-				polygonShape.needTransform = polygonShape.needLocalTransform = true;
-				polygonShape.draw = function(){
-	            	return this;
-	            }
-	            // group.addChild(circleShape);
-	            // this.canvas.addShape(clipShape);
-	           // _canvas.render();
-				this.addOverlay(circleShape,GeoMap.GROUP.SHAPE);
-				this.addOverlay(polygonShape,GeoMap.GROUP.SHAPE);
-			// },1000);
 		}
-
 	}
 	
 	function _createDom(id, type, painter) {
