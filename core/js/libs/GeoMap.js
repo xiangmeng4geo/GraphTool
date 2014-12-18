@@ -1,4 +1,7 @@
-define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender/shape/BrokenLine','zrender/Group','zrender/tool/util'],function(Zrender,Base,Polygon,BrokenLine,Group,util){
+define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender/shape/BrokenLine','zrender/Group','zrender/tool/util','zrender/shape/Circle'],function(Zrender,Base,Polygon,BrokenLine,Group,util,CircleShape){
+	var ZINDEX_MAP = 2,
+		ZINDEX_WEATHER = 1;
+
 	// retina 屏幕优化
     var devicePixelRatio = window.devicePixelRatio || 1;
     devicePixelRatio = Math.max(devicePixelRatio, 1);
@@ -30,25 +33,6 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 			return {x: x*px,y: y*px};
 		}
 	};
-	
-	// var scale = 2;
-	// var reference_dadi = Meractor.lngLatToPoint({x:116.404,y: 39.915});
-	// function pointToXY(point){
-	// 	return {
-	// 		x: (point.x - reference_dadi.x)*scale,
-	// 		y: (point.y - reference_dadi.y)*scale
-	// 	}
-	// }
-	
-	// function lngLatToXY(lonlat){
-	// 	return pointToXY(Meractor.lngLatToPoint(lonlat));
-	// }
-	// function xyToLnglat(xy){
-
-	// }
-	// console.log(lngLatToXY({x:115.404, y:39.915}));
-	// console.log(lngLatToXY({x:115.404, y:39.915}));
-	// console.log(lngLatToXY({x:117.404, y:39.915}));
 
 	var china_src_size = {
 		height: 35.4638,
@@ -58,7 +42,7 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 	};
 	var px_size_china_left_top = Meractor.lngLatToPoint({x: china_src_size.left, y: china_src_size.top}),
 		px_size_china_right_bottom = Meractor.lngLatToPoint({x: china_src_size.left+china_src_size.width, y: china_src_size.top-china_src_size.height});
-	// console.log(px_size_china_left_top,px_size_china_right_bottom);
+
 	var px_size_china = {width: px_size_china_right_bottom.x - px_size_china_left_top.x,height: px_size_china_left_top.y - px_size_china_right_bottom.y};
 	var default_conf = {
 		container: 'body'
@@ -77,8 +61,19 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 		
 		var center = conf.center||{x: china_src_size.left+china_src_size.width/2,y: china_src_size.top - china_src_size.height/2};
 		var center_xy = Meractor.lngLatToPoint(center);
-		// var group = new Group();
-		// _this.canvas.addGroup(group);
+		var group_map = new Group(),
+			group_shape = new Group(),
+			group_legend = new Group();
+		var _canvas = _this.canvas;
+		_canvas.addGroup(group_map);
+		_canvas.addGroup(group_shape);
+		_canvas.addGroup(group_legend);
+
+		_this.groups = {
+			map: group_map,
+			shape: group_shape,
+			legend: group_legend
+		};
 		_this._data = {
 			scale: Math.min(scale_x,scale_y),
 			center: {
@@ -96,42 +91,32 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 		var _this = this;
 		_this.conf = conf = $.extend({},default_conf,conf);
 		_this.canvas = Zrender.init($(conf.container).get(0));
+
 		_init_geomap.call(_this);
 	};
+	GeoMap.GROUP = {
+		MAP: 'map',
+		SHAPE: 'shape',
+		LEGEND: 'legend'
+	};
 	var GeoMapProp = GeoMap.prototype;
-	// var minx = miny = Number.MAX_VALUE,maxx = maxy = Number.MIN_VALUE;
-	function addGeoPolygon(coordinates,data){
+	function addGeoPolygon(coordinates,options){
 		var shapes = [];
 		var gm = this;
-		var is_not_lnglat = !data.is_lnglat;
+		var is_not_lnglat = !options.is_lnglat;
 		$.each(coordinates,function(i,v){
 			var points = [];
 			$.each(v,function(v_i,v_v){
 				points.push(new GeoMap.Point(v_v[0],v_v[1],is_not_lnglat));
-				// if(minx > v_v[0]){
-				// 	minx = v_v[0];
-				// }else if(maxx < v_v[0]){
-				// 	maxx = v_v[0];
-				// }
-				// if(miny > v_v[1]){
-				// 	miny = v_v[1];
-				// }else if(maxy < v_v[1]){
-				// 	maxy = v_v[1];
-				// }
 			});
-			// console.log(points);
-			var polygon = new GeoMap.Polygon(points,data);
+			var polygon = new GeoMap.Polygon(points,options);
+			// polygon.draw(gm);
 			polygon.points = points;
 			shapes.push(polygon);
-			gm.addOverlay(polygon);
-			// setTimeout(function(){
-			// 	var polygon_mask = new GeoMap.Mask(points);
-			// 	gm.addOverlay(polygon_mask);
-			// },3000);
+			gm.addOverlay(polygon,GeoMap.GROUP.MAP);
 		});
 		return shapes;
 	}
-	var zlevel_geo = 900;
 	function callback_loaedGeo(loadedData,options,callback_after_render_geo){
 		var gm = this;
 		var data = loadedData.shift();
@@ -166,22 +151,22 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 			if('Feature' == type){
 				var geometry = v.geometry;
 				var type_geometry = geometry.type;
-				var data = {
+				var options = {
 					enname: v.id,
 					properties: v.properties,
 					style: {
 						text: v.properties.name,
 						// color: '#F5F3F0'
 					},
-					zlevel: zlevel_geo,
+					zlevel: ZINDEX_MAP,
 					is_lnglat: is_lnglat
 				}
 
 				if('Polygon' == type_geometry ){
-					shapes.push(addGeoPolygon.call(gm,geometry.coordinates,data));
+					shapes.push(addGeoPolygon.call(gm,geometry.coordinates,options));
 				}else if('MultiPolygon' == type_geometry){
 					$.each(geometry.coordinates,function(v_i,v_v){
-						shapes.push(addGeoPolygon.call(gm,v_v,data));
+						shapes.push(addGeoPolygon.call(gm,v_v,options));
 					});
 				}else{
 					console.log(v,type_geometry);
@@ -194,12 +179,11 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 				points.push(v_v.shape.style.pointList);
 			});
 		});
+
 		gm.addMask(points,$.extend(true,{
 			'is_lnglat': false
 		},options));
-		// gm._data.group.clipShape = shapes[0][0].shape;console.log(shapes[0]);
-		// console.log(minx,miny,maxx,maxy,maxx-minx,maxy-miny);
-		$.isFunction(callback_after_render_geo) && callback_after_render_geo();
+		$.isFunction(callback_after_render_geo) && callback_after_render_geo(points);
 	}
 	GeoMapProp.loadGeo = function(src,options,callback_after_render_geo){
 		var _this = this;
@@ -217,10 +201,16 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 			});
 		});
 	};
-	GeoMapProp.addOverlay = function(overlay){
+	GeoMapProp.addOverlay = function(overlay,group_name){
+		var _this = this;
 		var shape = overlay.draw(this);
-		// this._data.group.addChild(shape);
-		this.canvas.addShape(shape);
+		var group = _this.groups[group_name];
+		if(group){
+			group.addChild(shape);
+		}else{
+			this.canvas.addShape(shape);
+		}
+		
 		this.canvas.render();
 		return shape;
 	}
@@ -243,23 +233,108 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 			y: (center.y - point.y)*scale + height/1.8//这里出来的数据暂时有一个整体偏移
 		}
 	}
-
-	GeoMapProp.addMask = function(polygons,options){
-		options = $.extend(true,{
+	var MyShape = function(options){
+        Base.call(this, options);
+    }
+    MyShape.prototype = {
+        type: 'MyShape',
+        buildPath: function(ctx,style){
+            ctx.beginPath();
+            ctx.arc(300,300,200,0,Math.PI*2);
+            ctx.rect(100,100,100,100);
+            ctx.moveTo(300,200);
+            ctx.lineTo(400,150);
+            ctx.lineTo(420,150);
+            ctx.lineTo(500,100);
+            
+            ctx.moveTo(500,100);
+            ctx.lineTo(500,250);
+            ctx.lineTo(520,250);
+            ctx.lineTo(500,200);
+            ctx.closePath();
+        }
+    }
+    util.inherits(MyShape, Base);
+	GeoMapProp.addMask = function(polygons){
+		var options = {
 			style: {
-				maskColor: 'white'
+				maskColor: 'white',
+				brushType : 'both',
+		        lineWidth : 1,
+		        strokeColor : '#3D534E',
+		        color: '#ff0000',
+		        textColor: 'black',
+		        textPosition : 'inside'// default top
 			},
-			zlevel: mask_zindex,
-			is_lnglat: true,
+			zlevel: ZINDEX_WEATHER,
+			is_lnglat: false,
 			hoverable: false,
-			is_show_mask: false
-		},options);
-
+			is_show_mask: true
+		};
 		if(options.is_show_mask){
-			this.addOverlay(new Mask(polygons,options));
+			var shape_mask = new Mask(this,polygons,options);
+			// shape_mask.draw();
+			var group = this.groups[GeoMap.GROUP.SHAPE];
+			group.clipShape = shape_mask;
+			return;
+			group.clipShape = new MyShape({
+                style: {
+                    maskColor: 'white',
+                    brushType : 'both',
+                    lineWidth : 1,
+                    strokeColor : '#3D534E',
+                    color: '#ff0000',
+                    textColor: 'black',
+                    textPosition : 'inside'// default top
+                },
+                zlevel: ZINDEX_WEATHER,
+                is_lnglat: true,
+                hoverable: false,
+                is_show_mask: false
+            });
+            return;
+            var _canvas = this.canvas;
+            // setTimeout(function(){
+	            var circleShape = new CircleShape({
+	                style: {
+	                    r: 200,
+	                    x: 0,
+	                    y: 0,
+	                    color: 'blue'
+	                },
+	                position: [200, 200]
+	            });
+	            circleShape.draw = function(){
+	            	return this;
+	            }
+	            // 多边形
+				var polygonShape = new Polygon({
+				    style : {
+				        pointList : [[310, 120], [360, 120], [348, 230], [250, 340], [146, 200]],
+				        brushType : 'both',
+				        color : 'green',
+				        // strokeColor : color.getColor(colorIdx++),
+				        lineWidth : 10,
+				        text : 'polygon',
+				        textPosition : 'inside'     // default top
+				    },
+				    draggable:true
+				});
+				polygonShape.needTransform = polygonShape.needLocalTransform = true;
+				polygonShape.draw = function(){
+	            	return this;
+	            }
+	            // group.addChild(circleShape);
+	            // this.canvas.addShape(clipShape);
+	           // _canvas.render();
+				this.addOverlay(circleShape,GeoMap.GROUP.SHAPE);
+				this.addOverlay(polygonShape,GeoMap.GROUP.SHAPE);
+			// },1000);
 		}
+
 	}
-	function createDom(id, type, painter) {
+	
+	function _createDom(id, type, painter) {
         var newDom = document.createElement(type);
         var width = painter._width;
         var height = painter._height;
@@ -294,7 +369,7 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 			delete layers[mask_zindex];
 			var imgData = canvas.toDataURL(type, backgroundColor, args);
 			var img = $('<img>').attr('src',imgData).get(0);
-			var maskImageDom = createDom('mask-image', 'canvas', painter);
+			var maskImageDom = _createDom('mask-image', 'canvas', painter);
 	        painter._bgDom.appendChild(maskImageDom);
 	        var ctx = maskImageDom.getContext('2d');
 	        devicePixelRatio != 1 
@@ -326,15 +401,18 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 				pointList: Points
 			}
 		});
+		
 		this.shape = new Polygon($.extend(true,{
 			style: {
 				brushType : 'both',
-		        lineWidth : 0.5,
-		        strokeColor : '#ccc',
+		        lineWidth : 1,
+		        strokeColor : '#3D534E',
 		        color: 'rgba(0,0,0,0)',
 		        textColor: 'black',
 		        textPosition : 'inside'// default top
 			},
+			needTransform: true,
+			needLocalTransform: true,
 			hoverable: false
 		},options));
 	}
@@ -349,8 +427,11 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 		drawPointList.call(this,map);
 		return this.shape;
 	}
+	GeoMap.Polygon.prototype.isCover = function(){
+		return true;
+	}
 
-	GeoMap.Polyline = function(Points,options){
+	GeoMap.Polyline = function(Points,	options){
 		options = $.extend(true,{},options,{
 			style: {
 				pointList: Points
@@ -362,12 +443,17 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 		        lineWidth : 1,
 		        strokeColor : 'red',
 			},
+			needTransform: true,
+			needLocalTransform: true,
 			hoverable: false
 		},options));
 	}
 	GeoMap.Polyline.prototype.draw = function(map){
 		drawPointList.call(this,map);
 		return this.shape;
+	}
+	GeoMap.Polyline.prototype.isCover = function(){
+		return true;
 	}
 	GeoMap.Pattern = {};
 	GeoMap.Pattern.Streak = function(options){
@@ -405,49 +491,32 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 		return pat;
 	}
 
-	var mask_zindex = 910;
-	var Mask = function(polygons,options){
+	var Mask = function(map,polygons,options){
 		Base.call(this, options);
-		polygons.is_lnglat = options.is_lnglat;
+		this.map = map;
+		if(options.is_lnglat){
+			var polygons_new = [];
+			$.each(polygons,function(i,v){
+				var arr = [];
+				$.each(v,function(v_i,v_v){
+					var val = pointToOverlayPixel.call(map,v_v);
+					arr.push([val.x,val.y]);
+				});
+				polygons_new.push(arr);
+			});
+			polygons = polygons_new;
+		}
 		this.polygons = polygons;
 	}
 	Mask.prototype = {
-		draw: function(map){
-			this.map = map;
-			var polygons = [];
-			if(this.polygons.is_lnglat){
-				$.each(this.polygons,function(i,v){
-					var arr = [];
-					$.each(v,function(v_i,v_v){
-						var val = pointToOverlayPixel.call(map,v_v);
-						arr.push([val.x,val.y]);
-					});
-					polygons.push(arr);
-				});
-				this.polygons = polygons;
-			}
-			return this;
-		},
-		isCover: function(){
-			return true;
-		},
-		brush : function(ctx, isHighlight) {
-			var style = this.beforeBrush(ctx, isHighlight);
-			var canvas = ctx.canvas;
-			var width = canvas.clientWidth,
-				height = canvas.clientHeight;
-			this.buildPath(ctx,style);
-			ctx.clip();
-			ctx.clearRect(0,0,width,height);
-		},
+		type: 'mask',
+		// draw: function(){
+		// 	return this;
+		// },
+		// isCover: function(){
+		// 	return true;
+		// },
 		buildPath: function(ctx,style){
-			var canvas = ctx.canvas;
-			var width = canvas.clientWidth,
-				height = canvas.clientHeight;
-
-			ctx.clearRect(0,0,width,height);
-			ctx.fillStyle = style.maskColor;
-			ctx.fillRect(0,0,width,height);
 			ctx.beginPath();
 			var map = this.map;
 			$.each(this.polygons,function(i_polygon,pointList){
@@ -461,6 +530,7 @@ define('GeoMap',['zrender','zrender/shape/Base','zrender/shape/Polygon','zrender
 	            }
 	            ctx.lineTo(pointList[0][0], pointList[0][1]);
 			});
+			ctx.closePath();
 		}
 	}
 	util.inherits(Mask, Base);

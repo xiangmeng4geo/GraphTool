@@ -12,8 +12,10 @@ body {
 	border: 0;
 	background-color: #fff;
 	color: #252525;
-	-webkit-font-smoothing: antialiased
+	-webkit-font-smoothing: antialiased;
+	/*background: -webkit-gradient(linear,0 0, 0 100%, color-stop(0,black), color-stop(0.8, rgb(150,150,150)), color-stop(1, rgb(200,200,200)));*/
 }
+
 /*对表单元素进行中文处理*/
 body,
 input, textarea, select, button{

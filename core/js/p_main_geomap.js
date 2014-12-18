@@ -27,7 +27,7 @@ Core.safe(function(){
 	        }
 	    });
 	}
-	var gm;
+	// var gm;
 	var initing = false;
 	function init(is_show_mask){
 		initing = true;
@@ -41,13 +41,17 @@ Core.safe(function(){
 			var china_json = '../../../git_project/GeoMap/json/china_mask.geo.json';
 			china_json1 = '../shell/data/china_mask.geo.meractor.json';
 			china_json = '../shell/data/china_province.meractor.json';
-			gm.loadGeo([china_json1,china_json],{
+			china_json = '../../../git_project/GeoMap/json/china.geo.json';
+			gm.loadGeo([china_json],{
 				style: {
-					color: '#F5F3F0',
+					// color: '#F5F3F0',
 					maskColor: 'white'
 				},
 				is_show_mask: is_show_mask
-			},function(){
+			},function(points){
+				// gm.addMask(points,{
+				// 	is_lnglat: false
+				// });
 				var data_url = 'http://10.14.85.116/nodejs_project/micaps/data/micaps/14/rr111314.024.json';
 				$.getJSON(data_url,function(data){
 					$.each(data.areas,function(i,v){
@@ -73,9 +77,10 @@ Core.safe(function(){
 								fillOpacity: 0.9, 
 								strokeWeight: 1, 
 								strokeOpacity:1
-							}
+							},
+							zlevel: 11
 						});
-						gm.addOverlay(polygon);   //增加面
+						gm.addOverlay(polygon,GeoMap.GROUP.SHAPE);   //增加面
 					});
 
 					var line_symbols = data.line_symbols;
@@ -93,9 +98,10 @@ Core.safe(function(){
 								style: {
 									strokeColor : 'blue',
 									lineWidth : 2,
-								}
+								},
+								zlevel: 11
 							});
-							gm.addOverlay(polyline);   //增加折线
+							gm.addOverlay(polyline,GeoMap.GROUP.SHAPE);   //增加折线
 						});
 					}
 					initing = false;
@@ -103,7 +109,7 @@ Core.safe(function(){
 			});
 		});
 	}
-	init();
+	init(true);
 	$('#geomap').on('contextmenu',function(e){
 		var $this = $(this);
 		var menu_map = $this.data('menu');
@@ -117,7 +123,7 @@ Core.safe(function(){
 			menu_save_img.on('click',function(){
 				if(gm){
 					$('<input type="file" nwsaveas="a.png"  />').on('change',function(){
-						var img_data = gm.toDataURL('image/png','white');
+						var img_data = gm.toDataURL();
 						img_data = img_data.substring(img_data.indexOf('base64,')+7);
 						img_data = new Buffer(img_data, 'base64');
 						Core.Lib.util.writeFile($(this).val(),img_data);
