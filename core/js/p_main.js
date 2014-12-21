@@ -85,7 +85,10 @@
 		        	if(menu_tree.items.length > 0){
 		        		menu_tree.popup(e.clientX, e.clientY);
 		        	}
-		        }    
+		        },
+		        onnodedblclick: function(e){
+		        	
+		        }   
 		    });
 		}
 		/*更新文件*/

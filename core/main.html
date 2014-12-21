@@ -5,10 +5,9 @@
 		<title></title>
 		<link rel="stylesheet" type="text/css" href="css/reset.css">
 		<link rel="stylesheet" type="text/css" href="css/p_main.css">
-		<style>
-		</style>
 	</head>
 	<body>
+		<!-- <div id="resizable"></div> -->
 		<div id="main">
 			<div id="c_top">
 				<input type="button" value="注销" id="btn_quite"/>
@@ -23,8 +22,9 @@
 					<div id="result"></div>
 				</div>
 				<div id="c_right">
-					<div id="geomap">
-						<img src="img/welcome.png"/>
+					<div id="geomap_container">
+						<div id="geomap"></div>
+						<div id="geomap_layer"></div>
 					</div>
 				</div>
 			</div>
@@ -32,6 +32,8 @@
 		<script type="text/javascript" src="./js/libs/jquery-2.1.1.min.js"></script>
 		<script type="text/javascript" src="./js/core.js"></script>
 		<script type="text/javascript" src="./js/libs/jquery.tree.js"></script>
+		<script type="text/javascript" src="./js/libs/jquery.texteditor.js"></script>
+		<script type="text/javascript" src="./js/libs/jquery.ui-1.11.2.js"></script>
 		<script type="text/javascript" src="./js/p_main.js"></script>
 		<script type="text/javascript" src="./js/p_main_geomap.js"></script>
 	</body>

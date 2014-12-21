@@ -306,6 +306,9 @@ define('GeoMap',['zrender',
 
         return newDom;
     }
+    var core_color = Core.Color,
+    	toRGB = core_color.toRGB,
+    	toHTML = core_color.toHTML;
     /*得到绘制好的图片*/
 	GeoMapProp.toDataURL = function(type, backgroundColor, args){
 		var painter = this.canvas.painter;
@@ -330,85 +333,64 @@ define('GeoMap',['zrender',
             },
             { normal: 'up', update: true }
         );
+        /*对透明做默认填色处理*/
+        backgroundColor = backgroundColor || '#ffffff';
+        var default_rgb_bgcolor = toRGB(backgroundColor,true);
         var img = ctx.getImageData(0,0,width,height);
         var pixel = img.data;
         for(var i = 0,j = pixel.length;i<j;i+=4){
-        	if(pixel[i] == 0 && pixel[i+1] == 0 && pixel[i+2] == 0){
-        		pixel[i] = pixel[i+1] = pixel[i+2] = '255';
+        	if(pixel[i] == 0 && pixel[i+1] == 0 && pixel[i+2] == 0 && pixel[i+3] == 0){
+        		pixel[i] = default_rgb_bgcolor[0];
+        		pixel[i+1] = default_rgb_bgcolor[1];
+        		pixel[i+2] = default_rgb_bgcolor[2];
+        		pixel[i+3] = 255;
         	}
         }
-        maskImageDom = null;
-        maskImageDom = _createDom('mask-image', 'canvas', painter);
-        ctx = maskImageDom.getContext('2d');
-	    devicePixelRatio != 1 && ctx.scale(devicePixelRatio, devicePixelRatio);
-        ctx.fillStyle = backgroundColor || '#f00';
-        ctx.fillRect(
-            0, 0, 
-            width,
-            height
-        );
         ctx.putImageData(img,0,0);
 
-        return maskImageDom.toDataURL(type, args);
-        // var image = maskImageDom.toDataURL(type, args);
-
-        // var img = new Image();
-        // img.onload = function(){
-        // 	ctx.fillStyle = backgroundColor || '#fff';
-	       //  ctx.rect(
-	       //      0, 0, 
-	       //      width,
-	       //      height
-	       //  );
-	       //  ctx.fill();
-        // 	ctx.putImageData(img,0,0);
-        // 	image = maskImageDom.toDataURL(type, args);
-        // 	console.log(image);
-        // };
-        // img.src = image;
-        // console.log(image);
-        // // image = maskImageDom.toDataURL(type, args);
-        // // ctx = null;
-        // return image;
-		// this.addMask();
-		// return this.canvas.toDataURL(type, backgroundColor, args);
-		// var canvas = this.canvas;
-		// var painter = canvas.painter;
-		// var storage = painter.storage;
-		// var shapeList = storage.getShapeList();
-		// var maskShape;
-		// for(var i = 0,j=shapeList.length;i<j;i++){
-		// 	if(shapeList[i] instanceof Mask){
-		// 		maskShape = shapeList[i];
-		// 	}
-		// }
-		// if(maskShape){
-		// 	storage.delRoot(maskShape.id);
-		// 	var layers = painter._layers;
-		// 	var mask_layer = layers[mask_zindex];
-		// 	delete layers[mask_zindex];
-		// 	var imgData = canvas.toDataURL(type, backgroundColor, args);
-		// 	var img = $('<img>').attr('src',imgData).get(0);
-		// 	var maskImageDom = _createDom('mask-image', 'canvas', painter);
-	 //        painter._bgDom.appendChild(maskImageDom);
-	 //        var ctx = maskImageDom.getContext('2d');
-	 //        devicePixelRatio != 1 
-	 //            && ctx.scale(devicePixelRatio, devicePixelRatio);
-
-		// 	maskShape.brush(ctx);
-		// 	ctx.drawImage(img,0,0);
-		// 	var image = maskImageDom.toDataURL(type, args);
-		// 	painter._bgDom.removeChild(maskImageDom);
-		// 	ctx = null;
-		// 	img = null;
-
-		// 	storage._updateAndAddShape(maskShape);
-		// 	layers[mask_zindex] = layers;
-		// 	return image;
-		// }else{
-		// 	return canvas.toDataURL(type, backgroundColor, args);
-		// }
+        var img_data = maskImageDom.toDataURL(type, args);
+        maskImageDom = null;
+        ctx = null;
+        return img_data;
 	}
+
+	var Mask = function(map,polygons,options){
+		Base.call(this, options);
+		this.map = map;
+		if(options.is_lnglat){
+			var polygons_new = [];
+			$.each(polygons,function(i,v){
+				var arr = [];
+				$.each(v,function(v_i,v_v){
+					var val = pointToOverlayPixel.call(map,v_v);
+					arr.push([val.x,val.y]);
+				});
+				polygons_new.push(arr);
+			});
+			polygons = polygons_new;
+		}
+		this.polygons = polygons;
+	}
+	Mask.prototype = {
+		type: 'mask',
+		buildPath: function(ctx,style){
+			ctx.beginPath();
+			var map = this.map;
+			$.each(this.polygons,function(i_polygon,pointList){
+				if (pointList.length < 2) {
+	                // 少于2个点就不画了~
+	                return;
+	            }
+	            ctx.moveTo(pointList[0][0], pointList[0][1]);
+	            for (var i = 1, l = pointList.length; i < l; i++) {
+	                ctx.lineTo(pointList[i][0], pointList[i][1]);
+	            }
+	            ctx.lineTo(pointList[0][0], pointList[0][1]);
+			});
+			ctx.closePath();
+		}
+	}
+	util.inherits(Mask, Base);
 
 	GeoMap.Point = function(lng,lat,is_not_lnglat){
 		this.lng = lng;
@@ -476,6 +458,7 @@ define('GeoMap',['zrender',
 		return true;
 	}
 	GeoMap.Pattern = {};
+	// 斜条纹
 	GeoMap.Pattern.Streak = function(options){
 		options = $.extend({
 			fillColor: 'white',
@@ -511,49 +494,6 @@ define('GeoMap',['zrender',
 		return pat;
 	}
 
-	var Mask = function(map,polygons,options){
-		Base.call(this, options);
-		this.map = map;
-		if(options.is_lnglat){
-			var polygons_new = [];
-			$.each(polygons,function(i,v){
-				var arr = [];
-				$.each(v,function(v_i,v_v){
-					var val = pointToOverlayPixel.call(map,v_v);
-					arr.push([val.x,val.y]);
-				});
-				polygons_new.push(arr);
-			});
-			polygons = polygons_new;
-		}
-		this.polygons = polygons;
-	}
-	Mask.prototype = {
-		type: 'mask',
-		// draw: function(){
-		// 	return this;
-		// },
-		// isCover: function(){
-		// 	return true;
-		// },
-		buildPath: function(ctx,style){
-			ctx.beginPath();
-			var map = this.map;
-			$.each(this.polygons,function(i_polygon,pointList){
-				if (pointList.length < 2) {
-	                // 少于2个点就不画了~
-	                return;
-	            }
-	            ctx.moveTo(pointList[0][0], pointList[0][1]);
-	            for (var i = 1, l = pointList.length; i < l; i++) {
-	                ctx.lineTo(pointList[i][0], pointList[i][1]);
-	            }
-	            ctx.lineTo(pointList[0][0], pointList[0][1]);
-			});
-			ctx.closePath();
-		}
-	}
-	util.inherits(Mask, Base);
-
+	
 	return GeoMap
 });

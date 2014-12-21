@@ -55,7 +55,8 @@ input[type=text]:hover, textarea:hover{
 }
 /*去掉得到焦点时的黄色边框*/
 .no_outline,
-input,button,select,textarea{outline:none}
+input,button,select,textarea,
+[contenteditable=true]{outline:none}
 /*不可放大缩小*/
 textarea{resize:none}
 ul,ol{

@@ -403,6 +403,15 @@
             }, function() {
                 $(this).removeClass("bbit-tree-node-over");
             }).click(nodeclick)
+            .on('dblclick',function(e){
+                e.preventDefault();
+                var path = $(this).attr("tpath");
+                var item = getItem(path);
+                if(dfop.onnodedblclick){
+                    dfop.onnodedblclick.call(this,e,item)
+                }
+                return false;
+            })
             .on('contextmenu',function(e){
                 e.preventDefault();
                 var path = $(this).attr("tpath");

@@ -186,7 +186,10 @@
 			}else{
 				_win = _open(name);
 				if(callback){
-					_win.on('loaded',callback);
+					_win.on('loaded',function(e){
+						console.log('loaded',callback);
+						callback.call(_win,e);
+					});
 					_win.on('focus',function(){
 						if(_win.focus_flag){
 							_win.focus_flag = false;
@@ -278,6 +281,7 @@
 			用法： Core.Window.sendMsg.call(window,'msg')
 		*/
 		sendMsg: function(type,data,_win){
+			console.log(type,data,_win);
 			_win || (_win = this);
 			_win.postMessage({
 				type: type,
