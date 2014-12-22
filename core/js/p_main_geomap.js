@@ -1,4 +1,10 @@
 Core.safe(function(){
+	var CoreWindow = Core.Window;
+	var msgType = Core.Const.msgType;
+	var gui = CoreWindow.getGui(),
+		Menu = gui.Menu,
+		MenuItem = gui.MenuItem;
+
 	var fileLocation= '../../../git_project/GeoMap_projection/src/zrender'
 	var developmod = true;
 	if(developmod){
@@ -110,17 +116,61 @@ Core.safe(function(){
 		});
 	}
 	init(true);
+	// 地图添加的图层类
+	var MapLayer = (function(){
+		// 定义文字和图片的右键菜单	
+		var menu_layer = new Menu();
+		var menu_layer_delete = new MenuItem({label: '删除'});
+		menu_layer_delete.on('click',function(){
+			var $layer = menu_layer._layer;
+			if($layer){
+				$layer.remove();
+			}
+		});
+		menu_layer.append(menu_layer_delete);
+		function TextLayer(option){
+			var pos = option.position;
+			return $('<div class="texteditor">')
+				.html('<span></span>')
+				.css(pos)
+				.addClass('off')
+				.resizable()
+				.draggable()
+				.on('mouseenter',function(){
+					$(this).removeClass('off');
+				}).on('mouseleave',function(){
+					$(this).addClass('off');
+				}).on('dblclick',function(){
+					var $this = $(this);
+					var text = $this.text(),
+						style = $this.attr('style');
+
+					var win_textstyle = Core.Page.textStyle(function(e){
+						CoreWindow.sendMsg(msgType.CONF_STYLE,{
+							text: text,
+							style: style
+						},win_textstyle.window);
+					});
+				}).on('contextmenu',function(e){
+					e.stopPropagation();
+					menu_layer._layer = $(this);
+					menu_layer.popup(e.clientX, e.clientY);
+				});
+		}
+		function ImageLayer(option){
+
+		}
+		return {
+			text: TextLayer,
+			img: ImageLayer
+		}
+	})();
+	
 	var $geomap_layer = $('#geomap_layer');
 	$('#geomap_container').on('contextmenu',function(e_contextmenu){
 		var $this = $(this);
 		var menu_map = $this.data('menu');
 		if(!menu_map){
-			var CoreWindow = Core.Window;
-			var msgType = Core.Const.msgType;
-			var gui = CoreWindow.getGui(),
-				Menu = gui.Menu,
-				MenuItem = gui.MenuItem;
-
 			var $current_text,contextmenu_postion;
 			CoreWindow.onMessage(function(e){
 				var data = e.data;
@@ -141,36 +191,14 @@ Core.safe(function(){
 						});
 					}
 					if(!$current_text){
-						$('<div class="texteditor">')
-							.html('<span>'+text+'</span>')
-							.css(styleObj)
-							.css({
+						$current_text = MapLayer.text({
+							position: {
 								left: e_contextmenu.offsetX,
 								top: e_contextmenu.offsetY
-							})
-							.addClass('off')
-							.resizable()
-							// .draggable()
-							.texteditor()
-							.appendTo($geomap_layer).on('mouseenter',function(){
-								$(this).removeClass('off');
-							}).on('mouseleave',function(){
-								$(this).addClass('off');
-							}).on('dblclick',function(){
-								$current_text = $(this);
-								var text = $current_text.text(),
-									style = $current_text.attr('style');
-
-								var win_textstyle = Core.Page.textStyle(function(e){
-									CoreWindow.sendMsg(msgType.CONF_STYLE,{
-										text: text,
-										style: style
-									},win_textstyle.window);
-								});
-							});
-					}else{
-						$current_text.css(styleObj).find('span').text(text);
+							}
+						}).appendTo($geomap_layer);
 					}
+					$current_text.css(styleObj).find('span').text(text);
 					$current_text = null;
 				}
 			});
@@ -185,14 +213,14 @@ Core.safe(function(){
 
 			var menu_add_img = new MenuItem({label: '添加图片'});
 			menu_add_img.on('click',function(){
-
+				$('<input type="file" nwworkingdir="./image" />').click();
 			});
 			menu_map.append(menu_add_img);
 
 			var menu_save_img = new MenuItem({ label: '导出图片' });
 			menu_save_img.on('click',function(){
 				if(gm){
-					$('<input type="file" nwsaveas="a.png"  />').on('change',function(){
+					$('<input type="file" nwsaveas="a.png" />').on('change',function(){
 						var img_data = gm.toDataURL();
 						img_data = img_data.substring(img_data.indexOf('base64,')+7);
 						img_data = new Buffer(img_data, 'base64');

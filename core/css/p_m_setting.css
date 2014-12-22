@@ -1,0 +1,133 @@
+#main{
+	height: 100%;
+	margin-top: 10px;
+}
+#c_top{
+	position: relative;
+	overflow: hidden;
+	height: 32px;
+	width: 98%;
+	margin: 0 auto;
+	top: 1px;
+}
+#c_top ul{
+	overflow: hidden;
+	padding-left: 5%;
+}
+#c_top li{
+	padding: 0 5px;
+	min-width: 80px;
+	text-align: center;
+	height: 28px;
+	line-height: 28px;
+	float: left;
+	border: 1px solid #bbb;
+	border-radius: 5px 5px 0 0;
+	margin-right: 3px;
+	margin-top: 2px;
+	background-color: #eee;
+}
+#c_top li:hover{
+	background-color: #eed;
+}
+#c_top li.on{
+	margin-top: 0px;
+	height: 30px;
+	line-height: 30px;
+	border-bottom: 1px solid white;
+	background-color: white;
+}
+
+#c_bottom{
+	width: 98%;
+	margin: 0 auto;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	padding-bottom: 10px;
+	height: 400px;
+	overflow: auto;
+}
+#c_bottom>fieldset{
+	width: 90%;
+	margin: 0 auto;
+	display: none;
+	height: 360px;
+}
+#c_bottom>fieldset.on{
+	display: block;
+}
+fieldset {
+	padding:10px;
+	margin:10px;
+	color:#333; 
+	border:#ccc solid 1px;
+	border-radius: 3px;
+} 
+
+.file_directory{
+	position: relative;
+	display: inline-block;
+	height: 30px;
+	width: 630px;
+}
+.file_directory input[type=file]{
+	visibility: none;
+	opacity: 0;
+	width: 100%;
+}
+.file_directory div{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+.text_file_dir{
+	width: 570px;
+}
+.tree_left,
+.tree_right{
+	height: 90%;
+	overflow: auto;
+}
+.tree_left{
+	width: 200px;
+	float: left;
+	border-right: 2px solid #ccc;
+}
+.tree_right li{
+	float: left;
+	width: 25%;
+	text-align: center;
+	margin: 5px 0;
+}
+.tree_right li.no_files{
+	font-size: 30px;
+	text-align: center;
+	width: 100%;
+	line-height: 50px; 
+}
+.tree_right li.on div{
+	border-radius: 3px;
+	background-color: #B6D8FB;
+}
+.tree_right li div{
+	width: 90%;
+	margin: 0 auto;
+}
+.tree_right li div img{
+	width: 100px;
+	height: 100px;
+	margin-top: 3px;
+}
+.tree_right li div span{
+	display: block;
+	height: 40px;
+	line-height: 20px;
+	overflow: hidden;
+}
+/*重写tree样式*/
+.tree_left .bbit-tree-node-leaf .bbit-tree-node-icon{
+	background-image:url(../img/jquery.tree/folder-open.gif);
+}
