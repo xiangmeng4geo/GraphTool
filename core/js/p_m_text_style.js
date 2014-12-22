@@ -18,9 +18,8 @@ Core.safe(function(){
 		$input_font_size = $('#input_font_size');
 	
 	var color_rgb2normal = Core.Color.toHTML;
-	Core.Window.get().showDevTools();		
+	// Core.Window.get().showDevTools();		
 	Core.Window.onMessage(function(e){
-		console.log(e);
 		var data = e.data;
 		var type = data.type;
 		if(const_msgtype.CONF_STYLE == type){
@@ -28,54 +27,50 @@ Core.safe(function(){
 			
 			var style = data.style;
 			var text = data.text;
-			if(!style && !text){
-				return;
-			}
-			$textarea_content.val(text||'').attr('style',style);
+			$textarea_content.val(text||'');
+			if(style){
+				$textarea_content.attr('style',style);
+				var styleObj = {};
+				var styleArr = style.split(/;\s*/);
+				$.each(styleArr,function(i,v){
+					var arr = v.split(/:\s+/);
+					if(arr[0]){
+						styleObj[arr[0]] = arr[1];
+					}
+				});
 
-			if(!style){
-				return;
-			}
-			var styleObj = {};
-			var styleArr = style.split(/;\s*/);
-			$.each(styleArr,function(i,v){
-				var arr = v.split(/:\s+/);
-				if(arr[0]){
-					styleObj[arr[0]] = arr[1];
+				var fontSize = parseFloat(styleObj['font-size']);
+				fontSize && $input_font_size.val(fontSize);
+				var color = styleObj['color'];
+				if(color){
+					color = color_rgb2normal(color);
+					$input_font_color.val(color);
+					// $input_font_color.get(0).value = color;
+					$btn_font_color.css('color',color);
 				}
-			});
 
-			var fontSize = parseFloat(styleObj['font-size']);
-			fontSize && $input_font_size.val(fontSize);
-			var color = styleObj['color'];
-			if(color){
-				color = color_rgb2normal(color);
-				$input_font_color.val(color);
-				// $input_font_color.get(0).value = color;
-				$btn_font_color.css('color',color);
-			}
-
-			var bgColor = styleObj['background-color'];
-			if(bgColor){
-				bgColor = color_rgb2normal(bgColor);
-				$cb_is_bg_color.prop('checked',true);
-				$input_bg_color.val(bgColor);
-				$btn_bg_color.css('background-color',bgColor)
-			}
-			if(styleObj['font-weight']){
-				$cb_font_weight.prop('checked',true)
-			}
-			if(styleObj['font-style'] == 'italic'){
-				$cb_font_italic.prop('checked',true)
-			}
-			var textDecoration = styleObj['text-decoration'];
-			if(textDecoration){
-				var arr = textDecoration.split(/\s+/);
-				if(arr.indexOf('underline') > -1){
-					$cb_text_underline.prop('checked',true)
+				var bgColor = styleObj['background-color'];
+				if(bgColor){
+					bgColor = color_rgb2normal(bgColor);
+					$cb_is_bg_color.prop('checked',true);
+					$input_bg_color.val(bgColor);
+					$btn_bg_color.css('background-color',bgColor)
 				}
-				if(arr.indexOf('line-through') > -1){
-					$cb_text_through.prop('checked',true)
+				if(styleObj['font-weight']){
+					$cb_font_weight.prop('checked',true)
+				}
+				if(styleObj['font-style'] == 'italic'){
+					$cb_font_italic.prop('checked',true)
+				}
+				var textDecoration = styleObj['text-decoration'];
+				if(textDecoration){
+					var arr = textDecoration.split(/\s+/);
+					if(arr.indexOf('underline') > -1){
+						$cb_text_underline.prop('checked',true)
+					}
+					if(arr.indexOf('line-through') > -1){
+						$cb_text_through.prop('checked',true)
+					}
 				}
 			}
 		}

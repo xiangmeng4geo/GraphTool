@@ -141,8 +141,8 @@ Core.safe(function(){
 						});
 					}
 					if(!$current_text){
-						$current_text = $('<div class="texteditor">')
-							.html(text)
+						$('<div class="texteditor">')
+							.html('<span>'+text+'</span>')
 							.css(styleObj)
 							.css({
 								left: e_contextmenu.offsetX,
@@ -150,18 +150,17 @@ Core.safe(function(){
 							})
 							.addClass('off')
 							.resizable()
-							.draggable()
-							// .texteditor()
+							// .draggable()
+							.texteditor()
 							.appendTo($geomap_layer).on('mouseenter',function(){
-								$(this).removeClass('off').resizable("enable").draggable("enable");
+								$(this).removeClass('off');
 							}).on('mouseleave',function(){
-								$(this).addClass('off').resizable("disable").draggable("disable");
+								$(this).addClass('off');
 							}).on('dblclick',function(){
 								$current_text = $(this);
 								var text = $current_text.text(),
 									style = $current_text.attr('style');
 
-								console.log(text,style);
 								var win_textstyle = Core.Page.textStyle(function(e){
 									CoreWindow.sendMsg(msgType.CONF_STYLE,{
 										text: text,
@@ -170,16 +169,15 @@ Core.safe(function(){
 								});
 							});
 					}else{
-						$current_text.html(text).css(styleObj);
+						$current_text.css(styleObj).find('span').text(text);
 					}
+					$current_text = null;
 				}
 			});
 			menu_map = new Menu();
 			var menu_add_text = new MenuItem({label: '添加文字'});
 			menu_add_text.on('click',function(e){
 				var win_textstyle = Core.Page.textStyle(function(e){
-					console.log('win_textstyle loaded');
-					debugger;
 					CoreWindow.sendMsg(msgType.CONF_STYLE,{},win_textstyle.window);
 				});
 			});
