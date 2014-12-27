@@ -268,3 +268,11 @@
 .bbit-tree-node .bbit-tree-selected {
 	background-color: #d9e8fb;
 }
+
+/*重写*/
+.bbit-tree-node-el:last-child{
+	
+}
+.bbit-tree-lines .bbit-tree-elbow-line.bbit-tree-elbow-line-end{
+	background: none;
+}

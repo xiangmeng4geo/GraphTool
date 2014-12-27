@@ -81,6 +81,17 @@ Core.safe(function(){
 			var toDir = item.path;
 			var flag = file_util.mkdir(path_util.join(toDir,name));
 			alert('操作'+(flag?'成功':'失败')+'!');
+			if(flag){
+				$(menu_tree._contextmenu_e.target).closest('.bbit-tree').addNode({
+				    "text" : name,
+				    "showcheck" : true,
+				    "complete" : true,
+				    "isexpand" : true,
+				    "checkstate" : 1,
+				    path: path_util.join(toDir,name),
+				    files: []
+				});
+			}
 		}
 	});
 	menu_delete_folder.on('click',function(){
@@ -89,6 +100,9 @@ Core.safe(function(){
 			var toDir = item.path;
 			var flag = file_util.rm(toDir);
 			alert('操作'+(flag?'成功':'失败')+'!');
+			if(flag){
+				$(menu_tree._contextmenu_e.target).closest('.bbit-tree').rmNode(item.id);
+			}
 		}
 	});
 	menu_tree.append(menu_add_files);
@@ -117,9 +131,9 @@ Core.safe(function(){
 							"id" : id,
 						    "text" : path_util.basename(v.name),
 						    "showcheck" : true,
-						    "complete" : true,
+						    "complete" : false,
 						    "isexpand" : true,
-						    "checkstate" : 1,
+						    "checkstate" : 0,
 						    path: v.name
 						};
 						var result = createNode(v.sub,id);
@@ -152,7 +166,7 @@ Core.safe(function(){
 		});
 		function showFiles(files){
 			var html = '';
-			if(files.length > 0){
+			if(files && files.length > 0){
 				$.each(files,function(i,v){
 					var file_path = v.name,
 						extname = path_util.extname(file_path);
@@ -175,6 +189,7 @@ Core.safe(function(){
 			},
 	        onnodecontextmenu: function(e,item){
 	        	menu_tree._treeitem = item;
+	        	menu_tree._contextmenu_e = e;
 	        	menu_tree.popup(e.clientX, e.clientY);
 	        },
 	        onnodedblclick: function(e){

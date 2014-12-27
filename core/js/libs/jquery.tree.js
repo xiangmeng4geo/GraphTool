@@ -136,7 +136,7 @@
             ht.push("</div>"); // Wrap end;
         }
         //endregion
-        function buildnode(nd, ht, deep, path, isend) {
+        function buildnode(nd, ht, deep, path, isend,ispend) {
             var nid = nd.id.replace(/[^\w]/gi, "_");
             ht.push("<li class='bbit-tree-node'>");
             ht.push("<div id='", id, "_", nid, "' tpath='", path, "' unselectable='on' title='", nd.text, "'");
@@ -158,8 +158,9 @@
             }
             else if (deep > 1) {
                 ht.push("<img class='bbit-tree-icon' src='" + dfop.cbiconpath + "s.gif'/>");
+
                 for (var j = 1; j < deep; j++) {
-                    ht.push("<img class='bbit-tree-elbow-line' src='" + dfop.cbiconpath + "/s.gif'/>");
+                    ht.push("<img class='bbit-tree-elbow-line "+(isend && ispend?'bbit-tree-elbow-line-end':'')+"' src='" + dfop.cbiconpath + "/s.gif'/>");
                 }
             }
             ht.push("</span>");
@@ -275,6 +276,20 @@
                 p = p.parent;
             }
         }
+        function _click(e,item,onclick){
+            if (dfop.citem) {
+                var nid = dfop.citem.id.replace(/[^\w]/gi, "_");
+                $("#" + id + "_" + nid).removeClass("bbit-tree-selected");
+            }
+            dfop.citem = item;
+            $(this).addClass("bbit-tree-selected");
+            if (onclick) {
+                if (!item.expand) {
+                    item.expand = function() { expandnode.call(item); };
+                }
+                onclick.call(this, item,e);
+            }
+        }
         function nodeclick(e) {
             var path = $(this).attr("tpath");
             var et = e.target || e.srcElement;
@@ -338,18 +353,7 @@
                 }
             }
             else {
-                if (dfop.citem) {
-                    var nid = dfop.citem.id.replace(/[^\w]/gi, "_");
-                    $("#" + id + "_" + nid).removeClass("bbit-tree-selected");
-                }
-                dfop.citem = item;
-                $(this).addClass("bbit-tree-selected");
-                if (dfop.onnodeclick) {
-                    if (!item.expand) {
-                        item.expand = function() { expandnode.call(item); };
-                    }
-                    dfop.onnodeclick.call(this, item);
-                }
+                _click.call(this,e,item,dfop.onnodeclick);
             }
         }
         function expandnode() {
@@ -397,6 +401,7 @@
                     , { name: "checkstate", value: node.checkstate}];
             return p;
         }
+        var item_contextmenu;
         function bindevent() {
             $(this).hover(function() {
                 $(this).addClass("bbit-tree-node-over");
@@ -414,14 +419,17 @@
             })
             .on('contextmenu',function(e){
                 e.preventDefault();
+                
+                item_contextmenu = e.target;
                 var path = $(this).attr("tpath");
                 var item = getItem(path);
                 if(dfop.onnodecontextmenu){
-                    dfop.onnodecontextmenu.call(this,e,item)
+                    dfop.onnodecontextmenu.call(this,e,item);
                 }
+                _click.call(this,e,item);
                 return false;
             })
-             .find("img.bbit-tree-ec-icon").each(function(e) {
+            .find("img.bbit-tree-ec-icon").each(function(e) {
                  if (!$(this).hasClass("bbit-tree-elbow")) {
                      $(this).hover(function() {
                          $(this).parent().addClass("bbit-tree-ec-over");
@@ -429,7 +437,7 @@
                          $(this).parent().removeClass("bbit-tree-ec-over");
                      });
                  }
-             });
+            });
         }
         function InitEvent(parent) {
             var nodes = $("li.bbit-tree-node>div", parent);
@@ -487,6 +495,10 @@
                 }
             }
         }
+        /*修复由于添加和删除节点时的样式问题*/
+        function fixedStyle(){
+
+        }
         me[0].t = {
             getSelectedNodes: function(gethalfchecknode) {
                 var s = [];
@@ -518,6 +530,72 @@
             },
             getTreeNodes: function(){
                 return treenodes;
+            },
+            addNode: function(opt){debugger;
+                var currentItem = this.getCurrentItem() || getItem('0');
+                var isHaveChildren = currentItem.hasChildren;
+                
+                var nid = currentItem.id.replace(/[^\w]/gi, "_");
+                var $item = $("#" + id + "_" + nid);
+                var tpath = $item.attr('tpath');
+                if(isHaveChildren){
+                    tpath += '.'+(currentItem.ChildNodes.length + 1);
+                }else{
+                    currentItem.ChildNodes = [];
+                    tpath += '.0';
+                }
+                opt.id = tpath.replace(/\./g,'_');
+                currentItem.hasChildren = true;
+
+                opt.parent = currentItem;
+                currentItem.ChildNodes.push(opt);
+                
+                var $item = $item.parent();
+                var isEnd = $item.next('.bbit-tree-node').length == 0;
+                var html = [];
+
+                buildnode(opt,html,tpath.split('.').length - 1,tpath,true,isEnd);
+                html = html.join('');
+
+                // 处理父级样式
+                $item.find('.bbit-tree-ec-icon')
+                    .removeClass('bbit-tree-elbow-end bbit-tree-elbow')
+                    .addClass('bbit-tree-elbow-end-minus');
+                if(!isHaveChildren){
+                    html = "<ul class='bbit-tree-node-ct'  style='z-index: 0; position: static; visibility: visible; top: auto; left: auto;'>"+
+                        html+'</ul>';
+                    $item.append(html);
+                }else{
+                    $item.find('>ul')
+                        // .find('.bbit-tree-elbow-end').last()
+                        // .removeClass('bbit-tree-elbow-end')
+                        // .addClass('bbit-tree-elbow')
+                        // .end()
+                    .append(html);
+                }
+                fixedStyle();
+                InitEvent($item);
+            },
+            rmNode: function(remove_id){
+                var nid = remove_id.replace(id+'_','').replace(/[^\w]/gi, "_");
+                var $item = $("#" + id + "_" + nid);
+                $item.parent().remove();
+                var tpath = nid.replace(/_/g,'.');
+                var item = getItem(tpath);
+                var item_p = item.parent;
+                if(item_p.ChildNodes.length <= 1){
+                    item_p.isHaveChildren = false;
+                    item_p.ChildNodes = [];
+                }else{
+                    for(var i = 0,c = item_p.ChildNodes,j=c.length;i<j;i++){
+                        var _nid = c[i].id.replace(/[^\w]/gi, "_");
+                        if(_nid == nid){
+                            c.splice(i,1);
+                            break;
+                        }
+                    }
+                }
+                fixedStyle();
             }
         };
         return me;
@@ -549,6 +627,16 @@
     $.fn.getTreeNodes = function(){
         if (this[0].t) {
             return this[0].t.getTreeNodes();
+        }
+    }
+    $.fn.addNode = function(opt){
+        if(this[0].t){
+            return this[0].t.addNode(opt);
+        }
+    }
+    $.fn.rmNode = function(tpath){
+        if(this[0].t){
+            return this[0].t.rmNode(tpath);
         }
     }
     var src = $('script').last().attr('src');

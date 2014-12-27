@@ -31,7 +31,7 @@
 				var opt = {
 					"id" : id,
 				    "text" : v.name,
-				    "showcheck" : true,
+				    "showcheck" : false,
 				    "complete" : true,
 				    "isexpand" : true,
 				    "checkstate" : 0,
