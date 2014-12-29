@@ -4,9 +4,11 @@ define('GeoMap',['zrender',
 	'zrender/shape/BrokenLine',
 	'zrender/Group',
 	'zrender/tool/util',
-	'zrender/shape/Text'],function(Zrender,Base,Polygon,BrokenLine,Group,util,TextShape){
+	'zrender/shape/Text',
+	'zrender/shape/Image'],function(Zrender,Base,Polygon,BrokenLine,Group,util,TextShape,ImageShape){
 	var ZINDEX_MAP = 2,
-		ZINDEX_WEATHER = 1;
+		ZINDEX_WEATHER = 1,
+		ZINDEX_LAYER = 3;
 
 	// retina 屏幕优化
     var devicePixelRatio = window.devicePixelRatio || 1;
@@ -262,20 +264,23 @@ define('GeoMap',['zrender',
     }
     util.inherits(MyShape, Base);
     function _doclip(ctx){
-		ctx.beginPath();
-		$.each(this.polygons,function(i_polygon,pointList){
-			if (pointList.length < 2) {
-                // 少于2个点就不画了~
-                return;
-            }
-            ctx.moveTo(pointList[0][0], pointList[0][1]);
-            for (var i = 1, l = pointList.length; i < l; i++) {
-                ctx.lineTo(pointList[i][0], pointList[i][1]);
-            }
-            ctx.lineTo(pointList[0][0], pointList[0][1]);
-		});
-		ctx.closePath();
-		ctx.clip();
+		var polygons = this.polygons;
+		if($.isArray(polygons)){
+			ctx.beginPath();
+			$.each(polygons,function(i_polygon,pointList){
+				if (pointList.length < 2) {
+	                // 少于2个点就不画了~
+	                return;
+	            }
+	            ctx.moveTo(pointList[0][0], pointList[0][1]);
+	            for (var i = 1, l = pointList.length; i < l; i++) {
+	                ctx.lineTo(pointList[i][0], pointList[i][1]);
+	            }
+	            ctx.lineTo(pointList[0][0], pointList[0][1]);
+			});
+			ctx.closePath();
+			ctx.clip();
+		}
     }
 	GeoMapProp.addMask = function(polygons){
 		if(!polygons){
@@ -457,6 +462,84 @@ define('GeoMap',['zrender',
 	GeoMap.Polyline.prototype.isCover = function(){
 		return true;
 	}
+	GeoMap.Text = function(text,attr_style){
+		//设置字体及其它属性请参考： http://blog.csdn.net/u012545279/article/details/14521567
+		var style_obj = {};
+		if(attr_style){
+			$.each(attr_style.split(';'),function(i,v){
+				var arr = v.split(':');
+				if(arr.length == 2){
+					style_obj[arr[0].trim()] = arr[1].trim();
+				}
+			});
+		}
+		var style = {
+			text: text,
+			brushType : 'fill',
+	        textAlign : 'left',
+	        textBaseline : 'top'
+		};
+		var left = style_obj.left;
+		var top = style_obj.top;
+		if(left){
+			style.x = parseFloat(left);
+		}
+		if(top){
+			style.y = parseFloat(top);
+		}
+		var color = style_obj.color;
+		if(color){
+			style.color = color;
+		}
+		var font = '';
+		var font_style = style_obj['font-style'];
+		if(font_style){
+			font += ' '+font_style;
+		}
+		var font_weight = style_obj['font-weight'];
+		if(font_weight){
+			font += ' ' + font_weight;
+		}
+		var font_size = style_obj['font-size'];
+		if(font_size){
+			font += ' ' + font_size;
+		}
+		font += ' "Microsoft Yahei"';
+		
+		if(font){
+			style.textFont = font;
+		}
+		this.shape = new TextShape({
+			style: style,
+			zlevel: ZINDEX_LAYER
+		});
+	}
+	GeoMap.Text.prototype.draw = function(map){
+		return this.shape;
+	}
+	GeoMap.Image = function(src,x,y,width,height){
+		var style = {
+			image: src,
+			x: x || 0,
+			y: y || 0
+		}
+		if(width){
+			style.width = width;
+		}
+		if(height){
+			style.height = height;
+		}
+		console.log(style);
+		this.shape = new ImageShape({
+			style: style,
+			zlevel: ZINDEX_LAYER
+		});
+	}
+	GeoMap.Image.prototype.draw = function(map){
+		return this.shape;
+	}
+
+	// 定义画笔的特殊样式
 	GeoMap.Pattern = {};
 	// 斜条纹
 	GeoMap.Pattern.Streak = function(options){
@@ -493,7 +576,5 @@ define('GeoMap',['zrender',
 		var pat = ctx_pattern.createPattern(canvas_pattern,options.repeat);
 		return pat;
 	}
-
-	
 	return GeoMap
 });

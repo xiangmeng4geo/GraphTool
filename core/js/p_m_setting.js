@@ -15,9 +15,7 @@ Core.safe(function(){
 		icon_path = file_path.icon,
 		image_path = file_path.image;
 
-	function is_img(file_path){
-		return /\.(jpg|bmp|gif|png)$/i.test(file_path)
-	}
+	var is_img = Core.util.isImg;
 	/*初始化右键菜单*/
 	var CoreWindow = Core.Window;
 	var gui = CoreWindow.getGui(),
@@ -29,28 +27,6 @@ Core.safe(function(){
 		menu_add_dir = new MenuItem({ label: '从文件夹导入' }),
 		menu_add_folder = new MenuItem({label: '新建资源库'}),
 		menu_delete_folder = new MenuItem({label: '删除资源库'});
-	function copyFiles(files){
-		var item = menu_tree._treeitem;
-		var toDir = item.path;
-		var success_num = 0;
-		$.each(files,function(i,v){
-			if(is_img(v.name)){
-				var from_path = v.path,
-					to_path = path_util.join(toDir,v.name);
-				if(from_path != to_path){
-					if(file_util.copy(from_path,to_path)){
-						item.files.push(to_path);
-						success_num++;
-					}					
-				}
-			}
-		});
-		if(success_num){
-			alert('成功导入'+success_num+'个图片！');
-		}else{
-			alert('没有找到图片！');
-		}
-	}
 	menu_add_files.on('click',function(){
 		$('<input type="file" multiple accept=".jpg,.gif,.bmp,.png"/>').on('change',function(){
 			var files = $(this)[0].files;
@@ -110,6 +86,56 @@ Core.safe(function(){
 	menu_tree.append(new gui.MenuItem({ type: 'separator' }));
 	menu_tree.append(menu_add_folder);
 	menu_tree.append(menu_delete_folder);
+
+	function copyFiles(files){
+		var item = menu_tree._treeitem;
+		var toDir = item.path;
+		var success_num = 0;
+		$.each(files,function(i,v){
+			if(is_img(v.name)){
+				var from_path = v.path,
+					to_path = path_util.join(toDir,v.name);
+				if(from_path != to_path){
+					if(file_util.copy(from_path,to_path)){
+						item.files.push(to_path);
+						success_num++;
+					}					
+				}
+			}
+		});
+		refreshFiles();
+		if(success_num){
+			alert('成功导入'+success_num+'个图片！');
+		}else{
+			alert('没有找到图片！');
+		}
+	}
+	/*刷新右侧文件列表*/
+	function refreshFiles(){
+		var item = menu_tree._treeitem;
+		var toDir = item.path;
+		var files = file_util.readdir(toDir);
+		item.files = files;
+		showFiles($('fieldset.on .tree_right ul'), files);
+	}
+	/*显示文件列表*/
+	function showFiles($container,files){
+		var html = '';
+		if(files && files.length > 0){
+			$.each(files,function(i,v){
+				var file_path = v.name,
+					extname = path_util.extname(file_path);
+				if(is_img(extname)){
+					var name = path_util.basename(file_path).replace(extname,'');
+					html += '<li><div><img src="'+file_path+'"/><span>'+name+'</span></div></li>';
+				}
+			});
+		}else{
+			html += '<li class="no_files">暂时无可以显示的文件</li>';
+		}
+		$container.html(html);
+	}
+	/*初始化树形菜单*/
 	function init_tree(tree_id,list_id,dir){
 		var files = file_util.readdir(dir);
 		function createNode(data,prefix){
@@ -164,28 +190,13 @@ Core.safe(function(){
 				}
 			}
 		});
-		function showFiles(files){
-			var html = '';
-			if(files && files.length > 0){
-				$.each(files,function(i,v){
-					var file_path = v.name,
-						extname = path_util.extname(file_path);
-					if(is_img(extname)){
-						var name = path_util.basename(file_path).replace(extname,'');
-						html += '<li><div><img src="'+file_path+'"/><span>'+name+'</span></div></li>';
-					}
-				});
-			}else{
-				html += '<li class="no_files">暂时无可以显示的文件</li>';
-			}
-			$list.html(html);
-		}
+		
 		$('#'+tree_id).treeview({
 			data: tree_opt,
 			showcheck: false,
 			cbiconpath: 'img/jquery.tree/',
 			onnodeclick: function(item){
-				showFiles(item.files);
+				showFiles($list, item.files);
 			},
 	        onnodecontextmenu: function(e,item){
 	        	menu_tree._treeitem = item;

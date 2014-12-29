@@ -3,6 +3,9 @@
   cursor: default;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
+[draggable=true] {
+  -khtml-user-drag: element;
+}
 /*html,body{
 	height: 100%
 }*/

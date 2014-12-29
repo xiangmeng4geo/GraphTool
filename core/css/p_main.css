@@ -107,3 +107,83 @@
 	background: none;
 }
 /* } jquery.texteditor */
+
+/* 添加图片用和图片工具 ｛ */
+.tool_image{
+	position: absolute;
+	left: 2%;
+	top: 0;
+	width: 96%;
+	height: 100%;
+	background: white;
+	display: none;
+}
+.tool_image select{
+	width: 200px;
+	margin: 10px auto;
+	display: block;
+}
+.btn_close_tool_image{
+	width: 100%;
+	height: 14px;
+	background-color: #999;
+	color: white;
+	box-shadow: 1px 1px 4px #333;
+}
+.btn_close_tool_image:after{
+	content: '▲';
+	position: absolute;
+	left: 50%;
+	top: -5px;
+}
+.tool_image li{
+	float: left;
+	width: 25%;
+	margin: 10px auto;
+	text-align: center;
+}
+.tool_image li img{
+	display: block;
+	width: 60px;
+	height: 60px;
+	margin: 0 auto;
+}
+.tool_image li span{
+	height: 40px;
+	line-height: 20px;
+	display: inline-block;
+	word-break: break-all;
+}
+/* ｝ 添加图片用和图片工具 */
+
+.map_layer_image{
+	position: absolute;
+	left: 0;
+	top: 0;
+	cursor: move;
+}
+.map_layer_image:after{
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	border: 2px solid #ccc;
+	left: -2px;
+	top: -2px;
+}
+.map_layer_image.off:after{
+	display: none;
+}
+.map_layer_image.off .ui-resizable-e{
+	cursor: default;
+}
+.map_layer_image.off .ui-resizable-s{
+	cursor: default;
+}
+.map_layer_image.off .ui-icon-gripsmall-diagonal-se{
+	background: none;
+}
+.map_layer_image img{
+	width: 100%;
+	height: 100%;
+}
