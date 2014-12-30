@@ -1,17 +1,26 @@
 Core.safe(function(){
 	var CoreWindow = Core.Window;
-	var msgType = Core.Const.msgType;
+	var Const = Core.Const,
+		msgType = Const.msgType,
+		ConstEvent = Const.Event;
+
+	var ConfUser = Core.Lib.conf.User;	
+
 	var gui = CoreWindow.getGui(),
 		Menu = gui.Menu,
 		MenuItem = gui.MenuItem;
 
 	var util = Core.Lib.util,
 		file_util = util.file,
+		micaps_file_util = file_util.micaps,
 		path_util = util.path,
 		file_path = file_util.path,
 		icon_path = file_path.icon,
 		image_path = file_path.image;
 
+	var $doc = $(document);
+	var $current_text; // 用于操作当前编辑的文字对象
+	var _cache_e_contextmenu; // 用于缓存contextmenu事件对象
 	var is_img = Core.util.isImg;
 	// 引入amd模块加载器	
 	Core.Html.addScript('./js/libs/esl.js',false,function(){
@@ -49,13 +58,61 @@ Core.safe(function(){
 	var $geomap = $('#geomap');
 	// var gm;
 	var initing = false;
+	var Loading = (function(){
+		var $html;
+		function show(callback){
+			if(!$html){
+				$html = $('<div class="loading"><div>正在处理。。。</div></div>').appendTo($geomap_container);
+			}
+			$html.show(callback);
+		}
+		function hide(){
+			$html && $html.hide();
+		}
+		return {
+			show: show,
+			hide: hide
+		}
+	})();
 	function init(is_show_mask){
+		/*初始化onmessage监听器*/
+		CoreWindow.onMessage(function(e){
+			var data = e.data;
+			var type = data.type;
+			if(msgType.CONF_STYLE == type){
+				data = data.data;
+				var style = data.style,
+					text = data.text;
+
+				var styleObj = {};
+				if(style){
+					var styleArr = style.split(/;\s*/);
+					$.each(styleArr,function(i,v){
+						var arr = v.split(/:\s+/);
+						if(arr[0]){
+							styleObj[arr[0]] = arr[1];
+						}
+					});
+				}
+				if(!$current_text){
+					$current_text = MapLayer.text({
+						position: {
+							left: _cache_e_contextmenu.offsetX,
+							top: _cache_e_contextmenu.offsetY
+						}
+					}).appendTo($geomap_layer);
+				}
+				$current_text.css(styleObj).find('span').text(text);
+				$current_text = null;
+			}
+		});
 		initing = true;
 		require(['GeoMap'],function(GeoMap){
 			window.GeoMap = GeoMap;
 			gm = new GeoMap({
 				container: $geomap
 			});
+			Loading.show();
 			var Color = ['red','blue','#000','#123','#f26','#ccc','#333'];
 			
 			var china_json = '../../../git_project/GeoMap/json/china_mask.geo.json';
@@ -72,6 +129,72 @@ Core.safe(function(){
 				// gm.addMask(points,{
 				// 	is_lnglat: false
 				// });
+				function addTitle(conf_title, pos){
+					if(conf_title && conf_title.is_show){
+						var text = conf_title.text;
+						if(text){
+							MapLayer.text({
+								position: pos,
+								text: text,
+								style: conf_title.style
+							}).appendTo($geomap_layer);
+						}
+					}
+				}
+				$doc.on(ConstEvent.PRODUCT_CHANGE,function(e,product_name){
+					if(product_name){
+						var conf_of_product = ConfUser.get(product_name);
+						console.log(conf_of_product);
+						var conf_other = conf_of_product.other;
+						var logo = conf_other.logo;
+						if(logo){
+							add_maplayer_img(logo, 20, 20);
+						}
+						var conf_title = conf_of_product.title;
+						addTitle(conf_title.title_1, {
+							left: 110,
+							top: 20
+						});
+						addTitle(conf_title.title_2, {
+							left: 110,
+							top: 80
+						});
+						addTitle(conf_title.title_3, {
+							left: 20,
+							top: 700
+						});
+
+						var conf_in_out = conf_of_product.in_out;
+						var dir_in = conf_in_out.dir_in;
+						if( file_util.exists(dir_in) ){
+							var param = [dir_in];
+							var conf_file = conf_of_product.file;
+							var conf_file_rule = conf_in_out.file_rule;
+							if(conf_file_rule.type == "1"){
+								var rule_common = conf_file_rule.common;
+								param.push(rule_common.prefix+rule_common.date_format+rule_common.postfix+'.'+rule_common.file_suffix);
+							}else{
+								param.push(conf_file_rule.custom);
+							}
+							if(conf_file.is_newest){
+								param.push(conf_file.newest_days);
+							}else{
+								param.push(conf_file.time_start);
+								param.push(conf_file.time_end);
+							}
+							var file_newest = micaps_file_util.getNewest.apply(null,param);
+							if(file_newest){
+								console.log(file_newest);
+							}else{
+								alert('没有找到符合条件的文件，请检查产品相关配置！');
+							}
+						}else{
+							alert("请配置该产品的数据源路径！");
+						}						
+					}
+				});
+
+				$doc.trigger(ConstEvent.GEOMAP_INITED);
 				var data_url = 'http://10.14.85.116/nodejs_project/micaps/data/micaps/14/rr111314.024.json';
 				$.getJSON(data_url,function(data){
 					$.each(data.areas,function(i,v){
@@ -126,6 +249,8 @@ Core.safe(function(){
 					}
 
 					initing = false;
+
+					Loading.hide();
 				});
 			});
 		});
@@ -139,8 +264,6 @@ Core.safe(function(){
 		menu_layer_delete.on('click',function(){
 			var $layer = menu_layer._layer;
 			if($layer){
-				var id = $layer.attr('id');
-				MapLayer.clearCache(id);
 				$layer.remove();
 			}
 		});
@@ -148,8 +271,13 @@ Core.safe(function(){
 		function TextLayer(option){
 			var pos = option.position;
 			var ondblclick = option.ondblclick;
-			return $('<div class="texteditor">')
-				.html('<span></span>')
+			var $html = $('<div class="texteditor">');
+			var style = option.style;
+			if(style){
+				$html.attr('style',style);
+			}
+
+			$html.html('<span>'+(option.text||'')+'</span>')
 				.css(pos)
 				.addClass('off')
 				.resizable()
@@ -170,12 +298,15 @@ Core.safe(function(){
 							style: style
 						},win_textstyle.window);
 					});
+					$current_text = $this;
 					ondblclick && ondblclick.call(this);
 				}).on('contextmenu',function(e){
 					e.stopPropagation();
 					menu_layer._layer = $(this);
 					menu_layer.popup(e.clientX, e.clientY);
 				});
+			
+			return $html;
 		}
 		function ImageLayer(option,callback){
 			var pos = option.position;
@@ -184,7 +315,7 @@ Core.safe(function(){
 			img.onload = function(){
 				var width = this.width,
 					height = this.height;
-				var $html = $('<div class="map_layer_image off"  id="'+id+'"><img src="'+option.src+'"></div>')
+				var $html = $('<div class="map_layer_image off"><img src="'+option.src+'"></div>')
 					.css(pos)
 					.css({
 						width: 80,
@@ -214,44 +345,12 @@ Core.safe(function(){
 	
 	var $geomap_layer = $('#geomap_layer');
 	/*右侧地图的右键功能*/
-	$('#geomap_container').on('contextmenu',function(e_contextmenu){
+	var $geomap_container = $('#geomap_container');
+	$geomap_layer.on('contextmenu',function(e_contextmenu){
+		_cache_e_contextmenu = e_contextmenu; // 暂存事件对象
 		var $this = $(this);
 		var menu_map = $this.data('menu');
 		if(!menu_map){
-			var $current_text,contextmenu_postion;
-			CoreWindow.onMessage(function(e){
-				var data = e.data;
-				var type = data.type;
-				if(msgType.CONF_STYLE == type){
-					data = data.data;
-					var style = data.style,
-						text = data.text;
-
-					var styleObj = {};
-					if(style){
-						var styleArr = style.split(/;\s*/);
-						$.each(styleArr,function(i,v){
-							var arr = v.split(/:\s+/);
-							if(arr[0]){
-								styleObj[arr[0]] = arr[1];
-							}
-						});
-					}
-					if(!$current_text){
-						$current_text = MapLayer.text({
-							position: {
-								left: e_contextmenu.offsetX,
-								top: e_contextmenu.offsetY
-							},
-							ondblclick: function(){
-								$current_text = $(this);
-							}
-						}).appendTo($geomap_layer);
-					}
-					$current_text.css(styleObj).find('span').text(text);
-					$current_text = null;
-				}
-			});
 			menu_map = new Menu();
 			var menu_add_text = new MenuItem({label: '添加文字'});
 			menu_add_text.on('click',function(e){
@@ -259,18 +358,16 @@ Core.safe(function(){
 					CoreWindow.sendMsg(msgType.CONF_STYLE,{},win_textstyle.window);
 				});
 			});
-			var middle_pos_e = {
-				offsetX: $geomap_layer.width()/2,
-				offsetY: $geomap_layer.height()/2
-			};
+			
 			var menu_add_img_external = new MenuItem({label: '添加外部图片'});
 			menu_add_img_external.on('click',function(){
 				$('<input type="file" nwworkingdir="./image" />').on('change',function(){
-					add_maplayer_img(middle_pos_e,$(this).val());
+					add_maplayer_img($(this).val(), $geomap_layer.width()/2, $geomap_layer.height()/2);
 				}).click();
 			});
 			var menu_add_img_entrepot = new MenuItem({label: '添加图片库图片'});
 
+			/*显示图标库文件*/
 			var show_entrepot_images = (function(){
 				var $tool_image,$tool_image_main;
 				var isReload = false;
@@ -288,17 +385,6 @@ Core.safe(function(){
 						}
 					});
 					$container.html(html);
-					// $container.find('img').on('dragstart',function(e){
-					// 	e.preventDefault();
-					// 	e.stopPropagation();
-					// 	var src = $(this).attr('src');
-					// 	$geomap_layer.data('drag_img',src);
-					// 	console.log($geomap_layer.data('drag_img'));
-					// 	// var dataTransfer = e.originalEvent.dataTransfer;
-					// 	// dataTransfer.setDragImage($(this).get(0),0,0);
-					// 	// dataTransfer.setData('Text',src);
-					// 	return false;
-					// });
 				}
 				/*当重新配置图片库时要重新加载*/
 				function reloadFiles(){
@@ -362,48 +448,52 @@ Core.safe(function(){
 			menu_add_img_entrepot.on('click',function(){
 				show_entrepot_images();
 			});
-			menu_map.append(menu_add_text);
-			menu_map.append(new gui.MenuItem({ type: 'separator' }));
-			menu_map.append(menu_add_img_external);
-			menu_map.append(menu_add_img_entrepot);
-			menu_map.append(new gui.MenuItem({ type: 'separator' }));
 
 			var menu_save_img = new MenuItem({ label: '导出图片' });
 			menu_save_img.on('click',function(){
 				if(gm){
 					$('<input type="file" nwsaveas="a.png" />').on('change',function(){
 						var save_file_name = $(this).val();
-						var img_data = gm.toDataURL();
+						Loading.show(function(){
+							var img_data = gm.toDataURL();
 
-						var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+$geomap.width()+'px; height: '+$geomap.height()+'px"></div>').appendTo($('body'));
-						
-						var gm_export = new GeoMap({
-							container: $div_container
-						});
-						gm_export.addOverlay(new GeoMap.Image(img_data));
+							var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+$geomap.width()+'px; height: '+$geomap.height()+'px"></div>').appendTo($('body'));
+							
+							var gm_export = new GeoMap({
+								container: $div_container
+							});
+							gm_export.addOverlay(new GeoMap.Image(img_data));
 
-						var imgnum_waiting_draw = 0;
-						var tt_draw;
-						$geomap_layer.find('>div').each(function(i,v){
-							var $layer = $(this);
-							var layer;
-							if($layer.is('.texteditor')){
-								gm_export.addOverlay(new GeoMap.Text($layer.text(),$layer.attr('style')));
-							}else if($layer.is('.map_layer_image')){
-								var pos = $layer.position();
-								var img = $layer.find('img').get(0);
-								gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height()));
-							}
+							var imgnum_waiting_draw = 0;
+							var tt_draw;
+							$geomap_layer.find('>div').each(function(i,v){
+								var $layer = $(this);
+								var layer;
+								if($layer.is('.texteditor')){
+									gm_export.addOverlay(new GeoMap.Text($layer.text(),$layer.attr('style')));
+								}else if($layer.is('.map_layer_image')){
+									var pos = $layer.position();
+									var img = $layer.find('img').get(0);
+									gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height()));
+								}
+							});
+							img_data = gm_export.toDataURL();
+							img_data = img_data.substring(img_data.indexOf('base64,')+7);
+							img_data = new Buffer(img_data, 'base64');
+							util.writeFile(save_file_name, img_data);
+							$div_container.remove();
+							alert('成功导出图片!');
+							Loading.hide();
 						});
-						img_data = gm_export.toDataURL();
-						img_data = img_data.substring(img_data.indexOf('base64,')+7);
-						img_data = new Buffer(img_data, 'base64');
-						util.writeFile(save_file_name, img_data);
-						$div_container.remove();
-						alert('成功导出图片!');
 					}).click();
 				}
 			});
+
+			menu_map.append(menu_add_text);
+			menu_map.append(new gui.MenuItem({ type: 'separator' }));
+			menu_map.append(menu_add_img_external);
+			menu_map.append(menu_add_img_entrepot);
+			menu_map.append(new gui.MenuItem({ type: 'separator' }));
 			menu_map.append(menu_save_img);
 
 			$this.data('menu',menu_map);
@@ -411,18 +501,20 @@ Core.safe(function(){
 		menu_map.popup(e_contextmenu.clientX, e_contextmenu.clientY);
 	})
 	
-	function add_maplayer_img(e,src,i){
+	// 向地图添加图片
+	function add_maplayer_img(src, x, y, i){
 		var dis = 10*(i||0);
 		MapLayer.img({
 			position: {
-				left: e.offsetX + dis,
-				top: e.offsetY + dis
+				left: x + dis,
+				top: y + dis
 			},
 			src: src
 		},function($html){
 			$geomap_layer.append($html);
 		});
 	}
+
 	$geomap_layer.on('dragover',function(e){
 		e.preventDefault();
 	}).on('dragenter',function(e){
@@ -433,13 +525,14 @@ Core.safe(function(){
 		e = e.originalEvent;
 		var dataTransfer = e.dataTransfer;
 		var drag_img = dataTransfer.getData('Text');
+		var x = e.offsetX,y = e.offsetY;
 		if(drag_img && is_img(drag_img)){
-			add_maplayer_img(e,drag_img);
+			add_maplayer_img(drag_img, x, y);
 		}else{
 			var files = dataTransfer.files;
 			if(files.length > 0){
 				$.each(files,function(i,file){
-					add_maplayer_img(e,file.path,i);
+					add_maplayer_img(file.path, x, y, i);
 				})
 			}
 		}

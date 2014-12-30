@@ -19,6 +19,7 @@ Core.safe(function(){
 		current_textarea_title = $(this).prev('textarea');
 		var win_textstyle = Core.Page.textStyle(function(e){
 			CoreWindow.sendMsg(const_msgtype.CONF_STYLE,{
+				text: current_textarea_title.val(),
 				style: current_textarea_title.attr('style')
 			},win_textstyle.window);
 		});
@@ -109,7 +110,7 @@ Core.safe(function(){
 			}else{
 				rule = $text_file_rule_custom.val();
 			}
-			rule = rule && new Date().format(rule);
+			rule = rule && new Date().format(rule,true);
 
 			var dir = $text_file_dir_in.val();
 			if(dir){
@@ -304,7 +305,7 @@ Core.safe(function(){
 				'time_start': $date_start.val(),
 				'time_end': $date_end.val(),
 				'is_newest': $cb_is_newest.prop('checked'),
-				'newest_days': $number_newest_days.val()
+				'newest_days': parseInt($number_newest_days.val())|| 0
 			},
 			'in_out': {
 				'dir_in': $text_file_dir_in.val(),

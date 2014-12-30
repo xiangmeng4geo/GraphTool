@@ -639,6 +639,9 @@
             return this[0].t.rmNode(tpath);
         }
     }
+    $.fn.getFirstSubItem = function(){
+        return $(this).find('.bbit-tree-node-leaf:first');
+    }
     var src = $('script').last().attr('src');
     Core.Html.addLink(Core.Path.resolve('../../css/jquery.tree/tree.css',src));
 })(jQuery);

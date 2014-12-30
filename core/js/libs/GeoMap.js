@@ -95,6 +95,7 @@ define('GeoMap',['zrender',
 			// group: group
 		}
 	}
+	
 	var GeoMap = function(conf){
 		var _this = this;
 		_this.conf = conf = $.extend({},default_conf,conf);
@@ -213,11 +214,7 @@ define('GeoMap',['zrender',
 		var _this = this;
 		var shape = overlay.draw(this);
 		var group = _this.groups[group_name];
-		// if(group){
-		// 	group.addChild(shape);
-		// }else{
-			this.canvas.addShape(shape);
-		// }
+		this.canvas.addShape(shape);
 		
 		this.canvas.render();
 		return shape;

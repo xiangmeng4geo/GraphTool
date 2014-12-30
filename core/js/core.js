@@ -65,16 +65,18 @@
 	}();
 
 	/*时间格式化*/
-	Date.prototype.format = function(format){
+	Date.prototype.format = function(format,is_not_second){
 		format || (format = 'yyyy-MM-dd hh:mm:ss');
 		var o = {
 			"M+" : this.getMonth()+1, //month
 			"d+" : this.getDate(),    //day
 			"h+" : this.getHours(),   //hour
 			"m+" : this.getMinutes(), //minute
-			"s+" : this.getSeconds(), //second
 			"q+" : Math.floor((this.getMonth()+3)/3),  //quarter
-			"S" : this.getMilliseconds() //millisecond
+		}
+		if(!is_not_second){
+			b["s+"] = this.getSeconds(); //second
+			b["S"] = this.getMilliseconds() //millisecond
 		}
 		if(/(y+)/.test(format)){
 			format = format.replace(RegExp.$1,(this.getFullYear()+"").substr(4 - RegExp.$1.length));
@@ -240,6 +242,10 @@
 	}
 	/*常量*/
 	Core.Const = conf.get('const');
+	Core.Const.Event = {
+		'GEOMAP_INITED': '0',
+		'PRODUCT_CHANGE': '1'
+	};
 	var $doc = $(document);
 	var message_listeners = [];
 	

@@ -6,7 +6,11 @@
 		Page = Core.Page;
 
 	var CoreWindow = Core.Window;
-	var msgType = Core.Const.msgType;
+	var Const = Core.Const,
+		ConstMsgType = Const.msgType,
+		ConstEvent = Const.Event;
+
+	var $doc = $(document);
 	$('#btn_quite').click(function(){
 		Page.logout();
 	});
@@ -54,7 +58,7 @@
 				root = {
 					"id" : 'root',
 				    "text" : '根目录',
-				    "showcheck" : true,
+				    "showcheck" : false,
 				    "complete" : true,
 				    "isexpand" : true,
 				    "checkstate" : 0,
@@ -70,7 +74,7 @@
 			
 			$tree.treeview({
 				data: root,
-				showcheck: true,
+				showcheck: false,
 				cbiconpath: 'img/jquery.tree/',
 		        // onnodeclick:function(item){
 		        // 	alert(item.text+' '+item.value);
@@ -84,9 +88,13 @@
 		        		menu_tree.popup(e.clientX, e.clientY);
 		        	}
 		        },
-		        onnodedblclick: function(e){
-		        	
+		        onnodedblclick: function(e,item){
+		        	$doc.trigger(ConstEvent.PRODUCT_CHANGE,item.text);
 		        }   
+		    });
+		    $doc.on(ConstEvent.GEOMAP_INITED,function(){
+		    	console.log('ConstEvent.GEOMAP_INITED');
+		    	$tree.getFirstSubItem().dblclick();
 		    });
 		}
 		/*更新文件*/
@@ -136,7 +144,7 @@
 		CoreWindow.onMessage(function(e){
 			var data = e.data;
 			var type = data.type;
-			if(msgType.ADD_PRODUCT == type){
+			if(ConstMsgType.ADD_PRODUCT == type){
 				data = data.data;
 				var d_type = data.type,
 					d_name = data.name;
@@ -183,7 +191,7 @@
 		var menu_conf = new MenuItem({ label: '产品配置' });
 		menu_conf.on('click',function(){
 			var win_confproduct = Page.confProduct(function(){
-				CoreWindow.sendMsg(msgType.CONF_PRODUCT,contextmenu_item.text,win_confproduct.window);
+				CoreWindow.sendMsg(ConstMsgType.CONF_PRODUCT,contextmenu_item.text,win_confproduct.window);
 			});
 		});
 		menu_tree.append(menu_conf);
