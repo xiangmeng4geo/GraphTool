@@ -125,14 +125,6 @@ Core.safe(function(){
 						});
 					}
 
-					var text_style = 'left: 353px; top: 160px; position: absolute; font-size: 50px; color: rgb(0, 128, 0); font-weight: bold; font-style: italic; text-decoration: line-through underline; background-color: transparent;';
-					var geo_text = new GeoMap.Text('abc测试中文hello',text_style);
-					gm.addOverlay(geo_text);
-					gm.addOverlay(new GeoMap.Image(
-							'file:///E:/source/nodejs_project/GraphTool/image/icon/%E5%9B%BE%E6%A0%87/5.%E7%9C%81%E6%B0%94%E8%B1%A1%E5%B1%80%E5%9B%BE%E6%A0%87_256/%E4%B8%AD%E5%9B%BD%E6%B0%94%E8%B1%A1%E5%B1%80.png',
-							184,430,80,80
-							));
-
 					initing = false;
 				});
 			});
@@ -153,13 +145,9 @@ Core.safe(function(){
 			}
 		});
 		menu_layer.append(menu_layer_delete);
-		var cache_layer = {};
-		var index = 0;
-		function getCid(){
-			return '_layer_'+(index++);
-		}
 		function TextLayer(option){
 			var pos = option.position;
+			var ondblclick = option.ondblclick;
 			return $('<div class="texteditor">')
 				.html('<span></span>')
 				.css(pos)
@@ -182,6 +170,7 @@ Core.safe(function(){
 							style: style
 						},win_textstyle.window);
 					});
+					ondblclick && ondblclick.call(this);
 				}).on('contextmenu',function(e){
 					e.stopPropagation();
 					menu_layer._layer = $(this);
@@ -189,12 +178,10 @@ Core.safe(function(){
 				});
 		}
 		function ImageLayer(option,callback){
-			var id = getCid();
 			var pos = option.position;
 			var src = option.src;
 			var img = new Image();
 			img.onload = function(){
-				cache_layer[id] = img;
 				var width = this.width,
 					height = this.height;
 				var $html = $('<div class="map_layer_image off"  id="'+id+'"><img src="'+option.src+'"></div>')
@@ -220,14 +207,6 @@ Core.safe(function(){
 			img.src = src;
 		}
 		return {
-			clearCache: function(id){
-				try{
-					delete cache_layer[id];
-				}catch(e){}
-			},
-			getCache: function(id){
-				return cache_layer[id];
-			},
 			text: TextLayer,
 			img: ImageLayer
 		}
@@ -263,6 +242,9 @@ Core.safe(function(){
 							position: {
 								left: e_contextmenu.offsetX,
 								top: e_contextmenu.offsetY
+							},
+							ondblclick: function(){
+								$current_text = $(this);
 							}
 						}).appendTo($geomap_layer);
 					}
@@ -408,27 +390,17 @@ Core.safe(function(){
 							if($layer.is('.texteditor')){
 								gm_export.addOverlay(new GeoMap.Text($layer.text(),$layer.attr('style')));
 							}else if($layer.is('.map_layer_image')){
-								imgnum_waiting_draw++;
-								var img = new Image();
-								img.onload = function(){
-									imgnum_waiting_draw--;
-									var pos = $layer.position();
-									gm_export.addOverlay(new GeoMap.Image(img.src, pos.left, pos,top, $layer.width(), $layer.height()));
-									clearTimeout(tt_draw);
-									tt_draw = setTimeout(function(){
-										if(imgnum_waiting_draw <=0 ){
-											console.log(gm_export.toDataURL());
-											img_data = img_data.substring(img_data.indexOf('base64,')+7);
-											img_data = new Buffer(img_data, 'base64');
-											util.writeFile(save_file_name, img_data);
-											$(layer).remove();
-											alert('成功导出图片!');
-										}
-									},1000);
-								}
-								img.src = $layer.find('img').attr('src');
+								var pos = $layer.position();
+								var img = $layer.find('img').get(0);
+								gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height()));
 							}
 						});
+						img_data = gm_export.toDataURL();
+						img_data = img_data.substring(img_data.indexOf('base64,')+7);
+						img_data = new Buffer(img_data, 'base64');
+						util.writeFile(save_file_name, img_data);
+						$div_container.remove();
+						alert('成功导出图片!');
 					}).click();
 				}
 			});
