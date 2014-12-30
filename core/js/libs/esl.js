@@ -1048,6 +1048,9 @@ var require;
     function createLocalRequire( baseId ) {
         var requiredCache = {};
         function req( requireId, callback ) {
+            if(requireId == 'nw.gui'){
+                return nwDispatcher.requireNwGui();
+            }
             if ( typeof requireId == 'string' ) {
                 var requiredModule;
                 if ( !( requiredModule = requiredCache[ requireId ] ) ) {

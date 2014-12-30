@@ -4,10 +4,12 @@
 	Core.require = nwrequire;
 	Core.Lib = nwrequire('core');
 	var conf = Core.Lib.conf;
-	var gui = nwrequire('nw.gui'),
+
+	var gui = nwDispatcher.requireNwGui(),// replace require('nw.gui')
 		Window = gui.Window,
 		win = Window.get();
 	win.focus();
+
 	!function(){
 		var DIRNAME_RE = /[^?#]*\//
 		function dirname(path) {
