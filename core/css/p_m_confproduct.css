@@ -8,12 +8,11 @@
 	height: 32px;
 	width: 98%;
 	margin: 0 auto;
+	top: 1px;
 }
 #c_top ul{
 	overflow: hidden;
 	padding-left: 5%;
-	position: absolute;
-	top: 1px;
 }
 #c_top li{
 	padding: 0 5px;

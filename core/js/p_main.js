@@ -1,8 +1,7 @@
 !function(){
 	var is_admin = true;
 	var CONF_NAME_SYS_PRODUCT_TREE = 'sys_product_tree';
-	var nwrequire = require;
-	var nwCore = nwrequire('core'),
+	var nwCore = Core.require('core'),
 		nwConf = nwCore.conf,
 		Page = Core.Page;
 
@@ -30,7 +29,7 @@
 				var opt = {
 					"id" : id,
 				    "text" : v.name,
-				    "showcheck" : true,
+				    "showcheck" : false,
 				    "complete" : true,
 				    "isexpand" : true,
 				    "checkstate" : 0,
@@ -84,7 +83,10 @@
 		        	if(menu_tree.items.length > 0){
 		        		menu_tree.popup(e.clientX, e.clientY);
 		        	}
-		        }    
+		        },
+		        onnodedblclick: function(e){
+		        	
+		        }   
 		    });
 		}
 		/*更新文件*/

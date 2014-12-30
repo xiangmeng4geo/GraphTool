@@ -18,7 +18,9 @@ Core.safe(function(){
 	$('#fieldset_title input[type=button]').click(function(){
 		current_textarea_title = $(this).prev('textarea');
 		var win_textstyle = Core.Page.textStyle(function(e){
-			CoreWindow.sendMsg(const_msgtype.CONF_STYLE,current_textarea_title.attr('style'),win_textstyle.window);
+			CoreWindow.sendMsg(const_msgtype.CONF_STYLE,{
+				style: current_textarea_title.attr('style')
+			},win_textstyle.window);
 		});
 	});
 
@@ -42,9 +44,11 @@ Core.safe(function(){
 		var data = e.data;
 		var type = data.type;
 		if(const_msgtype.CONF_STYLE == type){
-			var style = data.data;
+			data = data.data;
 			if(current_textarea_title){
-				current_textarea_title.attr('style',style);
+				var style = data.style,
+					text = data.text;
+				current_textarea_title.val(text).attr('style',style);
 				current_textarea_title.css('line-height',current_textarea_title.css('font-size'));
 			}
 			current_textarea_title = null;

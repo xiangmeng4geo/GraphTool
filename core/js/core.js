@@ -1,10 +1,13 @@
 !function(global){
-	var nwrequire = require;
-	var lib_core = nwrequire('core');
-	var conf = lib_core.conf;
+	var nwrequire = global.require;
 	var Core = {};
 	Core.require = nwrequire;
-	Core.Lib = lib_core;
+	Core.Lib = nwrequire('core');
+	var conf = Core.Lib.conf;
+	var gui = nwrequire('nw.gui'),
+		Window = gui.Window,
+		win = Window.get();
+	win.focus();
 	!function(){
 		var DIRNAME_RE = /[^?#]*\//
 		function dirname(path) {
@@ -84,9 +87,17 @@
 	}
 	var $header = $('head');
 	// 可以解决模块依赖css问题
-	Core.Style = {
+	Core.Html = {
 		addLink: function(link_src){
 			$('<link rel="stylesheet" type="text/css" href="'+link_src+'">').appendTo($header);
+		},
+		addScript: function(script_src,is_sync,callback){
+			if(is_sync){
+				document.write('<script src="'+script_src+'"></'+'script>');
+				callback && callback();
+			}else{
+				$('<script>').on('load',callback).appendTo('body').attr('src',script_src);
+			}
 		}
 	}
 
@@ -154,11 +165,6 @@
 			console.log(e,e.stack);
 		};
 	}
-
-	var gui = nwrequire('nw.gui'),
-		Window = gui.Window,
-		win = Window.get();
-	win.focus();
 	
 	var conf_gui_window = gui.App.manifest.window;
 	/*按指定文件加载页面*/
@@ -183,7 +189,6 @@
 				_win = _open(name);
 				if(callback){
 					_win.on('loaded',function(e){
-						console.log(name,'loaded');
 						callback.call(_win,e);
 					});
 					_win.on('focus',function(){
@@ -333,5 +338,10 @@
 			toHTML: color_rgb2normal
 		}
 	}();
+	Core.util = {
+		isImg: function is_img(file_path){
+			return /\.(jpg|bmp|gif|png)$/i.test(file_path)
+		}
+	}
 	global.Core = Core;
 }(this);
