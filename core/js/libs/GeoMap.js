@@ -7,8 +7,7 @@ define('GeoMap',['zrender',
 	'zrender/shape/Text',
 	'zrender/shape/Image'],function(Zrender,Base,Polygon,BrokenLine,Group,util,TextShape,ImageShape){
 	var ZINDEX_MAP = 2,
-		ZINDEX_WEATHER = 1,
-		ZINDEX_LAYER = 3;
+		ZINDEX_LAYER = 1;
 
 	// retina 屏幕优化
     var devicePixelRatio = window.devicePixelRatio || 1;
@@ -92,7 +91,7 @@ define('GeoMap',['zrender',
 			},
 			width: width_container,
 			height: height_container,
-			// group: group
+			layers: []
 		}
 	}
 	
@@ -103,13 +102,11 @@ define('GeoMap',['zrender',
 
 		_init_geomap.call(_this);
 	};
-	GeoMap.GROUP = {
-		MAP: 'map',
-		SHAPE: 'shape',
-		LEGEND: 'legend'
-	};
 	var GeoMapProp = GeoMap.prototype;
 	function addGeoPolygon(coordinates,options){
+		if(options){
+			options.zlevel = ZINDEX_MAP;
+		}
 		var shapes = [];
 		var gm = this;
 		var is_not_lnglat = !options.is_lnglat;
@@ -122,7 +119,7 @@ define('GeoMap',['zrender',
 			// polygon.draw(gm);
 			polygon.points = points;
 			shapes.push(polygon);
-			gm.addOverlay(polygon,GeoMap.GROUP.MAP);
+			gm.addOverlay(polygon);
 		});
 		return shapes;
 	}
@@ -217,7 +214,21 @@ define('GeoMap',['zrender',
 		this.canvas.addShape(shape);
 		
 		this.canvas.render();
+
+		if(shape.zlevel == ZINDEX_LAYER){
+			_this._data.layers.push(shape);
+		}
 		return shape;
+	}
+	GeoMapProp.clearLayers = function(){
+		var canvas = this.canvas;
+		var layers = this._data.layers;
+		var temp_layer;
+		while(temp_layer = layers.shift()){
+			canvas.delShape(temp_layer.id);
+		}
+		canvas.refresh();
+		this._data.layers
 	}
 	var pointToOverlayPixel = GeoMapProp.pointToOverlayPixel = function(point){
 		var is_lnglat = point.is_lnglat;
@@ -238,28 +249,6 @@ define('GeoMap',['zrender',
 			y: (center.y - point.y)*scale + height/1.8//这里出来的数据暂时有一个整体偏移
 		}
 	}
-	var MyShape = function(options){
-        Base.call(this, options);
-    }
-    MyShape.prototype = {
-        type: 'MyShape',
-        buildPath: function(ctx,style){
-            ctx.beginPath();
-            ctx.arc(300,300,200,0,Math.PI*2);
-            ctx.rect(100,100,100,100);
-            ctx.moveTo(300,200);
-            ctx.lineTo(400,150);
-            ctx.lineTo(420,150);
-            ctx.lineTo(500,100);
-            
-            ctx.moveTo(500,100);
-            ctx.lineTo(500,250);
-            ctx.lineTo(520,250);
-            ctx.lineTo(500,200);
-            ctx.closePath();
-        }
-    }
-    util.inherits(MyShape, Base);
     function _doclip(ctx){
 		var polygons = this.polygons;
 		if($.isArray(polygons)){
@@ -288,7 +277,7 @@ define('GeoMap',['zrender',
 		if(!polygons){
 			return;
 		}
-		var ctx = this.canvas.painter.getLayer(ZINDEX_WEATHER).ctx;
+		var ctx = this.canvas.painter.getLayer(ZINDEX_LAYER).ctx;
 		_doclip.call(this,ctx);
 	}
 	
@@ -415,6 +404,7 @@ define('GeoMap',['zrender',
 		        textColor: 'black',
 		        textPosition : 'inside'// default top
 			},
+			zlevel: ZINDEX_LAYER,
 			needTransform: true,
 			needLocalTransform: true,
 			hoverable: false
@@ -447,6 +437,7 @@ define('GeoMap',['zrender',
 		        lineWidth : 1,
 		        strokeColor : 'red',
 			},
+			zlevel: ZINDEX_LAYER,
 			needTransform: true,
 			needLocalTransform: true,
 			hoverable: false
@@ -545,7 +536,7 @@ define('GeoMap',['zrender',
 			lineCap: 'butt',
 			strokeStyle: "green",
 			repeat: 'repeat',
-			space: 3,
+			space: 2,
 		},options);
 
 		var size = options.space * 3;

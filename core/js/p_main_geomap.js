@@ -112,13 +112,87 @@ Core.safe(function(){
 			gm = new GeoMap({
 				container: $geomap
 			});
+			function render_conf(data, blendent){
+				var isHaveManyBlendent = blendent.length > 1;
+				function getColorByCondition(val, range){
+					for(var i = 0,j=range.length;i<j;i++){
+						var case_range = range[i];
+						var val_range = case_range.val;
+						if(val >= val_range[0] && val < val_range[1]){
+							return case_range.color;
+						}
+					}
+				}
+				function getColor(code, val){
+					if(isHaveManyBlendent){
+						for(var i = 0,j = blendent.length;i<j;i++){
+							var v = blendent[i];
+							if(code == v.val.v){
+								return getColorByCondition(val, v.colors);
+							}
+						}
+					}else{
+						return getColorByCondition(val, blendent[0].colors);
+					}
+				}
+				$.each(data.areas,function(i,v){
+					var point_arr = [];
+					$.each(v.items,function(v_i,v_v){
+						var point = new GeoMap.Point(v_v.x,v_v.y);
+						point_arr.push(point);
+					});
+					var radom_color = Color[Math.floor(Math.random()*Color.length)];
+					var strokeColor = 'rgba(0,0,0,0)';
+
+					var symbols = v.symbols;
+					var val_area = symbols? symbols.text : '';
+					strokeColor = getColor(v.code, val_area);
+					radom_color = strokeColor;
+					if(v.code == 24){
+						// strokeColor = 'red';
+						radom_color = new GeoMap.Pattern.Streak({
+							strokeStyle: strokeColor,
+							space: 1
+						});
+					}
+					var polygon = new GeoMap.Polygon(point_arr, {
+						style: {
+							strokeColor: strokeColor, 
+							color: radom_color,
+							lineWidth: 0.2
+						}
+					});
+					gm.addOverlay(polygon);   //增加面
+				});
+
+				var line_symbols = data.line_symbols;
+				if(line_symbols){
+					$.each(line_symbols,function(i,v){
+						if(v.code == 0){
+							return;
+						}
+						var point_arr = [];
+						$.each(v.items,function(v_i,v_v){
+							var point = new GeoMap.Point(v_v.x, v_v.y);
+							point_arr.push(point);
+						});
+						var polyline = new GeoMap.Polyline(point_arr,{
+							style: {
+								strokeColor : 'blue',
+								lineWidth : 2,
+							}
+						});
+						gm.addOverlay(polyline);   //增加折线
+					});
+				}
+			}
 			Loading.show();
 			var Color = ['red','blue','#000','#123','#f26','#ccc','#333'];
 			
 			var china_json = '../../../git_project/GeoMap/json/china_mask.geo.json';
 			china_json = '../shell/data/china_mask.geo.meractor.json';
-			// china_json = '../shell/data/china_province.meractor.json';
-			// china_json = '../../../git_project/GeoMap/json/china.geo.json';
+			china_json = '../shell/data/china_province.meractor.json';
+			china_json = '../../../git_project/GeoMap/json/china.geo.json';
 			gm.loadGeo([china_json],{
 				style: {
 					// color: '#F5F3F0',
@@ -141,10 +215,15 @@ Core.safe(function(){
 						}
 					}
 				}
-				$doc.on(ConstEvent.PRODUCT_CHANGE,function(e,product_name){
+				$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
 					if(product_name){
+						$('.map_layer').remove();
+						gm.clearLayers();
 						var conf_of_product = ConfUser.get(product_name);
-						console.log(conf_of_product);
+						if(!conf_of_product){
+							return alert('请对该产品进行配置！');
+						}
+						// console.log(conf_of_product);
 						var conf_other = conf_of_product.other;
 						var logo = conf_other.logo;
 						if(logo){
@@ -184,74 +263,21 @@ Core.safe(function(){
 							}
 							var file_newest = micaps_file_util.getNewest.apply(null,param);
 							if(file_newest){
-								console.log(file_newest);
+								var conf_file_newest = file_util.readFile(file_newest,true);
+								render_conf(conf_file_newest, conf_of_product.legend.blendent);
 							}else{
 								alert('没有找到符合条件的文件，请检查产品相关配置！');
 							}
 						}else{
 							alert("请配置该产品的数据源路径！");
-						}						
+						}
+						initing = false;
+
+						Loading.hide();				
 					}
 				});
 
 				$doc.trigger(ConstEvent.GEOMAP_INITED);
-				var data_url = 'http://10.14.85.116/nodejs_project/micaps/data/micaps/14/rr111314.024.json';
-				$.getJSON(data_url,function(data){
-					$.each(data.areas,function(i,v){
-						var point_arr = [];
-						$.each(v.items,function(v_i,v_v){
-							var point = new GeoMap.Point(v_v.x,v_v.y);
-							point_arr.push(point);
-						});
-						var radom_color = Color[Math.floor(Math.random()*Color.length)];
-						var strokeColor = 'rgba(0,0,0,0)';
-						if(v.code == 24){
-							strokeColor = 'red';
-							radom_color = new GeoMap.Pattern.Streak({
-								strokeStyle: strokeColor,
-								space: 2
-							});
-
-						}
-						var polygon = new GeoMap.Polygon(point_arr, {
-							style: {
-								strokeColor: strokeColor, 
-								color: radom_color,
-								fillOpacity: 0.9, 
-								strokeWeight: 1, 
-								strokeOpacity:1
-							},
-							zlevel: 1
-						});
-						gm.addOverlay(polygon,GeoMap.GROUP.SHAPE);   //增加面
-					});
-
-					var line_symbols = data.line_symbols;
-					if(line_symbols){
-						$.each(line_symbols,function(i,v){
-							if(v.code == 0){
-								return;
-							}
-							var point_arr = [];
-							$.each(v.items,function(v_i,v_v){
-								var point = new GeoMap.Point(v_v.x, v_v.y);
-								point_arr.push(point);
-							});
-							var polyline = new GeoMap.Polyline(point_arr,{
-								style: {
-									strokeColor : 'blue',
-									lineWidth : 2,
-								},
-								zlevel: 1
-							});
-							gm.addOverlay(polyline,GeoMap.GROUP.SHAPE);   //增加折线
-						});
-					}
-
-					initing = false;
-
-					Loading.hide();
-				});
 			});
 		});
 	}
@@ -268,10 +294,11 @@ Core.safe(function(){
 			}
 		});
 		menu_layer.append(menu_layer_delete);
+		// 文字图层
 		function TextLayer(option){
 			var pos = option.position;
 			var ondblclick = option.ondblclick;
-			var $html = $('<div class="texteditor">');
+			var $html = $('<div class="texteditor map_layer">');
 			var style = option.style;
 			if(style){
 				$html.attr('style',style);
@@ -308,6 +335,7 @@ Core.safe(function(){
 			
 			return $html;
 		}
+		// 图片图层
 		function ImageLayer(option,callback){
 			var pos = option.position;
 			var src = option.src;
@@ -315,7 +343,7 @@ Core.safe(function(){
 			img.onload = function(){
 				var width = this.width,
 					height = this.height;
-				var $html = $('<div class="map_layer_image off"><img src="'+option.src+'"></div>')
+				var $html = $('<div class="map_layer map_layer_image off"><img src="'+option.src+'"></div>')
 					.css(pos)
 					.css({
 						width: 80,

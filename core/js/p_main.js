@@ -93,7 +93,7 @@
 		        }   
 		    });
 		    $doc.on(ConstEvent.GEOMAP_INITED,function(){
-		    	console.log('ConstEvent.GEOMAP_INITED');
+		    	// console.log('ConstEvent.GEOMAP_INITED');
 		    	$tree.getFirstSubItem().dblclick();
 		    });
 		}
