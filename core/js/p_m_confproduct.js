@@ -78,12 +78,16 @@ Core.safe(function(){
 		$select_file_rule_common_date = $('#select_file_rule_common_date'),
 		$text_file_rule_common_postfix = $('#text_file_rule_common_postfix'),
 		$select_file_rule_common_postfix = $('#select_file_rule_common_postfix');
-		$file_rule_example_span = $('#file_rule_example span');
+		$file_rule_example_span = $('#file_rule_example span'),
+		$select_file_type = $('#select_file_type'),
+		$select_file_hour = $('#select_file_hour');
 	/*初始化文件选定*/
 	!function(){
 		var const_file_rule = Core.Const.fileRule,
 			file_rule_time = const_file_rule.time_rule,
-			file_rule_file_postfix = const_file_rule.file_postfix;
+			file_rule_file_postfix = const_file_rule.file_postfix,
+			file_type = const_file_rule.file_type,
+			file_hour = const_file_rule.file_hour;
 
 		var html_file_rule_time = '';
 		$.each(file_rule_time,function(i,v){
@@ -96,6 +100,18 @@ Core.safe(function(){
 			html_file_rule_file_postfix += '<option value="'+v+'">'+v+'</option>';
 		});
 		$select_file_rule_common_postfix.html(html_file_rule_file_postfix);
+
+		var html_file_type = '';
+		$.each(file_type,function(i,v){
+			html_file_type += '<option value="'+v.v+'">'+v.n+'</option>';
+		});
+		$select_file_type.html(html_file_type);
+
+		var html_file_hour = '';
+		$.each(file_hour,function(i,v){
+			html_file_hour += '<option value="'+v+'">'+v+'</option>';
+		});
+		$select_file_hour.html(html_file_hour);
 
 
 		var $text_file_dir_in = $('#text_file_dir_in');
@@ -122,7 +138,6 @@ Core.safe(function(){
 		file_rule_example();
 	}();
 
-	
 	var html_legend_unit = '';
 	$.each(Core.Const.legend.unit,function(i,v){
 		html_legend_unit += '<option value="'+v+'">'+v+'</option>';
@@ -133,7 +148,9 @@ Core.safe(function(){
 	var $btn_add_new_legend = $('#btn_add_new_legend').click(function(){
 		var val = init_legend_product.add();
 		$(html_fieldset_color.replace('_N_',val.n)).data('val_c',val).appendTo($legend_left);
-	});	
+	});
+
+	// 初始化图例设置
 	var init_legend_product = (function(){
 		var const_legend_product = Core.Const.legend.product;
 		var show_product = const_legend_product.slice(0);
@@ -318,7 +335,9 @@ Core.safe(function(){
 						'file_suffix': $select_file_rule_common_postfix.val() 
 					},
 					'custom': $text_file_rule_custom.val(),
-					'type': $('[name=file_rule]:checked').val()
+					'type': $('[name=file_rule]:checked').val(),
+					'file_type': $select_file_type.val(),
+					'file_hour': $select_file_hour.val()
 				}
 			},
 			'title': {
@@ -414,6 +433,9 @@ Core.safe(function(){
 				}
 				$text_file_rule_custom.val(file_rule.custom);
 				$('[name=file_rule]').filter('[value='+file_rule.type+']').prop('checked',true);
+
+				selected_option($select_file_type, file_rule.file_type);
+				selected_option($select_file_hour, file_rule.file_hour);
 			}
 			var conf_title = conf_product.title;
 			var conf_title_1 = conf_title.title_1;

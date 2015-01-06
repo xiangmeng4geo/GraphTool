@@ -517,7 +517,6 @@ define('GeoMap',['zrender',
 		if(height){
 			style.height = height;
 		}
-		console.log(style);
 		this.shape = new ImageShape({
 			style: style,
 			zlevel: ZINDEX_LAYER
