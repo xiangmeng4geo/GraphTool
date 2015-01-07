@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../../core/css/reset.css">
+		<style type="text/css">
+		body{
+			padding: 100px;
+		}
+		.legend_landscape{
+			width: 1024px;
+		}
+		.legend_landscape ul{
+			overflow: hidden;
+		}
+		.legend_landscape li{
+			float: left;
+			height: 30px;
+			width: 12.5%;
+		}
+		.legend_landscape li div{
+			background-color: red;
+			width: 100%;
+			height: 100%;
+		}
+		.legend_landscape li span{
+			width: 100%;
+			height: 100%;
+			line-height: 30px;
+			text-align: center;
+			float: left;
+			margin-top: -30px;
+		}
+
+		.portrait{position: relative; overflow: hidden;width: auto;display: inline-block;}
+		.portrait>div{
+			overflow: hidden;
+		}
+		.portrait>div span{
+			width: 45%;
+			margin-left: 5%;
+			float: left;
+			height: 100%;
+		}
+		.portrait ul{
+			float: left;
+			margin-right: 20px;
+		}
+		.portrait li{
+			text-align: center;
+			margin-bottom: 2px;
+			height: 16px;
+			line-height: 16px;
+		}
+		.portrait li div{
+			float: left;
+			width: 30px;
+			height: 100%;
+			background-color: red;
+			margin-right: 2px;
+		}
+		</style>
+	</head>
+	<body>
+		<script src="../../core/js/libs/jquery-2.1.1.min.js"></script>
+		<div class="portrait">
+			<div>
+				<span>雨</span>
+				<span>雨夹雪或雨转雪</span>
+			</div>
+			<ul>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+			</ul>
+			<ul>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+			</ul>
+		</div>
+
+		<div class="legend_landscape">
+			<div>
+				<span>雨</span>
+				<span>雨夹雪或雨转雪</span>
+			</div>
+			<ul>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+			</ul>
+			<ul>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+				<li><div></div><span>0-10</span></li>
+			</ul>
+		</div>
+	</body>
+</html>

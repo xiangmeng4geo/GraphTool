@@ -81,3 +81,68 @@ ul,ol{
 .mt10{
 	margin-top: 10px;
 }
+
+/* 图例 { */
+.legend_tmp{
+	position: fixed;
+	left: 100%;
+	top: 100%;
+	z-index: -100;
+	/*top: 0;*/
+	width: 100%;
+	height: 100%;
+}
+.legend_landscape{
+	width: 1024px;
+	font-size: 18px;
+}
+.legend_landscape ul{
+	overflow: hidden;
+}
+.legend_landscape li{
+	float: left;
+	height: 30px;
+	width: 12.5%;
+}
+.legend_landscape li div{
+	background-color: red;
+	width: 100%;
+	height: 100%;
+}
+.legend_landscape li span{
+	width: 100%;
+	height: 100%;
+	line-height: 30px;
+	text-align: center;
+	float: left;
+	margin-top: -30px;
+}
+
+.legend_portrait{position: relative;overflow: hidden;width: auto;display: inline-block;}
+.legend_portrait>div{
+	overflow: hidden;
+}
+.legend_portrait>div span{
+	width: 45%;
+	margin-right: 20px;
+	float: left;
+	height: 100%;
+}
+.legend_portrait ul{
+	float: left;
+	margin-right: 20px;
+}
+.legend_portrait li{
+	text-align: center;
+	margin-bottom: 2px;
+	height: 16px;
+	line-height: 16px;
+}
+.legend_portrait li div{
+	float: left;
+	width: 30px;
+	height: 100%;
+	background-color: red;
+	margin-right: 2px;
+}
+/* } 图例 */

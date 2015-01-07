@@ -278,6 +278,7 @@ Core.safe(function(){
 					text = '≤'+val[0]+'<'+val[1];
 			}
 			color_arr.push({
+				is_checked: true,
 				color: color,
 				val: val,
 				text: text
@@ -289,12 +290,14 @@ Core.safe(function(){
 	function getTable(color_arr){
 		var html_table = '<table>'+
 								'<tr>'+
-									'<th width="40%">颜色值</th>'+
+									'<th width="10%">状态</th>'+
+									'<th width="30%">颜色值</th>'+
 									'<th width="30%">值域</th>'+
 									'<th width="30%">显示文字</th>'+
 								'</tr>';
 		$.each(color_arr,function(i,v){
 			html_table += '<tr>'+
+								'<td><input type="checkbox" '+(v.is_checked?'checked':'')+'/></td>'+
 								'<td><input type="color" value="'+v.color+'"/></td>'+
 								'<td>'+(v.val[0] == Number.MIN_VALUE?'':v.val[0])+'~'+(v.val[1] == Number.MAX_VALUE?'':v.val[1])+'</td>'+
 								'<td contentEditable="true" class="no_outline">'+v.text+'</td>'+
@@ -386,11 +389,12 @@ Core.safe(function(){
 			var colors = [];
 			$this.find('tr').each(function(tr_i,tr_v){
 				var $td = $(tr_v).find('td');
-				if($td.length == 3){
+				if($td.length == 4){
 					colors.push({
-						'color': $td.eq(0).find('input').val(),
-						'val': $td.eq(1).text().split('~'),
-						'text': $td.eq(2).text()
+						'is_checked': $td.eq(0).find('input').prop('checked'),
+						'color': $td.eq(1).find('input').val(),
+						'val': $td.eq(2).text().split('~'),
+						'text': $td.eq(3).text()
 					});
 				}
 			});
@@ -473,7 +477,7 @@ Core.safe(function(){
 					$html_fieldset_color.find('.number_level').val(v.number_level);
 					var colors = v.colors;
 					if(colors && colors.length > 0){
-						$html_fieldset_color.append(getTable(colors));
+						$html_fieldset_color.find('.legend_value').append(getTable(colors));
 					}
 					$legend_left.append($html_fieldset_color);
 				});
