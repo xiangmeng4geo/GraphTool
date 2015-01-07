@@ -13,12 +13,18 @@ define('GeoMap',['zrender',
     var devicePixelRatio = window.devicePixelRatio || 1;
     devicePixelRatio = Math.max(devicePixelRatio, 1);
 
+    var radians = Math.PI / 180,
+  		degrees = 180 / Math.PI;
+  	var pv = {};
+  	pv.radians = function(degrees) { return radians * degrees; };
+  	pv.degrees = function(radians) { return degrees * radians; };
+
 	var MERACTOR_RATIO = 20037508.34/180;
 	var px = 3800000;//转成px
 	/*Web墨卡托坐标与WGS84坐标互转*/
 	var Meractor_cache_lnglat = {};// 进行缓存，减小重复计算量
 	var Meractor = {
-		lngLatToPoint: function(lnglat){
+		project: function(lnglat){
 			var lng = lnglat.x;
 			var lat = lnglat.y;
 			var cache_name = lng+'_'+lat;
@@ -33,13 +39,51 @@ define('GeoMap',['zrender',
 			Meractor_cache_lnglat[cache_name] = val;
 			return val;
 		},
-		pointToLngLat: function(mercator){
+		invert: function(mercator){
 			var x = mercator.x/MERACTOR_RATIO;
 			var y = mercator.y/MERACTOR_RATIO;
 			y = 180/Math.PI*(2*Math.atan(Math.exp(y*Math.PI/180))-Math.PI/2);
 			return {x: x*px,y: y*px};
 		}
 	};
+	function albers(lat0, lng0, phi1, phi2) {
+	    if (lat0 == undefined) lat0 = 23.0;  // Latitude_Of_Origin
+	    if (lng0 == undefined) lng0 = -96.0; // Central_Meridian
+	    if (phi1 == undefined) phi1 = 29.5;  // Standard_Parallel_1
+	    if (phi2 == undefined) phi2 = 45.5;  // Standard_Parallel_2
+	 
+	    lat0 = pv.radians(lat0);
+	    lng0 = pv.radians(lng0);
+	    phi1 = pv.radians(phi1);
+	    phi2 = pv.radians(phi2);
+	 
+	    var n = 0.5 * (Math.sin(phi1) + Math.sin(phi2)),
+	        c = Math.cos(phi1),
+	        C = c*c + 2*n*Math.sin(phi1),
+	        p0 = Math.sqrt(C - 2*n*Math.sin(lat0)) / n;
+	 
+	    return {
+	        project: function(latlng) {
+	            var theta = n * (pv.radians(latlng.x) - lng0),
+	                p = Math.sqrt(C - 2*n*Math.sin(pv.radians(latlng.y))) / n;
+	            var result = {
+	                x: p * Math.sin(theta)/px,
+	                y: p0 - p * Math.cos(theta)/px
+	            };
+	            return result;
+	        },
+	        invert: function(xy) {
+	            var theta = Math.atan(xy.x / (p0 - xy.y)),
+	                p = Math.sqrt(xy.x*xy.y + Math.pow(p0 - xy.y, 2));
+	            return {
+	                lng: pv.degrees(lon0 + theta/n),
+	                lat: pv.degrees(Math.asin( (C - p*p*n*n) / (2*n)))
+	            };
+	        }
+	    };
+	}
+	Meractor = albers(35, 105, 27, 45);
+	// Meractor = albers();
 
 	var china_src_size = {
 		height: 35.4638,
@@ -47,8 +91,8 @@ define('GeoMap',['zrender',
 		top: 53.5693,
 		width: 61.6113
 	};
-	var px_size_china_left_top = Meractor.lngLatToPoint({x: china_src_size.left, y: china_src_size.top}),
-		px_size_china_right_bottom = Meractor.lngLatToPoint({x: china_src_size.left+china_src_size.width, y: china_src_size.top-china_src_size.height});
+	var px_size_china_left_top = Meractor.project({x: china_src_size.left, y: china_src_size.top}),
+		px_size_china_right_bottom = Meractor.project({x: china_src_size.left+china_src_size.width, y: china_src_size.top-china_src_size.height});
 
 	var px_size_china = {width: px_size_china_right_bottom.x - px_size_china_left_top.x,height: px_size_china_left_top.y - px_size_china_right_bottom.y};
 	var default_conf = {
@@ -67,7 +111,7 @@ define('GeoMap',['zrender',
 		// console.log(scale_x,scale_y);
 		
 		var center = conf.center||{x: china_src_size.left+china_src_size.width/2,y: china_src_size.top - china_src_size.height/2};
-		var center_xy = Meractor.lngLatToPoint(center);
+		var center_xy = Meractor.project(center);
 		var group_map = new Group(),
 			group_shape = new Group(),
 			group_legend = new Group();
@@ -234,7 +278,7 @@ define('GeoMap',['zrender',
 		var is_lnglat = point.is_lnglat;
 		point = {x: point.lng,y: point.lat};
 		if(is_lnglat){
-			point = Meractor.lngLatToPoint(point);
+			point = Meractor.project(point);
 		}
 		
 		var _this = this;
