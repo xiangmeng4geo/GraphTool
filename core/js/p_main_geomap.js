@@ -296,14 +296,21 @@ Core.safe(function(){
 							var width = this.width,
 								height = this.height;
 
-							var toWidth = Math.min(width, $geomap_layer.width()),
-								toHeight = toWidth*height/width;
+							var _width = $geomap_layer.width();
 							var is_updown = conf_of_product.legend.is_updown;
+							if(is_updown){
+								var scale = _width/1024;
+								var toWidth = width * scale,
+									toHeight = height * scale;
+							}else{
+								var toWidth = Math.min(width, _width),
+									toHeight = toWidth*height/width;
+							}
 							new MapLayer.img({
 								position: {
-									left: is_updown?10: 0,
+									left: is_updown?5: 0,
 									top: 'auto',
-									bottom: is_updown?10: 0
+									bottom: is_updown?5: 0
 								},
 								width: toWidth,
 								height: toHeight,
