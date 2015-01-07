@@ -1,8 +1,9 @@
 Core.safe(function(){
 	var CoreWindow = Core.Window;
 	var Const = Core.Const,
-		msgType = Const.msgType,
-		ConstEvent = Const.Event;
+		ConstMsgType = Const.msgType,
+		ConstEvent = Const.Event,
+		ConstFileType = Const.fileRule.file_type;
 
 	var ConfUser = Core.Lib.conf.User;	
 
@@ -18,6 +19,34 @@ Core.safe(function(){
 		icon_path = file_path.icon,
 		image_path = file_path.image;
 
+	var conf_of_product; // 用于缓存已经加载的当前产品配置
+	var data_of_micsps; // 用于缓存加载的micaps数据
+
+	function _replace_date(text){
+		if(!conf_of_product || !data_of_micsps){
+			return text;
+		}
+
+		var file_rule = conf_of_product.in_out.file_rule,
+			file_type = file_rule.file_type || ConstFileType.shikuang.v,
+			file_hour = file_rule.file_hour || 0;
+
+		var time = new Date(data_of_micsps.time);
+			
+		if(ConstFileType.forecast.v == file_type){
+			var one = new Date(time.getTime());
+			one.setHours(one.getHours()+file_hour);
+			var two = new Date(one.getTime());
+			two.setHours(two.getHours()+Math.min(24, file_hour));
+
+			text = one.format(text);
+			text = two.format(text);
+			// text = two.format(text.replace(/y1/g,'yy').replace(/M1/g,'MM').replace(/d1/g,'dd').replace(/h1/g,'hh'));
+		}else{
+			text = time.format(text);
+		}
+		return text;
+	}
 	var $doc = $(document);
 	var $current_text; // 用于操作当前编辑的文字对象
 	var _cache_e_contextmenu; // 用于缓存contextmenu事件对象
@@ -79,7 +108,7 @@ Core.safe(function(){
 		CoreWindow.onMessage(function(e){
 			var data = e.data;
 			var type = data.type;
-			if(msgType.CONF_STYLE == type){
+			if(ConstMsgType.CONF_STYLE == type){
 				data = data.data;
 				var style = data.style,
 					text = data.text;
@@ -112,6 +141,7 @@ Core.safe(function(){
 			gm = new GeoMap({
 				container: $geomap
 			});
+			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
 				var isHaveManyBlendent = blendent.length > 1;
 				function getColorByCondition(val, range){
@@ -219,7 +249,7 @@ Core.safe(function(){
 					if(product_name){
 						$('.map_layer').remove();
 						gm.clearLayers();
-						var conf_of_product = ConfUser.get(product_name);
+						conf_of_product = ConfUser.get(product_name);
 						if(!conf_of_product){
 							return alert('请对该产品进行配置！');
 						}
@@ -263,8 +293,8 @@ Core.safe(function(){
 							}
 							var file_newest = micaps_file_util.getNewest.apply(null,param);
 							if(file_newest){
-								var conf_file_newest = file_util.readFile(file_newest,true);
-								render_conf(conf_file_newest, conf_of_product.legend.blendent);
+								data_of_micsps = file_util.readFile(file_newest,true);
+								render_conf(data_of_micsps, conf_of_product.legend.blendent);
 							}else{
 								alert('没有找到符合条件的文件，请检查产品相关配置！');
 							}
@@ -320,7 +350,7 @@ Core.safe(function(){
 						style = $this.attr('style');
 
 					var win_textstyle = Core.Page.textStyle(function(e){
-						CoreWindow.sendMsg(msgType.CONF_STYLE,{
+						CoreWindow.sendMsg(ConstMsgType.CONF_STYLE,{
 							text: text,
 							style: style
 						},win_textstyle.window);
@@ -383,7 +413,7 @@ Core.safe(function(){
 			var menu_add_text = new MenuItem({label: '添加文字'});
 			menu_add_text.on('click',function(e){
 				var win_textstyle = Core.Page.textStyle(function(e){
-					CoreWindow.sendMsg(msgType.CONF_STYLE,{},win_textstyle.window);
+					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE,{},win_textstyle.window);
 				});
 			});
 			
@@ -498,7 +528,7 @@ Core.safe(function(){
 								var $layer = $(this);
 								var layer;
 								if($layer.is('.texteditor')){
-									gm_export.addOverlay(new GeoMap.Text($layer.text(),$layer.attr('style')));
+									gm_export.addOverlay(new GeoMap.Text(_replace_date($layer.text()),$layer.attr('style')));
 								}else if($layer.is('.map_layer_image')){
 									var pos = $layer.position();
 									var img = $layer.find('img').get(0);

@@ -102,9 +102,11 @@ Core.safe(function(){
 		$select_file_rule_common_postfix.html(html_file_rule_file_postfix);
 
 		var html_file_type = '';
-		$.each(file_type,function(i,v){
+		for(var i in file_type){
+			var v = file_type[i];
 			html_file_type += '<option value="'+v.v+'">'+v.n+'</option>';
-		});
+		}
+
 		$select_file_type.html(html_file_type);
 
 		var html_file_hour = '';
@@ -337,7 +339,7 @@ Core.safe(function(){
 					'custom': $text_file_rule_custom.val(),
 					'type': $('[name=file_rule]:checked').val(),
 					'file_type': $select_file_type.val(),
-					'file_hour': $select_file_hour.val()
+					'file_hour': parseInt($select_file_hour.val()) || 0
 				}
 			},
 			'title': {
