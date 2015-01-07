@@ -275,7 +275,8 @@ Core.safe(function(){
 					text = val[0]+'≤';
 			}else{
 				var val = [format_number(start_val+cha_val*(i-1)),format_number(start_val+cha_val*i)],
-					text = '≤'+val[0]+'<'+val[1];
+					text = val[0]+'-'+val[1];
+					// text = '≤'+val[0]+'<'+val[1];
 			}
 			color_arr.push({
 				is_checked: true,
@@ -291,14 +292,17 @@ Core.safe(function(){
 		var html_table = '<table>'+
 								'<tr>'+
 									'<th width="10%">状态</th>'+
-									'<th width="30%">颜色值</th>'+
+									'<th width="15%">颜色值</th>'+
+									'<th width="15%">文字颜色</th>'+
 									'<th width="30%">值域</th>'+
 									'<th width="30%">显示文字</th>'+
 								'</tr>';
 		$.each(color_arr,function(i,v){
+			var text_color = v.color_text || '#000';
 			html_table += '<tr>'+
 								'<td><input type="checkbox" '+(v.is_checked?'checked':'')+'/></td>'+
 								'<td><input type="color" value="'+v.color+'"/></td>'+
+								'<td><input type="color" value="'+text_color+'"/></td>'+
 								'<td>'+(v.val[0] == Number.MIN_VALUE?'':v.val[0])+'~'+(v.val[1] == Number.MAX_VALUE?'':v.val[1])+'</td>'+
 								'<td contentEditable="true" class="no_outline">'+v.text+'</td>'+
 							'</tr>'
@@ -389,12 +393,13 @@ Core.safe(function(){
 			var colors = [];
 			$this.find('tr').each(function(tr_i,tr_v){
 				var $td = $(tr_v).find('td');
-				if($td.length == 4){
+				if($td.length == 5){
 					colors.push({
 						'is_checked': $td.eq(0).find('input').prop('checked'),
 						'color': $td.eq(1).find('input').val(),
-						'val': $td.eq(2).text().split('~'),
-						'text': $td.eq(3).text()
+						'color_text': $td.eq(2).find('input').val(),
+						'val': $td.eq(3).text().split('~'),
+						'text': $td.eq(4).text()
 					});
 				}
 			});

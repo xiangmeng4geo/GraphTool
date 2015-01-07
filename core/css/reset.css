@@ -94,7 +94,8 @@ ul,ol{
 }
 .legend_landscape{
 	width: 1024px;
-	font-size: 18px;
+	font-size: 20px;
+	font-weight: bold;
 }
 .legend_landscape ul{
 	overflow: hidden;
@@ -118,7 +119,14 @@ ul,ol{
 	margin-top: -30px;
 }
 
-.legend_portrait{position: relative;overflow: hidden;width: auto;display: inline-block;}
+.legend_portrait{
+	position: relative;
+	overflow: hidden;
+	width: auto;
+	display: inline-block;
+	font-weight: bold;
+	font-size: 18px;
+}
 .legend_portrait>div{
 	overflow: hidden;
 }

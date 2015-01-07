@@ -33,7 +33,8 @@ define('LegendImage',['zrender',
 			var c_colors = colors.length;
 			$.each(colors, function(color_i, color_v){
 				var style_width = is_updown? '': 'width: '+(1/c_colors*100)+'%;';
-				html_color += '<li style="'+style_width+'"><div style="background-color: '+color_v.color+';"></div><span>'+color_v.text+'</span></li>';
+				var style_color_text = is_updown? '': 'style="color: '+color_v.color_text+'"';
+				html_color += '<li style="'+style_width+'"><div style="background-color: '+color_v.color+';"></div><span '+style_color_text+'>'+color_v.text+'</span></li>';
 			});
 			html_color += '</ul>';
 		});
