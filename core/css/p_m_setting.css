@@ -44,14 +44,14 @@
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	padding-bottom: 10px;
-	height: 400px;
+	height: 350px;
 	overflow: auto;
 }
 #c_bottom>fieldset{
 	width: 90%;
 	margin: 0 auto;
 	display: none;
-	height: 360px;
+	height: 320px;
 }
 #c_bottom>fieldset.on{
 	display: block;
@@ -68,7 +68,8 @@ fieldset {
 	position: relative;
 	display: inline-block;
 	height: 30px;
-	width: 630px;
+	width: 490px;
+	margin-left: 10px;
 }
 .file_directory input[type=file]{
 	visibility: none;
@@ -84,7 +85,7 @@ fieldset {
 	overflow: hidden;
 }
 .text_file_dir{
-	width: 570px;
+	width: 420px;
 }
 .tree_left,
 .tree_right{
@@ -126,6 +127,20 @@ fieldset {
 	height: 40px;
 	line-height: 20px;
 	overflow: hidden;
+}
+
+.logo_right{
+	width: 116px;
+}
+.btns{
+	width: 300px;
+	margin: 0 auto;
+	text-align: center;
+	margin-top: 30px;
+}
+.btns input{
+	width: 100px;
+	margin: 0 20px;
 }
 /*重写tree样式*/
 .tree_left .bbit-tree-node-leaf .bbit-tree-node-icon{

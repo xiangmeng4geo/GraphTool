@@ -1,4 +1,14 @@
 Core.safe(function(){
+	var CONF_PRODUCTNAME = "系统";
+	var util = Core.Lib.util,
+		Conf_User = Core.Lib.conf.User,
+		file_util = util.file,
+		path_util = util.path,
+		file_path = file_util.path,
+		icon_path = file_path.icon,
+		image_path = file_path.image;
+	var CoreWindow = Core.Window;
+	
 	var $c_bottom_fieldset = $('#c_bottom > fieldset');
 	var $c_top_li = $('#c_top li').click(function(){
 		var $this = $(this);
@@ -7,14 +17,53 @@ Core.safe(function(){
 		$c_bottom_fieldset.removeClass('on');
 		$c_bottom_fieldset.eq($this.index()).addClass('on');
 	});
+	$('.file_dir').click(function(){
+		$(this).parent().prev().click();
+	});
+	$('.file_dir_nw').on('change',function(){
+		var $this = $(this);
+		$this.next().find('.text_file_dir').val($this.val());
+	});
+	$('.logos .file_dir_nw').attr('nwworkingdir', file_util.path.icon); // 指定默认目录
 
-	var util = Core.Lib.util,
-		file_util = util.file,
-		path_util = util.path,
-		file_path = file_util.path,
-		icon_path = file_path.icon,
-		image_path = file_path.image;
-
+	
+	var $text_file_southsea_logo = $('#text_file_southsea_logo'),
+		$text_file_company_logo = $('#text_file_company_logo'),
+		$checkbox_show_southsea = $('#checkbox_show_southsea'),
+		$checkbox_show_logo = $('#checkbox_show_logo');
+	var conf_sys = Conf_User.get(CONF_PRODUCTNAME);
+	if(conf_sys){
+		var logos = conf_sys.logos;
+		if(logos){
+			var logo_southsea = logos.southsea;
+			if(logo_southsea){
+				$checkbox_show_southsea.prop('checked', logo_southsea.flag);
+				$text_file_southsea_logo.val(logo_southsea.p);
+			}
+			var logo_company = logos.company;
+			if(logo_company){
+				$checkbox_show_logo.prop('checked', logo_company.flag);
+				$text_file_company_logo.val(logo_company.p);
+			}
+		}
+	}
+	$('#btn_cancel').click(CoreWindow.close);
+	$('#btn_save').click(function(){
+		var save_data = {
+			logos: {
+				southsea: {
+					flag: $checkbox_show_southsea.prop('checked'),
+					p: $text_file_southsea_logo.val()
+				},
+				company: {
+					flag: $checkbox_show_logo.prop('checked'),
+					p: $text_file_company_logo.val()
+				}
+			}
+		};
+		Conf_User.write(CONF_PRODUCTNAME,save_data,true);
+		CoreWindow.close();
+	});
 	var is_img = Core.util.isImg;
 	/*初始化右键菜单*/
 	var CoreWindow = Core.Window;
