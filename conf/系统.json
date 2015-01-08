@@ -1,1 +1,12 @@
-{"logos":{"southsea":{"flag":false,"p":"E:\\source\\nodejs_project\\GraphTool\\image\\icon\\图标\\icon\\nanhai.png"},"company":{"flag":false,"p":"E:\\source\\nodejs_project\\GraphTool\\image\\icon\\图标\\4.省气象局图标_128\\北京市气象局.png"}}}
+{
+	"logos": {
+		"southsea": {
+			"flag": true,
+			"p": "E:\\source\\nodejs_project\\GraphTool\\image\\icon\\图标\\icon\\nanhai.png"
+		},
+		"company": {
+			"flag": true,
+			"p": "E:\\source\\nodejs_project\\GraphTool\\image\\icon\\图标\\4.省气象局图标_128\\北京市气象局.png"
+		}
+	}
+}

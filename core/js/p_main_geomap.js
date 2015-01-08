@@ -274,7 +274,10 @@ Core.safe(function(){
 						var conf_other = conf_of_product.other;
 						var logo = conf_other.logo;
 						if(logo){
-							add_maplayer_img(logo, 20, 20);
+							add_maplayer_img(logo, {
+								left: 20,
+								top: 20
+							});
 						}
 						var conf_title = conf_of_product.title;
 						addTitle(conf_title.title_1, {
@@ -285,41 +288,217 @@ Core.safe(function(){
 							left: 110,
 							top: 80
 						});
-						addTitle(conf_title.title_3, {
-							left: 20,
-							top: 700
-						});
+						// addTitle(conf_title.title_3, {
+						// 	left: 20,
+						// 	top: 700
+						// });
 
-						var img_src = _get_legend_img(product_name);
-						var img = new Image();
-						img.onload = function(){
-							var width = this.width,
-								height = this.height;
+						var conf_legend = conf_of_product.legend;
+						var is_show_legend = conf_legend.is_show_legend,
+							is_updown = conf_legend.is_updown;
 
-							var _width = $geomap_layer.width();
-							var is_updown = conf_of_product.legend.is_updown;
-							if(is_updown){
-								var scale = _width/1024;
-								var toWidth = width * scale,
-									toHeight = height * scale;
+						function add_southsealogo(callback){
+							var logo_southsea = conf_other.logo_southsea;
+							if(logo_southsea && logo_southsea.flag){
+								if(is_updown){
+									var pos = {
+										left: 20,
+										top: 'auto',
+										bottom: 20
+									};
+								}else{
+									var pos = {
+										left: 'auto',
+										right: 20,
+										bottom: 20
+									};
+								}
+								add_maplayer_img(logo_southsea.p, pos, function($html, param){
+									callback(pos, param);
+								});
 							}else{
-								var toWidth = Math.min(width, _width),
-									toHeight = toWidth*height/width;
+								callback();
 							}
-							new MapLayer.img({
-								position: {
-									left: is_updown?5: 0,
-									top: 'auto',
-									bottom: is_updown?5: 0
-								},
-								width: toWidth,
-								height: toHeight,
-								src: img_src
-							},function($html){
-								$geomap_layer.append($html);
-							});
 						}
-						img.src = img_src;
+						function _add_southsealogo(pos, callback){
+							var logo_southsea = conf_other.logo_southsea;
+							if(logo_southsea && logo_southsea.flag){
+								add_maplayer_img(logo_southsea.p, pos, callback);
+							}else{
+								callback && callback();
+							}
+						}
+						function _add_title3(pos){
+							var _title_3 = conf_title.title_3;
+							if(!is_updown){
+								var m = /font-size: (\d+)px/.exec(_title_3.style);
+								var height = m? parseFloat(m[1]) + 10: 30;
+								if(!isNaN(pos.top)){
+									pos.top -= height;
+								}else{
+									pos.bottom += height;
+								}
+							}
+							
+							addTitle(_title_3, pos);
+						}
+						
+						var _width = $geomap_layer.width();
+						if(is_show_legend){
+							var img_src = _get_legend_img(product_name);
+							function _add_legend(pos, width, height, callback){
+								new MapLayer.img({
+									position: pos,
+									width: width,
+									height: height,
+									src: img_src
+								},function($html, param){
+									$geomap_layer.append($html);
+									callback && callback($html, param);
+								});
+							}
+							var img = new Image();
+							img.onload = function(){
+								var width = this.width,
+									height = this.height;
+								if(is_updown){
+									var scale = _width/1024;
+									var toWidth = width * scale,
+										toHeight = height * scale;
+									_add_southsealogo({
+										left: 10,
+										top: 'auto',
+										bottom: 10
+									}, function($html, param){
+										if($html && param){
+											var pos = {
+												left: 10 + param.width_show + 10,
+												top: 'auto',
+												bottom: 10
+											}
+										}else{
+											var pos = {
+												left: 10,
+												top: 'auto',
+												bottom: 10
+											};
+										}
+										_add_legend(pos, toWidth, toHeight);
+										_add_title3({
+											left: 'auto',
+											right: 10,
+											top: 'auto',
+											bottom: 10
+										});
+									});
+								}else{
+									var toWidth = Math.min(width, _width),
+										toHeight = toWidth*height/width;
+
+									_add_legend({
+										left: 0,
+										top: 'auto',
+										bottom: 0
+									},toWidth, toHeight,function($html, param){
+										var pos = $html.position();
+										_add_title3({
+											left: 10, 
+											top: pos.top
+										});
+										_add_southsealogo({
+											left: 'auto',
+											right: 10,
+											top: 'auto',
+											bottom: param.height_show + 10
+										});
+									});
+								}
+							}
+							img.src = img_src;
+						}else{
+							var pos_southsea,
+								pos_title3;
+							if(is_updown){
+								pos_southsea = {
+									left: 10,
+									top: 'auto',
+									bottom: 10
+								};
+								pos_title3 = {
+									left: 'auto',
+									right: 10,
+									top: 'auto',
+									bottom: 10
+								}
+							}else{
+								pos_southsea = {
+									left: 'auto',
+									right: 10,
+									top: 'auto',
+									bottom: 10
+								};
+								pos_title3 = {
+									left: 10,
+									top: 'auto',
+									bottom: 10
+								}
+							}
+							_add_southsealogo(pos_southsea);
+							_add_title3(pos_title3);
+						}
+						// var img_src = _get_legend_img(product_name);
+						// var img = new Image();
+						// img.onload = function(){
+						// 	var width = this.width,
+						// 		height = this.height;
+
+						// 	var _width = $geomap_layer.width();
+							
+						// 	if(is_updown){
+						// 		var scale = _width/1024;
+						// 		var toWidth = width * scale,
+						// 			toHeight = height * scale;
+						// 	}else{
+						// 		var toWidth = Math.min(width, _width),
+						// 			toHeight = toWidth*height/width;
+						// 	}
+
+						// 	var logo_southsea = conf_other.logo_southsea;
+						// 	if(logo_southsea){
+						// 		if(is_updown){
+						// 			var pos = {
+						// 				left: 20,
+						// 				top: 'auto',
+						// 				bottom: 20
+						// 			};
+						// 		}else{
+						// 			var pos = {
+						// 				left: 'auto',
+						// 				right: 20,
+						// 				bottom: 20
+						// 			};
+						// 		}
+						// 		add_maplayer_img(logo_southsea, pos, function($html, param){
+
+						// 		});
+						// 	}else{
+
+						// 	}
+							
+						// 	new MapLayer.img({
+						// 		position: {
+						// 			left: is_updown?5: 0,
+						// 			top: 'auto',
+						// 			bottom: is_updown?5: 0
+						// 		},
+						// 		width: toWidth,
+						// 		height: toHeight,
+						// 		src: img_src
+						// 	},function($html){
+						// 		$geomap_layer.append($html);
+						// 	});
+						// }
+						// img.src = img_src;
 						
 						var conf_in_out = conf_of_product.in_out;
 						var dir_in = conf_in_out.dir_in;
@@ -343,17 +522,14 @@ Core.safe(function(){
 							if(file_newest){
 								data_of_micsps = file_util.readFile(file_newest,true);
 								render_conf(data_of_micsps, conf_of_product.legend.blendent);
-
-
-								// _LegendImage(product_name, conf_of_product.legend);
 							}else{
 								alert('没有找到符合条件的文件，请检查产品相关配置！');
 							}
 						}else{
 							alert("请配置该产品的数据源路径！");
 						}
-						initing = false;
 
+						initing = false;
 						Loading.hide();				
 					}
 				});
@@ -417,7 +593,7 @@ Core.safe(function(){
 			return $html;
 		}
 		// 图片图层
-		function ImageLayer(option,callback){
+		function ImageLayer(option, callback){
 			var pos = option.position;
 			var src = option.src;
 			var img = new Image();
@@ -448,7 +624,12 @@ Core.safe(function(){
 					menu_layer._layer = $(this);
 					menu_layer.popup(e.clientX, e.clientY);
 				});
-				callback($html);
+				callback($html, {
+					width: width,
+					height: height,
+					width_show: toWidth,
+					height_show: toHeight
+				});
 			}
 			img.src = src;
 		}
@@ -616,16 +797,13 @@ Core.safe(function(){
 	})
 	
 	// 向地图添加图片
-	function add_maplayer_img(src, x, y, i){
-		var dis = 10*(i||0);
+	function add_maplayer_img(src, pos, callback){
 		MapLayer.img({
-			position: {
-				left: x + dis,
-				top: y + dis
-			},
+			position: pos,
 			src: src
-		},function($html){
+		},function($html, param){
 			$geomap_layer.append($html);
+			callback && callback($html, param);
 		});
 	}
 
@@ -641,12 +819,18 @@ Core.safe(function(){
 		var drag_img = dataTransfer.getData('Text');
 		var x = e.offsetX,y = e.offsetY;
 		if(drag_img && is_img(drag_img)){
-			add_maplayer_img(drag_img, x, y);
+			add_maplayer_img(drag_img, {
+				left: x,
+				top: y
+			});
 		}else{
 			var files = dataTransfer.files;
 			if(files.length > 0){
 				$.each(files,function(i,file){
-					add_maplayer_img(file.path, x, y, i);
+					add_maplayer_img(file.path, {
+						left: x+i*10,
+						top: y+i*10
+					});
 				})
 			}
 		}

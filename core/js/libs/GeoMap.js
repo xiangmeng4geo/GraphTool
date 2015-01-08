@@ -290,7 +290,7 @@ define('GeoMap',['zrender',
 
 		return {
 			x: (point.x - center.x)*scale + width/2,
-			y: (center.y - point.y)*scale + height/1.8//这里出来的数据暂时有一个整体偏移
+			y: (center.y - point.y)*scale + height/1.8 - 20//这里出来的数据暂时有一个整体偏移,(-20保证多个图例时不遮挡地图)
 		}
 	}
     function _doclip(ctx){
