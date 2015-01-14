@@ -159,7 +159,7 @@
 			return false;
 		}
 		process.on('uncaughtException',fn_error);
-		window.onerror = fn_error;
+		// window.onerror = fn_error;
 	}();
 	
 	Core.safe = function(auto_fn){
@@ -324,6 +324,8 @@
 				var m = REG_RGB.exec(color_rgb);
 				if(m){
 					return '#'+to16(m[1])+to16(m[2])+to16(m[3]);
+				}else if(REG_HTML.test(color_rgb)){
+					return color_rgb;
 				}
 			}
 		}
@@ -338,6 +340,16 @@
 						return arr;
 					}
 					return 'rgb('+(arr.join(','))+')';
+				}else{
+					var m = REG_RGB.exec(color_html);
+					if(m){
+						if(isReturnArray){
+							m.shift();
+							return m;
+						}else{
+							return color_html;
+						}
+					}
 				}
 			}
 		}

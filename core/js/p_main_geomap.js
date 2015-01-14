@@ -21,6 +21,7 @@ Core.safe(function(){
 
 	var conf_of_product; // 用于缓存已经加载的当前产品配置
 	var data_of_micsps; // 用于缓存加载的micaps数据
+	var conf_export; //保存导出图片设置
 
 	// 替换标题里的时间
 	function _replace_date(text){
@@ -54,9 +55,9 @@ Core.safe(function(){
 		var legend_util = file_util.tmp.legend;
 		return function(product_name){
 			var img_path = legend_util.getPath(product_name);
-			// if(!legend_util.isNew(product_name)){
+			if(!legend_util.isNew(product_name)){
 				_LegendImage(img_path, conf_of_product.legend);
-			// }
+			}
 			return img_path;
 		}
 	})();
@@ -279,6 +280,28 @@ Core.safe(function(){
 								top: 20
 							});
 						}
+
+						conf_export = {};
+						var bg_flag = false;
+						$geomap.removeAttr('style');
+						var conf_bgimg = conf_other.bg_img;
+						if(conf_bgimg){
+							if(conf_bgimg.flag && conf_bgimg.val){
+								$geomap.css('background-image', 'url('+conf_bgimg.val.replace(/\\/g,'/')+')');
+								bg_flag = true;
+								conf_export.bgimg = conf_bgimg.val;
+							}
+						}
+						if(!bg_flag){
+							var conf_bgcolor = conf_other.bg_color;
+							if(conf_bgcolor){
+								if(conf_bgcolor.flag && conf_bgcolor.val){
+									$geomap.css('background-color', conf_bgcolor.val);
+									conf_export.bgcolor = conf_bgcolor.val;
+								}
+							}
+						}
+						
 						var conf_title = conf_of_product.title;
 						addTitle(conf_title.title_1, {
 							left: 110,
@@ -550,7 +573,76 @@ Core.safe(function(){
 				$layer.remove();
 			}
 		});
+
+		/*更改各图层的z-index*/
+		function _changeZ(is_add){
+			var $layer = menu_layer._layer;
+			if($layer){
+				var pos_layer = $layer.position(),
+					left_layer = pos_layer.left,
+					top_layer = pos_layer.top,
+					width_layer = $layer.width(),
+					height_layer = $layer.height(),
+					bottom_layer = top_layer + height_layer,
+					right_layer = left_layer + width_layer,
+					zindex_layer = parseInt($layer.css('z-index')) || 0;
+
+				var zindex_max = Number.MIN_VALUE,
+					zindex_min = Number.MAX_VALUE;
+				var $layer_over = $('.map_layer').filter(function(){
+					var $this = $(this);
+					if(!$this.is($layer)){
+						var w = $this.width(),
+							h = $this.height();
+						var pos = $this.position(),
+							left = pos.left,
+							top = pos.top;
+
+						var lt_x = Math.max(left, left_layer),
+							lt_y = Math.max(top, top_layer),
+							rb_x = Math.min(left+w, right_layer),
+							rb_y = Math.min(top+h, bottom_layer);
+
+						if(lt_x < rb_x && lt_y < rb_y){
+							return $this;
+						}
+					}
+				}).each(function(){
+					var $this = $(this);
+					var zindex = parseInt($this.css('z-index')) || 0;
+					if(zindex > zindex_max){
+						zindex_max = zindex;
+					}else if(zindex < zindex_min){
+						zindex_min = zindex;
+					}
+				});
+				
+				if(zindex_max != Number.MIN_VALUE || zindex_min != Number.MAX_VALUE){
+					var to_zindex = is_add? zindex_max+1: zindex_min-1;
+					if(to_zindex < 0){
+						var zindex_abs = -to_zindex;
+						$layer_over.each(function(){
+							$(this).css('z-index', (parseInt($(this).css('z-index'))||0)+zindex_abs);
+						});
+						to_zindex = 0;
+					}
+					$layer.css('z-index', to_zindex);
+				}
+			}
+		}
+		var menu_layer_add_z = new MenuItem({label: '置于上层'});
+		menu_layer_add_z.on('click',function(){
+			_changeZ(true);
+		});
+		var menu_layer_minus_z = new MenuItem({label: '置于下层'});
+		menu_layer_minus_z.on('click',function(){
+			_changeZ(false);
+		});
+
 		menu_layer.append(menu_layer_delete);
+		menu_layer.append(new gui.MenuItem({ type: 'separator' }));
+		menu_layer.append(menu_layer_add_z);
+		menu_layer.append(menu_layer_minus_z);
 		// 文字图层
 		function TextLayer(option){
 			var pos = option.position;
@@ -773,7 +865,7 @@ Core.safe(function(){
 									gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height()));
 								}
 							});
-							img_data = gm_export.toDataURL();
+							img_data = gm_export.toDataURL(conf_export);
 
 							file_util.img.saveBase64(save_file_name, img_data);
 							$div_container.remove();

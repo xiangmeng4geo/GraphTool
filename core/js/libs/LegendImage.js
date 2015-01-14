@@ -104,7 +104,7 @@ define('LegendImage',['zrender',
 		});
 		
 		var img_data = _canvas.toDataURL('image/png', 'rgba(0, 0, 0, 0)');
-		console.log(img_data);
+		// console.log(img_data);
 		Core.Lib.util.file.tmp.legend.save(img_path, img_data);
 	}
 	return genlegendImage;

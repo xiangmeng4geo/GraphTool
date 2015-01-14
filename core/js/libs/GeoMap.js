@@ -309,6 +309,14 @@ define('GeoMap',['zrender',
 	            ctx.lineTo(pointList[0][0], pointList[0][1]);
 			});
 			ctx.closePath();
+
+			// ctx.fillStyle = '#ff0000';
+			// console.log(ctx, polygons);
+			// // ctx.globalCompositeOperation="destination-out";  
+   //          ctx.fill();
+   //          // ctx.globalCompositeOperation="source-over";  
+			
+			// // ctx.globalCompositeOperation = "source-in";
 			ctx.clip();
 		}
     }
@@ -345,7 +353,7 @@ define('GeoMap',['zrender',
     	toRGB = core_color.toRGB,
     	toHTML = core_color.toHTML;
     /*得到绘制好的图片*/
-	GeoMapProp.toDataURL = function(type, backgroundColor, args){
+	GeoMapProp.toDataURL = function(conf){
 		var painter = this.canvas.painter;
 		var width = painter._width;
         var height = painter._height;
@@ -353,6 +361,16 @@ define('GeoMap',['zrender',
 		var ctx = maskImageDom.getContext('2d');
 	    devicePixelRatio != 1 && ctx.scale(devicePixelRatio, devicePixelRatio);
 
+	    if(conf){
+	    	var bgimg = conf.bgimg;
+	    	bgimg && ctx.drawImage(bgimg, 0, 0);
+	    }
+	    if(conf){
+        	/*对透明做默认填色处理*/
+	        var backgroundColor = conf.bgcolor || '#ffffff';
+	        ctx.fillStyle = backgroundColor;
+	        ctx.fillRect(0, 0, width, height);
+	    }
 	    ctx.save();
 	    _doclip.call(this,ctx);
 	    this.canvas.storage.iterShape(
@@ -368,22 +386,25 @@ define('GeoMap',['zrender',
             },
             { normal: 'up', update: true }
         );
-        /*对透明做默认填色处理*/
-        backgroundColor = backgroundColor || '#ffffff';
-        var default_rgb_bgcolor = toRGB(backgroundColor,true);
-        var img = ctx.getImageData(0,0,width,height);
-        var pixel = img.data;
-        for(var i = 0,j = pixel.length;i<j;i+=4){
-        	if(pixel[i] == 0 && pixel[i+1] == 0 && pixel[i+2] == 0 && pixel[i+3] == 0){
-        		pixel[i] = default_rgb_bgcolor[0];
-        		pixel[i+1] = default_rgb_bgcolor[1];
-        		pixel[i+2] = default_rgb_bgcolor[2];
-        		pixel[i+3] = 255;
-        	}
+        if(conf){
+        	/*对透明做默认填色处理*/
+	        var backgroundColor = conf.bgcolor || '#ffffff';
+	        // var default_rgb_bgcolor = toRGB(backgroundColor,true);
+	        // var img = ctx.getImageData(0,0,width,height);
+	        // var pixel = img.data;
+	        // for(var i = 0,j = pixel.length;i<j;i+=4){
+	        // 	if(pixel[i] == 0 && pixel[i+1] == 0 && pixel[i+2] == 0 && pixel[i+3] == 0){
+	        // 		pixel[i] = default_rgb_bgcolor[0];
+	        // 		pixel[i+1] = default_rgb_bgcolor[1];
+	        // 		pixel[i+2] = default_rgb_bgcolor[2];
+	        // 		pixel[i+3] = 255;
+	        // 	}
+	        // }
+	        // ctx.putImageData(img,0,0);
         }
-        ctx.putImageData(img,0,0);
+        
 
-        var img_data = maskImageDom.toDataURL(type, args);
+        var img_data = maskImageDom.toDataURL(null, backgroundColor);
         maskImageDom = null;
         ctx = null;
         return img_data;

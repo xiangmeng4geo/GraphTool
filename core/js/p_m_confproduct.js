@@ -80,7 +80,9 @@ Core.safe(function(){
 		$select_file_rule_common_postfix = $('#select_file_rule_common_postfix');
 		$file_rule_example_span = $('#file_rule_example span'),
 		$select_file_type = $('#select_file_type'),
-		$select_file_hour = $('#select_file_hour');
+		$select_file_hour = $('#select_file_hour'),
+		$cb_use_bgcolor = $('#cb_use_bgcolor'),
+		$cb_use_bgimg = $('#cb_use_bgimg');
 	/*初始化文件选定*/
 	!function(){
 		var const_file_rule = Core.Const.fileRule,
@@ -114,7 +116,6 @@ Core.safe(function(){
 			html_file_hour += '<option value="'+v+'">'+v+'</option>';
 		});
 		$select_file_hour.html(html_file_hour);
-
 
 		var $text_file_dir_in = $('#text_file_dir_in');
 		/*显示选定的文件规则*/
@@ -323,7 +324,9 @@ Core.safe(function(){
 		$cb_is_updown = $('#cb_is_updown'),
 		$text_file_logo = $('#text_file_logo'),
 		$color_bg = $('#color_bg'),
-		$fieldset_legend = $('#fieldset_legend');
+		$fieldset_legend = $('#fieldset_legend'),
+		$text_file_bgimg = $('#text_file_bgimg');
+
 	$('#btn_cancel').click(CoreWindow.close);
 	$('#btn_save').click(function(){
 		var save_data = {
@@ -375,7 +378,14 @@ Core.safe(function(){
 			},
 			'other': {
 				'logo': $text_file_logo.val(),
-				'bg_color': $color_bg.val()
+				'bg_img': {
+					'val': $text_file_bgimg.val(),
+					'flag': $cb_use_bgimg.prop('checked')
+				},
+				'bg_color': {
+					'val': $color_bg.val(),
+					'flag': $cb_use_bgcolor.prop('checked')
+				}
 			}
 		};
 		var blendent = [];
@@ -490,8 +500,23 @@ Core.safe(function(){
 
 			var conf_other = conf_product.other;
 			if(conf_other){
-				$text_file_logo.val(conf_other.logo);
-				$color_bg.val(conf_other.bg_color);
+				var conf_bg_color = conf_other.bg_color;
+				if(conf_bg_color){
+					$color_bg.val(conf_bg_color.val);
+					$cb_use_bgcolor.prop('checked', conf_bg_color.flag);
+				}
+				
+
+				var conf_logo = conf_other.logo;
+				if(conf_logo){
+					$text_file_logo.val(conf_logo);
+				}
+
+				var conf_bgimg = conf_other.bg_img;
+				if(conf_bgimg){
+					$text_file_bgimg.val(conf_bgimg.val);
+					$cb_use_bgimg.prop('checked', conf_bgimg.flag);
+				}
 			}
 		}
 	}
