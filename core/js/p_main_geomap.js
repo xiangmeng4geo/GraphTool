@@ -854,10 +854,13 @@ Core.safe(function(){
 
 							var imgnum_waiting_draw = 0;
 							var tt_draw;
-							$geomap_layer.find('>div').each(function(i,v){
+							$geomap_layer.find('.map_layer').sort(function(a, b){
+								return $(a).css('z-index') > $(b).css('z-index');
+							}).each(function(i,v){
 								var $layer = $(this);
 								var layer;
 								if($layer.is('.texteditor')){
+									$layer.css($layer.position()); // 修复样式里的left和top为auto情况
 									gm_export.addOverlay(new GeoMap.Text(_replace_date($layer.text()),$layer.attr('style')));
 								}else if($layer.is('.map_layer_image')){
 									var pos = $layer.position();
