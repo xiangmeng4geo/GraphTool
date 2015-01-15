@@ -869,6 +869,7 @@ Core.safe(function(){
 								}
 							});
 
+							// 防止背景图片没有加载完成
 							function _export(){
 								img_data = gm_export.toDataURL(conf_export);
 
@@ -878,7 +879,7 @@ Core.safe(function(){
 								Loading.hide();
 							}
 							var _bgimg = conf_export.bgimg;
-							if(_bgimg){
+							if(_bgimg && file_util.exists(_bgimg)){
 								var img = new Image();
 								img.onload = function(){
 									conf_export.bgimg = img;
