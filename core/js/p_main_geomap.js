@@ -289,7 +289,7 @@ Core.safe(function(){
 							if(conf_bgimg.flag && conf_bgimg.val){
 								$geomap.css('background-image', 'url('+conf_bgimg.val.replace(/\\/g,'/')+')');
 								bg_flag = true;
-								conf_export.bgimg = conf_bgimg.val;
+								conf_export.bgimg = conf_bgimg.val;//$('<img src="'+conf_bgimg.val+'"/>').get(0);
 							}
 						}
 						if(!bg_flag){
@@ -868,12 +868,26 @@ Core.safe(function(){
 									gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height()));
 								}
 							});
-							img_data = gm_export.toDataURL(conf_export);
 
-							file_util.img.saveBase64(save_file_name, img_data);
-							$div_container.remove();
-							alert('成功导出图片!');
-							Loading.hide();
+							function _export(){
+								img_data = gm_export.toDataURL(conf_export);
+
+								file_util.img.saveBase64(save_file_name, img_data);
+								$div_container.remove();
+								alert('成功导出图片!');
+								Loading.hide();
+							}
+							var _bgimg = conf_export.bgimg;
+							if(_bgimg){
+								var img = new Image();
+								img.onload = function(){
+									conf_export.bgimg = img;
+									_export();
+								}
+								img.src = _bgimg;
+							}else{
+								_export();
+							}
 						});
 					}).click();
 				}

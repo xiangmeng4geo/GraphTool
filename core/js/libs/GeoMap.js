@@ -363,13 +363,14 @@ define('GeoMap',['zrender',
 
 	    if(conf){
 	    	var bgimg = conf.bgimg;
-	    	bgimg && ctx.drawImage(bgimg, 0, 0);
-	    }
-	    if(conf){
-        	/*对透明做默认填色处理*/
-	        var backgroundColor = conf.bgcolor || '#ffffff';
-	        ctx.fillStyle = backgroundColor;
-	        ctx.fillRect(0, 0, width, height);
+	    	if(bgimg){
+	    		ctx.drawImage(bgimg, 0, 0);
+	    	}else{
+	    		/*对透明做默认填色处理*/
+		        var backgroundColor = conf.bgcolor || '#ffffff';
+		        ctx.fillStyle = backgroundColor;
+		        ctx.fillRect(0, 0, width, height);
+	    	}
 	    }
 	    ctx.save();
 	    _doclip.call(this,ctx);
