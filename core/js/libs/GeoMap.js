@@ -386,23 +386,6 @@ define('GeoMap',['zrender',
             },
             { normal: 'up', update: true }
         );
-        if(conf){
-        	/*对透明做默认填色处理*/
-	        var backgroundColor = conf.bgcolor || '#ffffff';
-	        // var default_rgb_bgcolor = toRGB(backgroundColor,true);
-	        // var img = ctx.getImageData(0,0,width,height);
-	        // var pixel = img.data;
-	        // for(var i = 0,j = pixel.length;i<j;i+=4){
-	        // 	if(pixel[i] == 0 && pixel[i+1] == 0 && pixel[i+2] == 0 && pixel[i+3] == 0){
-	        // 		pixel[i] = default_rgb_bgcolor[0];
-	        // 		pixel[i+1] = default_rgb_bgcolor[1];
-	        // 		pixel[i+2] = default_rgb_bgcolor[2];
-	        // 		pixel[i+3] = 255;
-	        // 	}
-	        // }
-	        // ctx.putImageData(img,0,0);
-        }
-        
 
         var img_data = maskImageDom.toDataURL(null, backgroundColor);
         maskImageDom = null;
