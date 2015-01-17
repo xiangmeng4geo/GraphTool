@@ -5,6 +5,9 @@ Core.safe(function(){
 		ConstEvent = Const.Event,
 		ConstFileType = Const.fileRule.file_type;
 
+	var Logger = Core.util.Logger,
+		Timer = Logger.Timer;
+		
 	var ConfUser = Core.Lib.conf.User;	
 
 	var gui = CoreWindow.getGui(),
@@ -58,7 +61,7 @@ Core.safe(function(){
 			if(!legend_util.isNew(product_name)){
 				_LegendImage(img_path, conf_of_product.legend);
 			}
-			return img_path;
+			return img_path+'?'+Math.random();
 		}
 	})();
 	
@@ -157,7 +160,8 @@ Core.safe(function(){
 			window.GeoMap = GeoMap;
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
-				container: $geomap
+				container: $geomap,
+				// jsonLoader: file_util.getJson
 			});
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
@@ -237,10 +241,15 @@ Core.safe(function(){
 			Loading.show();
 			var Color = ['red','blue','#000','#123','#f26','#ccc','#333'];
 			
+			function _resolve(_path){
+				return path_util.resolve(file_util.path.project, _path);
+			}
 			var china_json = '../../../git_project/GeoMap/json/china_mask.geo.json';
-			china_json = '../shell/data/china_mask.geo.meractor.json';
-			china_json = '../shell/data/china_province.meractor.json';
 			china_json = '../../../git_project/GeoMap/json/china.geo.json';
+			// china_json = 'shell/data/china_mask.geo.meractor.json';
+			// china_json = _resolve('shell/data/china_province.meractor.json');
+			china_json = _resolve('shell/data/china.geo.albers.json');
+			china_json = _resolve('shell/data/china_province.albers.json');
 			gm.loadGeo([china_json],{
 				style: {
 					// color: '#F5F3F0',
@@ -841,6 +850,7 @@ Core.safe(function(){
 			menu_save_img.on('click',function(){
 				if(gm){
 					$('<input type="file" nwsaveas="a.png" />').on('change',function(){
+						Timer.start('save image');
 						var save_file_name = $(this).val();
 						Loading.show(function(){
 							var img_data = gm.toDataURL();
@@ -875,8 +885,9 @@ Core.safe(function(){
 
 								file_util.img.saveBase64(save_file_name, img_data);
 								$div_container.remove();
-								alert('成功导出图片!');
 								Loading.hide();
+								Timer.end('save image');
+								alert('成功导出图片!');
 							}
 							var _bgimg = conf_export.bgimg;
 							if(_bgimg && file_util.exists(_bgimg)){

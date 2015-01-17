@@ -103,9 +103,9 @@ define('LegendImage',['zrender',
 			_canvas.render();
 		});
 		
-		var img_data = _canvas.toDataURL('image/png', 'rgba(0, 0, 0, 0)');
-		// console.log(img_data);
+		var img_data = _canvas.toDataURL();
 		Core.Lib.util.file.tmp.legend.save(img_path, img_data);
+		$legend_tmp.empty();
 	}
 	return genlegendImage;
 });

@@ -1,6 +1,88 @@
 var fs = require('fs'),
 	path = require('path');
 
+function number_fixed(num,len){
+	len || (len = 2);
+	return Number(num.toFixed(len));
+}
+
+var radians = Math.PI / 180,
+	degrees = 180 / Math.PI,
+	px = 3800000;//转成px
+	// px = 1;
+var Meractor = (function(){
+	var MERACTOR_RATIO = 20037508.34/180;
+	/*Web墨卡托坐标与WGS84坐标互转*/
+	var Meractor_cache_lnglat = {};// 进行缓存，减小重复计算量
+	return {
+		name: 'meractor',
+		project: function(lnglat){
+			var lng = lnglat.x;
+			var lat = lnglat.y;
+			var cache_name = lng+'_'+lat;
+			var cache_val = Meractor_cache_lnglat[cache_name];
+			if(cache_val){
+				return cache_val;
+			}
+			var x = lng * MERACTOR_RATIO;
+			var y = Math.log(Math.tan((90+lat)*Math.PI/360))/(Math.PI/180);
+			y = y * MERACTOR_RATIO;
+			var val = {x: x/px,y: y/px};
+			Meractor_cache_lnglat[cache_name] = val;
+			return val;
+		},
+		invert: function(mercator){
+			var x = mercator.x/MERACTOR_RATIO;
+			var y = mercator.y/MERACTOR_RATIO;
+			y = 180/Math.PI*(2*Math.atan(Math.exp(y*Math.PI/180))-Math.PI/2);
+			return {x: x*px,y: y*px};
+		}
+	}
+})();
+var Albers = (function(){
+	var pv = {};
+	pv.radians = function(degrees) { return radians * degrees; };
+	pv.degrees = function(radians) { return degrees * radians; };
+	function albers(lat0, lng0, phi1, phi2) {
+	    if (lat0 == undefined) lat0 = 23.0;  // Latitude_Of_Origin
+	    if (lng0 == undefined) lng0 = -96.0; // Central_Meridian
+	    if (phi1 == undefined) phi1 = 29.5;  // Standard_Parallel_1
+	    if (phi2 == undefined) phi2 = 45.5;  // Standard_Parallel_2
+	 
+	    lat0 = pv.radians(lat0);
+	    lng0 = pv.radians(lng0);
+	    phi1 = pv.radians(phi1);
+	    phi2 = pv.radians(phi2);
+	 
+	    var n = 0.5 * (Math.sin(phi1) + Math.sin(phi2)),
+	        c = Math.cos(phi1),
+	        C = c*c + 2*n*Math.sin(phi1),
+	        p0 = Math.sqrt(C - 2*n*Math.sin(lat0)) / n;
+	 
+	    return {
+	    	name: 'albers',
+	        project: function(latlng) {
+	            var theta = n * (pv.radians(latlng.x) - lng0),
+	                p = Math.sqrt(C - 2*n*Math.sin(pv.radians(latlng.y))) / n;
+	            var result = {
+	                x: p * Math.sin(theta)/px,
+	                y: p0 - p * Math.cos(theta)/px
+	            };
+	            return result;
+	        },
+	        invert: function(xy) {
+	            var theta = Math.atan(xy.x / (p0 - xy.y)),
+	                p = Math.sqrt(xy.x*xy.y + Math.pow(p0 - xy.y, 2));
+	            return {
+	                lng: pv.degrees(lon0 + theta/n),
+	                lat: pv.degrees(Math.asin( (C - p*p*n*n) / (2*n)))
+	            };
+	        }
+	    };
+	}
+	return albers(35, 105, 27, 45);
+})();
+
 var format = (function(){
 	function formatDir(dir,format_path_fn){
 		fs.readdir(dir, function(err, files) {
@@ -25,29 +107,7 @@ var format = (function(){
 		});
 	}
 	
-	function number_fixed(num,len){
-		len || (len = 4);
-		return Number(num.toFixed(len));
-	}
-    var MERACTOR_RATIO = 20037508.34/180;
-	var px = 3800000;//转成px
-	/*Web墨卡托坐标与WGS84坐标互转*/
-	var Meractor_cache_lnglat = {};// 进行缓存，减小重复计算量
-	var Meractor_lngLatToPoint = function(lnglat){
-		var lng = lnglat[0];
-		var lat = lnglat[1];
-		var cache_name = lng+'_'+lat;
-		var cache_val = Meractor_cache_lnglat[cache_name];
-		if(cache_val){
-			return cache_val;
-		}
-		var x = lng * MERACTOR_RATIO;
-		var y = Math.log(Math.tan((90+lat)*Math.PI/360))/(Math.PI/180);
-		y = y * MERACTOR_RATIO;
-		var val = [number_fixed(x/px), number_fixed(y/px)];
-		Meractor_cache_lnglat[cache_name] = val;
-		return val;
-	}
+
 	/*同步递归创建目录*/
 	var mkdirSync = function(mkPath){
 		var parentPath = path.dirname(mkPath);
@@ -78,10 +138,9 @@ var format = (function(){
 		var min_x = max_x = first_v[0],
 			min_y = max_y = first_v[1];
 		var len = val.length;
-		// if(len < 200){
-		// 	return;
-		// }
-		num_total += len;
+		if(len < 200){
+			return;
+		}
 		val.forEach(function(v){
 			var x = v[0],
 				y = v[1];
@@ -97,8 +156,11 @@ var format = (function(){
 			if(y > max_y){
 				max_y = y;
 			}
-			arr.push(Meractor_lngLatToPoint(v));
+			var val = global_projector.project({x: x, y: y});
+
+			arr.push([val.x, val.y]);
 		});
+		
 		return {
 			arr: arr,
 			min_x: min_x,
@@ -107,29 +169,58 @@ var format = (function(){
 			max_y: max_y
 		};
 	}
+	var SPACE = 0.04; //这里控制过滤点之间距离，可能用这个参数出不同分辨率的地图数据
+	function _scale(val, scale){
+		var newVal = [];
+
+		val.forEach(function(v, i){
+			var x = v[0]*scale,
+				y = v[1]*scale;
+			var is_can_add = true;
+			var len = newVal.length;
+			if(len > 0){
+				var before_val = newVal[len-1];
+				var dis = Math.sqrt(Math.pow(before_val[0] - x, 2), Math.pow(before_val[1] - y, 2));
+
+				if(dis < SPACE){
+					is_can_add = false;
+				}
+			}
+			if(is_can_add){
+				newVal.push([number_fixed(x), number_fixed(y)]);
+			}
+		});
+		var len = newVal.length;
+		if(len < 200){
+			return;
+		}
+		num_total += len;
+		return newVal;
+	}
 	function formatFile(file_path,format_path_fn){
 		fs.readFile(file_path,{encoding: 'utf8'},function(err,data){
 			if(err){
 				console.log(err);
 			}else{
-				var min_x = min_y = Number.MAX_VALUE,
-					max_x = max_y = Number.MIN_VALUE;
+				var min_x_file = min_y_file = Number.MAX_VALUE,
+					max_x_file = max_y_file = Number.MIN_VALUE;
 				function getExtremum(val){
-					if(val.min_x < min_x){
-						min_x = val.min_x;
+					if(val.min_x < min_x_file){
+						min_x_file = val.min_x;
 					}
-					if(val.min_y < min_y){
-						min_y = val.min_y;
+					if(val.min_y < min_y_file){
+						min_y_file = val.min_y;
 					}
-					if(val.max_x > max_x){
-						max_x = val.max_x;
+					if(val.max_x > max_x_file){
+						max_x_file = val.max_x;
 					}
-					if(val.max_y > max_y){
-						max_y = val.max_y;
+					if(val.max_y > max_y_file){
+						max_y_file = val.max_y;
 					}
 				}
 				data = JSON.parse(data);
 				var newData = {type: data.type,features: []};
+
 				data.features.forEach(function(v,i){
 					var geometry = v.geometry;
 					var type = geometry.type;
@@ -164,16 +255,50 @@ var format = (function(){
 						properties: {}
 					});
 				});
-				newData.projector = 'meractor';
+				newData.projector = global_projector.name;
 
 				newData.srcSize = {
-					left: min_x,
-					top: max_y,
-					width: max_x - min_x,
-					height: max_y - min_y
+					left: number_fixed(min_x_file),
+					top: number_fixed(max_y_file),
+					width: number_fixed(max_x_file - min_x_file),
+					height: number_fixed(max_y_file - min_y_file)
 				};
+				var width_relative = 100;
+				var px_size_china_left_top = global_projector.project({x: newData.srcSize.left, y: newData.srcSize.top}),
+					px_size_china_right_bottom = global_projector.project({x: newData.srcSize.left+newData.srcSize.width, y: newData.srcSize.top-newData.srcSize.height});
+
+				var px_size_china = {width: px_size_china_right_bottom.x - px_size_china_left_top.x,height: px_size_china_left_top.y - px_size_china_right_bottom.y};
+			
+				var scale = width_relative/px_size_china.width;
+				newData.scale = scale;
+				newData.features.forEach(function(v,i){
+					var geometry = v.geometry;
+					var type = geometry.type;
+					
+					var coordinates = [];
+					if('Polygon' == type){
+						var new_coordinates = [];
+						geometry.coordinates.forEach(function(v_1, i_1){
+							var v = _scale(v_1, scale);
+							v && new_coordinates.push(v);
+						});
+						geometry.coordinates = new_coordinates;
+					}else if('MultiPolygon' == type){
+						var new_coordinates_multi = [];
+						geometry.coordinates.forEach(function(v_coordinates, i_coordinates){
+							var new_coordinates = [];
+							v_coordinates.forEach(function(v_1, i_1){
+								var v = _scale(v_1, scale);
+								v && new_coordinates.push(v);
+							});
+							new_coordinates.length > 0 && new_coordinates_multi.push(new_coordinates);
+						});
+						geometry.coordinates = new_coordinates_multi;
+					}
+				});
+				
 				saveData(newData,format_path_fn(file_path));
-				console.log(num_total+' points!');
+				console.log(global_projector.name+' '+num_total+' points!');
 			}
 		});
 	}
@@ -195,7 +320,21 @@ var format = (function(){
 
 var file_path = 'E:/source/git_project/GeoMap/json/china_mask.geo.json';
 file_path = './data-source/';
+// file_path = './data-source/china.geo.json';
+var args = [].slice.call(process.argv);
+var global_projector = Meractor;
+//命令行进行指定文件压缩
+if(args.length > 2){
+	var projector = args[2];
+	if(projector == 'albers'){
+		global_projector = Albers;
+		// number_fixed = function(num){
+		// 	return num;
+		// }
+	}
+}
 format(file_path,function(source_path){
 	// return path.join(__dirname,'./data',path.basename(source_path).replace('.json','.meractor.json'));
-	return source_path.replace('data-source','data').replace('.json','.meractor.json');
+	return source_path.replace('data-source','data').replace('.json','.'+global_projector.name+'.json');
 });
+

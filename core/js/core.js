@@ -363,5 +363,28 @@
 			return /\.(jpg|bmp|gif|png)$/i.test(file_path)
 		}
 	}
+	!function(){
+		var cache_log_time = {};
+
+		var Logger = {
+			log: function(){
+				console.log.apply(console, arguments);
+			}
+		};
+		Logger.Timer = {
+			start: function(name){
+				cache_log_time[name] = new Date();
+			}, 
+			end: function(name){
+				var start_time = cache_log_time[name];
+				if(start_time){
+					var end_time = new Date();
+					Logger.log(name, 'takes', (end_time - start_time), 'ms!');
+					delete cache_log_time[name];
+				}
+			}
+		};
+		Core.util.Logger = Logger;
+	}();
 	global.Core = Core;
 }(this);

@@ -6,6 +6,10 @@ define('GeoMap',['zrender',
 	'zrender/tool/util',
 	'zrender/shape/Text',
 	'zrender/shape/Image'],function(Zrender,Base,Polygon,BrokenLine,Group,util,TextShape,ImageShape){
+
+	var Logger = Core.util.Logger,
+		Timer = Logger.Timer;
+
 	var ZINDEX_MAP = 2,
 		ZINDEX_LAYER = 1;
 
@@ -14,76 +18,81 @@ define('GeoMap',['zrender',
     devicePixelRatio = Math.max(devicePixelRatio, 1);
 
     var radians = Math.PI / 180,
-  		degrees = 180 / Math.PI;
-  	var pv = {};
-  	pv.radians = function(degrees) { return radians * degrees; };
-  	pv.degrees = function(radians) { return degrees * radians; };
-
-	var MERACTOR_RATIO = 20037508.34/180;
-	var px = 3800000;//转成px
-	/*Web墨卡托坐标与WGS84坐标互转*/
-	var Meractor_cache_lnglat = {};// 进行缓存，减小重复计算量
-	var Meractor = {
-		project: function(lnglat){
-			var lng = lnglat.x;
-			var lat = lnglat.y;
-			var cache_name = lng+'_'+lat;
-			var cache_val = Meractor_cache_lnglat[cache_name];
-			if(cache_val){
-				return cache_val;
+		degrees = 180 / Math.PI,
+		px = 3800000;//转成px
+	// px = 1;
+	var Meractor = (function(){
+		var MERACTOR_RATIO = 20037508.34/180;
+		/*Web墨卡托坐标与WGS84坐标互转*/
+		var Meractor_cache_lnglat = {};// 进行缓存，减小重复计算量
+		return {
+			name: 'meractor',
+			project: function(lnglat){
+				var lng = lnglat.x;
+				var lat = lnglat.y;
+				var cache_name = lng+'_'+lat;
+				var cache_val = Meractor_cache_lnglat[cache_name];
+				if(cache_val){
+					return cache_val;
+				}
+				var x = lng * MERACTOR_RATIO;
+				var y = Math.log(Math.tan((90+lat)*Math.PI/360))/(Math.PI/180);
+				y = y * MERACTOR_RATIO;
+				var val = {x: x/px,y: y/px};
+				Meractor_cache_lnglat[cache_name] = val;
+				return val;
+			},
+			invert: function(mercator){
+				var x = mercator.x/MERACTOR_RATIO;
+				var y = mercator.y/MERACTOR_RATIO;
+				y = 180/Math.PI*(2*Math.atan(Math.exp(y*Math.PI/180))-Math.PI/2);
+				return {x: x*px,y: y*px};
 			}
-			var x = lng * MERACTOR_RATIO;
-			var y = Math.log(Math.tan((90+lat)*Math.PI/360))/(Math.PI/180);
-			y = y * MERACTOR_RATIO;
-			var val = {x: x/px,y: y/px};
-			Meractor_cache_lnglat[cache_name] = val;
-			return val;
-		},
-		invert: function(mercator){
-			var x = mercator.x/MERACTOR_RATIO;
-			var y = mercator.y/MERACTOR_RATIO;
-			y = 180/Math.PI*(2*Math.atan(Math.exp(y*Math.PI/180))-Math.PI/2);
-			return {x: x*px,y: y*px};
 		}
-	};
-	function albers(lat0, lng0, phi1, phi2) {
-	    if (lat0 == undefined) lat0 = 23.0;  // Latitude_Of_Origin
-	    if (lng0 == undefined) lng0 = -96.0; // Central_Meridian
-	    if (phi1 == undefined) phi1 = 29.5;  // Standard_Parallel_1
-	    if (phi2 == undefined) phi2 = 45.5;  // Standard_Parallel_2
-	 
-	    lat0 = pv.radians(lat0);
-	    lng0 = pv.radians(lng0);
-	    phi1 = pv.radians(phi1);
-	    phi2 = pv.radians(phi2);
-	 
-	    var n = 0.5 * (Math.sin(phi1) + Math.sin(phi2)),
-	        c = Math.cos(phi1),
-	        C = c*c + 2*n*Math.sin(phi1),
-	        p0 = Math.sqrt(C - 2*n*Math.sin(lat0)) / n;
-	 
-	    return {
-	        project: function(latlng) {
-	            var theta = n * (pv.radians(latlng.x) - lng0),
-	                p = Math.sqrt(C - 2*n*Math.sin(pv.radians(latlng.y))) / n;
-	            var result = {
-	                x: p * Math.sin(theta)/px,
-	                y: p0 - p * Math.cos(theta)/px
-	            };
-	            return result;
-	        },
-	        invert: function(xy) {
-	            var theta = Math.atan(xy.x / (p0 - xy.y)),
-	                p = Math.sqrt(xy.x*xy.y + Math.pow(p0 - xy.y, 2));
-	            return {
-	                lng: pv.degrees(lon0 + theta/n),
-	                lat: pv.degrees(Math.asin( (C - p*p*n*n) / (2*n)))
-	            };
-	        }
-	    };
-	}
-	Meractor = albers(35, 105, 27, 45);
-	// Meractor = albers();
+	})();
+	var Albers = (function(){
+		var pv = {};
+		pv.radians = function(degrees) { return radians * degrees; };
+		pv.degrees = function(radians) { return degrees * radians; };
+		function albers(lat0, lng0, phi1, phi2) {
+		    if (lat0 == undefined) lat0 = 23.0;  // Latitude_Of_Origin
+		    if (lng0 == undefined) lng0 = -96.0; // Central_Meridian
+		    if (phi1 == undefined) phi1 = 29.5;  // Standard_Parallel_1
+		    if (phi2 == undefined) phi2 = 45.5;  // Standard_Parallel_2
+		 
+		    lat0 = pv.radians(lat0);
+		    lng0 = pv.radians(lng0);
+		    phi1 = pv.radians(phi1);
+		    phi2 = pv.radians(phi2);
+		 
+		    var n = 0.5 * (Math.sin(phi1) + Math.sin(phi2)),
+		        c = Math.cos(phi1),
+		        C = c*c + 2*n*Math.sin(phi1),
+		        p0 = Math.sqrt(C - 2*n*Math.sin(lat0)) / n;
+		 
+		    return {
+		    	name: 'albers',
+		        project: function(latlng) {
+		            var theta = n * (pv.radians(latlng.x) - lng0),
+		                p = Math.sqrt(C - 2*n*Math.sin(pv.radians(latlng.y))) / n;
+		            var result = {
+		                x: p * Math.sin(theta)/px,
+		                y: p0 - p * Math.cos(theta)/px
+		            };
+		            return result;
+		        },
+		        invert: function(xy) {
+		            var theta = Math.atan(xy.x / (p0 - xy.y)),
+		                p = Math.sqrt(xy.x*xy.y + Math.pow(p0 - xy.y, 2));
+		            return {
+		                lng: pv.degrees(lon0 + theta/n),
+		                lat: pv.degrees(Math.asin( (C - p*p*n*n) / (2*n)))
+		            };
+		        }
+		    };
+		}
+		return albers(35, 105, 27, 45);
+	})();
 
 	var china_src_size = {
 		height: 35.4638,
@@ -91,10 +100,6 @@ define('GeoMap',['zrender',
 		top: 53.5693,
 		width: 61.6113
 	};
-	var px_size_china_left_top = Meractor.project({x: china_src_size.left, y: china_src_size.top}),
-		px_size_china_right_bottom = Meractor.project({x: china_src_size.left+china_src_size.width, y: china_src_size.top-china_src_size.height});
-
-	var px_size_china = {width: px_size_china_right_bottom.x - px_size_china_left_top.x,height: px_size_china_left_top.y - px_size_china_right_bottom.y};
 	var default_conf = {
 		container: 'body'
 	};
@@ -105,13 +110,18 @@ define('GeoMap',['zrender',
 		var container = $(conf.container);
 		var width_container = container.width(),
 			height_container = container.height();
+
+		var px_size_china_left_top = _this.projector.project({x: china_src_size.left, y: china_src_size.top}),
+			px_size_china_right_bottom = _this.projector.project({x: china_src_size.left+china_src_size.width, y: china_src_size.top-china_src_size.height});
+
+		var px_size_china = {width: px_size_china_right_bottom.x - px_size_china_left_top.x,height: px_size_china_left_top.y - px_size_china_right_bottom.y};
+	
 		var scale_x = width_container/px_size_china.width,
 			scale_y = height_container/(px_size_china.height);
 
-		// console.log(scale_x,scale_y);
 		
 		var center = conf.center||{x: china_src_size.left+china_src_size.width/2,y: china_src_size.top - china_src_size.height/2};
-		var center_xy = Meractor.project(center);
+		var center_xy = _this.projector.project(center);
 		var group_map = new Group(),
 			group_shape = new Group(),
 			group_legend = new Group();
@@ -141,9 +151,10 @@ define('GeoMap',['zrender',
 	
 	var GeoMap = function(conf){
 		var _this = this;
+		_this.projector = conf.projector == 'mercator'? Meractor: Albers;
 		_this.conf = conf = $.extend({},default_conf,conf);
 		_this.canvas = Zrender.init($(conf.container).get(0));
-
+		_this.jsonLoader = conf.jsonLoader || $.getJSON;
 		_init_geomap.call(_this);
 	};
 	var GeoMapProp = GeoMap.prototype;
@@ -154,20 +165,22 @@ define('GeoMap',['zrender',
 		var shapes = [];
 		var gm = this;
 		var is_not_lnglat = !options.is_lnglat;
+		var scale = options.scale || 1;
 		$.each(coordinates,function(i,v){
 			var points = [];
 			$.each(v,function(v_i,v_v){
-				points.push(new GeoMap.Point(v_v[0],v_v[1],is_not_lnglat));
+				points.push(new GeoMap.Point(v_v[0]/scale,v_v[1]/scale, is_not_lnglat));
 			});
-			var polygon = new GeoMap.Polygon(points,options);
+			var polygon = new GeoMap.Polygon(points, options);
 			// polygon.draw(gm);
 			polygon.points = points;
 			shapes.push(polygon);
-			gm.addOverlay(polygon);
+			gm.addOverlay(polygon, 200*Math.random());
 		});
 		return shapes;
 	}
 	function callback_loaedGeo(loadedData,options,callback_after_render_geo){
+		Timer.start('render geo');
 		var gm = this;
 		var data = loadedData.shift();
 		$.each(loadedData,function(i,v){
@@ -196,6 +209,8 @@ define('GeoMap',['zrender',
 		});
 		var shapes = [];
 		var is_lnglat = !data.projector;
+		var scale = data.scale;
+
 		$.each(data.features,function(i,v){
 			var type = v.type;
 			if('Feature' == type){
@@ -209,7 +224,8 @@ define('GeoMap',['zrender',
 						// color: '#F5F3F0'
 					},
 					zlevel: ZINDEX_MAP,
-					is_lnglat: is_lnglat
+					is_lnglat: is_lnglat,
+					scale: scale
 				}
 
 				if('Polygon' == type_geometry ){
@@ -219,20 +235,23 @@ define('GeoMap',['zrender',
 						shapes.push(addGeoPolygon.call(gm,v_v,options));
 					});
 				}else{
-					console.log(v,type_geometry);
+					Logger.log(v,type_geometry);
 				}
 			}
 		});
+		Timer.end('render geo');
 		var points = [];
 		$.each(shapes,function(i,v){
 			$.each(v,function(v_i,v_v){
 				points.push(v_v.shape.style.pointList);
 			});
 		});
-
+		Timer.start('addMask');
 		gm.addMask(points,$.extend(true,{
 			'is_lnglat': false
 		},options));
+		Timer.end('addMask');
+
 		$.isFunction(callback_after_render_geo) && callback_after_render_geo(points);
 	}
 	GeoMapProp.loadGeo = function(src,options,callback_after_render_geo){
@@ -242,22 +261,26 @@ define('GeoMap',['zrender',
 		}
 		var loadedData = [],
 			len = src.length;
-		$.each(src,function(i,v){
-			$.getJSON(v,function(data){
+		Timer.start('loadGeo');
+		$.each(src,function(i, v){
+			_this.jsonLoader(v, function(data){
 				loadedData.push(data);
 				if(loadedData.length == len){
+					Timer.end('loadGeo');
 					callback_loaedGeo.call(_this,loadedData,options,callback_after_render_geo);
 				}
 			});
 		});
 	};
-	GeoMapProp.addOverlay = function(overlay,group_name){
+	GeoMapProp.addOverlay = function(overlay, delay){
 		var _this = this;
 		var shape = overlay.draw(this);
-		var group = _this.groups[group_name];
-		this.canvas.addShape(shape);
+		delay || (delay = 0);
+		// setTimeout(function(){
+			_this.canvas.addShape(shape);
 		
-		this.canvas.render();
+			_this.canvas.render();
+		// }, delay);
 
 		if(shape.zlevel == ZINDEX_LAYER){
 			_this._data.layers.push(shape);
@@ -278,9 +301,9 @@ define('GeoMap',['zrender',
 		var is_lnglat = point.is_lnglat;
 		point = {x: point.lng,y: point.lat};
 		if(is_lnglat){
-			point = Meractor.project(point);
+			point = this.projector.project(point);
 		}
-		
+
 		var _this = this;
 		var data = _this._data;
 		var center = data.center;
@@ -297,7 +320,7 @@ define('GeoMap',['zrender',
 		var polygons = this.polygons;
 		if($.isArray(polygons)){
 			ctx.beginPath();
-			$.each(polygons,function(i_polygon,pointList){
+			$.each(polygons, function(i_polygon, pointList){
 				if (pointList.length < 2) {
 	                // 少于2个点就不画了~
 	                return;
@@ -309,14 +332,6 @@ define('GeoMap',['zrender',
 	            ctx.lineTo(pointList[0][0], pointList[0][1]);
 			});
 			ctx.closePath();
-
-			// ctx.fillStyle = '#ff0000';
-			// console.log(ctx, polygons);
-			// // ctx.globalCompositeOperation="destination-out";  
-   //          ctx.fill();
-   //          // ctx.globalCompositeOperation="source-over";  
-			
-			// // ctx.globalCompositeOperation = "source-in";
 			ctx.clip();
 		}
     }
@@ -349,12 +364,23 @@ define('GeoMap',['zrender',
 
         return newDom;
     }
+    function _drawShape(ctx, shape){
+    	if (!shape.invisible) {
+            if (!shape.onbrush // 没有onbrush
+                // 有onbrush并且调用执行返回false或undefined则继续粉刷
+                || (shape.onbrush && !shape.onbrush(ctx, false))
+            ) {
+                shape.brush(ctx, false, self.updatePainter);
+            }
+        }
+    }
     var core_color = Core.Color,
     	toRGB = core_color.toRGB,
     	toHTML = core_color.toHTML;
     /*得到绘制好的图片*/
 	GeoMapProp.toDataURL = function(conf){
-		var painter = this.canvas.painter;
+		var _this = this;
+		var painter = _this.canvas.painter;
 		var width = painter._width;
         var height = painter._height;
 		var maskImageDom = _createDom('mask-image', 'canvas', painter);
@@ -373,20 +399,41 @@ define('GeoMap',['zrender',
 	    	}
 	    }
 	    ctx.save();
-	    _doclip.call(this,ctx);
-	    this.canvas.storage.iterShape(
-            function (shape) {
-                if (!shape.invisible) {
-                    if (!shape.onbrush // 没有onbrush
-                        // 有onbrush并且调用执行返回false或undefined则继续粉刷
-                        || (shape.onbrush && !shape.onbrush(ctx, false))
-                    ) {
-                            shape.brush(ctx, false, self.updatePainter);
-                    }
-                }
-            },
-            { normal: 'up', update: true }
-        );
+	    _doclip.call(_this,ctx);
+	    var shapeList = _this.canvas.storage.getShapeList();
+	    var geoShapes = [];
+	    $.each(shapeList, function(i, shape){
+	    	if(shape.zlevel == ZINDEX_LAYER){
+	    		_drawShape(ctx, shape);
+	    	}else{
+	    		geoShapes.push(shape);
+	    	}
+	    });
+	    ctx.restore();
+	    $.each(geoShapes, function(i, shape){
+	    	_drawShape(ctx, shape);
+	    });
+	    // var _cliped = false;
+	    // _this.canvas.storage.iterShape(
+     //        function (shape) {
+     //            if (!shape.invisible) {
+     //                if (!shape.onbrush // 没有onbrush
+     //                    // 有onbrush并且调用执行返回false或undefined则继续粉刷
+     //                    || (shape.onbrush && !shape.onbrush(ctx, false))
+     //                ) {
+     //                	if(shape.zlevel == ZINDEX_LAYER && !_cliped){
+     //                		_cliped = true;console.log('_doclip');
+     //                		_doclip.call(_this,ctx);
+     //                	}
+     //                	if(_cliped){console.log('restore');
+     //                		ctx.restore();
+     //                	}
+     //                    shape.brush(ctx, false, self.updatePainter);
+     //                }
+     //            }
+     //        },
+     //        { normal: 'up', update: true }
+     //    );
 
         var img_data = maskImageDom.toDataURL(null, backgroundColor);
         maskImageDom = null;

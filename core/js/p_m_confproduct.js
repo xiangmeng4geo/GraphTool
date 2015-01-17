@@ -492,6 +492,9 @@ Core.safe(function(){
 					$html_fieldset_color.find('.number_level').val(v.number_level);
 					var colors = v.colors;
 					if(colors && colors.length > 0){
+						colors.sort(function(a, b){
+							return a.val[0] > b.val[0];
+						});
 						$html_fieldset_color.find('.legend_value').append(getTable(colors));
 					}
 					$legend_left.append($html_fieldset_color);
