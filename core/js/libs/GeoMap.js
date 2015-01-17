@@ -387,6 +387,23 @@ define('GeoMap',['zrender',
 		var ctx = maskImageDom.getContext('2d');
 	    devicePixelRatio != 1 && ctx.scale(devicePixelRatio, devicePixelRatio);
 
+	    _doclip.call(_this,ctx);
+	    var shapeList = _this.canvas.storage.getShapeList();
+	    var geoShapes = [];
+	    $.each(shapeList, function(i, shape){
+	    	if(shape.zlevel == ZINDEX_LAYER){
+	    		_drawShape(ctx, shape);
+	    	}else{
+	    		geoShapes.push(shape);
+	    	}
+	    });
+	    var layer_data = maskImageDom.toDataURL();
+
+
+	    maskImageDom = _createDom('mask-image', 'canvas', painter);
+		ctx = maskImageDom.getContext('2d');
+	    devicePixelRatio != 1 && ctx.scale(devicePixelRatio, devicePixelRatio);
+	    
 	    if(conf){
 	    	var bgimg = conf.bgimg;
 	    	if(bgimg){
@@ -398,42 +415,13 @@ define('GeoMap',['zrender',
 		        ctx.fillRect(0, 0, width, height);
 	    	}
 	    }
-	    ctx.save();
-	    _doclip.call(_this,ctx);
-	    var shapeList = _this.canvas.storage.getShapeList();
-	    var geoShapes = [];
-	    $.each(shapeList, function(i, shape){
-	    	if(shape.zlevel == ZINDEX_LAYER){
-	    		_drawShape(ctx, shape);
-	    	}else{
-	    		geoShapes.push(shape);
-	    	}
-	    });
-	    ctx.restore();
+	    var img = new Image();
+	    img.src = layer_data;
+	    ctx.drawImage(img, 0, 0);
+
 	    $.each(geoShapes, function(i, shape){
 	    	_drawShape(ctx, shape);
 	    });
-	    // var _cliped = false;
-	    // _this.canvas.storage.iterShape(
-     //        function (shape) {
-     //            if (!shape.invisible) {
-     //                if (!shape.onbrush // 没有onbrush
-     //                    // 有onbrush并且调用执行返回false或undefined则继续粉刷
-     //                    || (shape.onbrush && !shape.onbrush(ctx, false))
-     //                ) {
-     //                	if(shape.zlevel == ZINDEX_LAYER && !_cliped){
-     //                		_cliped = true;console.log('_doclip');
-     //                		_doclip.call(_this,ctx);
-     //                	}
-     //                	if(_cliped){console.log('restore');
-     //                		ctx.restore();
-     //                	}
-     //                    shape.brush(ctx, false, self.updatePainter);
-     //                }
-     //            }
-     //        },
-     //        { normal: 'up', update: true }
-     //    );
 
         var img_data = maskImageDom.toDataURL(null, backgroundColor);
         maskImageDom = null;
