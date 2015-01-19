@@ -18,6 +18,7 @@ define('LegendImage',['zrender',
 		var len = blendent.length;
 		var html_title = '';
 		$.each(blendent, function(i, v){
+			var is_stripe = blendent.is_stripe || false;
 			var title = v.val.n;
 			html_title += '<span>'+title+'</span>';
 			html_color += '<ul>';
@@ -34,7 +35,7 @@ define('LegendImage',['zrender',
 			$.each(colors, function(color_i, color_v){
 				var style_width = is_updown? '': 'width: '+(1/c_colors*100)+'%;';
 				var style_color_text = is_updown? '': 'style="color: '+color_v.color_text+'"';
-				html_color += '<li style="'+style_width+'"><div style="background-color: '+color_v.color+';"></div><span '+style_color_text+'>'+color_v.text+'</span></li>';
+				html_color += '<li style="'+style_width+'"><div style="background-color: '+color_v.color+';" data-stripe='+is_stripe+'></div><span '+style_color_text+'>'+color_v.text+'</span></li>';
 			});
 			html_color += '</ul>';
 		});
@@ -56,18 +57,27 @@ define('LegendImage',['zrender',
 		
 		var div = $('<div style="width: '+$legend.width()+'px;height: '+$legend.height()+'px"></div>').appendTo($legend_tmp).get(0);
 		var _canvas = Zrender.init(div);
-		
+		console.log($legend.html());
 		
 		$legend.find('li div').each(function(){
 			var $this = $(this);
+			var _is_stripe = $this.data('stripe');
+			var color = $this.css('background-color');
+			console.log(_is_stripe);
+			if(_is_stripe){
+				color = new GeoMap.Pattern.Streak({
+					strokeStyle: color,
+					space: 1
+				});
+			}
 			var pos = $(this).position();
 			var style = {
 		        x : pos.left,
 		        y : pos.top,
 		        width : $this.width(),
 		        height: $this.height(),
-		        brushType : 'both',
-		        color : $this.css('background-color')
+		        brushType: 'both',
+		        color: color
 		    }
 			_canvas.addShape(new RectangleShape({
 			    style: style

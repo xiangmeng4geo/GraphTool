@@ -32,6 +32,7 @@ Core.safe(function(){
 		$checkbox_show_southsea = $('#checkbox_show_southsea'),
 		$checkbox_show_logo = $('#checkbox_show_logo');
 	var conf_sys = Conf_User.get(CONF_PRODUCTNAME);
+	console.log(conf_sys);
 	if(conf_sys){
 		var logos = conf_sys.logos;
 		if(logos){

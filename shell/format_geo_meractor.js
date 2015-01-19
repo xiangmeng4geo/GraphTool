@@ -124,7 +124,9 @@ var format = (function(){
 			content_info = JSON.stringify(content_info);
 		}
 		mkdirSync(path.dirname(save_file_path));
-		fs.writeFile(save_file_path,content_info,function(err){
+		fs.writeFile(save_file_path,content_info, {
+			encoding: 'utf8'
+		}, function(err){
 			if(err){
 				return console.log(err);
 			}
@@ -132,13 +134,13 @@ var format = (function(){
 		});
 	}
 	var num_total = 0;
-	function formatCoordinates(val){
+	function formatCoordinates(val, is_small_prov){
 		var arr = [];
 		var first_v = val[0];
 		var min_x = max_x = first_v[0],
 			min_y = max_y = first_v[1];
 		var len = val.length;
-		if(len < 200){
+		if(len < 200 && !is_small_prov){
 			return;
 		}
 		val.forEach(function(v){
@@ -169,10 +171,23 @@ var format = (function(){
 			max_y: max_y
 		};
 	}
-	var SPACE = 0.04; //这里控制过滤点之间距离，可能用这个参数出不同分辨率的地图数据
-	function _scale(val, scale){
+	function _get_cityname(name){
+		if(name){
+			return name.replace(/(壮族|回族|维吾尔)?(省|市|自治区|特别行政区)/,'');
+		}
+	}
+	var SPACE = 0.05,
+		SPACE_SMALL = {
+			'110000': 0.04, //北京
+			'120000': 0.04, //天津
+			'710000': 0.049,	//台湾
+			'810000': 0.02,//香港
+			'820000': 0.001	//澳门
+		}; //这里控制过滤点之间距离，可能用这个参数出不同分辨率的地图数据
+	function _scale(val, scale, small_prov_code){
 		var newVal = [];
 
+		var _space = SPACE_SMALL[small_prov_code] || SPACE;
 		val.forEach(function(v, i){
 			var x = v[0]*scale,
 				y = v[1]*scale;
@@ -182,7 +197,7 @@ var format = (function(){
 				var before_val = newVal[len-1];
 				var dis = Math.sqrt(Math.pow(before_val[0] - x, 2), Math.pow(before_val[1] - y, 2));
 
-				if(dis < SPACE){
+				if(dis < _space){
 					is_can_add = false;
 				}
 			}
@@ -191,14 +206,20 @@ var format = (function(){
 			}
 		});
 		var len = newVal.length;
-		if(len < 200){
+		if(len < (_space == SPACE?200: 10)){
 			return;
 		}
 		num_total += len;
 		return newVal;
 	}
+	function _is_small_prov(properties){
+		var prov_code = properties.prov_code;
+		return prov_code == 820000 || prov_code == 810000 || prov_code == 710000;
+	}
 	function formatFile(file_path,format_path_fn){
-		fs.readFile(file_path,{encoding: 'utf8'},function(err,data){
+		fs.readFile(file_path, {
+			encoding: 'utf8'
+		}, function(err,data){
 			if(err){
 				console.log(err);
 			}else{
@@ -222,13 +243,21 @@ var format = (function(){
 				var newData = {type: data.type,features: []};
 
 				data.features.forEach(function(v,i){
+					var properties = v.properties;
+					var name = properties['NAME'],
+						cname = properties['CAPNAME'],
+						prov_code = properties['PROV_CODE'];
+					var new_properties = {name: _get_cityname(name), cname: _get_cityname(cname), prov_code: prov_code};
+console.log(new_properties);
+					var _flag_is_small_prov = _is_small_prov(new_properties);
+
 					var geometry = v.geometry;
 					var type = geometry.type;
 					
 					var coordinates = [];
 					if('Polygon' == type){
 						geometry.coordinates.forEach(function(v_1){
-							var val = formatCoordinates(v_1);
+							var val = formatCoordinates(v_1, _flag_is_small_prov);
 							if(val){
 								getExtremum(val);
 								coordinates.push(val.arr);
@@ -238,7 +267,7 @@ var format = (function(){
 						geometry.coordinates.forEach(function(v_coordinates){
 							var arr = [];
 							v_coordinates.forEach(function(v_1){
-								var val = formatCoordinates(v_1);
+								var val = formatCoordinates(v_1, _flag_is_small_prov);
 								if(val){
 									getExtremum(val);
 									arr.push(val.arr);
@@ -252,7 +281,7 @@ var format = (function(){
 					newData.features.push({
 						type: v.type,
 						geometry: geometry_meractor,
-						properties: {}
+						properties: new_properties
 					});
 				});
 				newData.projector = global_projector.name;
@@ -271,7 +300,9 @@ var format = (function(){
 			
 				var scale = width_relative/px_size_china.width;
 				newData.scale = scale;
+
 				newData.features.forEach(function(v,i){
+					var prov_code = v.properties.prov_code;
 					var geometry = v.geometry;
 					var type = geometry.type;
 					
@@ -279,7 +310,7 @@ var format = (function(){
 					if('Polygon' == type){
 						var new_coordinates = [];
 						geometry.coordinates.forEach(function(v_1, i_1){
-							var v = _scale(v_1, scale);
+							var v = _scale(v_1, scale, prov_code);
 							v && new_coordinates.push(v);
 						});
 						geometry.coordinates = new_coordinates;
@@ -288,7 +319,7 @@ var format = (function(){
 						geometry.coordinates.forEach(function(v_coordinates, i_coordinates){
 							var new_coordinates = [];
 							v_coordinates.forEach(function(v_1, i_1){
-								var v = _scale(v_1, scale);
+								var v = _scale(v_1, scale, prov_code);
 								v && new_coordinates.push(v);
 							});
 							new_coordinates.length > 0 && new_coordinates_multi.push(new_coordinates);

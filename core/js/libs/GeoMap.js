@@ -232,6 +232,9 @@ define('GeoMap',['zrender',
 					shapes.push(addGeoPolygon.call(gm,geometry.coordinates,options));
 				}else if('MultiPolygon' == type_geometry){
 					$.each(geometry.coordinates,function(v_i,v_v){
+						if(v_i > 0){
+							delete options.style.text;
+						}
 						shapes.push(addGeoPolygon.call(gm,v_v,options));
 					});
 				}else{
@@ -478,7 +481,6 @@ define('GeoMap',['zrender',
 				pointList: Points
 			}
 		});
-		
 		this.shape = new Polygon($.extend(true,{
 			style: {
 				brushType : 'both',
@@ -486,6 +488,7 @@ define('GeoMap',['zrender',
 		        strokeColor : '#3D534E',
 		        color: 'rgba(0,0,0,0)',
 		        textColor: 'black',
+		        textFont: '12px "Microsoft Yahei"',
 		        textPosition : 'inside'// default top
 			},
 			zlevel: ZINDEX_LAYER,

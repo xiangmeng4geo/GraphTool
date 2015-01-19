@@ -248,7 +248,7 @@ Core.safe(function(){
 			china_json = '../../../git_project/GeoMap/json/china.geo.json';
 			// china_json = 'shell/data/china_mask.geo.meractor.json';
 			// china_json = _resolve('shell/data/china_province.meractor.json');
-			china_json = _resolve('shell/data/china.geo.albers.json');
+			// china_json = _resolve('shell/data/china.geo.albers.json');
 			china_json = _resolve('shell/data/china_province.albers.json');
 			gm.loadGeo([china_json],{
 				style: {
@@ -759,7 +759,10 @@ Core.safe(function(){
 			var menu_add_img_external = new MenuItem({label: '添加外部图片'});
 			menu_add_img_external.on('click',function(){
 				$('<input type="file" nwworkingdir="./image" />').on('change',function(){
-					add_maplayer_img($(this).val(), $geomap_layer.width()/2, $geomap_layer.height()/2);
+					add_maplayer_img($(this).val(), {
+						left: $geomap_layer.width()/2,
+						top: $geomap_layer.height()/2
+					});
 				}).click();
 			});
 			var menu_add_img_entrepot = new MenuItem({label: '添加图片库图片'});
