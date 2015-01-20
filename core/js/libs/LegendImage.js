@@ -2,7 +2,7 @@ define('LegendImage',['zrender',
 	'zrender/shape/Text',
 	'zrender/shape/Rectangle'],function(Zrender, TextShape, RectangleShape){
 
-	var $legend_tmp = $('<div class="legend_tmp"></div>').appendTo('body');
+	var $legend_tmp = $('<div class="legend_tmp"></div>').appendTo('#geomap_container');
 	function genlegendImage(img_path, conf_legend){
 		var unit = conf_legend.util,
 			is_show_unit = conf_legend.is_show_unit,
@@ -57,7 +57,6 @@ define('LegendImage',['zrender',
 		
 		var div = $('<div style="width: '+$legend.width()+'px;height: '+$legend.height()+'px"></div>').appendTo($legend_tmp).get(0);
 		var _canvas = Zrender.init(div);
-		console.log($legend.html());
 		
 		$legend.find('li div').each(function(){
 			var $this = $(this);

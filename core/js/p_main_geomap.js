@@ -56,9 +56,9 @@ Core.safe(function(){
 	var _LegendImage;
 	var _get_legend_img = (function(){
 		var legend_util = file_util.tmp.legend;
-		return function(product_name){
-			var img_path = legend_util.getPath(product_name);
-			if(!legend_util.isNew(product_name)){
+		return function(product_name, width, height){
+			var img_path = legend_util.getPath(product_name, width, height);
+			if(!legend_util.isNew(product_name, width, height)){
 				_LegendImage(img_path, conf_of_product.legend);
 			}
 			return img_path+'?'+Math.random();
@@ -159,6 +159,8 @@ Core.safe(function(){
 		initing = true;
 		require(['GeoMap', 'LegendImage'],function(GeoMap, LegendImage){
 			window.GeoMap = GeoMap;
+			var width_geomap = $geomap.width(),
+				height_geomap = $geomap.height();
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
 				container: $geomap,
@@ -354,29 +356,6 @@ Core.safe(function(){
 						var is_show_legend = conf_legend.is_show_legend,
 							is_updown = conf_legend.is_updown;
 
-						function add_southsealogo(callback){
-							var logo_southsea = conf_other.logo_southsea;
-							if(logo_southsea && logo_southsea.flag){
-								if(is_updown){
-									var pos = {
-										left: 20,
-										top: 'auto',
-										bottom: 20
-									};
-								}else{
-									var pos = {
-										left: 'auto',
-										right: 20,
-										bottom: 20
-									};
-								}
-								add_maplayer_img(logo_southsea.p, pos, function($html, param){
-									callback(pos, param);
-								});
-							}else{
-								callback();
-							}
-						}
 						function _add_southsealogo(pos, callback){
 							var logo_southsea = conf_other.logo_southsea;
 							if(logo_southsea && logo_southsea.flag){
@@ -402,7 +381,7 @@ Core.safe(function(){
 						
 						var _width = $geomap_layer.width();
 						if(is_show_legend){
-							var img_src = _get_legend_img(product_name);
+							var img_src = _get_legend_img(product_name, width_geomap, height_geomap);
 							function _add_legend(pos, width, height, callback){
 								new MapLayer.img({
 									position: pos,
