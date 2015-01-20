@@ -118,6 +118,9 @@
 .geomap_mirror.ui-draggable-dragging{
 	cursor: url(../img/closedhand.cur) 8 8, move !important;
 }
+.geomap_mirror.ui-draggable-disabled{
+	cursor: default !important;
+}
 #map_tool{
 	float: left;
 	margin-top: 20px;

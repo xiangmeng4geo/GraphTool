@@ -26,6 +26,9 @@ Core.safe(function(){
 	var data_of_micsps; // 用于缓存加载的micaps数据
 	var conf_export; //保存导出图片设置
 
+	var $geomap = $('#geomap');
+	var width_geomap = $geomap.width(),
+		height_geomap = $geomap.height();
 	// 替换标题里的时间
 	function _replace_date(text){
 		if(!conf_of_product || !data_of_micsps){
@@ -104,8 +107,6 @@ Core.safe(function(){
 		init(true);
 	});
 	
-	var $geomap = $('#geomap');
-	
 	// var gm;
 	var initing = false;
 	var Loading = (function(){
@@ -159,8 +160,6 @@ Core.safe(function(){
 		initing = true;
 		require(['GeoMap', 'LegendImage'],function(GeoMap, LegendImage){
 			window.GeoMap = GeoMap;
-			var width_geomap = $geomap.width(),
-				height_geomap = $geomap.height();
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
 				container: $geomap,
@@ -192,6 +191,9 @@ Core.safe(function(){
 				$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomout');
 			});
 			$('#map_tool_reset').click(function(){
+				gm.draggable({
+				  disabled: true
+				});
 				gm.reset(true);
 			});
 			// 根据配色方案进行地图元素初始化
@@ -308,9 +310,11 @@ Core.safe(function(){
 						$('.map_layer').remove();
 						// gm.clearLayers();
 						conf_of_product = ConfUser.get(product_name);
+
 						if(!conf_of_product){
 							return alert('请对该产品进行配置！');
 						}
+						conf_of_product.name = product_name;
 						// console.log(conf_of_product);
 						var conf_other = conf_of_product.other;
 						var logo = conf_other.logo;
@@ -691,6 +695,9 @@ Core.safe(function(){
 		}
 	})();
 	
+	function _get_save_img_name(){
+		return conf_of_product.name+'_'+width_geomap+'x'+height_geomap+'.png';
+	}
 	/*右侧地图的右键功能*/
 	var $geomap_container = $('#geomap_container');
 	var $geomap_layer = $geomap_container;//$('#geomap_layer');
@@ -709,7 +716,7 @@ Core.safe(function(){
 			
 			var menu_add_img_external = new MenuItem({label: '添加外部图片'});
 			menu_add_img_external.on('click',function(){
-				$('<input type="file" nwworkingdir="./image" />').on('change',function(){
+				$('<input type="file" nwworkingdir="'+file_util.path.image+'" />').on('change',function(){
 					add_maplayer_img($(this).val(), {
 						left: $geomap_layer.width()/2,
 						top: $geomap_layer.height()/2
@@ -803,13 +810,13 @@ Core.safe(function(){
 			var menu_save_img = new MenuItem({ label: '导出图片' });
 			menu_save_img.on('click',function(){
 				if(gm){
-					$('<input type="file" nwsaveas="a.png" />').on('change',function(){
+					$('<input type="file" nwsaveas="'+_get_save_img_name()+'" nwworkingdir="'+conf_of_product.in_out.dir_out+'"/>').on('change',function(){
 						Timer.start('save image');
 						var save_file_name = $(this).val();
 						Loading.show(function(){
 							var img_data = gm.toDataURL();
 
-							var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+$geomap.width()+'px; height: '+$geomap.height()+'px"></div>').appendTo($('body'));
+							var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+width_geomap+'px; height: '+height_geomap+'px"></div>').appendTo($('body'));
 							
 							var gm_export = new GeoMap({
 								container: $div_container

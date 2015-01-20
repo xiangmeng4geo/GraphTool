@@ -177,6 +177,7 @@ define('GeoMap',['zrender',
 		var w = data.width*per,
 			h = data.height*per;
 		var draggable_option = $.extend({
+			disabled: false,
 			containment: [-w+300, -h, w+300, h],
 			stop: function(){
 				_this.reset();
