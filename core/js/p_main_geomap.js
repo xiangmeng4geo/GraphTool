@@ -162,6 +162,7 @@ Core.safe(function(){
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
 				container: $geomap,
+				mirror: true
 				// jsonLoader: file_util.getJson
 			});
 			// 绑定缩放事件 
@@ -170,19 +171,26 @@ Core.safe(function(){
 				$geomap_container.click(function(e){
 					if($geomap_container.is('.zoom')){
 						var pos = $geomap.position();
-						gm.zoom($geomap_container.is('zoomin')? zoom_step: 1/zoom_step, {x: e.offsetX - pos.left, y: e.offsetY - pos.top});
+						gm.zoom($geomap_container.is('.zoomin')? zoom_step: 1/zoom_step, {x: e.offsetX - pos.left, y: e.offsetY - pos.top});
 					}
 				});
 			}();
 			
+			var $tools = $('#map_tool div').click(function(){
+				$tools.removeClass('on');
+				$(this).addClass('on');
+			});
 			$('#map_tool_move').click(function(){
 				gm.draggable();
 			});
 			$('#map_tool_zoomin').click(function(){
-				$geomap_container.addClass('zoom zoomin');
+				$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomin');
 			});
 			$('#map_tool_zoomout').click(function(){
-				$geomap_container.addClass('zoom zoomout');
+				$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomout');
+			});
+			$('#map_tool_reset').click(function(){
+				gm.reset(true);
 			});
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
@@ -296,7 +304,7 @@ Core.safe(function(){
 				$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
 					if(product_name){
 						$('.map_layer').remove();
-						gm.clearLayers();
+						// gm.clearLayers();
 						conf_of_product = ConfUser.get(product_name);
 						if(!conf_of_product){
 							return alert('请对该产品进行配置！');

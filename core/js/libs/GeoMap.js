@@ -122,21 +122,43 @@ define('GeoMap',['zrender',
 		var center = conf.center||{x: china_src_size.left+china_src_size.width/2,y: china_src_size.top - china_src_size.height/2};
 		var center_xy = _this.projector.project(center);
 		
-		var _canvas = _this.canvas;
 		_this._data = {
 			scale: Math.min(scale_x,scale_y),
+			zoom: 1,
 			center: {
 				lng: center.x,
 				lat: center.y,
 				x: center_xy.x,
 				y: center_xy.y
 			},
+			translat: [width_container/2, height_container/2],
 			width: width_container,
 			height: height_container,
-			layers: []
+			overlays: []
+		}
+		_this._data_o = $.extend(true,{},_this._data);
+
+		if(conf.mirror){
+			_this.mirror = $('<img class="geomap_mirror">').appendTo(container.parent());
 		}
 	}
 	
+	function _init_mirror(){
+		Timer.start('init mirror');
+		var _this = this;
+		var img_data = _this.toDataURL({
+			bgcolor: 'rgba(0,0,0,0)'
+		});
+		var data = _this._data;
+		_this.mirror.attr('src', img_data).css({
+			left: 0,
+			top: 0,
+			'transform-origin': (data.width/2)+'px '+(data.height/2)+'px',
+			'transform': 'scale(1)'
+		}).show();
+		$(_this.conf.container).addClass('mirror');
+		Timer.end('init mirror');
+	}
 	var GeoMap = function(conf){
 		var _this = this;
 		_this.projector = conf.projector == 'mercator'? Meractor: Albers;
@@ -148,37 +170,93 @@ define('GeoMap',['zrender',
 	var GeoMapProp = GeoMap.prototype;
 	/*地图拖拽*/
 	GeoMapProp.draggable = function(option){
-		var $container = $(this.conf.container);
+		var _this = this,
+			data = _this._data;
+		var $drag_obj = $(this.mirror);
 		var per = 0.3
-		var w = $container.width()*per,
-			h = $container.height()*per;
+		var w = data.width*per,
+			h = data.height*per;
 		var draggable_option = $.extend({
-			containment: [-w+300, -h, w+300, h]
+			containment: [-w+300, -h, w+300, h],
+			stop: function(){
+				_this.reset();
+			}
 		}, option);
 
-		$container.draggable(draggable_option);
-	}
-	function _getCurrentScale($container){
-		var matrix = $container.css('transform');
-		var m = /matrix\((.+)\)/.exec(matrix);
-		if(m){
-			var arr = m[1].split(',');
-			return arr[0];
-		}
-		return 1;
+		$drag_obj.draggable(draggable_option);
 	}
 	/*地图缩放*/
 	GeoMapProp.zoom = function(scale, origin){
 		if(scale != 1 && scale > 0){
 			var _this = this,
-				$container = $(_this.conf.container);
-
-			scale *= _getCurrentScale($container);
-			$container.css({
+				$mirror = $(_this.mirror);
+			// scale *= _getCurrentScale($mirror);
+			_this._data.zoom *= scale;
+			var pos = $mirror.position();
+			$mirror.css({
 				'transform-origin': origin.x+'px '+origin.y+'px',
-				'transform': 'scale('+scale+','+scale+')'
+				'transform': 'scale('+scale+')'
 			});
+			setTimeout(function(){
+				_this.reset();
+			}, 10);
 		}
+	}
+	GeoMapProp.reset = function(reset_old){
+		var _this = this,
+			canvas = _this.canvas,
+			data = _this._data,
+			_width = data.width,
+			_height = data.height;
+		var $mirror = $(_this.mirror);
+		var overlays = data.overlays;
+		if(reset_old){
+			var data_old = _this._data_o;
+			data = $.extend(true, {}, data_old);
+			data.overlays = overlays;
+			_this._data = data;
+		}else{
+			var pos = $mirror.position();
+
+			var origin = $mirror.css('transform-origin').split(/\s+/),
+				origin_x = parseFloat(origin[0]),
+				origin_y = parseFloat(origin[1]);
+			var zoom = data.zoom,
+				zoom_add = zoom - 1;
+			data.translat = [data.width/2*zoom - origin_x*zoom_add + pos.left, data.height/2*zoom - origin_y*zoom_add + pos.top];
+		}
+		
+		var $container = $(_this.conf.container);
+		var points_mask = [],
+			shapes_weather = [];
+
+		canvas.dispose();
+		canvas = _this.canvas = Zrender.init($container.get(0));
+		$.each(overlays, function(i, v){
+			var shape = v.draw(_this);
+			if(shape.zlevel == ZINDEX_MAP){
+				points_mask.push(shape.style.pointList);
+				canvas.addShape(shape);
+			}else{
+				shapes_weather.push(shape);
+			}	
+		});
+		Timer.start('reset addMask');
+		gm.addMask(points_mask, {
+			'is_lnglat': false
+		});
+		Timer.end('reset addMask');
+
+		$.each(shapes_weather, function(i, v){
+			canvas.addShape(v);
+		});
+		canvas.render();
+		canvas.refresh(function(){
+			$container.removeClass();
+			$mirror.fadeOut(function(){
+				_init_mirror.call(_this);
+			});
+		});
 	}
 	function addGeoPolygon(coordinates,options){
 		if(options){
@@ -188,7 +266,7 @@ define('GeoMap',['zrender',
 		var gm = this;
 		var is_not_lnglat = !options.is_lnglat;
 		var scale = options.scale || 1;
-		$.each(coordinates,function(i,v){
+		$.each(coordinates, function(i,v){
 			var points = [];
 			$.each(v,function(v_i,v_v){
 				points.push(new GeoMap.Point(v_v[0]/scale,v_v[1]/scale, is_not_lnglat));
@@ -272,7 +350,7 @@ define('GeoMap',['zrender',
 			});
 		});
 		Timer.start('addMask');
-		gm.addMask(points,$.extend(true,{
+		gm.addMask(points, $.extend(true,{
 			'is_lnglat': false
 		},options));
 		Timer.end('addMask');
@@ -292,7 +370,12 @@ define('GeoMap',['zrender',
 				loadedData.push(data);
 				if(loadedData.length == len){
 					Timer.end('loadGeo');
+					Timer.start('add weather layers');
 					callback_loaedGeo.call(_this,loadedData,options,callback_after_render_geo);
+					Timer.end('add weather layers');
+					_init_mirror.call(_this);
+					var onInitedLayers = _this.conf.onInitedLayers;
+					onInitedLayers && onInitedLayers(); // 所有初始化完成时触发
 				}
 			});
 		});
@@ -300,6 +383,7 @@ define('GeoMap',['zrender',
 	GeoMapProp.addOverlay = function(overlay, delay){
 		var _this = this;
 		var shape = overlay.draw(this);
+		_this._data.overlays.push(overlay);
 		delay || (delay = 0);
 		// setTimeout(function(){
 			_this.canvas.addShape(shape);
@@ -307,21 +391,21 @@ define('GeoMap',['zrender',
 			_this.canvas.render();
 		// }, delay);
 
-		if(shape.zlevel == ZINDEX_LAYER){
-			_this._data.layers.push(shape);
-		}
+		// if(shape.zlevel == ZINDEX_LAYER){
+		// 	_this._data.layers.push(shape);
+		// }
 		return shape;
 	}
-	GeoMapProp.clearLayers = function(){
-		var canvas = this.canvas;
-		var layers = this._data.layers;
-		var temp_layer;
-		while(temp_layer = layers.shift()){
-			canvas.delShape(temp_layer.id);
-		}
-		canvas.refresh();
-		this._data.layers
-	}
+	// GeoMapProp.clearLayers = function(){
+	// 	var canvas = this.canvas;
+	// 	var layers = this._data.layers;
+	// 	var temp_layer;
+	// 	while(temp_layer = layers.shift()){
+	// 		canvas.delShape(temp_layer.id);
+	// 	}
+	// 	canvas.refresh();
+	// 	this._data.layers
+	// }
 	var pointToOverlayPixel = GeoMapProp.pointToOverlayPixel = function(point){
 		var is_lnglat = point.is_lnglat;
 		point = {x: point.lng,y: point.lat};
@@ -334,16 +418,18 @@ define('GeoMap',['zrender',
 		var center = data.center;
 		var scale = data.scale;
 		var width = data.width,
-			height = data.height;
-
+			height = data.height,
+			zoom = data.zoom,
+			translat = data.translat;
 		return {
-			x: (point.x - center.x)*scale + width/2,
-			y: (center.y - point.y)*scale + height/1.8 - 20//这里出来的数据暂时有一个整体偏移,(-20保证多个图例时不遮挡地图)
+			x: (point.x - center.x)*scale*zoom + translat[0],
+			y: (center.y - point.y)*scale*zoom + translat[1]//这里出来的数据暂时有一个整体偏移,(-20保证多个图例时不遮挡地图)
 		}
 	}
     function _doclip(ctx){
 		var polygons = this.polygons;
 		if($.isArray(polygons)){
+			ctx.save();
 			ctx.beginPath();
 			$.each(polygons, function(i_polygon, pointList){
 				if (pointList.length < 2) {
@@ -498,11 +584,7 @@ define('GeoMap',['zrender',
 		this.is_lnglat = !is_not_lnglat;
 	}
 	GeoMap.Polygon = function(Points,options){
-		options = $.extend(true,{},options,{
-			style: {
-				pointList: Points
-			}
-		});
+		this.points = Points;
 		this.shape = new Polygon($.extend(true,{
 			style: {
 				brushType : 'both',
@@ -520,11 +602,13 @@ define('GeoMap',['zrender',
 		},options));
 	}
 	function _drawPointList(map){
-		var pointList = this.shape.style.pointList;
-		$.each(pointList,function(i,v){
-			var val = pointToOverlayPixel.call(map,v);
-			pointList[i] = [val.x,val.y];
+		var points = this.points;
+		var pointList = [];
+		$.each(points,function(i, v){
+			var val = pointToOverlayPixel.call(map, v);
+			pointList.push([val.x,val.y]);
 		});
+		this.shape.style.pointList = pointList;
 	}
 	GeoMap.Polygon.prototype.draw = function(map){
 		_drawPointList.call(this,map);
@@ -535,11 +619,7 @@ define('GeoMap',['zrender',
 	}
 
 	GeoMap.Polyline = function(Points,	options){
-		options = $.extend(true,{},options,{
-			style: {
-				pointList: Points
-			}
-		});
+		this.points = Points;
 		this.shape = new BrokenLine($.extend(true,{
 			style: {
 				brushType : 'both',
@@ -553,13 +633,13 @@ define('GeoMap',['zrender',
 		},options));
 	}
 	GeoMap.Polyline.prototype.draw = function(map){
-		_drawPointList.call(this,map);
+		_drawPointList.call(this, map);
 		return this.shape;
 	}
 	GeoMap.Polyline.prototype.isCover = function(){
 		return true;
 	}
-	GeoMap.Text = function(text,attr_style){
+	GeoMap.Text = function(text, attr_style){
 		//设置字体及其它属性请参考： http://blog.csdn.net/u012545279/article/details/14521567
 		var style_obj = {};
 		if(attr_style){
