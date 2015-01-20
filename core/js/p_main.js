@@ -197,5 +197,11 @@
 		menu_tree.append(menu_conf);
 	})();
 
+	var $win = $(window);
+	var $c_right = $('#c_right');
+	$c_right.css({
+		width: $win.width() - 300 + 10,
+		height: $win.height() - $c_right.offset().top
+	});
 	Page.inited();
 }();

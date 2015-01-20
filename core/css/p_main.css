@@ -42,6 +42,7 @@
 }
 #c_left{
 	position: absolute;
+	z-index: 999;
 	left: 0;
 	top: 0;
 	width: 300px;
@@ -51,14 +52,15 @@
 }
 #c_right{
 	padding-left: 300px;
+	overflow: auto;
 }
 
 #tree{
 	margin: 10px 0;
 }
 #geomap_container{
-	width: 1800px;
-	height: 1800px;
+	width: 800px;
+	height: 800px;
 	border: 1px solid #333;
 	/*background-color: #71B7FD;*/
 	/*background-image: url(http://10.14.85.116/android/ChinaWeatherDecision_assets/assets/img/geomap/map.png);*/
