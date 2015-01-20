@@ -1,6 +1,5 @@
 * {
   -webkit-user-select: none;
-  cursor: default;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 [draggable=true] {

@@ -105,6 +105,7 @@ Core.safe(function(){
 	});
 	
 	var $geomap = $('#geomap');
+	
 	// var gm;
 	var initing = false;
 	var Loading = (function(){
@@ -162,6 +163,26 @@ Core.safe(function(){
 			gm = new GeoMap({
 				container: $geomap,
 				// jsonLoader: file_util.getJson
+			});
+			// 绑定缩放事件 
+			!function(){
+				var zoom_step = 1.2;
+				$geomap_container.click(function(e){
+					if($geomap_container.is('.zoom')){
+						var pos = $geomap.position();
+						gm.zoom($geomap_container.is('zoomin')? zoom_step: 1/zoom_step, {x: e.offsetX - pos.left, y: e.offsetY - pos.top});
+					}
+				});
+			}();
+			
+			$('#map_tool_move').click(function(){
+				gm.draggable();
+			});
+			$('#map_tool_zoomin').click(function(){
+				$geomap_container.addClass('zoom zoomin');
+			});
+			$('#map_tool_zoomout').click(function(){
+				$geomap_container.addClass('zoom zoomout');
 			});
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
@@ -292,7 +313,7 @@ Core.safe(function(){
 
 						conf_export = {};
 						var bg_flag = false;
-						$geomap.removeAttr('style');
+						// $geomap.removeAttr('style');
 						var conf_bgimg = conf_other.bg_img;
 						if(conf_bgimg){
 							if(conf_bgimg.flag && conf_bgimg.val){
@@ -320,10 +341,6 @@ Core.safe(function(){
 							left: 110,
 							top: 80
 						});
-						// addTitle(conf_title.title_3, {
-						// 	left: 20,
-						// 	top: 700
-						// });
 
 						var conf_legend = conf_of_product.legend;
 						var is_show_legend = conf_legend.is_show_legend,
@@ -478,59 +495,6 @@ Core.safe(function(){
 							_add_southsealogo(pos_southsea);
 							_add_title3(pos_title3);
 						}
-						// var img_src = _get_legend_img(product_name);
-						// var img = new Image();
-						// img.onload = function(){
-						// 	var width = this.width,
-						// 		height = this.height;
-
-						// 	var _width = $geomap_layer.width();
-							
-						// 	if(is_updown){
-						// 		var scale = _width/1024;
-						// 		var toWidth = width * scale,
-						// 			toHeight = height * scale;
-						// 	}else{
-						// 		var toWidth = Math.min(width, _width),
-						// 			toHeight = toWidth*height/width;
-						// 	}
-
-						// 	var logo_southsea = conf_other.logo_southsea;
-						// 	if(logo_southsea){
-						// 		if(is_updown){
-						// 			var pos = {
-						// 				left: 20,
-						// 				top: 'auto',
-						// 				bottom: 20
-						// 			};
-						// 		}else{
-						// 			var pos = {
-						// 				left: 'auto',
-						// 				right: 20,
-						// 				bottom: 20
-						// 			};
-						// 		}
-						// 		add_maplayer_img(logo_southsea, pos, function($html, param){
-
-						// 		});
-						// 	}else{
-
-						// 	}
-							
-						// 	new MapLayer.img({
-						// 		position: {
-						// 			left: is_updown?5: 0,
-						// 			top: 'auto',
-						// 			bottom: is_updown?5: 0
-						// 		},
-						// 		width: toWidth,
-						// 		height: toHeight,
-						// 		src: img_src
-						// 	},function($html){
-						// 		$geomap_layer.append($html);
-						// 	});
-						// }
-						// img.src = img_src;
 						
 						var conf_in_out = conf_of_product.in_out;
 						var dir_in = conf_in_out.dir_in;
@@ -740,9 +704,9 @@ Core.safe(function(){
 		}
 	})();
 	
-	var $geomap_layer = $('#geomap_layer');
 	/*右侧地图的右键功能*/
 	var $geomap_container = $('#geomap_container');
+	var $geomap_layer = $geomap_container;//$('#geomap_layer');
 	$geomap_layer.on('contextmenu',function(e_contextmenu){
 		_cache_e_contextmenu = e_contextmenu; // 暂存事件对象
 		var $this = $(this);

@@ -2,10 +2,9 @@ define('GeoMap',['zrender',
 	'zrender/shape/Base',
 	'zrender/shape/Polygon',
 	'zrender/shape/BrokenLine',
-	'zrender/Group',
 	'zrender/tool/util',
 	'zrender/shape/Text',
-	'zrender/shape/Image'],function(Zrender,Base,Polygon,BrokenLine,Group,util,TextShape,ImageShape){
+	'zrender/shape/Image'],function(Zrender,Base,Polygon,BrokenLine,util,TextShape,ImageShape){
 
 	var Logger = Core.util.Logger,
 		Timer = Logger.Timer;
@@ -122,19 +121,8 @@ define('GeoMap',['zrender',
 		
 		var center = conf.center||{x: china_src_size.left+china_src_size.width/2,y: china_src_size.top - china_src_size.height/2};
 		var center_xy = _this.projector.project(center);
-		var group_map = new Group(),
-			group_shape = new Group(),
-			group_legend = new Group();
+		
 		var _canvas = _this.canvas;
-		_canvas.addGroup(group_map);
-		_canvas.addGroup(group_shape);
-		_canvas.addGroup(group_legend);
-
-		_this.groups = {
-			map: group_map,
-			shape: group_shape,
-			legend: group_legend
-		};
 		_this._data = {
 			scale: Math.min(scale_x,scale_y),
 			center: {
@@ -158,6 +146,40 @@ define('GeoMap',['zrender',
 		_init_geomap.call(_this);
 	};
 	var GeoMapProp = GeoMap.prototype;
+	/*地图拖拽*/
+	GeoMapProp.draggable = function(option){
+		var $container = $(this.conf.container);
+		var per = 0.3
+		var w = $container.width()*per,
+			h = $container.height()*per;
+		var draggable_option = $.extend({
+			containment: [-w+300, -h, w+300, h]
+		}, option);
+
+		$container.draggable(draggable_option);
+	}
+	function _getCurrentScale($container){
+		var matrix = $container.css('transform');
+		var m = /matrix\((.+)\)/.exec(matrix);
+		if(m){
+			var arr = m[1].split(',');
+			return arr[0];
+		}
+		return 1;
+	}
+	/*地图缩放*/
+	GeoMapProp.zoom = function(scale, origin){
+		if(scale != 1 && scale > 0){
+			var _this = this,
+				$container = $(_this.conf.container);
+
+			scale *= _getCurrentScale($container);
+			$container.css({
+				'transform-origin': origin.x+'px '+origin.y+'px',
+				'transform': 'scale('+scale+','+scale+')'
+			});
+		}
+	}
 	function addGeoPolygon(coordinates,options){
 		if(options){
 			options.zlevel = ZINDEX_MAP;
