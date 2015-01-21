@@ -23,7 +23,7 @@ Core.safe(function(){
 		image_path = file_path.image;
 
 	var conf_of_product; // 用于缓存已经加载的当前产品配置
-	var data_of_micsps; // 用于缓存加载的micaps数据
+	var data_of_micaps; // 用于缓存加载的micaps数据
 	var conf_export; //保存导出图片设置
 
 	var $geomap = $('#geomap');
@@ -31,7 +31,7 @@ Core.safe(function(){
 		height_geomap = $geomap.height();
 	// 替换标题里的时间
 	function _replace_date(text){
-		if(!conf_of_product || !data_of_micsps){
+		if(!conf_of_product || !data_of_micaps){
 			return text;
 		}
 
@@ -39,7 +39,7 @@ Core.safe(function(){
 			file_type = file_rule.file_type || ConstFileType.shikuang.v,
 			file_hour = file_rule.file_hour || 0;
 
-		var time = new Date(data_of_micsps.time);
+		var time = new Date(data_of_micaps.time);
 			
 		if(ConstFileType.forecast.v == file_type){
 			var one = new Date(time.getTime());
@@ -171,8 +171,7 @@ Core.safe(function(){
 				var zoom_step = 1.2;
 				$geomap_container.click(function(e){
 					if($geomap_container.is('.zoom')){
-						var pos = $geomap.position();
-						gm.zoom($geomap_container.is('.zoomin')? zoom_step: 1/zoom_step, {x: e.offsetX - pos.left, y: e.offsetY - pos.top});
+						gm.zoom($geomap_container.is('.zoomin')? zoom_step: 1/zoom_step, {x: e.offsetX, y: e.offsetY});
 					}
 				});
 			}();
@@ -198,6 +197,7 @@ Core.safe(function(){
 			});
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
+				Timer.start('render micaps', 1);
 				var isHaveManyBlendent = blendent.length > 1;
 				function getColorByCondition(val, range){
 					for(var i = 0,j=range.length;i<j;i++){
@@ -270,6 +270,7 @@ Core.safe(function(){
 						gm.addOverlay(polyline);   //增加折线
 					});
 				}
+				Timer.end('render micaps', 1);
 			}
 			Loading.show();
 			var Color = ['red','blue','#000','#123','#f26','#ccc','#333'];
@@ -507,8 +508,10 @@ Core.safe(function(){
 							}
 							var file_newest = micaps_file_util.getNewest.apply(null,param);
 							if(file_newest){
-								data_of_micsps = file_util.readFile(file_newest,true);
-								render_conf(data_of_micsps, conf_of_product.legend.blendent);
+								Timer.start('read micaps');
+								data_of_micaps = file_util.readFile(file_newest,true);
+								Timer.end('read micaps', 1);
+								render_conf(data_of_micaps, conf_of_product.legend.blendent);
 							}else{
 								alert('没有找到符合条件的文件，请检查产品相关配置！');
 							}

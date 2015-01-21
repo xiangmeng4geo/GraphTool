@@ -150,7 +150,8 @@ define('GeoMap',['zrender',
 			bgcolor: 'rgba(0,0,0,0)'
 		});
 		var data = _this._data;
-		_this.mirror.attr('src', img_data).css({
+		var mirror = _this.mirror;
+		mirror.attr('src', img_data).css({
 			left: 0,
 			top: 0,
 			'transform-origin': (data.width/2)+'px '+(data.height/2)+'px',
@@ -190,16 +191,17 @@ define('GeoMap',['zrender',
 	GeoMapProp.zoom = function(scale, origin){
 		if(scale != 1 && scale > 0){
 			var _this = this,
+				zoom = _this._data.zoom,
 				$mirror = $(_this.mirror);
 			// scale *= _getCurrentScale($mirror);
-			_this._data.zoom *= scale;
-			var pos = $mirror.position();
+			scale *= zoom;
+			_this._data.zoom = scale;
 			$mirror.css({
 				'transform-origin': origin.x+'px '+origin.y+'px',
 				'transform': 'scale('+scale+')'
 			});
 			setTimeout(function(){
-				_this.reset();
+				// _this.reset();
 			}, 10);
 		}
 	}
@@ -218,13 +220,14 @@ define('GeoMap',['zrender',
 			_this._data = data;
 		}else{
 			var pos = $mirror.position();
-
+			var pos_o = $mirror.data('pos_o') || {left: 0, top: 0};
 			var origin = $mirror.css('transform-origin').split(/\s+/),
 				origin_x = parseFloat(origin[0]),
 				origin_y = parseFloat(origin[1]);
+			console.log(origin_x, origin_y);
 			var zoom = data.zoom,
 				zoom_add = zoom - 1;
-			data.translat = [data.width/2*zoom - origin_x*zoom_add + pos.left, data.height/2*zoom - origin_y*zoom_add + pos.top];
+			data.translat = [data.width/2*zoom - origin_x*zoom_add + pos.left + pos_o.left, data.height/2*zoom - origin_y*zoom_add + pos.top + pos_o.top];
 		}
 		
 		var $container = $(_this.conf.container);
@@ -252,11 +255,12 @@ define('GeoMap',['zrender',
 			canvas.addShape(v);
 		});
 		canvas.render();
-		canvas.refresh(function(){
-			$container.removeClass();
-			$mirror.fadeOut(function(){
-				_init_mirror.call(_this);
-			});
+		var _pos_current = $mirror.position();
+		_pos_current.left += pos_o.left;
+		_pos_current.top += pos_o.top;
+		$mirror.data('pos_o', _pos_current);
+		$mirror.fadeOut(function(){
+			_init_mirror.call(_this);
 		});
 	}
 	function addGeoPolygon(coordinates,options){

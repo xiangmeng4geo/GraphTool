@@ -371,15 +371,20 @@
 				console.log.apply(console, arguments);
 			}
 		};
+		var PREFIX_LEVEL = ['', '# ', '## '];
 		Logger.Timer = {
 			start: function(name){
 				cache_log_time[name] = new Date();
 			}, 
-			end: function(name){
+			end: function(name, level){
+				level = parseInt(level) || 0;
+				if(!(level >=0 && level < PREFIX_LEVEL.length)){
+					level = 0;
+				}
 				var start_time = cache_log_time[name];
 				if(start_time){
 					var end_time = new Date();
-					Logger.log(name, 'takes', (end_time - start_time), 'ms!');
+					Logger.log(PREFIX_LEVEL[level]+''+name, 'takes', (end_time - start_time), 'ms!');
 					delete cache_log_time[name];
 				}
 			}
