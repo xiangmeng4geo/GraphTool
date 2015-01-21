@@ -384,8 +384,10 @@
 				var start_time = cache_log_time[name];
 				if(start_time){
 					var end_time = new Date();
-					Logger.log(PREFIX_LEVEL[level]+''+name, 'takes', (end_time - start_time), 'ms!');
+					var used_time = end_time - start_time;
+					Logger.log(PREFIX_LEVEL[level]+''+name, 'takes', used_time, 'ms!');
 					delete cache_log_time[name];
+					return used_time;
 				}
 			}
 		};

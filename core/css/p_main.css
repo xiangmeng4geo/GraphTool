@@ -99,7 +99,7 @@
 	position: absolute;
 	left: 0;
 	top: 0;
-	opacity: 0.5;
+	/*opacity: 0.5;*/
 }
 #geomap{
 	width: 100%;
@@ -109,7 +109,7 @@
 	top: 0;
 }
 #geomap.mirror{
-	/*opacity: 0;*/
+	opacity: 0;
 }
 
 .geomap_mirror.ui-draggable-handle{

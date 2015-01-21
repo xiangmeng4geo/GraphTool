@@ -835,7 +835,11 @@ Core.safe(function(){
 								var layer;
 								if($layer.is('.texteditor')){
 									$layer.css($layer.position()); // 修复样式里的left和top为auto情况
-									gm_export.addOverlay(new GeoMap.Text(_replace_date($layer.text()),$layer.attr('style')));
+									var padding_top = parseFloat($layer.css('padding-top')) || 0,
+										padding_right = parseFloat($layer.css('padding-right')) || 0,
+										padding_bottom = parseFloat($layer.css('padding-bottom')) || 0,
+										padding_left = parseFloat($layer.css('padding-left')) || 0;
+									gm_export.addOverlay(new GeoMap.Text(_replace_date($layer.text()),$layer.attr('style'), [padding_top, padding_right, padding_bottom, padding_left]));
 								}else if($layer.is('.map_layer_image')){
 									var pos = $layer.position();
 									var img = $layer.find('img').get(0);
@@ -850,8 +854,8 @@ Core.safe(function(){
 								file_util.img.saveBase64(save_file_name, img_data);
 								$div_container.remove();
 								Loading.hide();
-								Timer.end('save image');
-								alert('成功导出图片!');
+								var time = Timer.end('save image');
+								alert('成功导出图片, 用时'+time+'毫秒!');
 							}
 							var _bgimg = conf_export.bgimg;
 							if(_bgimg && file_util.exists(_bgimg)){

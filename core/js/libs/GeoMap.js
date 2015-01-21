@@ -4,7 +4,8 @@ define('GeoMap',['zrender',
 	'zrender/shape/BrokenLine',
 	'zrender/tool/util',
 	'zrender/shape/Text',
-	'zrender/shape/Image'],function(Zrender,Base,Polygon,BrokenLine,util,TextShape,ImageShape){
+	'zrender/shape/Image',
+	'zrender/tool/area'],function(Zrender,Base,Polygon,BrokenLine,util,TextShape,ImageShape,util_area){
 
 	var Logger = Core.util.Logger,
 		Timer = Logger.Timer;
@@ -122,6 +123,7 @@ define('GeoMap',['zrender',
 		var center = conf.center||{x: china_src_size.left+china_src_size.width/2,y: china_src_size.top - china_src_size.height/2};
 		var center_xy = _this.projector.project(center);
 		
+		var _scale_size = width_container/800;
 		_this._data = {
 			scale: Math.min(scale_x,scale_y),
 			zoom: 1,
@@ -138,13 +140,15 @@ define('GeoMap',['zrender',
 		}
 		_this._data_o = $.extend(true,{},_this._data);
 
+		_this.MAX_ZOOM = 3*_scale_size;
+		_this.MIN_ZOOM = 0.5*_scale_size;
+
 		if(conf.mirror){
 			_this.mirror = $('<img class="geomap_mirror" draggable=false>').appendTo(container.parent());
 		}
 	}
 	
 	function _init_mirror(){
-		Timer.start('init mirror');
 		var _this = this;
 		var img_data = _this.toDataURL({
 			bgcolor: 'rgba(0,0,0,0)'
@@ -158,7 +162,6 @@ define('GeoMap',['zrender',
 			'transform': 'scale(1)'
 		}).show();
 		$(_this.conf.container).addClass('mirror');
-		Timer.end('init mirror');
 	}
 	var GeoMap = function(conf){
 		var _this = this;
@@ -181,7 +184,7 @@ define('GeoMap',['zrender',
 			disabled: false,
 			containment: [-w+300, -h, w+300, h],
 			stop: function(){
-				_this.reset();
+				_reset.call(_this, RESET_TYPE_DRAG);
 			}
 		}, option);
 
@@ -193,19 +196,30 @@ define('GeoMap',['zrender',
 			var _this = this,
 				zoom = _this._data.zoom,
 				$mirror = $(_this.mirror);
-			// scale *= _getCurrentScale($mirror);
 			scale *= zoom;
-			_this._data.zoom = scale;
-			$mirror.css({
-				'transform-origin': origin.x+'px '+origin.y+'px',
-				'transform': 'scale('+scale+')'
-			});
-			setTimeout(function(){
-				// _this.reset();
-			}, 10);
+			if(scale >= _this.MIN_ZOOM && scale <= _this.MAX_ZOOM){
+				_this._data.zoom = scale;
+				$mirror.css({
+					'transform-origin': origin.x+'px '+origin.y+'px',
+					'transform': 'scale('+scale+')'
+				});
+				_reset.call(_this, RESET_TYPE_ZOOM);
+			}
 		}
 	}
-	GeoMapProp.reset = function(reset_old){
+	GeoMapProp.reset = function(){
+		_reset.call(this, RESET_TYPE_RESET);
+	}
+	GeoMapProp.reset_drag = function(){
+		_reset.call(this, RESET_TYPE_DRAG);
+	}
+	GeoMapProp.reset_zoom = function(){
+		_reset.call(this, RESET_TYPE_ZOOM);
+	}
+	var RESET_TYPE_ZOOM = 1,
+		RESET_TYPE_DRAG = 2,
+		RESET_TYPE_RESET = 3;
+	var _reset = function(reset_type){
 		var _this = this,
 			canvas = _this.canvas,
 			data = _this._data,
@@ -213,21 +227,37 @@ define('GeoMap',['zrender',
 			_height = data.height;
 		var $mirror = $(_this.mirror);
 		var overlays = data.overlays;
-		if(reset_old){
+		if(RESET_TYPE_RESET == reset_type){
 			var data_old = _this._data_o;
 			data = $.extend(true, {}, data_old);
 			data.overlays = overlays;
 			_this._data = data;
 		}else{
-			var pos = $mirror.position();
-			var pos_o = $mirror.data('pos_o') || {left: 0, top: 0};
-			var origin = $mirror.css('transform-origin').split(/\s+/),
-				origin_x = parseFloat(origin[0]),
-				origin_y = parseFloat(origin[1]);
-			console.log(origin_x, origin_y);
 			var zoom = data.zoom,
 				zoom_add = zoom - 1;
-			data.translat = [data.width/2*zoom - origin_x*zoom_add + pos.left + pos_o.left, data.height/2*zoom - origin_y*zoom_add + pos.top + pos_o.top];
+
+			var pos = $mirror.position();
+			var pos_o_drag = $mirror.data('pos_o_drag') || {left: 0, top: 0};
+
+			var origin_o = $mirror.data('origin_o');
+			var origin = origin_o && RESET_TYPE_DRAG == reset_type?origin_o : $mirror.css('transform-origin'),
+				origin_arr = origin.split(/\s+/),
+				origin_x = parseFloat(origin_arr[0]),
+				origin_y = parseFloat(origin_arr[1]);
+			var translat_x = translat_y = 0;
+			if(RESET_TYPE_DRAG == reset_type){ // 排除transform:scale()对position的影响
+				var pos_x = pos.left + pos_o_drag.left,
+					pos_y = pos.top + pos_o_drag.top;
+				translat_x = pos_x - origin_x*zoom_add;
+				translat_y = pos_y - origin_y*zoom_add;
+				$mirror.data('pos_o_drag', {left: pos_x, top: pos_y});
+			}else{
+				translat_x = pos.left;
+				translat_y = pos.top;
+				$mirror.data('origin_o', origin);
+			}
+			
+			data.translat = [data.width/2*zoom + translat_x, data.height/2*zoom + translat_y];
 		}
 		
 		var $container = $(_this.conf.container);
@@ -245,23 +275,19 @@ define('GeoMap',['zrender',
 				shapes_weather.push(shape);
 			}	
 		});
-		Timer.start('reset addMask');
+		// Timer.start('reset addMask');
 		gm.addMask(points_mask, {
 			'is_lnglat': false
 		});
-		Timer.end('reset addMask');
+		// Timer.end('reset addMask');
 
 		$.each(shapes_weather, function(i, v){
 			canvas.addShape(v);
 		});
 		canvas.render();
-		var _pos_current = $mirror.position();
-		_pos_current.left += pos_o.left;
-		_pos_current.top += pos_o.top;
-		$mirror.data('pos_o', _pos_current);
-		$mirror.fadeOut(function(){
+		// $mirror.fadeOut(function(){
 			_init_mirror.call(_this);
-		});
+		// });
 	}
 	function addGeoPolygon(coordinates,options){
 		if(options){
@@ -378,7 +404,9 @@ define('GeoMap',['zrender',
 					Timer.start('add weather layers');
 					callback_loaedGeo.call(_this,loadedData,options,callback_after_render_geo);
 					Timer.end('add weather layers');
+					Timer.start('init mirror');
 					_init_mirror.call(_this);
+					Timer.end('init mirror');
 					var onInitedLayers = _this.conf.onInitedLayers;
 					onInitedLayers && onInitedLayers(); // 所有初始化完成时触发
 				}
@@ -583,6 +611,63 @@ define('GeoMap',['zrender',
 	}
 	util.inherits(Mask, Base);
 
+	var GeoMapText = function(options){
+		TextShape.call(this, options);
+	}
+	GeoMapText.prototype = {
+		type: 'mask',
+		brush: function(ctx, isHighlight){
+			var style = this.style;
+			var bgcolor = style.backgroundColor;
+			var rect = this.getRect(style);
+			var x = rect.x,
+				y = rect.y,
+				width = rect.width,
+				height = rect.height;
+			var lineHeight = util_area.getTextHeight('国', style.textFont);
+
+			ctx.save();	
+			if(bgcolor){
+				ctx.fillStyle = bgcolor;
+				
+				
+				var w = width, 
+					h = Math.max(height, lineHeight);
+				var padding = style.padding;
+				if(padding){
+					// y -= padding[0];
+					w += padding[1] + padding[3];
+					h += padding[0] + padding[2];
+					// x -= padding[3]
+				}
+				h += 3;
+				ctx.fillRect(x, y, w, h);
+			}
+			var textDecoration = style.textDecoration;
+			if(textDecoration){
+				var _scale = lineHeight/30;
+				ctx.lineWidth = 0.5 * _scale;
+				ctx.strokeStyle = style.color;
+				if(textDecoration.indexOf('underline') > -1){
+					var h = y + height + 2 * _scale;
+					ctx.moveTo(x, h);
+                    ctx.lineTo(x + width, h);
+				}
+				ctx.stroke();
+				if(textDecoration.indexOf('line-through') > -1){
+					var h = y + height/2 + 3 * _scale;
+					ctx.moveTo(x, h);
+                    ctx.lineTo(x + width, h);
+				}
+				ctx.stroke();
+			}
+			ctx.restore();
+			TextShape.prototype.brush.call(this, ctx, isHighlight);
+			// this.parent.brush(ctx, isHighlight);
+		}
+	}
+	util.inherits(GeoMapText, TextShape);
+
 	GeoMap.Point = function(lng,lat,is_not_lnglat){
 		this.lng = lng;
 		this.lat = lat;
@@ -644,7 +729,8 @@ define('GeoMap',['zrender',
 	GeoMap.Polyline.prototype.isCover = function(){
 		return true;
 	}
-	GeoMap.Text = function(text, attr_style){
+	GeoMap.Text = function(text, attr_style, padding){
+		padding || (padding = [0, 0, 0, 0]);
 		//设置字体及其它属性请参考： http://blog.csdn.net/u012545279/article/details/14521567
 		var style_obj = {};
 		if(attr_style){
@@ -691,7 +777,16 @@ define('GeoMap',['zrender',
 		if(font){
 			style.textFont = font;
 		}
-		this.shape = new TextShape({
+		var bgcolor = style_obj['background-color'];
+		if(bgcolor && 'transparent' != bgcolor){
+			style.backgroundColor = bgcolor;
+		}
+		style.padding = padding;
+		var text_decoration = style_obj['text-decoration'];
+		if(text_decoration){
+			style.textDecoration = text_decoration;
+		}
+		this.shape = new GeoMapText({
 			style: style,
 			zlevel: ZINDEX_LAYER
 		});
