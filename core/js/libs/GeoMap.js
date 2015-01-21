@@ -139,7 +139,7 @@ define('GeoMap',['zrender',
 		_this._data_o = $.extend(true,{},_this._data);
 
 		if(conf.mirror){
-			_this.mirror = $('<img class="geomap_mirror">').appendTo(container.parent());
+			_this.mirror = $('<img class="geomap_mirror" draggable=false>').appendTo(container.parent());
 		}
 	}
 	
