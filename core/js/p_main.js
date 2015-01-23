@@ -199,9 +199,17 @@
 
 	var $win = $(window);
 	var $c_right = $('#c_right');
-	$c_right.css({
-		width: $win.width() - 300 + 10,
-		height: $win.height() - $c_right.offset().top
-	});
+	var _init_size_TT;
+	function _init_size(){
+		clearTimeout(_init_size_TT);
+		_init_size_TT = setTimeout(function(){
+			$c_right.css({
+				width: $win.width() - 300 + 10,
+				height: $win.height() - $c_right.offset().top
+			});
+		}, 10);
+	}
+	_init_size();
+	$win.on('resize', _init_size);
 	Page.inited();
 }();
