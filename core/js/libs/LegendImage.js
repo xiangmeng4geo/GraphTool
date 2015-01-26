@@ -111,8 +111,7 @@ define('LegendImage',['zrender',
 			}));
 			_canvas.render();
 		});
-		
-		var img_data = _canvas.toDataURL();
+		var img_data = _canvas.toDataURL(null, 'rgba(0,0,0,0)'); // 保证图例为透明图片
 		Core.Lib.util.file.tmp.legend.save(img_path, img_data);
 		$legend_tmp.empty();
 	}
