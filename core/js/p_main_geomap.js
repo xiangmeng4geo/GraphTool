@@ -309,7 +309,7 @@ Core.safe(function(){
 				$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
 					if(product_name){
 						$('.map_layer').remove();
-						// gm.clearLayers();
+						gm.clearWeatherLayers();
 						conf_of_product = ConfUser.get(product_name);
 
 						if(!conf_of_product){
@@ -506,10 +506,12 @@ Core.safe(function(){
 								param.push(conf_file.time_start);
 								param.push(conf_file.time_end);
 							}
+							console.log(param);
 							var file_newest = micaps_file_util.getNewest.apply(null,param);
 							if(file_newest){
 								Timer.start('read micaps');
 								data_of_micaps = file_util.readFile(file_newest,true);
+								console.log(data_of_micaps);
 								Timer.end('read micaps', 1);
 								render_conf(data_of_micaps, conf_of_product.legend.blendent);
 							}else{

@@ -429,16 +429,25 @@ define('GeoMap',['zrender',
 		// }
 		return shape;
 	}
-	// GeoMapProp.clearLayers = function(){
-	// 	var canvas = this.canvas;
-	// 	var layers = this._data.layers;
-	// 	var temp_layer;
-	// 	while(temp_layer = layers.shift()){
-	// 		canvas.delShape(temp_layer.id);
-	// 	}
-	// 	canvas.refresh();
-	// 	this._data.layers
-	// }
+	GeoMapProp.clearWeatherLayers = function(){
+		var canvas = this.canvas;
+		var layers = this._data.overlays;
+		var new_overlays = [];
+		for(var i = 0, j = layers.length; i<j; i++){
+			var overlay = layers[i];
+			var shape = overlay.shape;
+			
+
+			if(shape.zlevel == ZINDEX_LAYER){console.log('delete',shape, i);
+				canvas.delShape(shape.id);
+			}else{console.log(shape.zlevel, i);
+				new_overlays.push(overlay);
+			}
+		}
+		console.log(new_overlays.length);
+		canvas.refresh();
+		this._data.overlays = new_overlays;
+	}
 	var pointToOverlayPixel = GeoMapProp.pointToOverlayPixel = function(point){
 		var is_lnglat = point.is_lnglat;
 		point = {x: point.lng,y: point.lat};
