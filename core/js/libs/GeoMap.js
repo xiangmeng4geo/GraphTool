@@ -424,29 +424,29 @@ define('GeoMap',['zrender',
 			_this.canvas.render();
 		// }, delay);
 
-		// if(shape.zlevel == ZINDEX_LAYER){
-		// 	_this._data.layers.push(shape);
-		// }
 		return shape;
 	}
-	GeoMapProp.clearWeatherLayers = function(){
-		var canvas = this.canvas;
-		var layers = this._data.overlays;
+	/*清除所有天气图层*/
+	GeoMapProp.clearLayers = function(){
+		var _this = this;
+		var canvas = _this.canvas;
+		var overlays = _this._data.overlays;
 		var new_overlays = [];
-		for(var i = 0, j = layers.length; i<j; i++){
-			var overlay = layers[i];
-			var shape = overlay.shape;
-			
-
-			if(shape.zlevel == ZINDEX_LAYER){console.log('delete',shape, i);
+		var temp_layer;
+		while(temp_layer = overlays.shift()){
+			var shape = temp_layer.shape;
+			if(shape.zlevel == ZINDEX_LAYER){
 				canvas.delShape(shape.id);
-			}else{console.log(shape.zlevel, i);
-				new_overlays.push(overlay);
-			}
+			}else{
+				new_overlays.push(temp_layer);
+			}			
 		}
-		console.log(new_overlays.length);
 		canvas.refresh();
-		this._data.overlays = new_overlays;
+		_this._data.overlays = new_overlays;
+	}
+	/*对外提供刷新接口*/
+	GeoMapProp.refresh = function(){
+		_init_mirror.call(_this);
 	}
 	var pointToOverlayPixel = GeoMapProp.pointToOverlayPixel = function(point){
 		var is_lnglat = point.is_lnglat;
