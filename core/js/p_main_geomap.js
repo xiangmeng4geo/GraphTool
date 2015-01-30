@@ -5,6 +5,8 @@ Core.safe(function(){
 		ConstEvent = Const.Event,
 		ConstFileType = Const.fileRule.file_type;
 
+	var color_toRGB = Core.Color.toRGB
+
 	var Logger = Core.util.Logger,
 		Timer = Logger.Timer;
 		
@@ -163,7 +165,8 @@ Core.safe(function(){
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
 				container: $geomap,
-				mirror: true
+				mirror: true,
+				// projector: 'meractor',
 				// jsonLoader: file_util.getJson
 			});
 			// 绑定缩放事件 
@@ -208,7 +211,7 @@ Core.safe(function(){
 						}
 					}
 				}
-				function getColor(code, val){
+				function getColor(val, code){
 					if(isHaveManyBlendent){
 						for(var i = 0,j = blendent.length;i<j;i++){
 							var v = blendent[i];
@@ -220,36 +223,68 @@ Core.safe(function(){
 						return getColorByCondition(val, blendent[0].colors);
 					}
 				}
-				$.each(data.areas,function(i,v){
-					var point_arr = [];
-					$.each(v.items,function(v_i,v_v){
-						var point = new GeoMap.Point(v_v.x,v_v.y);
-						point_arr.push(point);
-					});
-					var radom_color = Color[Math.floor(Math.random()*Color.length)];
-					var strokeColor = 'rgba(0,0,0,0)';
-
-					var symbols = v.symbols;
-					var val_area = symbols? symbols.text : '';
-					strokeColor = getColor(v.code, val_area);
-					radom_color = strokeColor;
-					if(v.code == 24){
-						// strokeColor = 'red';
-						radom_color = new GeoMap.Pattern.Streak({
-							strokeStyle: strokeColor,
-							space: 1
+				var interpolate = data.interpolate;
+				if(interpolate){
+					var _interpolate_width,
+						_interpolate_height;
+					try{
+						_interpolate_width = interpolate.length;
+						_interpolate_height = interpolate[0].length;
+					}catch(e){}
+					var _new_interpolate_data = [];
+					for(var i = 0; i < _interpolate_width; i++){
+                        var arr = [];
+                        for(var j = 0; j< _interpolate_height; j++){
+                            var v = interpolate[i][j];
+                            var color = color_toRGB(getColor(v.v), true);
+                            if(color){
+                                color.push(200);
+                            }else{
+                                color = [0, 0, 0, 0];
+                            }
+                            arr.push({
+                            	x: v.x,
+                            	y: v.y,
+                            	c: color
+                            });
+                        } 
+                        _new_interpolate_data.push(arr);  
+                    }
+					var interpolation_overlay = new GeoMap.Interpolation(_new_interpolate_data);
+					gm.addOverlay(interpolation_overlay);   //渲染插值结果
+				}
+				var areas = data.areas;
+				if(areas){
+					$.each(areas, function(i,v){
+						var point_arr = [];
+						$.each(v.items,function(v_i,v_v){
+							var point = new GeoMap.Point(v_v.x,v_v.y);
+							point_arr.push(point);
 						});
-					}
-					var polygon = new GeoMap.Polygon(point_arr, {
-						style: {
-							strokeColor: strokeColor, 
-							color: radom_color,
-							lineWidth: 0.2
-						}
-					});
-					gm.addOverlay(polygon);   //增加面
-				});
+						var radom_color = Color[Math.floor(Math.random()*Color.length)];
+						var strokeColor = 'rgba(0,0,0,0)';
 
+						var symbols = v.symbols;
+						var val_area = symbols? symbols.text : '';
+						strokeColor = getColor(val_area, v.code);
+						radom_color = strokeColor;
+						if(v.code == 24){
+							// strokeColor = 'red';
+							radom_color = new GeoMap.Pattern.Streak({
+								strokeStyle: strokeColor,
+								space: 1
+							});
+						}
+						var polygon = new GeoMap.Polygon(point_arr, {
+							style: {
+								strokeColor: strokeColor, 
+								color: radom_color,
+								lineWidth: 0.2
+							}
+						});
+						gm.addOverlay(polygon);   //增加面
+					});
+				}
 				var line_symbols = data.line_symbols;
 				if(line_symbols){
 					$.each(line_symbols,function(i,v){
@@ -307,7 +342,7 @@ Core.safe(function(){
 					}
 				}
 				$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
-					if(product_name){
+					if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
 						$('.map_layer').remove();
 						gm.clearLayers();
 						conf_of_product = ConfUser.get(product_name);
@@ -506,7 +541,7 @@ Core.safe(function(){
 								param.push(conf_file.time_start);
 								param.push(conf_file.time_end);
 							}
-							console.log(param);
+							// console.log(param);
 							var file_newest = micaps_file_util.getNewest.apply(null,param);
 							if(file_newest){
 								Timer.start('read micaps');
