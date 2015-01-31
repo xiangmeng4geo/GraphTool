@@ -161,12 +161,13 @@ Core.safe(function(){
 		});
 		initing = true;
 		require(['GeoMap', 'LegendImage'],function(GeoMap, LegendImage){
+			var gm_projector = GeoMap.PROJECT_MERACTOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERACTOR
 			window.GeoMap = GeoMap;
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
 				container: $geomap,
 				mirror: true,
-				// projector: 'meractor',
+				projector: gm_projector,
 				// jsonLoader: file_util.getJson
 			});
 			// 绑定缩放事件 
@@ -223,6 +224,52 @@ Core.safe(function(){
 						return getColorByCondition(val, blendent[0].colors);
 					}
 				}
+				var temp_color = [
+		            'rgb(2,12,100)',
+		            'rgb(7,30,120)',
+		            'rgb(17,49,139)',
+		            'rgb(27,68,159)',
+		            'rgb(38,87,179)',
+		            'rgb(48,106,199)',
+		            'rgb(59,126,219)',
+		            'rgb(78,138,221)',
+		            'rgb(97,150,224)',
+		            'rgb(116,163,226)',
+		            'rgb(135,175,229)',
+		            'rgb(155,188,232)',
+		            'rgb(154,196,220)',
+		            'rgb(153,205,208)',
+		            'rgb(152,214,196)',
+		            'rgb(151,232,173)',
+		            'rgb(215,222,126)',
+		            'rgb(234,219,112)',
+		            'rgb(244,217,99)',
+		            'rgb(250,204,79)',
+		            'rgb(247,180,45)',
+		            'rgb(242,155,0)',
+		            'rgb(241,147,3)',
+		            'rgb(240,132,10)',
+		            'rgb(239,117,17)',
+		            'rgb(238,102,24)',
+		            'rgb(238,88,31)',
+		            'rgb(231,75,26a)',
+		            'rgb(224,63,22)',
+		            'rgb(217,51,18)',
+		            'rgb(208,36,14)',
+		            'rgb(194,0,3)',
+		            'rgb(181,1,9)',
+		            'rgb(169,2,16)',
+		            'rgb(138,5,25)',
+		            'rgb(111,0,21)',
+		            'rgb(80,0,15)'
+		        ]
+		        // function getColor(v){
+		        //     if(v < -30){
+		        //         v = -30;
+		        //     }
+		        //     var color = temp_color[Math.ceil((v - (-30))/2)];
+		        //     return color;
+		        // }
 				var interpolate = data.interpolate;
 				if(interpolate){
 					var _interpolate_width,
@@ -247,7 +294,7 @@ Core.safe(function(){
                             	y: v.y,
                             	c: color
                             });
-                        } 
+                        }
                         _new_interpolate_data.push(arr);  
                     }
 					var interpolation_overlay = new GeoMap.Interpolation(_new_interpolate_data);
@@ -318,7 +365,7 @@ Core.safe(function(){
 			// china_json = 'shell/data/china_mask.geo.meractor.json';
 			// china_json = _resolve('shell/data/china_province.meractor.json');
 			// china_json = _resolve('shell/data/china.geo.albers.json');
-			china_json = _resolve('shell/data/china_province.albers.json');
+			china_json = _resolve('shell/data/china_province.'+gm_projector+'.json');
 			gm.loadGeo([china_json],{
 				style: {
 					// color: '#F5F3F0',

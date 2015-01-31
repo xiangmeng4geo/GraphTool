@@ -493,7 +493,15 @@ Core.safe(function(){
 					var colors = v.colors;
 					if(colors && colors.length > 0){
 						colors.sort(function(a, b){
-							return a.val[0] > b.val[0];
+							var v_a = a.val[0],
+								v_b = b.val[0];
+							if(v_a == ''){
+								v_a = Number.NEGATIVE_INFINITY;
+							}
+							if(v_b == ''){
+								v_b = Number.NEGATIVE_INFINITY;
+							}
+							return Number(v_a) > Number(v_b);
 						});
 						$html_fieldset_color.find('.legend_value').append(getTable(colors));
 					}

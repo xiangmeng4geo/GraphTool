@@ -171,6 +171,8 @@ define('GeoMap',['zrender',
 		_this.jsonLoader = conf.jsonLoader || $.getJSON;
 		_init_geomap.call(_this);
 	};
+	GeoMap.PROJECT_MERACTOR = 'meractor';
+	GeoMap.PROJECT_ALBERS = 'albers';
 	var GeoMapProp = GeoMap.prototype;
 	/*地图拖拽*/
 	GeoMapProp.draggable = function(option){
@@ -931,8 +933,8 @@ define('GeoMap',['zrender',
 	                    var pixel10 = _get_pixel(i+1, j);
 	                    var pixel01 = _get_pixel(i, j+1);
 	                    var pixel11 = _get_pixel(i+1, j+1);
-	                    for(var p_x = Math.floor(pixel00.x), p_e_x = Math.ceil(pixel10.x); p_x <= p_e_x && p_x <= pixel_x_end; p_x++){
-	                        for(var p_y = Math.ceil(pixel00.y), p_e_y = Math.floor(pixel01.y); p_y >= p_e_y && p_y >= pixel_y_end; p_y--){
+	                    for(var p_x = Math.floor(pixel00.x), p_e_x = Math.ceil(pixel10.x); p_x < p_e_x && p_x <= pixel_x_end; p_x++){
+	                        for(var p_y = Math.ceil(pixel00.y), p_e_y = Math.floor(pixel01.y); p_y > p_e_y && p_y >= pixel_y_end; p_y--){
 	                            var color = _get_pixel_color(p_x, p_y, pixel01, pixel11, pixel00, pixel10);
 	                            _set_rgba(p_x, p_y, color);
 	                        }
@@ -974,6 +976,8 @@ define('GeoMap',['zrender',
 	GeoMap.Interpolation.prototype.draw = function(map){
 		var _this = this,
 			data_conf = map._data,
+			c_width = data_conf.width,
+			c_height = data_conf.height,
 			data = _this.data,
 			_width = data.width,
 			_height = data.height,
@@ -993,7 +997,7 @@ define('GeoMap',['zrender',
 				var pixel = map.pointToOverlayPixel(new GeoMap.Point(item.x, item.y));
 				var x_pixel = pixel.x,
 					y_pixel = pixel.y;
-				// if(x_pixel > -space_pixel_x && x_pixel <= data_width && y_pixel > -space_pixel_y && y_pixel <= data_height){
+				// if(x_pixel > -space_pixel_x && x_pixel <= c_width && y_pixel > -space_pixel_y && y_pixel <= c_height){
 					arr.push({
 						lng: item.x,
 						lat: item.y,
@@ -1005,7 +1009,7 @@ define('GeoMap',['zrender',
 			}
 			new_data.push(arr);
 		}
-		shape.setData(new_data, data_conf.width, data_conf.height);
+		shape.setData(new_data, c_width, c_height);
 		shape.gm = map;
 		return shape;
 	}

@@ -181,6 +181,7 @@ var format = (function(){
 			'110000': 0.04, //北京
 			'120000': 0.04, //天津
 			'710000': 0.049,	//台湾
+			'460000': 0.04, //海南
 			'810000': 0.02,//香港
 			'820000': 0.001	//澳门
 		}; //这里控制过滤点之间距离，可能用这个参数出不同分辨率的地图数据
@@ -248,7 +249,6 @@ var format = (function(){
 						cname = properties['CAPNAME'],
 						prov_code = properties['PROV_CODE'];
 					var new_properties = {name: _get_cityname(name), cname: _get_cityname(cname), prov_code: prov_code};
-console.log(new_properties);
 					var _flag_is_small_prov = _is_small_prov(new_properties);
 
 					var geometry = v.geometry;
