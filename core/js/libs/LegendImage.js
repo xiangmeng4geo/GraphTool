@@ -18,7 +18,7 @@ define('LegendImage',['zrender',
 		var len = blendent.length;
 		var html_title = '';
 		$.each(blendent, function(i, v){
-			var is_stripe = blendent.is_stripe || false;
+			var is_stripe = v.is_stripe || false;
 			var title = v.val.n;
 			html_title += '<span>'+title+'</span>';
 			html_color += '<ul>';
@@ -62,7 +62,6 @@ define('LegendImage',['zrender',
 			var $this = $(this);
 			var _is_stripe = $this.data('stripe');
 			var color = $this.css('background-color');
-			console.log(_is_stripe);
 			if(_is_stripe){
 				color = new GeoMap.Pattern.Streak({
 					strokeStyle: color,
@@ -71,10 +70,10 @@ define('LegendImage',['zrender',
 			}
 			var pos = $(this).position();
 			var style = {
-		        x : pos.left,
-		        y : pos.top,
-		        width : $this.width(),
-		        height: $this.height(),
+		        x : pos.left+1,
+		        y : pos.top+1,
+		        width : $this.width()-2,
+		        height: $this.height()-2,
 		        brushType: 'both',
 		        color: color
 		    }
