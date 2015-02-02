@@ -10,12 +10,12 @@ var radians = Math.PI / 180,
 	degrees = 180 / Math.PI,
 	px = 3800000;//转成px
 	// px = 1;
-var Meractor = (function(){
+var Mercator = (function(){
 	var MERACTOR_RATIO = 20037508.34/180;
 	/*Web墨卡托坐标与WGS84坐标互转*/
 	var Meractor_cache_lnglat = {};// 进行缓存，减小重复计算量
 	return {
-		name: 'meractor',
+		name: 'mercator',
 		project: function(lnglat){
 			var lng = lnglat.x;
 			var lat = lnglat.y;
@@ -353,7 +353,7 @@ var file_path = 'E:/source/git_project/GeoMap/json/china_mask.geo.json';
 file_path = './data-source/';
 // file_path = './data-source/china.geo.json';
 var args = [].slice.call(process.argv);
-var global_projector = Meractor;
+var global_projector = Mercator;
 //命令行进行指定文件压缩
 if(args.length > 2){
 	var projector = args[2];

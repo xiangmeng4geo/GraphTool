@@ -161,7 +161,7 @@ Core.safe(function(){
 		});
 		initing = true;
 		require(['GeoMap', 'LegendImage'],function(GeoMap, LegendImage){
-			var gm_projector = GeoMap.PROJECT_MERACTOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERACTOR
+			var gm_projector = GeoMap.PROJECT_MERCATOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
 			window.GeoMap = GeoMap;
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
@@ -390,221 +390,224 @@ Core.safe(function(){
 				}
 				$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
 					if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
-						$('.map_layer').remove();
-						gm.clearLayers();
-						conf_of_product = ConfUser.get(product_name);
+						Loading.show(function(){
+							$('.map_layer').remove();
+							gm.clearLayers();
+							conf_of_product = ConfUser.get(product_name);
 
-						if(!conf_of_product){
-							return alert('请对该产品进行配置！');
-						}
-						conf_of_product.name = product_name;
-						// console.log(conf_of_product);
-						var conf_other = conf_of_product.other;
-						var logo = conf_other.logo;
-						if(logo){
-							add_maplayer_img(logo, {
-								left: 20,
-								top: 20
-							});
-						}
-
-						conf_export = {};
-						var bg_flag = false;
-						// $geomap.removeAttr('style');
-						var conf_bgimg = conf_other.bg_img;
-						if(conf_bgimg){
-							if(conf_bgimg.flag && conf_bgimg.val){
-								$geomap.css('background-image', 'url('+conf_bgimg.val.replace(/\\/g,'/')+')');
-								bg_flag = true;
-								conf_export.bgimg = conf_bgimg.val;//$('<img src="'+conf_bgimg.val+'"/>').get(0);
+							if(!conf_of_product){
+								loading.hide();
+								return alert('请对该产品进行配置！');
 							}
-						}
-						if(!bg_flag){
-							var conf_bgcolor = conf_other.bg_color;
-							if(conf_bgcolor){
-								if(conf_bgcolor.flag && conf_bgcolor.val){
-									$geomap.css('background-color', conf_bgcolor.val);
-									conf_export.bgcolor = conf_bgcolor.val;
+							conf_of_product.name = product_name;
+							// console.log(conf_of_product);
+							var conf_other = conf_of_product.other;
+							var logo = conf_other.logo;
+							if(logo){
+								add_maplayer_img(logo, {
+									left: 20,
+									top: 20
+								});
+							}
+
+							conf_export = {};
+							var bg_flag = false;
+							// $geomap.removeAttr('style');
+							var conf_bgimg = conf_other.bg_img;
+							if(conf_bgimg){
+								if(conf_bgimg.flag && conf_bgimg.val){
+									$geomap.css('background-image', 'url('+conf_bgimg.val.replace(/\\/g,'/')+')');
+									bg_flag = true;
+									conf_export.bgimg = conf_bgimg.val;//$('<img src="'+conf_bgimg.val+'"/>').get(0);
 								}
 							}
-						}
-						
-						var conf_title = conf_of_product.title;
-						addTitle(conf_title.title_1, {
-							left: 110,
-							top: 20
-						});
-						addTitle(conf_title.title_2, {
-							left: 110,
-							top: 80
-						});
-
-						var conf_legend = conf_of_product.legend;
-						var is_show_legend = conf_legend.is_show_legend,
-							is_updown = conf_legend.is_updown;
-
-						function _add_southsealogo(pos, callback){
-							var logo_southsea = conf_other.logo_southsea;
-							if(logo_southsea && logo_southsea.flag){
-								add_maplayer_img(logo_southsea.p, pos, callback);
-							}else{
-								callback && callback();
-							}
-						}
-						function _add_title3(pos){
-							var _title_3 = conf_title.title_3;
-							if(!is_updown){
-								var m = /font-size: (\d+)px/.exec(_title_3.style);
-								var height = m? parseFloat(m[1]) + 10: 30;
-								if(!isNaN(pos.top)){
-									pos.top -= height;
-								}else{
-									pos.bottom += height;
+							if(!bg_flag){
+								var conf_bgcolor = conf_other.bg_color;
+								if(conf_bgcolor){
+									if(conf_bgcolor.flag && conf_bgcolor.val){
+										$geomap.css('background-color', conf_bgcolor.val);
+										conf_export.bgcolor = conf_bgcolor.val;
+									}
 								}
 							}
 							
-							addTitle(_title_3, pos);
-						}
-						
-						var _width = $geomap_layer.width();
-						if(is_show_legend){
-							var img_src = _get_legend_img(product_name, width_geomap, height_geomap);
-							function _add_legend(pos, width, height, callback){
-								new MapLayer.img({
-									position: pos,
-									width: width,
-									height: height,
-									src: img_src
-								},function($html, param){
-									$geomap_layer.append($html);
-									callback && callback($html, param);
-								});
+							var conf_title = conf_of_product.title;
+							addTitle(conf_title.title_1, {
+								left: 110,
+								top: 20
+							});
+							addTitle(conf_title.title_2, {
+								left: 110,
+								top: 80
+							});
+
+							var conf_legend = conf_of_product.legend;
+							var is_show_legend = conf_legend.is_show_legend,
+								is_updown = conf_legend.is_updown;
+
+							function _add_southsealogo(pos, callback){
+								var logo_southsea = conf_other.logo_southsea;
+								if(logo_southsea && logo_southsea.flag){
+									add_maplayer_img(logo_southsea.p, pos, callback);
+								}else{
+									callback && callback();
+								}
 							}
-							var img = new Image();
-							img.onload = function(){
-								var width = this.width,
-									height = this.height;
+							function _add_title3(pos){
+								var _title_3 = conf_title.title_3;
+								if(!is_updown){
+									var m = /font-size: (\d+)px/.exec(_title_3.style);
+									var height = m? parseFloat(m[1]) + 10: 30;
+									if(!isNaN(pos.top)){
+										pos.top -= height;
+									}else{
+										pos.bottom += height;
+									}
+								}
+								
+								addTitle(_title_3, pos);
+							}
+							
+							var _width = $geomap_layer.width();
+							if(is_show_legend){
+								var img_src = _get_legend_img(product_name, width_geomap, height_geomap);
+								function _add_legend(pos, width, height, callback){
+									new MapLayer.img({
+										position: pos,
+										width: width,
+										height: height,
+										src: img_src
+									},function($html, param){
+										$geomap_layer.append($html);
+										callback && callback($html, param);
+									});
+								}
+								var img = new Image();
+								img.onload = function(){
+									var width = this.width,
+										height = this.height;
+									if(is_updown){
+										var scale = _width/1024;
+										var toWidth = width * scale,
+											toHeight = height * scale;
+										_add_southsealogo({
+											left: 10,
+											top: 'auto',
+											bottom: 10
+										}, function($html, param){
+											if($html && param){
+												var pos = {
+													left: 10 + param.width_show + 10,
+													top: 'auto',
+													bottom: 10
+												}
+											}else{
+												var pos = {
+													left: 10,
+													top: 'auto',
+													bottom: 10
+												};
+											}
+											_add_legend(pos, toWidth, toHeight);
+											_add_title3({
+												left: 'auto',
+												right: 10,
+												top: 'auto',
+												bottom: 10
+											});
+										});
+									}else{
+										var toWidth = Math.min(width, _width),
+											toHeight = toWidth*height/width;
+
+										_add_legend({
+											left: 0,
+											top: 'auto',
+											bottom: 0
+										},toWidth, toHeight,function($html, param){
+											var pos = $html.position();
+											_add_title3({
+												left: 10, 
+												top: pos.top
+											});
+											_add_southsealogo({
+												left: 'auto',
+												right: 10,
+												top: 'auto',
+												bottom: param.height_show + 10
+											});
+										});
+									}
+								}
+								img.src = img_src;
+							}else{
+								var pos_southsea,
+									pos_title3;
 								if(is_updown){
-									var scale = _width/1024;
-									var toWidth = width * scale,
-										toHeight = height * scale;
-									_add_southsealogo({
+									pos_southsea = {
 										left: 10,
 										top: 'auto',
 										bottom: 10
-									}, function($html, param){
-										if($html && param){
-											var pos = {
-												left: 10 + param.width_show + 10,
-												top: 'auto',
-												bottom: 10
-											}
-										}else{
-											var pos = {
-												left: 10,
-												top: 'auto',
-												bottom: 10
-											};
-										}
-										_add_legend(pos, toWidth, toHeight);
-										_add_title3({
-											left: 'auto',
-											right: 10,
-											top: 'auto',
-											bottom: 10
-										});
-									});
-								}else{
-									var toWidth = Math.min(width, _width),
-										toHeight = toWidth*height/width;
-
-									_add_legend({
-										left: 0,
+									};
+									pos_title3 = {
+										left: 'auto',
+										right: 10,
 										top: 'auto',
-										bottom: 0
-									},toWidth, toHeight,function($html, param){
-										var pos = $html.position();
-										_add_title3({
-											left: 10, 
-											top: pos.top
-										});
-										_add_southsealogo({
-											left: 'auto',
-											right: 10,
-											top: 'auto',
-											bottom: param.height_show + 10
-										});
-									});
+										bottom: 10
+									}
+								}else{
+									pos_southsea = {
+										left: 'auto',
+										right: 10,
+										top: 'auto',
+										bottom: 10
+									};
+									pos_title3 = {
+										left: 10,
+										top: 'auto',
+										bottom: 10
+									}
 								}
+								_add_southsealogo(pos_southsea);
+								_add_title3(pos_title3);
 							}
-							img.src = img_src;
-						}else{
-							var pos_southsea,
-								pos_title3;
-							if(is_updown){
-								pos_southsea = {
-									left: 10,
-									top: 'auto',
-									bottom: 10
-								};
-								pos_title3 = {
-									left: 'auto',
-									right: 10,
-									top: 'auto',
-									bottom: 10
+							
+							var conf_in_out = conf_of_product.in_out;
+							var dir_in = conf_in_out.dir_in;
+							if( file_util.exists(dir_in) ){
+								var param = [dir_in];
+								var conf_file = conf_of_product.file;
+								var conf_file_rule = conf_in_out.file_rule;
+								if(conf_file_rule.type == "1"){
+									var rule_common = conf_file_rule.common;
+									param.push(rule_common.prefix+rule_common.date_format+rule_common.postfix+'.'+rule_common.file_suffix);
+								}else{
+									param.push(conf_file_rule.custom);
+								}
+								if(conf_file.is_newest){
+									param.push(conf_file.newest_days);
+								}else{
+									param.push(conf_file.time_start);
+									param.push(conf_file.time_end);
+								}
+								var file_newest = micaps_file_util.getNewest.apply(null,param);
+								// console.log(file_newest, param);
+								if(file_newest){
+									Timer.start('read micaps');
+									data_of_micaps = file_util.readFile(file_newest,true);
+									Timer.end('read micaps', 1);
+									render_conf(data_of_micaps, conf_of_product.legend.blendent);
+								}else{
+									alert('没有找到符合条件的文件，请检查产品相关配置！');
 								}
 							}else{
-								pos_southsea = {
-									left: 'auto',
-									right: 10,
-									top: 'auto',
-									bottom: 10
-								};
-								pos_title3 = {
-									left: 10,
-									top: 'auto',
-									bottom: 10
-								}
+								alert("请配置该产品的数据源路径！");
 							}
-							_add_southsealogo(pos_southsea);
-							_add_title3(pos_title3);
-						}
-						
-						var conf_in_out = conf_of_product.in_out;
-						var dir_in = conf_in_out.dir_in;
-						if( file_util.exists(dir_in) ){
-							var param = [dir_in];
-							var conf_file = conf_of_product.file;
-							var conf_file_rule = conf_in_out.file_rule;
-							if(conf_file_rule.type == "1"){
-								var rule_common = conf_file_rule.common;
-								param.push(rule_common.prefix+rule_common.date_format+rule_common.postfix+'.'+rule_common.file_suffix);
-							}else{
-								param.push(conf_file_rule.custom);
-							}
-							if(conf_file.is_newest){
-								param.push(conf_file.newest_days);
-							}else{
-								param.push(conf_file.time_start);
-								param.push(conf_file.time_end);
-							}
-							// console.log(param);
-							var file_newest = micaps_file_util.getNewest.apply(null,param);
-							if(file_newest){
-								Timer.start('read micaps');
-								data_of_micaps = file_util.readFile(file_newest,true);
-								Timer.end('read micaps', 1);
-								render_conf(data_of_micaps, conf_of_product.legend.blendent);
-							}else{
-								alert('没有找到符合条件的文件，请检查产品相关配置！');
-							}
-						}else{
-							alert("请配置该产品的数据源路径！");
-						}
 
-						initing = false;
-						Loading.hide();
-						gm.refresh();	
+							initing = false;
+							Loading.hide();
+							gm.refresh();
+						});
 					}
 				});
 
