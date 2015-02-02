@@ -417,7 +417,7 @@ Core.safe(function(){
 							var conf_bgimg = conf_other.bg_img;
 							if(conf_bgimg){
 								if(conf_bgimg.flag && conf_bgimg.val){
-									$geomap.css('background-image', 'url('+conf_bgimg.val.replace(/\\/g,'/')+')');
+									$geomap_container.css('background-image', 'url("'+conf_bgimg.val.replace(/\\/g,'/')+'")');
 									bg_flag = true;
 									conf_export.bgimg = conf_bgimg.val;//$('<img src="'+conf_bgimg.val+'"/>').get(0);
 								}
@@ -426,7 +426,7 @@ Core.safe(function(){
 								var conf_bgcolor = conf_other.bg_color;
 								if(conf_bgcolor){
 									if(conf_bgcolor.flag && conf_bgcolor.val){
-										$geomap.css('background-color', conf_bgcolor.val);
+										$geomap_container.css('background-color', conf_bgcolor.val);
 										conf_export.bgcolor = conf_bgcolor.val;
 									}
 								}
