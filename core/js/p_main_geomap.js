@@ -546,6 +546,7 @@ Core.safe(function(){
 										});
 									}
 								}
+								img.onerror = img.onload;
 								img.src = img_src;
 							}else{
 								var pos_southsea,

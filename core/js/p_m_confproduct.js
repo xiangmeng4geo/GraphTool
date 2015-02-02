@@ -459,18 +459,19 @@ Core.safe(function(){
 				selected_option($select_file_hour, file_rule.file_hour);
 			}
 			var conf_title = conf_product.title;
-			var conf_title_1 = conf_title.title_1;
-			$textarea_title_1.text(conf_title_1.text).attr('style',conf_title_1.style);
-			$cb_title_1.prop('checked',conf_title_1.is_show);
+			if(conf_title){
+				var conf_title_1 = conf_title.title_1;
+				$textarea_title_1.text(conf_title_1.text).attr('style',conf_title_1.style);
+				$cb_title_1.prop('checked',conf_title_1.is_show);
 
-			var conf_title_2 = conf_title.title_2;
-			$textarea_title_2.text(conf_title_2.text).attr('style',conf_title_2.style);
-			$cb_title_2.prop('checked',conf_title_2.is_show);
+				var conf_title_2 = conf_title.title_2;
+				$textarea_title_2.text(conf_title_2.text).attr('style',conf_title_2.style);
+				$cb_title_2.prop('checked',conf_title_2.is_show);
 
-			var conf_title_3 = conf_title.title_3;
-			$textarea_title_3.text(conf_title_3.text).attr('style',conf_title_3.style);
-			$cb_title_3.prop('checked',conf_title_3.is_show);
-
+				var conf_title_3 = conf_title.title_3;
+				$textarea_title_3.text(conf_title_3.text).attr('style',conf_title_3.style);
+				$cb_title_3.prop('checked',conf_title_3.is_show);
+			}
 			var conf_legend = conf_product.legend;
 			if(conf_legend){
 				selected_option($select_legend_unit,conf_legend.unit);
