@@ -743,7 +743,7 @@ define('GeoMap',['zrender',
 	GeoMap.Polyline.prototype.isCover = function(){
 		return true;
 	}
-	GeoMap.Text = function(text, attr_style, padding){
+	GeoMap.Text = function(text, attr_style, padding, option){
 		padding || (padding = [0, 0, 0, 0]);
 		//设置字体及其它属性请参考： http://blog.csdn.net/u012545279/article/details/14521567
 		var style_obj = {};
@@ -757,7 +757,7 @@ define('GeoMap',['zrender',
 		}
 		var style = {
 			text: text,
-			brushType : 'fill',
+			brushType : 'both',
 	        textAlign : 'left',
 	        textBaseline : 'top'
 		};
@@ -772,6 +772,7 @@ define('GeoMap',['zrender',
 		var color = style_obj.color;
 		if(color){
 			style.color = color;
+			style.strokeColor = color;
 		}
 		var font = '';
 		var font_style = style_obj['font-style'];
@@ -804,9 +805,24 @@ define('GeoMap',['zrender',
 			style: style,
 			zlevel: ZINDEX_LAYER
 		});
+		this.shape._option = option;
 	}
 	GeoMap.Text.prototype.draw = function(map){
-		return this.shape;
+		var shape = this.shape;
+		var option = shape._option;
+		if(option){
+			if(option.zlevel){
+				shape.zlevel = option.zlevel;
+			}
+			if(option.pos){
+				try{
+					var pixel = map.pointToOverlayPixel(new GeoMap.Point(option.pos.x, option.pos.y));
+					shape.style.x = pixel.x;
+					shape.style.y = pixel.y;
+				}catch(e){}
+			}
+		}
+		return shape;
 	}
 	GeoMap.Image = function(src,x,y,width,height){
 		var style = {

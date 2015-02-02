@@ -75,7 +75,7 @@ Core.safe(function(){
 	var _cache_e_contextmenu; // 用于缓存contextmenu事件对象
 	var is_img = Core.util.isImg;
 	// 引入amd模块加载器	
-	Core.Html.addScript('./js/libs/esl.js',false,function(){
+	Core.Html.addScript('./js/libs/esl.js', false, function(){
 		var developmod = false;
 		// if(developmod){
 		// 	require.config({
@@ -206,7 +206,7 @@ Core.safe(function(){
 			});
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
-				Timer.start('render micaps', 1);
+				Timer.start('render micaps');
 				var isHaveManyBlendent = blendent.length > 1;
 				function getColorByCondition(val, range){
 					for(var i = 0,j=range.length;i<j;i++){
@@ -275,6 +275,7 @@ Core.safe(function(){
 		        //     var color = temp_color[Math.ceil((v - (-30))/2)];
 		        //     return color;
 		        // }
+		        // 3类里的插值结果
 				var interpolate = data.interpolate;
 				if(interpolate){
 					var _interpolate_width,
@@ -305,6 +306,7 @@ Core.safe(function(){
 					var interpolation_overlay = new GeoMap.Interpolation(_new_interpolate_data);
 					gm.addOverlay(interpolation_overlay);   //渲染插值结果
 				}
+				// 14类中的面
 				var areas = data.areas;
 				if(areas){
 					$.each(areas, function(i,v){
@@ -337,6 +339,7 @@ Core.safe(function(){
 						gm.addOverlay(polygon);   //增加面
 					});
 				}
+				// 14类中的特殊线，如冷锋、暖锋
 				var line_symbols = data.line_symbols;
 				if(line_symbols){
 					$.each(line_symbols,function(i,v){
@@ -357,7 +360,62 @@ Core.safe(function(){
 						gm.addOverlay(polyline);   //增加折线
 					});
 				}
-				Timer.end('render micaps', 1);
+				// 14类中的普通线
+				// var lines = data.lines;
+				// if(lines){
+				// 	$.each(lines, function(i, line){
+				// 		var point_arr = [];
+				// 		var points = line.point;
+				// 		if(points.length >= 2){
+				// 			$.each(points,function(p_i, p_v){
+				// 				var point = new GeoMap.Point(p_v.x, p_v.y);
+				// 				point_arr.push(point);
+				// 			});
+				// 			var polyline = new GeoMap.Polyline(point_arr,{
+				// 				style: {
+				// 					strokeColor : '#1010FF',
+				// 					lineWidth : 2,
+				// 				},
+				// 				zlevel: 10
+				// 			});
+				// 			gm.addOverlay(polyline);   //增加折线
+				// 		}
+				// 		var flags = line.flags;
+				// 		if(flags && flags.items && flags.items.length > 0){
+				// 			var text = flags.text;
+				// 			$.each(flags.items,function(i,v){
+				// 				gm.addOverlay(new GeoMap.Text(text, 'left:'+v.x+'px;top:'+v.y+'px;font-size: 12px'));
+				// 			});
+				// 		}
+				// 	});
+				// }
+				var symbols = data.symbols;
+				if(symbols){
+					$.each(symbols, function(i, v){
+						var type = v.type;
+						
+						var text = '',
+							color = '#1010FF';
+						
+						if('60' == type){
+							text = 'H';
+							color = 'red';
+						}else if('61' == type){
+							text = 'L';
+						}else if('37' == type){
+							text = '台';
+							color = 'green';
+						}
+						var textShape = new GeoMap.Text(text, 'color:'+color+';left:'+(v.x)+'px;top:'+v.y+'px;font-size: 30px', null, {
+							pos: {
+								x: v.x,
+								y: v.y
+							}
+						});
+						gm.addOverlay(textShape);
+					});
+				}
+				Timer.end('render micaps');
 			}
 			Loading.show();
 			var Color = ['red','blue','#000','#123','#f26','#ccc','#333'];
