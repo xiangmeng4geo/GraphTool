@@ -76,23 +76,23 @@ Core.safe(function(){
 	var is_img = Core.util.isImg;
 	// 引入amd模块加载器	
 	Core.Html.addScript('./js/libs/esl.js',false,function(){
-		var fileLocation= '../../../git_project/GeoMap_projection/src/zrender'
-		var developmod = true;
-		if(developmod){
-			require.config({
-		        packages: [
-		            {
-		                name: 'zrender',
-		                location: '../../../git_project/zrender-2.0.5/src/',
-		                main: 'zrender'
-		            }
-		        ],
-		        paths: {
-		        	'GeoMap': 'js/libs/GeoMap',
-		        	'LegendImage': 'js/libs/LegendImage'
-		        }
-		    });
-		}else{
+		var developmod = false;
+		// if(developmod){
+		// 	require.config({
+		//         packages: [
+		//             {
+		//                 name: 'zrender',
+		//                 location: '../../../git_project/zrender-2.0.5/src/',
+		//                 main: 'zrender'
+		//             }
+		//         ],
+		//         paths: {
+		//         	'GeoMap': 'js/libs/GeoMap',
+		//         	'LegendImage': 'js/libs/LegendImage'
+		//         }
+		//     });
+		// }else{
+			var fileLocation= './js/libs/zr'
 			require.config({
 		        paths:{
 		            'zrender': fileLocation,
@@ -101,11 +101,15 @@ Core.safe(function(){
 		            'zrender/shape/Polygon': fileLocation,
 		            'zrender/Group': fileLocation,
 		            'zrender/tool/util': fileLocation,
+		            'zrender/tool/area': fileLocation,
+		            'zrender/shape/Image': fileLocation,
+		            'zrender/shape/Text': fileLocation,
+		            'zrender/shape/Rectangle': fileLocation,
 		            'GeoMap': 'js/libs/GeoMap',
 		            'LegendImage': 'js/libs/LegendImage'
 		        }
 		    });
-		}
+		// }
 		init(true);
 	});
 	
@@ -603,7 +607,6 @@ Core.safe(function(){
 								if(file_newest){
 									Timer.start('read micaps');
 									file_util.micaps.getData(file_newest, function(err, data){
-										console.log(err, data);
 										Timer.end('read micaps');
 										if(err){
 											alert(err.msg || '读取数据错误！');
