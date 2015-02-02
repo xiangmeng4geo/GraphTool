@@ -159,7 +159,7 @@
 			return false;
 		}
 		process.on('uncaughtException',fn_error);
-		// window.onerror = fn_error;
+		window.onerror = fn_error;
 	}();
 	
 	Core.safe = function(auto_fn){

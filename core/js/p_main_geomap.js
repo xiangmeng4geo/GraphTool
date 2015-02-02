@@ -389,6 +389,11 @@ Core.safe(function(){
 						}
 					}
 				}
+				function _afterRender(){
+					initing = false;
+					Loading.hide();
+					gm.refresh();
+				}
 				$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
 					if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
 						Loading.show(function(){
@@ -595,19 +600,27 @@ Core.safe(function(){
 								// console.log(file_newest, param);
 								if(file_newest){
 									Timer.start('read micaps');
-									data_of_micaps = file_util.readFile(file_newest,true);
-									Timer.end('read micaps', 1);
-									render_conf(data_of_micaps, conf_of_product.legend.blendent);
+									file_util.micaps.getData(file_newest, function(err, data){
+										Timer.end('read micaps');
+										if(err){
+											alert(err.msg || '读取数据错误！');
+										}else{
+											data_of_micaps = data;
+											render_conf(data_of_micaps, conf_of_product.legend.blendent);
+										}
+										_afterRender()
+									});
+									
 								}else{
 									alert('没有找到符合条件的文件，请检查产品相关配置！');
+									_afterRender()
 								}
 							}else{
 								alert("请配置该产品的数据源路径！");
+								_afterRender()
 							}
 
-							initing = false;
-							Loading.hide();
-							gm.refresh();
+							
 						});
 					}
 				});
