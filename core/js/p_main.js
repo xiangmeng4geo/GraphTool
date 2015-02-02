@@ -92,10 +92,10 @@
 		        	$doc.trigger(ConstEvent.PRODUCT_CHANGE,item.text);
 		        }   
 		    });
-		    $doc.on(ConstEvent.GEOMAP_INITED,function(){
-		    	// console.log('ConstEvent.GEOMAP_INITED');
-		    	$tree.getFirstSubItem().dblclick();
-		    });
+		    // $doc.on(ConstEvent.GEOMAP_INITED,function(){
+		    // 	// console.log('ConstEvent.GEOMAP_INITED');
+		    // 	$tree.getFirstSubItem().dblclick();
+		    // });
 		}
 		/*更新文件*/
 		function updateProductTreeConf(){

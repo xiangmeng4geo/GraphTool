@@ -374,6 +374,7 @@ Core.safe(function(){
 				},
 				is_show_mask: is_show_mask
 			},function(points){
+				Loading.hide();
 				// gm.addMask(points,{
 				// 	is_lnglat: false
 				// });
@@ -418,7 +419,7 @@ Core.safe(function(){
 
 							conf_export = {};
 							var bg_flag = false;
-							// $geomap.removeAttr('style');
+							$geomap_container.removeAttr('style');
 							var conf_bgimg = conf_other.bg_img;
 							if(conf_bgimg){
 								if(conf_bgimg.flag && conf_bgimg.val){
@@ -601,6 +602,7 @@ Core.safe(function(){
 								if(file_newest){
 									Timer.start('read micaps');
 									file_util.micaps.getData(file_newest, function(err, data){
+										console.log(err, data);
 										Timer.end('read micaps');
 										if(err){
 											alert(err.msg || '读取数据错误！');
