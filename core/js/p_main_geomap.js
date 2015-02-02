@@ -161,7 +161,8 @@ Core.safe(function(){
 		});
 		initing = true;
 		require(['GeoMap', 'LegendImage'],function(GeoMap, LegendImage){
-			var gm_projector = GeoMap.PROJECT_MERCATOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+			var conf_sys = ConfUser.getSys();
+			var gm_projector = conf_sys && conf_sys.projector || GeoMap.PROJECT_MERCATOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
 			window.GeoMap = GeoMap;
 			_LegendImage = LegendImage;
 			gm = new GeoMap({

@@ -8,7 +8,8 @@ Core.safe(function(){
 		icon_path = file_path.icon,
 		image_path = file_path.image;
 	var CoreWindow = Core.Window;
-	
+	var const_projector = Core.Const.projector;
+
 	var $c_bottom_fieldset = $('#c_bottom > fieldset');
 	var $c_top_li = $('#c_top li').click(function(){
 		var $this = $(this);
@@ -30,9 +31,10 @@ Core.safe(function(){
 	var $text_file_southsea_logo = $('#text_file_southsea_logo'),
 		$text_file_company_logo = $('#text_file_company_logo'),
 		$checkbox_show_southsea = $('#checkbox_show_southsea'),
-		$checkbox_show_logo = $('#checkbox_show_logo');
+		$checkbox_show_logo = $('#checkbox_show_logo'),
+		$select_map_projector = $('#select_map_projector');
 	var conf_sys = Conf_User.get(CONF_PRODUCTNAME);
-	console.log(conf_sys);
+	var projector_user = '';
 	if(conf_sys){
 		var logos = conf_sys.logos;
 		if(logos){
@@ -47,7 +49,14 @@ Core.safe(function(){
 				$text_file_company_logo.val(logo_company.p);
 			}
 		}
+		projector_user = conf_sys.projector;
 	}
+	var html_map_projector = '';
+	$.each(const_projector, function(i, v){
+		var val = v.v;
+		html_map_projector += '<option value="'+val+'" '+(val == projector_user? 'selected': '')+'>'+v.n+'</option>';
+	});
+	$select_map_projector.html(html_map_projector);
 	$('#btn_cancel').click(CoreWindow.close);
 	$('#btn_save').click(function(){
 		var save_data = {
@@ -60,7 +69,8 @@ Core.safe(function(){
 					flag: $checkbox_show_logo.prop('checked'),
 					p: $text_file_company_logo.val()
 				}
-			}
+			},
+			projector: $select_map_projector.val()
 		};
 		Conf_User.write(CONF_PRODUCTNAME,save_data,true);
 		CoreWindow.close();
