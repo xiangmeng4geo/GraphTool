@@ -342,6 +342,11 @@ Core.safe(function(){
 				// 14类中的特殊线，如冷锋、暖锋
 				var line_symbols = data.line_symbols;
 				if(line_symbols){
+					var color_symbols = {
+						2: 'blue',
+						3: 'red',
+						38: 'red'
+					};
 					$.each(line_symbols,function(i, v){
 						if(v.code == 0){
 							return;
@@ -351,49 +356,54 @@ Core.safe(function(){
 							var point = new GeoMap.Point(v_v.x, v_v.y);
 							point_arr.push(point);
 						});
+						var option = {
+							code: v.code,
+							width: 20, //线上标识图形的大小（如暖锋大小）
+							space_point: 10 //两个线上标识图形的间隔经纬度点数
+						};
+						if(v.code == 38){
+							option.width = 10;
+							option.space_point = 8;
+						}
 						var polyline = new GeoMap.Polyline(point_arr,{
 							style: {
-								strokeColor : 'blue',
+								strokeColor : color_symbols[v.code],
 								lineWidth : 2,
 							},
 							zlevel: 10
-						}, {
-							code: v.code,
-							width: 20, //线上标识图形的大小（如暖锋大小）
-							space_point: 5 //两个线上标识图形的间隔经纬度点数
-						});
+						}, option);
 						gm.addOverlay(polyline);   //增加折线
 					});
 				}
 				// 14类中的普通线
-				// var lines = data.lines;
-				// if(lines){
-				// 	$.each(lines, function(i, line){
-				// 		var point_arr = [];
-				// 		var points = line.point;
-				// 		if(points.length >= 2){
-				// 			$.each(points,function(p_i, p_v){
-				// 				var point = new GeoMap.Point(p_v.x, p_v.y);
-				// 				point_arr.push(point);
-				// 			});
-				// 			var polyline = new GeoMap.Polyline(point_arr,{
-				// 				style: {
-				// 					strokeColor : '#1010FF',
-				// 					lineWidth : 2,
-				// 				},
-				// 				zlevel: 10
-				// 			});
-				// 			gm.addOverlay(polyline);   //增加折线
-				// 		}
-				// 		var flags = line.flags;
-				// 		if(flags && flags.items && flags.items.length > 0){
-				// 			var text = flags.text;
-				// 			$.each(flags.items,function(i,v){
-				// 				gm.addOverlay(new GeoMap.Text(text, 'left:'+v.x+'px;top:'+v.y+'px;font-size: 12px'));
-				// 			});
-				// 		}
-				// 	});
-				// }
+				var lines = data.lines;
+				if(lines){
+					$.each(lines, function(i, line){
+						var point_arr = [];
+						var points = line.point;
+						if(points.length >= 2){
+							$.each(points,function(p_i, p_v){
+								var point = new GeoMap.Point(p_v.x, p_v.y);
+								point_arr.push(point);
+							});
+							var polyline = new GeoMap.Polyline(point_arr,{
+								style: {
+									strokeColor : '#1010FF',
+									lineWidth : 2,
+								},
+								zlevel: 10
+							});
+							gm.addOverlay(polyline);   //增加折线
+						}
+						var flags = line.flags;
+						if(flags && flags.items && flags.items.length > 0){
+							var text = flags.text;
+							$.each(flags.items,function(i,v){
+								gm.addOverlay(new GeoMap.Text(text, 'left:'+v.x+'px;top:'+v.y+'px;font-size: 12px'));
+							});
+						}
+					});
+				}
 				var symbols = data.symbols;
 				if(symbols){
 					$.each(symbols, function(i, v){

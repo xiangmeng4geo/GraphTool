@@ -660,18 +660,49 @@ define('GeoMap',['zrender',
 				var _width2 = Math.pow(_width, 2); //减少距离开方运算
 				var style = _this.style;
 				var pointList = style.pointList;
-				var color = style.color;
+				var color = style.color || style.strokeColor;
 				ctx.save();
 				ctx.fillStyle = color;
+				ctx.strokeStyle = color;
 				var start_point, mid_points = [], end_point;
 				if(pointList[0][0] > pointList[pointList.length-1][0]){
 					pointList.reverse();
 				}
-				console.log('pointList', pointList);
+				if(code == 38){	//霜冻线
+					for(var i = _space_point, j = pointList.length; i < j; i+=_space_point){
+						var start = pointList[i],
+							end = pointList[i+1];
+						if(start && end){
+							var x1 = start[0], y1 = start[1],
+								x2 = end[0], y2 = end[1];
+							if(x1 != x2){
+								var radiu = Math.atan((y2 - y1)/(x2 - x1)) + Math.PI;
+								if(x1 < x2){
+									radiu += Math.PI;
+								}
+								var x_mid = x1 + (x2 - x1)/2,
+									y_mid = y1 + (y2 - y1)/2;
+								var y = y_mid - _width * Math.cos(radiu),
+									x = x_mid + _width * Math.sin(radiu);
+								// ctx.beginPath();
+								// ctx.arc(x, y, 3, 0, Math.PI*2, true);
+								// ctx.arc(x1, y1, 3, 0, Math.PI*2, true);
+								// ctx.arc(x2, y2, 3, 0, Math.PI*2, true);
+								// ctx.closePath();
+								// ctx.fill();
+								ctx.moveTo(x_mid, y_mid);
+								ctx.lineTo(x, y);
+								ctx.stroke();
+							}
+						}
+						
+					}
+					return;
+				}
 				for(var i = _space_point, j = pointList.length; i < j; i++){
 					var p = pointList[i];
 					if(!start_point){
-						start_point = p;console.log('flag start', i, start_point)
+						start_point = p;
 					}else{
 						var dis = Math.pow(p[0] - start_point[0], 2) + Math.pow(p[1] - start_point[1], 2);
 						if(dis >= _width2){
@@ -700,20 +731,15 @@ define('GeoMap',['zrender',
 										var A = 1 + k*k,
 											B = 2*k*b - 2*x0 - 2*k*y0,
 											C = x0*x0 + y0*y0 + b*b - 2*b*y0 - _width2;
-										var a1 = -B/2*A,
-											a2 = Math.sqrt(B*B - 4*A*C)/2*A;
-										console.log('x1 = '+x1, 'y1 = '+y1, 'x2 = '+x2, 'y2 = '+y2, 'x0 = '+x0, 'y0 = '+y0, 'k = '+k, 'b = '+b, 'x00 = '+((-B+Math.sqrt(B*B-4*A*C))/2*A), 'x01 = '+((-B-Math.sqrt(B*B-4*A*C))/2*A));
-										// ((-B+Math.sqrt(B*B-4*A*C))/2*A)
+										var a1 = -B/(2*A),
+											a2 = Math.sqrt(B*B - 4*A*C)/(2*A);
+										// console.log('x1 = '+x1, 'y1 = '+y1, 'x2 = '+x2, 'y2 = '+y2, 'x0 = '+x0, 'y0 = '+y0, 'k = '+k, 'b = '+b, 'x00 = '+((-B+Math.sqrt(B*B-4*A*C))/2*A), 'x01 = '+((-B-Math.sqrt(B*B-4*A*C))/2*A));
 										if(a2){
 											var min_x = Math.min(x1, x2),
 												max_x = Math.max(x1, x2);
 											var x = a1 + a2;
 											if(x < min_x || x > max_x){
 												x = a1 - a2;
-												// if(x < min_x || x > max_x){
-												// 	mid_points.push(p);
-												// 	continue;
-												// }
 											}
 											end_point = [x, k*x+b];
 										}else{
@@ -736,35 +762,31 @@ define('GeoMap',['zrender',
 						}
 						if(start_point && end_point){
 							// 画标识
-							for(var i = 0, j = mid_points.length; i<j; i++){
-								var p = mid_points[i];
-								ctx.arc(p[0], p[1], 2, 0, Math.PI*2);
-								ctx.stroke();
-							}
 							ctx.beginPath();
 							ctx.moveTo(start_point[0], start_point[1]);
-							for(var i = 0, j = mid_points.length; i<j; i++){
-								var p = mid_points[i];
+							for(var i_p = 0, j_p = mid_points.length; i_p<j_p; i_p++){
+								var p = mid_points[i_p];
 								ctx.lineTo(p[0], p[1]);
-								ctx.arc(mid_x, mid_y, _width, 0, Math.PI);
 							}
+							var x1 = start_point[0], y1 = start_point[1],
+								x2 = end_point[0], y2 = end_point[1];
 
-							var mid_x = (start_point[0] - end_point[0])/2,
-								mid_y = (start_point[1] - end_point[1])/2;
-							if(code == 3){	//冷锋
-								if(mid_x == 0){
-									var to_point = [start_point[0] - _width, mid_y];
+							if(code == 2){	//冷锋
+								if(x1 == x2){
+									var to_point = [x1 - _width, y1 + (y2 - y1)/2];
 								}else{
-									var radiu = Math.atan(mid_y/mid_x);
-									var to_point = [mid_x - _width*Math.sin(radiu), mid_y - Math.cos(radiu)];
+									var radiu = -Math.atan((y2 - y1)/(x2 - x1));
+									var w = _width * Math.sin(Math.PI/4);
+									radiu = Math.PI/4 - radiu;
+									var x = x1 + (w * Math.cos(radiu)),
+										y = y1 + (w * Math.sin(radiu));
+									var to_point = [x, y];
 								}
 
-								console.log(start_point, mid_points, end_point);
 								ctx.lineTo(to_point[0], to_point[1]);
-							}else if(code == 2){ //暖锋
-								ctx.arc(mid_x, mid_y, _width, 0, Math.PI);
-							}else if(code == 38){	//霜冻线
-
+							}else if(code == 3){ //暖锋
+								var radiu = x2 == x1? 0 : Math.atan((y2 - y1)/(x2 - x1));
+								ctx.arc(x1 + (x2 - x1)/2, y1 + (y2 - y1)/2, _width/2, radiu, radiu + Math.PI, true);
 							}
 							ctx.closePath();
 							ctx.fill();
