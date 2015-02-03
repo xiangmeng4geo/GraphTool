@@ -817,7 +817,7 @@ define('GeoMap',['zrender',
 		var shape = this.shape;
 		var option = shape._option;
 		if(option){
-			if(option.zlevel){
+			if(!isNaN(option.zlevel)){
 				shape.zlevel = option.zlevel;
 			}
 			if(option.pos){

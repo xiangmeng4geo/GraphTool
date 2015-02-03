@@ -376,7 +376,7 @@ Core.safe(function(){
 									strokeColor : '#1010FF',
 									lineWidth : 2,
 								},
-								zlevel: 10
+								zlevel: GeoMap.ZLEVEL.NOCLIP
 							});
 							gm.addOverlay(polyline);   //增加折线
 						}
