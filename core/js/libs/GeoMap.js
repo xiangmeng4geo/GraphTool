@@ -587,49 +587,11 @@ define('GeoMap',['zrender',
         return img_data;
 	}
 
-	var Mask = function(map,polygons,options){
-		Base.call(this, options);
-		this.map = map;
-		if(options.is_lnglat){
-			var polygons_new = [];
-			$.each(polygons,function(i,v){
-				var arr = [];
-				$.each(v,function(v_i,v_v){
-					var val = pointToOverlayPixel.call(map,v_v);
-					arr.push([val.x,val.y]);
-				});
-				polygons_new.push(arr);
-			});
-			polygons = polygons_new;
-		}
-		this.polygons = polygons;
-	}
-	Mask.prototype = {
-		type: 'mask',
-		buildPath: function(ctx,style){
-			ctx.beginPath();
-			var map = this.map;
-			$.each(this.polygons,function(i_polygon,pointList){
-				if (pointList.length < 2) {
-	                // 少于2个点就不画了~
-	                return;
-	            }
-	            ctx.moveTo(pointList[0][0], pointList[0][1]);
-	            for (var i = 1, l = pointList.length; i < l; i++) {
-	                ctx.lineTo(pointList[i][0], pointList[i][1]);
-	            }
-	            ctx.lineTo(pointList[0][0], pointList[0][1]);
-			});
-			ctx.closePath();
-		}
-	}
-	util.inherits(Mask, Base);
-
 	var GeoMapText = function(options){
 		TextShape.call(this, options);
 	}
 	GeoMapText.prototype = {
-		type: 'mask',
+		type: 'gmtext',
 		brush: function(ctx, isHighlight){
 			var style = this.style;
 			var bgcolor = style.backgroundColor;
@@ -677,10 +639,146 @@ define('GeoMap',['zrender',
 			}
 			ctx.restore();
 			TextShape.prototype.brush.call(this, ctx, isHighlight);
-			// this.parent.brush(ctx, isHighlight);
 		}
 	}
 	util.inherits(GeoMapText, TextShape);
+
+	var GeoMapPolyline = function(options, special_options){
+		BrokenLine.call(this, options);
+		this.special_options = special_options;
+	}
+	GeoMapPolyline.prototype = {
+		type: 'gmpolyline',
+		brush: function(ctx, isHighlight){
+			var _this = this;
+			BrokenLine.prototype.brush.call(_this, ctx, isHighlight);
+			var special_options = _this.special_options;
+			var code = special_options.code;
+			if(code && code == 2 || code == 3 || code == 38){
+				var _width = special_options.width, 
+					_space_point = special_options.space_point;
+				var _width2 = Math.pow(_width, 2); //减少距离开方运算
+				var style = _this.style;
+				var pointList = style.pointList;
+				var color = style.color;
+				ctx.save();
+				ctx.fillStyle = color;
+				var start_point, mid_points = [], end_point;
+				if(pointList[0][0] > pointList[pointList.length-1][0]){
+					pointList.reverse();
+				}
+				console.log('pointList', pointList);
+				for(var i = _space_point, j = pointList.length; i < j; i++){
+					var p = pointList[i];
+					if(!start_point){
+						start_point = p;console.log('flag start', i, start_point)
+					}else{
+						var dis = Math.pow(p[0] - start_point[0], 2) + Math.pow(p[1] - start_point[1], 2);
+						if(dis >= _width2){
+							if(dis == _width2){
+								end_point = p;
+							}else{
+								if(mid_points.length > 0){
+									var p_prev = mid_points[mid_points.length-1];
+									var x1 = p_prev[0], y1 = p_prev[1],
+										x2 = p[0], y2 = p[1],
+										x0 = start_point[0], y0 = start_point[1];
+
+									if(x1 == x2){
+										var x = x1;
+										var y = Math.sqrt(_width2 - Math.pow(x0 - x, 2));
+										var min_y = Math.min(y1, y2),
+											max_y = Math.max(y1, y2);
+										if(y >= min_y && y <= max_y){
+											end_point = [x, y];
+										}else{
+											end_point = [x, -y];
+										}
+									}else{
+										var k = (y1 - y2)/(x1 - x2),
+											b = (x1*y2 - x2*y1)/(x1 - x2);
+										var A = 1 + k*k,
+											B = 2*k*b - 2*x0 - 2*k*y0,
+											C = x0*x0 + y0*y0 + b*b - 2*b*y0 - _width2;
+										var a1 = -B/2*A,
+											a2 = Math.sqrt(B*B - 4*A*C)/2*A;
+										// console.log(x1, y1, x2, y2, x0, y0, a1, a2, 'k = '+k, 'b = '+b, 'x00 = '+((-B+Math.sqrt(B*B-4*A*C))/2*A), 'x01 = '+((-B-Math.sqrt(B*B-4*A*C))/2*A));
+										((-B+Math.sqrt(B*B-4*A*C))/2*A)
+										if(a2){
+											var min_x = Math.min(x1, x2),
+												max_x = Math.max(x1, x2);
+											var x = a1 + a2;
+											if(x < min_x || x > max_x){
+												x = a1 - a2;
+												// if(x < min_x || x > max_x){
+												// 	mid_points.push(p);
+												// 	continue;
+												// }
+											}
+											end_point = [x, k*x+b];
+										}else{
+											mid_points.push(p);
+										}
+									}
+								}else{
+									var x1 = start_point[0], y1 = start_point[1],
+										x2 = p[0], y2 = p[1];
+									if(x1 == x2){
+										end_point = [x1, y1 + _width];
+									}else{
+										var radiu = Math.atan((y2 - y1)/(x2 - x1));
+										end_point = [x1 - _width*Math.sin(radiu), y1 - Math.cos(radiu)];
+									}
+								}
+							}
+						}else{
+							mid_points.push(p);
+						}
+						if(start_point && end_point){
+							// 画标识
+							for(var i = 0, j = mid_points.length; i<j; i++){
+								var p = mid_points[i];
+								ctx.arc(p[0], p[1], 2, 0, Math.PI*2);
+								ctx.stroke();
+							}
+							ctx.beginPath();
+							ctx.moveTo(start_point[0], start_point[1]);
+							for(var i = 0, j = mid_points.length; i<j; i++){
+								var p = mid_points[i];
+								ctx.lineTo(p[0], p[1]);
+								ctx.arc(mid_x, mid_y, _width, 0, Math.PI);
+							}
+
+							var mid_x = (start_point[0] - end_point[0])/2,
+								mid_y = (start_point[1] - end_point[1])/2;
+							if(code == 3){	//冷锋
+								if(mid_x == 0){
+									var to_point = [start_point[0] - _width, mid_y];
+								}else{
+									var radiu = Math.atan(mid_y/mid_x);
+									var to_point = [mid_x - _width*Math.sin(radiu), mid_y - Math.cos(radiu)];
+								}
+
+								console.log(start_point, mid_points, end_point);
+								ctx.lineTo(to_point[0], to_point[1]);
+							}else if(code == 2){ //暖锋
+								ctx.arc(mid_x, mid_y, _width, 0, Math.PI);
+							}else if(code == 38){	//霜冻线
+
+							}
+							ctx.closePath();
+							ctx.fill();
+							start_point = end_point = null;
+							mid_points = [];
+							i += _space_point;
+						}
+					}
+				}
+				ctx.restore();
+			}
+		}
+	}
+	util.inherits(GeoMapPolyline, BrokenLine);
 
 	GeoMap.Point = function(lng,lat,is_not_lnglat){
 		this.lng = lng;
@@ -718,13 +816,9 @@ define('GeoMap',['zrender',
 		_drawPointList.call(this,map);
 		return this.shape;
 	}
-	GeoMap.Polygon.prototype.isCover = function(){
-		return true;
-	}
-
-	GeoMap.Polyline = function(Points,	options){
+	GeoMap.Polyline = function(Points,	options, special_options){
 		this.points = Points;
-		this.shape = new BrokenLine($.extend(true,{
+		this.shape = new GeoMapPolyline($.extend(true,{
 			style: {
 				brushType : 'both',
 		        lineWidth : 1,
@@ -734,14 +828,11 @@ define('GeoMap',['zrender',
 			needTransform: true,
 			needLocalTransform: true,
 			hoverable: false
-		},options));
+		},options), $.extend({width: 20, space_point: 10}, special_options));
 	}
 	GeoMap.Polyline.prototype.draw = function(map){
 		_drawPointList.call(this, map);
 		return this.shape;
-	}
-	GeoMap.Polyline.prototype.isCover = function(){
-		return true;
 	}
 	GeoMap.Text = function(text, attr_style, padding, option){
 		padding || (padding = [0, 0, 0, 0]);
