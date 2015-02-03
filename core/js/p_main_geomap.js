@@ -342,7 +342,12 @@ Core.safe(function(){
 				// 14类中的特殊线，如冷锋、暖锋
 				var line_symbols = data.line_symbols;
 				if(line_symbols){
-					$.each(line_symbols,function(i,v){
+					var color_symbols = {
+						2: 'blue',
+						3: 'red',
+						38: 'red'
+					};
+					$.each(line_symbols,function(i, v){
 						if(v.code == 0){
 							return;
 						}
@@ -351,12 +356,22 @@ Core.safe(function(){
 							var point = new GeoMap.Point(v_v.x, v_v.y);
 							point_arr.push(point);
 						});
+						var option = {
+							code: v.code,
+							width: 20, //线上标识图形的大小（如暖锋大小）
+							space_point: 10 //两个线上标识图形的间隔经纬度点数
+						};
+						if(v.code == 38){
+							option.width = 10;
+							option.space_point = 8;
+						}
 						var polyline = new GeoMap.Polyline(point_arr,{
 							style: {
-								strokeColor : 'blue',
+								strokeColor : color_symbols[v.code],
 								lineWidth : 2,
-							}
-						});
+							},
+							zlevel: 10
+						}, option);
 						gm.addOverlay(polyline);   //增加折线
 					});
 				}
@@ -667,7 +682,7 @@ Core.safe(function(){
 								if(file_newest){
 									Timer.start('read micaps');
 									file_util.micaps.getData(file_newest, function(err, data){
-										console.log(err, data);
+										// console.log(err, data);
 										Timer.end('read micaps');
 										if(err){
 											alert(err.msg || '读取数据错误！');
