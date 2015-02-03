@@ -361,34 +361,34 @@ Core.safe(function(){
 					});
 				}
 				// 14类中的普通线
-				// var lines = data.lines;
-				// if(lines){
-				// 	$.each(lines, function(i, line){
-				// 		var point_arr = [];
-				// 		var points = line.point;
-				// 		if(points.length >= 2){
-				// 			$.each(points,function(p_i, p_v){
-				// 				var point = new GeoMap.Point(p_v.x, p_v.y);
-				// 				point_arr.push(point);
-				// 			});
-				// 			var polyline = new GeoMap.Polyline(point_arr,{
-				// 				style: {
-				// 					strokeColor : '#1010FF',
-				// 					lineWidth : 2,
-				// 				},
-				// 				zlevel: 10
-				// 			});
-				// 			gm.addOverlay(polyline);   //增加折线
-				// 		}
-				// 		var flags = line.flags;
-				// 		if(flags && flags.items && flags.items.length > 0){
-				// 			var text = flags.text;
-				// 			$.each(flags.items,function(i,v){
-				// 				gm.addOverlay(new GeoMap.Text(text, 'left:'+v.x+'px;top:'+v.y+'px;font-size: 12px'));
-				// 			});
-				// 		}
-				// 	});
-				// }
+				var lines = data.lines;
+				if(lines){
+					$.each(lines, function(i, line){
+						var point_arr = [];
+						var points = line.point;
+						if(points.length >= 2){
+							$.each(points,function(p_i, p_v){
+								var point = new GeoMap.Point(p_v.x, p_v.y);
+								point_arr.push(point);
+							});
+							var polyline = new GeoMap.Polyline(point_arr,{
+								style: {
+									strokeColor : '#1010FF',
+									lineWidth : 2,
+								},
+								zlevel: 10
+							});
+							gm.addOverlay(polyline);   //增加折线
+						}
+						var flags = line.flags;
+						if(flags && flags.items && flags.items.length > 0){
+							var text = flags.text;
+							$.each(flags.items,function(i,v){
+								gm.addOverlay(new GeoMap.Text(text, 'left:'+v.x+'px;top:'+v.y+'px;font-size: 12px'));
+							});
+						}
+					});
+				}
 				var symbols = data.symbols;
 				if(symbols){
 					$.each(symbols, function(i, v){
@@ -410,7 +410,8 @@ Core.safe(function(){
 							pos: {
 								x: v.x,
 								y: v.y
-							}
+							},
+							zlevel: GeoMap.ZLEVEL.NOCLIP
 						});
 						gm.addOverlay(textShape);
 					});
@@ -458,7 +459,8 @@ Core.safe(function(){
 					gm.refresh();
 				}
 				$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
-					if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
+					// if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
+					if(product_name){
 						Loading.show(function(){
 							$('.map_layer').remove();
 							gm.clearLayers();

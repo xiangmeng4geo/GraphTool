@@ -304,7 +304,7 @@ Core.safe(function(){
 								'<td><input type="checkbox" '+(v.is_checked?'checked':'')+'/></td>'+
 								'<td><input type="color" value="'+v.color+'"/></td>'+
 								'<td><input type="color" value="'+text_color+'"/></td>'+
-								'<td>'+(v.val[0] == Number.MIN_VALUE?'':v.val[0])+'~'+(v.val[1] == Number.MAX_VALUE?'':v.val[1])+'</td>'+
+								'<td contentEditable="true">'+(v.val[0] == Number.MIN_VALUE?'':v.val[0])+'~'+(v.val[1] == Number.MAX_VALUE?'':v.val[1])+'</td>'+
 								'<td contentEditable="true" class="no_outline">'+v.text+'</td>'+
 							'</tr>'
 		});

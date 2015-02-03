@@ -11,7 +11,8 @@ define('GeoMap',['zrender',
 		Timer = Logger.Timer;
 
 	var ZINDEX_MAP = 2,
-		ZINDEX_LAYER = 1;
+		ZINDEX_LAYER = 1,
+		ZINDEX_NO_CLIP = 0;
 
 	// retina 屏幕优化
     var devicePixelRatio = window.devicePixelRatio || 1;
@@ -173,6 +174,11 @@ define('GeoMap',['zrender',
 	};
 	GeoMap.PROJECT_MERCATOR = 'mercator';
 	GeoMap.PROJECT_ALBERS = 'albers';
+	GeoMap.ZLEVEL = {
+		MAP: ZINDEX_MAP,
+		LAYER: ZINDEX_LAYER,
+		NOCLIP: ZINDEX_NO_CLIP
+	};
 	var GeoMapProp = GeoMap.prototype;
 	/*地图拖拽*/
 	GeoMapProp.draggable = function(option){
@@ -435,7 +441,7 @@ define('GeoMap',['zrender',
 		var temp_layer;
 		while(temp_layer = overlays.shift()){
 			var shape = temp_layer.shape;
-			if(shape.zlevel == ZINDEX_LAYER){
+			if(shape.zlevel != ZINDEX_MAP){
 				canvas.delShape(shape.id);
 			}else{
 				new_overlays.push(temp_layer);
@@ -547,12 +553,12 @@ define('GeoMap',['zrender',
 
 	    _doclip.call(_this,ctx);
 	    var shapeList = _this.canvas.storage.getShapeList();
-	    var geoShapes = [];
+	    var noclipShapes = [];
 	    $.each(shapeList, function(i, shape){
 	    	if(shape.zlevel == ZINDEX_LAYER){
 	    		_drawShape(ctx, shape);
 	    	}else{
-	    		geoShapes.push(shape);
+	    		noclipShapes.push(shape);
 	    	}
 	    });
 	    var layer_data = maskImageDom.toDataURL();
@@ -577,7 +583,7 @@ define('GeoMap',['zrender',
 	    img.src = layer_data;
 	    ctx.drawImage(img, 0, 0);
 
-	    $.each(geoShapes, function(i, shape){
+	    $.each(noclipShapes, function(i, shape){
 	    	_drawShape(ctx, shape);
 	    });
 
