@@ -702,8 +702,8 @@ define('GeoMap',['zrender',
 											C = x0*x0 + y0*y0 + b*b - 2*b*y0 - _width2;
 										var a1 = -B/2*A,
 											a2 = Math.sqrt(B*B - 4*A*C)/2*A;
-										// console.log(x1, y1, x2, y2, x0, y0, a1, a2, 'k = '+k, 'b = '+b, 'x00 = '+((-B+Math.sqrt(B*B-4*A*C))/2*A), 'x01 = '+((-B-Math.sqrt(B*B-4*A*C))/2*A));
-										((-B+Math.sqrt(B*B-4*A*C))/2*A)
+										console.log('x1 = '+x1, 'y1 = '+y1, 'x2 = '+x2, 'y2 = '+y2, 'x0 = '+x0, 'y0 = '+y0, 'k = '+k, 'b = '+b, 'x00 = '+((-B+Math.sqrt(B*B-4*A*C))/2*A), 'x01 = '+((-B-Math.sqrt(B*B-4*A*C))/2*A));
+										// ((-B+Math.sqrt(B*B-4*A*C))/2*A)
 										if(a2){
 											var min_x = Math.min(x1, x2),
 												max_x = Math.max(x1, x2);
