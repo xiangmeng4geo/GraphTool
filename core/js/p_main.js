@@ -178,10 +178,22 @@
 		var menu_tree = new Menu();
 		if(is_admin){
 			var menu_manage = new Menu();
+			var menu_manage_update = new MenuItem({ label: '修改' });
 			var menu_manage_add = new MenuItem({ label: '添加' });
-			menu_manage_add.on('click',Page.addProduct);
 			var menu_manage_delete = new MenuItem({ label: '删除' });
+
+			menu_manage_update.on('click', function(){
+				var win_addproduct = Page.addProduct(function(){
+					console.log('modify', ConstMsgType.ADD_PRODUCT);
+					CoreWindow.sendMsg(ConstMsgType.ADD_PRODUCT, {
+						name: contextmenu_item.text 
+					}, win_addproduct.window);
+				});
+			});
+			menu_manage_add.on('click',Page.addProduct);
 			menu_manage_delete.on('click',deleteCurrentItem);
+
+			menu_manage.append(menu_manage_update);
 			menu_manage.append(menu_manage_add);
 			menu_manage.append(menu_manage_delete);
 			menu_tree.append(new MenuItem({ label: '管理', submenu: menu_manage }));

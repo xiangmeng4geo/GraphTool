@@ -47,13 +47,22 @@
 		<script type="text/javascript" src="./js/libs/j.js"></script>
 		<script type="text/javascript" src="./js/core.js"></script>
 		<script type="text/javascript">
-		Core.safe(function(){
-			var CoreWindow = Core.Window;
-			function send(type,data){
-				CoreWindow.sendMsg(type,data,opener);
-			}
+		Core.safe(function(){Core.Window.get().showDevTools();	
 			var $product_type = $('#product_type'),
 				$product_name = $('#product_name');
+			var CoreWindow = Core.Window;
+			CoreWindow.onMessage(function(e){console.log(e);
+				var data = e.data;
+				var type = data.type;debugger;
+				if(Core.Const.msgType.ADD_PRODUCT == type){
+					if(data.name){
+						$product_name.val(data.name);
+					}
+				}
+			}, true);
+			function send(type, data){
+				CoreWindow.sendMsg(type, data, opener);
+			}
 
 			var productType = Core.Const.productType;
 			for(var i in productType){
@@ -78,9 +87,6 @@
 			var $btn_cancel = $('#btn_cancel').click(function(){
 				CoreWindow.close();
 			})
-			// setTimeout(function(){
-			// 	Core.Window.sendMsg.call(opener,'hello from add product');
-			// },2000);
 		});
 		</script>
 	</body>

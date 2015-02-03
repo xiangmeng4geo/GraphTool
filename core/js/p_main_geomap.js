@@ -667,6 +667,7 @@ Core.safe(function(){
 								if(file_newest){
 									Timer.start('read micaps');
 									file_util.micaps.getData(file_newest, function(err, data){
+										console.log(err, data);
 										Timer.end('read micaps');
 										if(err){
 											alert(err.msg || '读取数据错误！');
@@ -803,7 +804,7 @@ Core.safe(function(){
 						style = $this.attr('style');
 
 					var win_textstyle = Core.Page.textStyle(function(e){
-						CoreWindow.sendMsg(ConstMsgType.CONF_STYLE,{
+						CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
 							text: text,
 							style: style
 						},win_textstyle.window);

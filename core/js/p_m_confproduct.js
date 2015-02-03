@@ -404,11 +404,15 @@ Core.safe(function(){
 			$this.find('tr').each(function(tr_i,tr_v){
 				var $td = $(tr_v).find('td');
 				if($td.length == 5){
+					var val_arr = $td.eq(3).text().split('~');
+					val_arr.forEach(function(v, i){
+						val_arr[i] = v != ''? parseFloat(v): v
+					});
 					colors.push({
 						'is_checked': $td.eq(0).find('input').prop('checked'),
 						'color': $td.eq(1).find('input').val(),
 						'color_text': $td.eq(2).find('input').val(),
-						'val': $td.eq(3).text().split('~'),
+						'val': val_arr,
 						'text': $td.eq(4).text()
 					});
 				}
