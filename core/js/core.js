@@ -68,17 +68,17 @@
 	Date.prototype.format = function(format,is_not_second){
 		format || (format = 'yyyy-MM-dd hh:mm:ss');
 		var o = {
-			"M+" : this.getMonth()+1, //month
-			"d+" : this.getDate(),    //day
-			"h+" : this.getHours(),   //hour
-			"m+" : this.getMinutes(), //minute
-			"q+" : Math.floor((this.getMonth()+3)/3),  //quarter
+			"M{2}" : this.getMonth()+1, //month
+			"d{2}" : this.getDate(),    //day
+			"h{2}" : this.getHours(),   //hour
+			"m{2}" : this.getMinutes(), //minute
+			"q{2}" : Math.floor((this.getMonth()+3)/3),  //quarter
 		}
 		if(!is_not_second){
-			o["s+"] = this.getSeconds(); //second
-			o["S"] = this.getMilliseconds() //millisecond
+			o["s{2}"] = this.getSeconds(); //second
+			o["S{2}"] = this.getMilliseconds() //millisecond
 		}
-		if(/(y+)/.test(format)){
+		if(/(y{4}|y{2})/.test(format)){
 			format = format.replace(RegExp.$1,(this.getFullYear()+"").substr(4 - RegExp.$1.length));
 		} 
 		for(var k in o){
