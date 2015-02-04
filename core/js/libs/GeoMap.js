@@ -1069,8 +1069,8 @@ define('GeoMap',['zrender',
 	                    var pixel10 = _get_pixel(i+1, j);
 	                    var pixel01 = _get_pixel(i, j+1);
 	                    var pixel11 = _get_pixel(i+1, j+1);
-	                    for(var p_x = Math.floor(pixel00.x), p_e_x = Math.ceil(pixel10.x); p_x < p_e_x && p_x <= pixel_x_end; p_x++){
-	                        for(var p_y = Math.ceil(pixel00.y), p_e_y = Math.floor(pixel01.y); p_y > p_e_y && p_y >= pixel_y_end; p_y--){
+	                    for(var p_x = Math.floor(pixel00.x)+1, p_e_x = Math.ceil(pixel10.x); p_x < p_e_x && p_x <= pixel_x_end; p_x++){
+	                        for(var p_y = Math.ceil(pixel00.y)+1, p_e_y = Math.floor(pixel01.y); p_y > p_e_y && p_y >= pixel_y_end; p_y--){
 	                            var color = _get_pixel_color(p_x, p_y, pixel01, pixel11, pixel00, pixel10);
 	                            _set_rgba(p_x, p_y, color);
 	                        }

@@ -696,6 +696,7 @@ Core.safe(function(){
 									Timer.start('read micaps');
 									var conf_interpolation = conf_other.interpolation;
 									file_util.micaps.getData(file_newest, {
+										grid_space: 0.1,
 										interpolation_all: conf_interpolation && conf_interpolation.flag //传入micaps解析需要参数
 									}, function(err, data){
 										// console.log(err, data);
