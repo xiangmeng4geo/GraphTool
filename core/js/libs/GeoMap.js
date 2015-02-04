@@ -876,7 +876,7 @@ define('GeoMap',['zrender',
 		}
 		var style = {
 			text: text,
-			brushType : 'both',
+			brushType : 'fill',
 	        textAlign : 'left',
 	        textBaseline : 'top'
 		};
