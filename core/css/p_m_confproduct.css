@@ -48,13 +48,18 @@
 	overflow: auto;
 }
 #c_bottom>fieldset{
-	width: 90%;
+	width: 94%;
 	margin: 0 auto;
+	display: none;
+	border: none;
+}
+#c_bottom>fieldset legend{
 	display: none;
 }
 #c_bottom>fieldset.on{
 	display: block;
 }
+
 fieldset {
 	padding:10px;
 	margin:10px;
@@ -195,4 +200,7 @@ fieldset {
 }
 [contentEditable]:focus{
 	background-color: white;
-};
+}
+#text_out_filename{
+	width: 400px;
+}

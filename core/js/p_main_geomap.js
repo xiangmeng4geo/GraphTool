@@ -694,7 +694,10 @@ Core.safe(function(){
 								// console.log(file_newest, param);
 								if(file_newest){
 									Timer.start('read micaps');
-									file_util.micaps.getData(file_newest, function(err, data){
+									var conf_interpolation = conf_other.interpolation;
+									file_util.micaps.getData(file_newest, {
+										interpolation_all: conf_interpolation && conf_interpolation.flag //传入micaps解析需要参数
+									}, function(err, data){
 										// console.log(err, data);
 										Timer.end('read micaps');
 										if(err){
@@ -904,7 +907,12 @@ Core.safe(function(){
 	})();
 	
 	function _get_save_img_name(){
-		return conf_of_product.name+'_'+width_geomap+'x'+height_geomap+'.png';
+		var filename;
+		try{
+			filename = _replace_date(conf_of_product.in_out.out_filename);//优先使用用户自定义文件名
+		}catch(e){}
+
+		return filename || conf_of_product.name+'_'+width_geomap+'x'+height_geomap+'.png';
 	}
 	/*右侧地图的右键功能*/
 	var $geomap_container = $('#geomap_container');

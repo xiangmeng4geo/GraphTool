@@ -87,6 +87,11 @@
 					    		</div>
 					    	</div>
 					    </div>
+					    <div>
+					    	输出文件名:
+					    	<input type="text" id="text_out_filename" placeholder=""/>
+					    	<span></span>
+					    </div>
 					    <div class="mt10">
 					    	数据类型：
 					    	<select id="select_file_type">
@@ -153,12 +158,12 @@
 			    	</div>
 			    	<div class="mt10">
 						<input type="checkbox" id="cb_use_bgcolor"/>
-						<label>背景颜色</label>
+						<label for="cb_use_bgcolor">背景颜色</label>
 						<input type="color" id="color_bg" value="#ffffff"/>
 					</div>
 					<div class="mt10">
 						<input type="checkbox" id="cb_use_bgimg"/>
-						<label>背景图片</label>
+						<label for="cb_use_bgimg">背景图片</label>
 						<div class="file_directory" style="width: 603px;">
 				    		<input type="file" class="file_dir_nw" accept=".jpg,.png,.bmp"/>
 				    		<div>
@@ -166,6 +171,10 @@
 					    		<input type="button" value="浏览" class="file_dir"/>
 				    		</div>
 				    	</div>
+					</div>
+					<div class="mt10">
+						<input type="checkbox" id="cb_interpolation_all"/>
+						<label for="cb_interpolation_all" title="只有3类数据会进行插值" style="width:150px;cursor:help">是否进地全部插值</label>
 					</div>
 				</fieldset>
 			</div>

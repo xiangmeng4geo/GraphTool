@@ -1,5 +1,7 @@
 Core.safe(function(){
-	var product_name = '';
+	var product_name = '',
+		map_width,
+		map_height;
 	var Conf_User = Core.Lib.conf.User;
 	var CoreWindow = Core.Window;
 	var const_msgtype = Core.Const.msgType;
@@ -54,8 +56,12 @@ Core.safe(function(){
 			}
 			current_textarea_title = null;
 		}else if(const_msgtype.CONF_PRODUCT == type){
-			product_name = data.data;
-			if(product_name){
+			data = data.data;
+			if(data){
+				product_name = data.name;
+				map_width = data.width;
+				map_height = data.height;
+
 				$('title').text(product_name);
 				var conf_product = Conf_User.get(product_name);
 				init(conf_product)
@@ -82,7 +88,8 @@ Core.safe(function(){
 		$select_file_type = $('#select_file_type'),
 		$select_file_hour = $('#select_file_hour'),
 		$cb_use_bgcolor = $('#cb_use_bgcolor'),
-		$cb_use_bgimg = $('#cb_use_bgimg');
+		$cb_use_bgimg = $('#cb_use_bgimg'),
+		$cb_interpolation_all = $('#cb_interpolation_all');
 	/*初始化文件选定*/
 	!function(){
 		var const_file_rule = Core.Const.fileRule,
@@ -325,7 +332,8 @@ Core.safe(function(){
 		$text_file_logo = $('#text_file_logo'),
 		$color_bg = $('#color_bg'),
 		$fieldset_legend = $('#fieldset_legend'),
-		$text_file_bgimg = $('#text_file_bgimg');
+		$text_file_bgimg = $('#text_file_bgimg'),
+		$text_out_filename = $('#text_out_filename');
 
 	$('#btn_cancel').click(CoreWindow.close);
 	$('#btn_save').click(function(){
@@ -350,7 +358,8 @@ Core.safe(function(){
 					'type': $('[name=file_rule]:checked').val(),
 					'file_type': $select_file_type.val(),
 					'file_hour': parseInt($select_file_hour.val()) || 0
-				}
+				},
+				'out_filename': $text_out_filename.val()
 			},
 			'title': {
 				'title_1': {
@@ -385,6 +394,9 @@ Core.safe(function(){
 				'bg_color': {
 					'val': $color_bg.val(),
 					'flag': $cb_use_bgcolor.prop('checked')
+				},
+				'interpolation': {
+					'flag': $cb_interpolation_all.prop('checked')
 				}
 			}
 		};
@@ -461,6 +473,9 @@ Core.safe(function(){
 
 				selected_option($select_file_type, file_rule.file_type);
 				selected_option($select_file_hour, file_rule.file_hour);
+
+				var filename = conf_in_out.out_filename || product_name+'_'+map_width+'x'+map_height+'.png';
+				$text_out_filename.val(filename);
 			}
 			var conf_title = conf_product.title;
 			if(conf_title){
@@ -532,6 +547,10 @@ Core.safe(function(){
 				if(conf_bgimg){
 					$text_file_bgimg.val(conf_bgimg.val);
 					$cb_use_bgimg.prop('checked', conf_bgimg.flag);
+				}
+				var conf_interpolation = conf_other.interpolation;
+				if(conf_interpolation){
+					$cb_interpolation_all.prop('checked', conf_interpolation.flag);
 				}
 			}
 		}

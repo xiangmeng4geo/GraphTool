@@ -203,10 +203,15 @@
 			menu_tree.append(new MenuItem({ type: 'separator' }));
 		}
 
+		var $geomap = $('#geomap');
 		var menu_conf = new MenuItem({ label: '产品配置' });
 		menu_conf.on('click',function(){
 			var win_confproduct = Page.confProduct(function(){
-				CoreWindow.sendMsg(ConstMsgType.CONF_PRODUCT,contextmenu_item.text,win_confproduct.window);
+				CoreWindow.sendMsg(ConstMsgType.CONF_PRODUCT, {
+					name: contextmenu_item.text,
+					width: $geomap.width(),
+					height: $geomap.height()
+				}, win_confproduct.window);
 			});
 		});
 		menu_tree.append(menu_conf);
