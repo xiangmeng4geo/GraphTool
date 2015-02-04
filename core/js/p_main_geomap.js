@@ -460,9 +460,9 @@ Core.safe(function(){
 					if(conf_title && conf_title.is_show){
 						var text = conf_title.text;
 						if(text){
-							MapLayer.text({
+							return MapLayer.text({
 								position: pos,
-								text: text,
+								text: _replace_date(text),
 								style: conf_title.style
 							}).appendTo($geomap_layer);
 						}
@@ -518,14 +518,15 @@ Core.safe(function(){
 							}
 							
 							var conf_title = conf_of_product.title;
-							addTitle(conf_title.title_1, {
+							var $html_title1 = addTitle(conf_title.title_1, {
 								left: 110,
 								top: 20
 							});
-							addTitle(conf_title.title_2, {
+							var $html_title2 = addTitle(conf_title.title_2, {
 								left: 110,
 								top: 80
 							});
+							var $html_title3;
 
 							var conf_legend = conf_of_product.legend;
 							var is_show_legend = conf_legend.is_show_legend,
@@ -551,7 +552,7 @@ Core.safe(function(){
 									}
 								}
 								
-								addTitle(_title_3, pos);
+								$html_title3 = addTitle(_title_3, pos);
 							}
 							
 							var _width = $geomap_layer.width();
@@ -689,6 +690,15 @@ Core.safe(function(){
 										}else{
 											data_of_micaps = data;
 											render_conf(data_of_micaps, conf_of_product.legend.blendent);
+											$html_title1 && $html_title1.find('span').text(function(){
+												return _replace_date($(this).text());
+											});
+											$html_title2 && $html_title2.find('span').text(function(){
+												return _replace_date($(this).text());
+											});
+											$html_title3 && $html_title3.find('span').text(function(){
+												return _replace_date($(this).text());
+											});
 										}
 										_afterRender()
 									});
