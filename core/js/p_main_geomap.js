@@ -206,6 +206,24 @@ Core.safe(function(){
 			});
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
+				console.log({
+						x: 0,
+						y: 0,
+						width: width_geomap,
+						height: height_geomap,
+						color: conf_export.bgcolor || '#ffffff'
+					});
+				gm.clearLayers();
+				gm.addOverlay(new GeoMap.Rectangle({
+					style: {
+						x: 0,
+						y: 0,
+						width: width_geomap,
+						height: height_geomap,
+						color: conf_export.bgcolor || '#ffffff'
+					}
+				}));
+
 				for(var i = 0, j = blendent.length; i < j; i++){
 					var colors = blendent[i].colors;
 					for(var i_c = 0, j_c = colors.length; i_c < j_c; i_c++){
@@ -490,7 +508,6 @@ Core.safe(function(){
 					if(product_name){
 						Loading.show(function(){
 							$('.map_layer').remove();
-							gm.clearLayers();
 							conf_of_product = ConfUser.get(product_name);
 
 							if(!conf_of_product){

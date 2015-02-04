@@ -5,7 +5,8 @@ define('GeoMap',['zrender',
 	'zrender/tool/util',
 	'zrender/shape/Text',
 	'zrender/shape/Image',
-	'zrender/tool/area'],function(Zrender,Base,Polygon,BrokenLine,util,TextShape,ImageShape,util_area){
+	'zrender/shape/Rectangle',
+	'zrender/tool/area'],function(Zrender,Base,Polygon,BrokenLine,util,TextShape,ImageShape,Rectangle,util_area){
 
 	var Logger = Core.util.Logger,
 		Timer = Logger.Timer;
@@ -963,7 +964,14 @@ define('GeoMap',['zrender',
 	GeoMap.Image.prototype.draw = function(map){
 		return this.shape;
 	}
-
+	GeoMap.Rectangle = function(options){
+		this.shape = new Rectangle($.extend(options,{
+			zlevel: ZINDEX_LAYER,
+		}));
+	}
+	GeoMap.Rectangle.prototype.draw = function(map){
+		return this.shape;
+	}
 	// 渲染插值后的结果
 	/*格点数组
 	[
