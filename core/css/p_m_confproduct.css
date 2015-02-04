@@ -53,7 +53,7 @@
 	display: none;
 	border: none;
 }
-#c_bottom>fieldset legend{
+#c_bottom>fieldset>legend{
 	display: none;
 }
 #c_bottom>fieldset.on{
@@ -161,7 +161,7 @@ fieldset {
 	margin-left: 26px;
 }
 #number_newest_days{
-	width: 30px;
+	width: 40px;
 }
 
 #fieldset_legend table{

@@ -1,4 +1,7 @@
 Core.safe(function(){
+	var MAX_VAL = 99999,
+		MIN_VAL = -9999;
+
 	var product_name = '',
 		map_width,
 		map_height;
@@ -276,13 +279,13 @@ Core.safe(function(){
 		for(var i = 0;i<level_color;i++){
 			var color = color_toHTML('rgb('+[start_r+cha_r*i,start_g+cha_g*i,start_b+cha_b*i]+')');
 			if(i == 0){
-				var val = [Number.MIN_VALUE,format_number(start_val)],
+				var val = [MIN_VAL, format_number(start_val)],
 					text = '<'+val[1];
 			}else if(i == level_color - 1){
-				var val = [format_number(start_val+cha_val*(i-1)),Number.MAX_VALUE],
+				var val = [format_number(start_val+cha_val*(i-1)), MAX_VAL],
 					text = val[0]+'≤';
 			}else{
-				var val = [format_number(start_val+cha_val*(i-1)),format_number(start_val+cha_val*i)],
+				var val = [format_number(start_val+cha_val*(i-1)), format_number(start_val+cha_val*i)],
 					text = val[0]+'-'+val[1];
 					// text = '≤'+val[0]+'<'+val[1];
 			}
@@ -311,7 +314,7 @@ Core.safe(function(){
 								'<td><input type="checkbox" '+(v.is_checked?'checked':'')+'/></td>'+
 								'<td><input type="color" value="'+v.color+'"/></td>'+
 								'<td><input type="color" value="'+text_color+'"/></td>'+
-								'<td contentEditable="true">'+(v.val[0] == Number.MIN_VALUE?'':v.val[0])+'~'+(v.val[1] == Number.MAX_VALUE?'':v.val[1])+'</td>'+
+								'<td contentEditable="true">'+v.val[0]+'~'+v.val[1]+'</td>'+
 								'<td contentEditable="true" class="no_outline">'+v.text+'</td>'+
 							'</tr>'
 		});
@@ -513,16 +516,9 @@ Core.safe(function(){
 					var colors = v.colors;
 					if(colors && colors.length > 0){
 						colors.sort(function(a, b){
-							var v_a = a.val[0],
-								v_b = b.val[0];
-							if(v_a == ''){
-								v_a = Number.NEGATIVE_INFINITY;
-							}
-							if(v_b == ''){
-								v_b = Number.NEGATIVE_INFINITY;
-							}
-							return Number(v_a) > Number(v_b);
+							return a.val[0] > b.val[0]? 1: -1;
 						});
+						console.log(colors);
 						$html_fieldset_color.find('.legend_value').append(getTable(colors));
 					}
 					$legend_left.append($html_fieldset_color);

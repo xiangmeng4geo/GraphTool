@@ -1060,7 +1060,7 @@ define('GeoMap',['zrender',
 				        _data[index] = color[0];
 				        _data[index + 1] = color[1];
 				        _data[index + 2] = color[2];
-				        _data[index + 3] = color[3] || 255;
+				        _data[index + 3] = color[3];
 			        }
 			    }
 	            for(var i = 0; i < width; i++){
