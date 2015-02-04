@@ -51,12 +51,17 @@
 			var $product_type = $('#product_type'),
 				$product_name = $('#product_name');
 			var CoreWindow = Core.Window;
+			var flag_is_modify = false;
 			CoreWindow.onMessage(function(e){console.log(e);
 				var data = e.data;
-				var type = data.type;debugger;
+				var type = data.type;
 				if(Core.Const.msgType.ADD_PRODUCT == type){
+					data = data.data;
 					if(data.name){
+						flag_is_modify = true;
 						$product_name.val(data.name);
+						$('#btn_add').val('修改');
+						document.title = '修改产品';
 					}
 				}
 			}, true);
@@ -76,6 +81,7 @@
 				}
 				
 				send(Core.Const.msgType.ADD_PRODUCT,{
+					is_modify: flag_is_modify,
 					type: $product_type.val(),
 					name: product_name
 				});

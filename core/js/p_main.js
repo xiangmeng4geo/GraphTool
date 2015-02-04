@@ -154,10 +154,14 @@
 					name: d_name
 				};
 				if(operate_item){
-					if(!operate_item.childNodes){
-						operate_item.childNodes = [];
+					if(is_modify){
+
+					}else{
+						if(!operate_item.childNodes){
+							operate_item.childNodes = [];
+						}
+						operate_item.childNodes.push(add_item);
 					}
-					operate_item.childNodes.push(add_item);
 				}else{
 					if(!tree_data){
 						tree_data = [];
@@ -184,7 +188,6 @@
 
 			menu_manage_update.on('click', function(){
 				var win_addproduct = Page.addProduct(function(){
-					console.log('modify', ConstMsgType.ADD_PRODUCT);
 					CoreWindow.sendMsg(ConstMsgType.ADD_PRODUCT, {
 						name: contextmenu_item.text 
 					}, win_addproduct.window);

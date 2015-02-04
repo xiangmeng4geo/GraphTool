@@ -206,6 +206,18 @@ Core.safe(function(){
 			});
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
+				for(var i = 0, j = blendent.length; i < j; i++){
+					var colors = blendent[i].colors;
+					for(var i_c = 0, j_c = colors.length; i_c < j_c; i_c++){
+						var range = colors[i_c].val;
+						if(range[0] === ''){
+							range[0] = Number.NEGATIVE_INFINITY;
+						}
+						if(range[1] === ''){
+							range[1] = Number.POSITIVE_INFINITY;
+						}
+					}
+				}
 				Timer.start('render micaps');
 				var isHaveManyBlendent = blendent.length > 1;
 				function getColorByCondition(val, range){
