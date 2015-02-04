@@ -47,12 +47,12 @@
 		<script type="text/javascript" src="./js/libs/j.js"></script>
 		<script type="text/javascript" src="./js/core.js"></script>
 		<script type="text/javascript">
-		Core.safe(function(){Core.Window.get().showDevTools();	
+		Core.safe(function(){
 			var $product_type = $('#product_type'),
 				$product_name = $('#product_name');
 			var CoreWindow = Core.Window;
 			var flag_is_modify = false;
-			CoreWindow.onMessage(function(e){console.log(e);
+			CoreWindow.onMessage(function(e){
 				var data = e.data;
 				var type = data.type;
 				if(Core.Const.msgType.ADD_PRODUCT == type){

@@ -154,8 +154,8 @@
 					name: d_name
 				};
 				if(operate_item){
-					if(is_modify){
-
+					if(data.is_modify){
+						operate_item.name = d_name;
 					}else{
 						if(!operate_item.childNodes){
 							operate_item.childNodes = [];
