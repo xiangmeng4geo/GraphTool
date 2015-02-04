@@ -196,8 +196,8 @@
 			menu_manage_add.on('click',Page.addProduct);
 			menu_manage_delete.on('click',deleteCurrentItem);
 
-			menu_manage.append(menu_manage_update);
 			menu_manage.append(menu_manage_add);
+			menu_manage.append(menu_manage_update);
 			menu_manage.append(menu_manage_delete);
 			menu_tree.append(new MenuItem({ label: '管理', submenu: menu_manage }));
 			menu_tree.append(new MenuItem({ type: 'separator' }));
