@@ -37,7 +37,7 @@
 				    "text" : v.name,
 				    "showcheck" : false,
 				    "complete" : true,
-				    "isexpand" : true,
+				    "isexpand" : false,
 				    "checkstate" : 0,
 				    "hasChildren" : is_hasChildren
 				};

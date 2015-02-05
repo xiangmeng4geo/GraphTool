@@ -276,3 +276,17 @@
 .bbit-tree-lines .bbit-tree-elbow-line.bbit-tree-elbow-line-end{
 	background: none;
 }
+
+
+/*重写树形菜单 ui2.0*/
+.bbit-tree-node a span{
+	color: #282828;
+}
+.bbit-tree-node-expanded .bbit-tree-node-icon,
+.bbit-tree-node-leaf .bbit-tree-node-icon,
+.bbit-tree-node-collapsed .bbit-tree-node-icon{
+	display: none;
+}
+.bbit-tree-node-expanded a{
+	/*background-color: red;*/
+}
