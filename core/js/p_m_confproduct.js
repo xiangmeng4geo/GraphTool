@@ -35,6 +35,7 @@ Core.safe(function(){
 		var blendent = _getBlendent();
 		if(blendent.length > 0){
 			file_util.write($(this).val(), JSON.stringify(blendent));
+			alert('配色方案导出成功！');
 		}else{
 			alert('暂时没有可导出的配色方案！');
 		}
