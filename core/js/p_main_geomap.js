@@ -206,7 +206,6 @@ Core.safe(function(){
 			});
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
-				gm.clearLayers();
 				// 添加背景色让地图不透明
 				gm.addOverlay(new GeoMap.Rectangle({
 					style: {
@@ -217,7 +216,7 @@ Core.safe(function(){
 						color: conf_export.bgcolor || '#ffffff'
 					}
 				}));
-
+				
 				for(var i = 0, j = blendent.length; i < j; i++){
 					var colors = blendent[i].colors;
 					for(var i_c = 0, j_c = colors.length; i_c < j_c; i_c++){
@@ -454,8 +453,12 @@ Core.safe(function(){
 				$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
 					// if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
 					if(product_name){
+						// 清空地图及样式
+						$('.map_layer').remove();
+						gm.clearLayers();
+						$geomap_container.removeAttr('style');
+
 						Loading.show(function(){
-							$('.map_layer').remove();
 							conf_of_product = ConfUser.get(product_name);
 							if(!conf_of_product || !conf_of_product.title || !conf_of_product.legend || !conf_of_product.in_out){
 								Loading.hide();
@@ -474,7 +477,7 @@ Core.safe(function(){
 
 							conf_export = {};
 							var bg_flag = false;
-							$geomap_container.removeAttr('style');
+							
 							var conf_bgimg = conf_other.bg_img;
 							if(conf_bgimg){
 								if(conf_bgimg.flag && conf_bgimg.val){
