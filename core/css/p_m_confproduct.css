@@ -195,6 +195,10 @@ fieldset {
 	float: left;
 	width: 80%;
 }
+.legend_right{
+	float: left;
+	width: 20%;
+}
 .btn_dele_lengend{
 	margin: 0 5px;
 }
@@ -203,4 +207,12 @@ fieldset {
 }
 #text_out_filename{
 	width: 400px;
+}
+.btns_legend_colors{
+	width: 100%;
+	text-align: center;
+}
+.btns_legend_colors input{
+	width: 130px;
+	margin: 3px 0;
 }

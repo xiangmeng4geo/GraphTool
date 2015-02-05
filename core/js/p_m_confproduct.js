@@ -5,7 +5,9 @@ Core.safe(function(){
 	var product_name = '',
 		map_width,
 		map_height;
-	var Conf_User = Core.Lib.conf.User;
+	var core_libs = Core.Lib;
+	var file_util = core_libs.util.file;
+	var Conf_User = core_libs.conf.User;
 	var CoreWindow = Core.Window;
 	var const_msgtype = Core.Const.msgType;
 	
@@ -28,6 +30,40 @@ Core.safe(function(){
 				style: current_textarea_title.attr('style')
 			},win_textstyle.window);
 		});
+	});
+	var $input_export_colors = $('<input type="file"/>').on('change',function(){
+		var blendent = _getBlendent();
+		if(blendent.length > 0){
+			file_util.write($(this).val(), JSON.stringify(blendent));
+		}else{
+			alert('暂时没有可导出的配色方案！');
+		}
+	});
+	var $input_import_colors = $('<input type="file"/>').on('change',function(){
+		var file_path = $(this).val();
+		var blendent = file_util.readFile(file_path, true);
+
+		$('.btn_dele_lengend').click();// 把原来数据还原
+
+		$.each(blendent, function(i, v){
+			var val = init_legend_product.add(v.val);
+			var $html = $(html_fieldset_color.replace('_N_',val.n)).data('val_c',val).appendTo($legend_left);
+			$html.find('.color_start').val(v.color_start);
+			$html.find('.color_end').val(v.color_end);
+			$html.find('.cb_is_stripe').prop('checked', v.is_stripe);
+			$html.find('.number_min').val(v.number_min);
+			$html.find('.number_max').val(v.number_max);
+			$html.find('.number_level').val(v.number_level);
+
+			$html.append(getTable(v.colors));
+		});
+
+	})
+	$('#bt_export_colors').click(function(){
+		$input_export_colors.click();
+	});
+	$('#bt_import_colors').click(function(){
+		$input_import_colors.click();
 	});
 
 	var $number_newest_days = $('#number_newest_days'),
@@ -66,8 +102,9 @@ Core.safe(function(){
 				map_height = data.height;
 
 				$('title').text(product_name);
+				$input_export_colors.attr('nwsaveas', product_name+'(配色方案).db');
 				var conf_product = Conf_User.get(product_name);
-				init(conf_product)
+				init(conf_product);
 			}
 		}
 	},true);
@@ -403,6 +440,14 @@ Core.safe(function(){
 				}
 			}
 		};
+		
+		save_data.legend.blendent = _getBlendent();
+
+		Conf_User.write(product_name,save_data,true);
+		CoreWindow.close();
+	});	
+	
+	function _getBlendent(){
 		var blendent = [];
 		$fieldset_legend.find('.fieldset_color').each(function(i,v){
 			var $this = $(this);
@@ -421,7 +466,7 @@ Core.safe(function(){
 				if($td.length == 5){
 					var val_arr = $td.eq(3).text().split('~');
 					val_arr.forEach(function(v, i){
-						val_arr[i] = v != ''? parseFloat(v): v
+						val_arr[i] = isNaN(v)? (i == 0?MIN_VAL:MAX_VAL) :parseFloat(v);
 					});
 					colors.push({
 						'is_checked': $td.eq(0).find('input').prop('checked'),
@@ -435,12 +480,8 @@ Core.safe(function(){
 			data.colors = colors;
 			blendent.push(data);
 		});
-		save_data.legend.blendent = blendent;
-
-		Conf_User.write(product_name,save_data,true);
-		CoreWindow.close();
-	});	
-
+		return blendent;
+	}
 	function init(conf_product){
 		function selected_option($select,val){
 			$select.find('option').each(function(i,v){
@@ -518,7 +559,6 @@ Core.safe(function(){
 						colors.sort(function(a, b){
 							return a.val[0] > b.val[0]? 1: -1;
 						});
-						console.log(colors);
 						$html_fieldset_color.find('.legend_value').append(getTable(colors));
 					}
 					$legend_left.append($html_fieldset_color);

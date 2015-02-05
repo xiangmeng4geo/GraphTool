@@ -133,16 +133,24 @@
 							<input type="button" value="添加" id="btn_add_new_legend"/>
 						</fieldset>
 					</div>
-					<fieldset>
-						<legend>其它设置</legend>
-						<label>单位</label>
-						<select id="select_legend_unit"></select>
-						<br/>
-						<input type="checkbox" checked id="cb_is_show_legend"/>图例显示<br/>
-						<input type="checkbox" checked id="cb_is_show_unit"/>单位显示<br/>
-						<input type="checkbox" id="cb_is_reverse"/>倒序显示<br/>
-						<input type="checkbox" checked id="cb_is_updown"/>上下显示
-					</fieldset>
+					<div class="legend_right">
+						<fieldset>
+							<legend>其它设置</legend>
+							<label>单位</label>
+							<select id="select_legend_unit"></select>
+							<br/>
+							<input type="checkbox" checked id="cb_is_show_legend"/>图例显示<br/>
+							<input type="checkbox" checked id="cb_is_show_unit"/>单位显示<br/>
+							<input type="checkbox" id="cb_is_reverse"/>倒序显示<br/>
+							<input type="checkbox" checked id="cb_is_updown"/>上下显示
+						</fieldset>
+
+						<div class="btns_legend_colors">
+							<input type="button" value="导入配色方案" id="bt_import_colors"/>
+							<input type="button" value="导出配色方案" id="bt_export_colors"/>
+						</div>
+					</div>
+					
 				</fieldset>
 				<fieldset id="other_setting">
 					<legend>其它设置</legend>
