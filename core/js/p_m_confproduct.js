@@ -340,10 +340,11 @@ Core.safe(function(){
 		var html_table = '<table>'+
 								'<tr>'+
 									'<th width="10%">状态</th>'+
-									'<th width="15%">颜色值</th>'+
-									'<th width="15%">文字颜色</th>'+
+									'<th width="12%">颜色值</th>'+
+									'<th width="12%">文字颜色</th>'+
 									'<th width="30%">值域</th>'+
 									'<th width="30%">显示文字</th>'+
+									'<th title="图例排列顺序\n从小到大排（图例倒序显示时从大到小）" class="cursor_help">顺序</th>'+
 								'</tr>';
 		$.each(color_arr,function(i,v){
 			var text_color = v.color_text || '#000';
@@ -353,6 +354,7 @@ Core.safe(function(){
 								'<td><input type="color" value="'+text_color+'"/></td>'+
 								'<td contentEditable="true">'+v.val[0]+'~'+v.val[1]+'</td>'+
 								'<td contentEditable="true" class="no_outline">'+v.text+'</td>'+
+								'<td><input type="number" value="'+(v.order||0)+'"/></td>'
 							'</tr>'
 		});
 		html_table += '</table>';
@@ -463,7 +465,7 @@ Core.safe(function(){
 			var colors = [];
 			$this.find('tr').each(function(tr_i,tr_v){
 				var $td = $(tr_v).find('td');
-				if($td.length == 5){
+				if($td.length > 0){
 					var val_arr = $td.eq(3).text().split('~');
 					val_arr.forEach(function(v, i){
 						val_arr[i] = isNaN(v)? (i == 0?MIN_VAL:MAX_VAL) :parseFloat(v);
@@ -473,7 +475,8 @@ Core.safe(function(){
 						'color': $td.eq(1).find('input').val(),
 						'color_text': $td.eq(2).find('input').val(),
 						'val': val_arr,
-						'text': $td.eq(4).text()
+						'text': $td.eq(4).text(),
+						'order': parseInt($td.eq(5).find('input').val())
 					});
 				}
 			});
