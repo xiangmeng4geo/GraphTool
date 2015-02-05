@@ -5,6 +5,8 @@
 		nwConf = nwCore.conf,
 		Page = Core.Page;
 
+	var ConfUser = Core.Lib.conf.User;
+		
 	var CoreWindow = Core.Window;
 	var Const = Core.Const,
 		ConstMsgType = Const.msgType,
@@ -140,6 +142,42 @@
 				updateProductTreeConf();
 			}
 		}
+		function _is_in_tree(name, tree){debugger;
+			if(tree){
+				if(tree.name == name){
+					return true;
+				}else{
+					var c = tree.childNodes;
+					if(c){
+						for(var i = 0, j = c.length; i < j; i++){
+							var t = c[i];
+							return _is_in_tree(name, t);
+						}
+					}
+				}
+			}
+		}
+		function _is_in_tree(name, tree){
+			if(tree){
+				for(var i = 0, j = tree.length; i < j; i++){
+					var node = tree[i];
+					// alert('name = '+name+', node.name = '+ node.name);
+					if(name == node.name){
+						return true;
+					}else{
+						var c = node.childNodes;
+						if(c && _is_in_tree(name, c)){
+							return true;
+						}
+					}
+				}
+			}
+		}
+		function _is_exists(pro_name){
+			if(_is_in_tree(pro_name, tree_data)){
+				return true;
+			}
+		}
 		/*和其它窗体进行通信*/
 		CoreWindow.onMessage(function(e){
 			var data = e.data;
@@ -154,13 +192,20 @@
 					name: d_name
 				};
 				if(operate_item){
-					if(data.is_modify){
-						operate_item.name = d_name;
+					if(_is_exists(d_name)){//Core.Lib.util.file.exists(ConfUser.getPath(d_name))
+						alert('名称为“'+d_name+'”的产品已经存在，添加会把以前配置文件覆盖,系统将放弃本次操作！');
 					}else{
-						if(!operate_item.childNodes){
-							operate_item.childNodes = [];
+						if(data.is_modify){
+							if(!operate_item.childNodes){
+								ConfUser.rename(operate_item.name, d_name); //重命名配置文件
+							}
+							operate_item.name = d_name;
+						}else{
+							if(!operate_item.childNodes){
+								operate_item.childNodes = [];
+							}
+							operate_item.childNodes.push(add_item);
 						}
-						operate_item.childNodes.push(add_item);
 					}
 				}else{
 					if(!tree_data){

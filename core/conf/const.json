@@ -19,7 +19,9 @@
 			"yyyyMMddhh",
 			"yyMMddhh",
 			"yyMMdd",
-			"MMddhh"
+			"yyMM",
+			"MMddhh",
+			"MMdd"
 		],
 		"file_postfix": [
 			"000","006","012","024","048","072","084","096","108","120","132","144","156","168","dat"

@@ -457,9 +457,8 @@ Core.safe(function(){
 						Loading.show(function(){
 							$('.map_layer').remove();
 							conf_of_product = ConfUser.get(product_name);
-
-							if(!conf_of_product){
-								loading.hide();
+							if(!conf_of_product || !conf_of_product.title || !conf_of_product.legend || !conf_of_product.in_out){
+								Loading.hide();
 								return alert('请对该产品进行配置！');
 							}
 							conf_of_product.name = product_name;
@@ -494,7 +493,7 @@ Core.safe(function(){
 								}
 							}
 							
-							var conf_title = conf_of_product.title;
+							var conf_title = conf_of_product.title || {};//当没有配置文件时title == undefined
 							var $html_title1 = addTitle(conf_title.title_1, {
 								left: 110,
 								top: 20
