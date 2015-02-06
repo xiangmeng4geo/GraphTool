@@ -32,18 +32,17 @@ Core.safe(function(){
 	var width_geomap = $geomap.width(),
 		height_geomap = $geomap.height();
 	// 替换标题里的时间
-	function _replace_date(text){
+	function _replace_date(text, is_use_publish_time){
 		if(!conf_of_product || !data_of_micaps){
 			return text;
 		}
-
 		var file_rule = conf_of_product.in_out.file_rule,
 			file_type = file_rule.file_type || ConstFileType.shikuang.v,
 			file_hour = file_rule.file_hour || 0;
 
-		var time = new Date(data_of_micaps.time);
+		var time = new Date(is_use_publish_time? data_of_micaps.mtime: data_of_micaps.time);
 			
-		if(ConstFileType.forecast.v == file_type){
+		if(ConstFileType.forecast.v == file_type && !is_use_publish_time){
 			var one = new Date(time.getTime());
 			one.setHours(one.getHours()+file_hour);
 			var two = new Date(one.getTime());
@@ -181,33 +180,36 @@ Core.safe(function(){
 			});
 			// 绑定缩放事件 
 			!function(){
+				var maptt;
 				var zoom_step = 1.2;
-				$geomap_container.click(function(e){
-					if($geomap_container.is('.zoom')){
-						gm.zoom($geomap_container.is('.zoomin')? zoom_step: 1/zoom_step, {x: e.offsetX, y: e.offsetY});
-					}
+				$geomap_container.on('mousewheel', function(e, delta){
+					clearTimeout(maptt);
+					maptt = setTimeout(function(){
+						gm.zoom(e.originalEvent.wheelDelta > 0 ? zoom_step: 1/zoom_step, {x: e.offsetX, y: e.offsetY});
+					}, 30);
 				});
+				gm.draggable();
 			}();
 			
 			var $tools = $('#map_tool div').click(function(){
 				$tools.removeClass('on');
 				$(this).addClass('on');
 			});
-			$('#map_tool_move').click(function(){
-				gm.draggable();
-			});
-			$('#map_tool_zoomin').click(function(){
-				$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomin');
-			});
-			$('#map_tool_zoomout').click(function(){
-				$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomout');
-			});
-			$('#map_tool_reset').click(function(){
-				gm.draggable({
-				  disabled: true
-				});
-				gm.reset(true);
-			});
+			// $('#map_tool_move').click(function(){
+			// 	gm.draggable();
+			// });
+			// $('#map_tool_zoomin').click(function(){
+			// 	$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomin');
+			// });
+			// $('#map_tool_zoomout').click(function(){
+			// 	$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomout');
+			// });
+			// $('#map_tool_reset').click(function(){
+			// 	gm.draggable({
+			// 	  disabled: true
+			// 	});
+			// 	gm.reset(true);
+			// });
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
 				// 添加背景色让地图不透明
@@ -437,13 +439,13 @@ Core.safe(function(){
 				// gm.addMask(points,{
 				// 	is_lnglat: false
 				// });
-				function addTitle(conf_title, pos){
+				function addTitle(conf_title, pos, is_use_publish_time){
 					if(conf_title && conf_title.is_show){
 						var text = conf_title.text;
 						if(text){
 							return MapLayer.text({
 								position: pos,
-								text: _replace_date(text),
+								text: _replace_date(text, is_use_publish_time),
 								style: conf_title.style
 							}).appendTo($geomap_layer);
 						}
@@ -535,7 +537,8 @@ Core.safe(function(){
 									}
 								}
 								
-								$html_title3 = addTitle(_title_3, pos);
+								$html_title3 = addTitle(_title_3, pos, true);
+								$html_title3.data('use_mtime', true);
 							}
 							
 							var _width = $geomap_layer.width();
@@ -684,7 +687,7 @@ Core.safe(function(){
 												return _replace_date($(this).text());
 											});
 											$html_title3 && $html_title3.find('span').text(function(){
-												return _replace_date($(this).text());
+												return _replace_date($(this).text(), true);
 											});
 										}
 										_afterRender()
