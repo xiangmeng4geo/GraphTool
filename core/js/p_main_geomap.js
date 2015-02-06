@@ -270,7 +270,7 @@ Core.safe(function(){
                             if(color){
                                 color.push(200);
                             }else{
-                                color = [0, 0, 0, 0];
+                                color = [255, 255, 255, 255];// 方便做边缘渐变
                             }
                             arr.push({
                             	x: v.x,

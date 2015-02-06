@@ -983,6 +983,7 @@ define('GeoMap',['zrender',
 			zlevel: ZINDEX_LAYER
 		});
 	}
+	//双线性插值
 	function _get_pixel_color(x, y, pixel00, pixel10, pixel01, pixel11){
         var x1 = pixel00.x,
             x2 = pixel10.x,
@@ -1007,6 +1008,32 @@ define('GeoMap',['zrender',
             arr.push(v);
         }
         return arr;
+    }
+    // 用idw插值
+    var idw_e = 2;
+    function _get_pixel_color1(x, y, pixel00, pixel10, pixel01, pixel11){
+    	var arr = [].slice.call(arguments, 2);
+    	var dis_arr = [],
+    		dis_sum = 0;
+    	for(var i = 0, j = arr.length; i < j; i++){
+    		var point = arr[i];
+    		var dis = Math.pow(point.x - x, 2) + Math.pow(point.y - x, 2);
+    		if(dis == 0){
+    			return point.color;
+    		}
+    		var v = 1/dis; //当距离幂为二时直接得到距离的平方
+    		dis_arr.push(v);
+    		dis_sum += v;
+    	}
+    	var result_color = [0, 0, 0, 0];
+    	for(var i = 0, j = arr.length; i < j; i++){
+    		var persent = dis_arr[i]/dis_sum;
+    		var color = arr[i].color;
+    		for(var c_i = 0; c_i < 4;c_i++){
+    			result_color[c_i] += color[c_i] * persent;
+    		}
+    	}
+    	return result_color;
     }
 	GeoMapInterpolation.prototype = {
 		type: 'mask',
@@ -1058,7 +1085,8 @@ define('GeoMap',['zrender',
 	                return {
 	                    x: pixel_x_start + x*space_pixel_x, 
 	                    y: pixel_y_start + y*space_pixel_y, 
-	                    color: [0, 0, 0, 0]
+	                    // color: [0, 0, 0, 0]
+	                    color: [255, 0, 255, 255]
 	                }
 	            }
 
@@ -1077,12 +1105,27 @@ define('GeoMap',['zrender',
 	                    var pixel10 = _get_pixel(i+1, j);
 	                    var pixel01 = _get_pixel(i, j+1);
 	                    var pixel11 = _get_pixel(i+1, j+1);
+	                    var x_arr = [pixel00.x, pixel10.x, pixel01.x, pixel11.x],
+	                    	y_arr = [pixel00.y, pixel10.y, pixel01.y, pixel11.y];
+
+	                    var x_min = Math.floor(Math.min.apply(Math, x_arr)),
+	                    	x_max = Math.ceil(Math.max.apply(Math, x_arr)),
+	                    	y_min = Math.floor(Math.min.apply(Math, y_arr)),
+	                    	y_max = Math.ceil(Math.max.apply(Math, y_arr));
+	                    // console.log(x_min, x_max, y_min, y_max);
 	                    for(var p_x = Math.floor(pixel00.x)+1, p_e_x = Math.ceil(pixel10.x); p_x < p_e_x && p_x <= pixel_x_end; p_x++){
 	                        for(var p_y = Math.ceil(pixel00.y)+1, p_e_y = Math.floor(pixel01.y); p_y > p_e_y && p_y >= pixel_y_end; p_y--){
 	                            var color = _get_pixel_color(p_x, p_y, pixel01, pixel11, pixel00, pixel10);
+	                            // var color = _get_pixel_color(p_x, p_y, pixel01, pixel11, pixel00, pixel10);
 	                            _set_rgba(p_x, p_y, color);
 	                        }
 	                    }
+	                   	// for(var p_x = x_min, p_e_x = x_max; p_x < p_e_x && p_x <= pixel_x_end; p_x++){
+	                    //     for(var p_y = y_min, p_e_y = y_max; p_y > p_e_y && p_y >= pixel_y_end; p_y--){
+	                    //         var color = _get_pixel_color(p_x, p_y, pixel01, pixel11, pixel00, pixel10, _get_pixel(i-1, j), _get_pixel(i-1, j-1), _get_pixel(i, j-1));
+	                    //         _set_rgba(p_x, p_y, color);
+	                    //     }
+	                    // }
 	                }
 	            }
 	            ctx_interpolat.putImageData(imagedata, 0, 0);
