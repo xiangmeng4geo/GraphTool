@@ -32,18 +32,17 @@ Core.safe(function(){
 	var width_geomap = $geomap.width(),
 		height_geomap = $geomap.height();
 	// 替换标题里的时间
-	function _replace_date(text){
+	function _replace_date(text, is_use_publish_time){
 		if(!conf_of_product || !data_of_micaps){
 			return text;
 		}
-
 		var file_rule = conf_of_product.in_out.file_rule,
 			file_type = file_rule.file_type || ConstFileType.shikuang.v,
 			file_hour = file_rule.file_hour || 0;
 
-		var time = new Date(data_of_micaps.time);
+		var time = new Date(is_use_publish_time? data_of_micaps.mtime: data_of_micaps.time);
 			
-		if(ConstFileType.forecast.v == file_type){
+		if(ConstFileType.forecast.v == file_type && !is_use_publish_time){
 			var one = new Date(time.getTime());
 			one.setHours(one.getHours()+file_hour);
 			var two = new Date(one.getTime());
@@ -433,13 +432,13 @@ Core.safe(function(){
 				// gm.addMask(points,{
 				// 	is_lnglat: false
 				// });
-				function addTitle(conf_title, pos){
+				function addTitle(conf_title, pos, is_use_publish_time){
 					if(conf_title && conf_title.is_show){
 						var text = conf_title.text;
 						if(text){
 							return MapLayer.text({
 								position: pos,
-								text: _replace_date(text),
+								text: _replace_date(text, is_use_publish_time),
 								style: conf_title.style
 							}).appendTo($geomap_layer);
 						}
@@ -531,7 +530,8 @@ Core.safe(function(){
 									}
 								}
 								
-								$html_title3 = addTitle(_title_3, pos);
+								$html_title3 = addTitle(_title_3, pos, true);
+								$html_title3.data('use_mtime', true);
 							}
 							
 							var _width = $geomap_layer.width();
@@ -680,7 +680,7 @@ Core.safe(function(){
 												return _replace_date($(this).text());
 											});
 											$html_title3 && $html_title3.find('span').text(function(){
-												return _replace_date($(this).text());
+												return _replace_date($(this).text(), true);
 											});
 										}
 										_afterRender()
@@ -1020,7 +1020,7 @@ Core.safe(function(){
 										padding_right = parseFloat($layer.css('padding-right')) || 0,
 										padding_bottom = parseFloat($layer.css('padding-bottom')) || 0,
 										padding_left = parseFloat($layer.css('padding-left')) || 0;
-									gm_export.addOverlay(new GeoMap.Text(_replace_date($layer.text()),$layer.attr('style'), [padding_top, padding_right, padding_bottom, padding_left]));
+									gm_export.addOverlay(new GeoMap.Text(_replace_date($layer.text(), $layer.data('use_mtime')),$layer.attr('style'), [padding_top, padding_right, padding_bottom, padding_left]));
 								}else if($layer.is('.map_layer_image')){
 									var pos = $layer.position();
 									var img = $layer.find('img').get(0);
