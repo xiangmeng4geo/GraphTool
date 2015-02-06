@@ -13,7 +13,6 @@
 					<li class="on">系统</li>
 					<li>图标库管理</li>
 					<li>图片库管理</li>
-					<li>文本对象管理</li>
 				</ul>
 			</div>
 			<div id="c_bottom">
@@ -22,7 +21,8 @@
 					<fieldset class="logos">
 						<legend>图标路径</legend>
 						<div class="clear">
-							<label class="fl">南海图标</label>
+							<input type="checkbox" checked id="checkbox_show_southsea" class="fl"/>
+							<label class="fl" for="checkbox_show_southsea">南海图标</label>
 							<div class="file_directory fl">
 					    		<input type="file" class="file_dir_nw" accept=".jpg,.png,.bmp"/>
 					    		<div>
@@ -30,23 +30,16 @@
 						    		<input type="button" value="浏览" class="file_dir"/>
 					    		</div>
 					    	</div>
-					    	<div class="fl logo_right">
-					    		<input type="checkbox" checked id="checkbox_show_southsea"/>
-					    		<label for="checkbox_show_sourcesea">全区显示南海</label>
-					    	</div>
 				    	</div>
-				    	<div class="clear">
-							<label class="fl">单位图标</label>
+				    	<div class="clear mt10">
+				    		<input type="checkbox" checked id="checkbox_show_logo" class="fl"/>
+							<label class="fl" for="checkbox_show_logo">单位图标</label>
 							<div class="file_directory fl">
 					    		<input type="file" class="file_dir_nw" accept=".jpg,.png,.bmp"/>
 					    		<div>
 						    		<input type="text" class="text_file_dir" id="text_file_company_logo"/>
 						    		<input type="button" value="浏览" class="file_dir"/>
 					    		</div>
-					    	</div>
-					    	<div class="fl logo_right">
-					    		<input type="checkbox" checked id="checkbox_show_logo"/>
-					    		<label for="checkbox_show_logo">使用单位图标</label>
 					    	</div>
 				    	</div>
 					</fieldset>
@@ -74,10 +67,6 @@
 					<div class="tree_right">
 						<ul id="file_list_image"></ul>
 					</div>
-				</fieldset>
-				<fieldset>
-					<legend>文本对象管理</legend>
-					
 				</fieldset>
 			</div>
 			<div class="btns">

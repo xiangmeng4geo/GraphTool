@@ -35,7 +35,7 @@
 				<fieldset>
 				    <legend>输入输出设置</legend>
 				    <div>
-				    	<div>
+				    	<div class=" p_bottom10">
 				    		数据目录：
 					    	<div class="file_directory">
 					    		<input type="file" nwdirectory class="file_dir_nw"/>
@@ -45,7 +45,7 @@
 					    		</div>
 					    	</div>
 					    </div>
-					    <fieldset id="fieldset_file_rule">
+					    <fieldset id="fieldset_file_rule" class="bd_bottom">
 				    		<legend>文件名</legend>
 				    		<ul>
 				    			<li>
@@ -77,7 +77,7 @@
 					    <div id="file_rule_example">
 					    	文件名样例:  <span></span>
 					    </div>
-					    <div>
+					    <div class="mt10 row_h">
 				    		输出目录：
 					    	<div class="file_directory">
 					    		<input type="file" nwdirectory class="file_dir_nw"/>
@@ -87,12 +87,12 @@
 					    		</div>
 					    	</div>
 					    </div>
-					    <div>
+					    <div class="mt10 row_h">
 					    	输出文件名:
 					    	<input type="text" id="text_out_filename" placeholder=""/>
 					    	<span></span>
 					    </div>
-					    <div class="mt10">
+					    <div class="mt10 row_h">
 					    	数据类型：
 					    	<select id="select_file_type">
 							</select>
@@ -128,7 +128,7 @@
 					<div class="legend_left">
 						<fieldset class="admin">
 							<legend>添加新的配色方案</legend>
-							<select id="select_legent_product">
+							<select id="select_legent_product" class="mt10">
 							</select>
 							<input type="button" value="添加" id="btn_add_new_legend"/>
 						</fieldset>
@@ -137,24 +137,24 @@
 						<fieldset>
 							<legend>其它设置</legend>
 							<label>单位</label>
-							<select id="select_legend_unit"></select>
+							<select id="select_legend_unit" class="mt10"></select>
 							<br/>
-							<input type="checkbox" checked id="cb_is_show_legend"/>图例显示<br/>
-							<input type="checkbox" checked id="cb_is_show_unit"/>单位显示<br/>
-							<input type="checkbox" id="cb_is_reverse"/>倒序显示<br/>
-							<input type="checkbox" checked id="cb_is_updown"/>上下显示
+							<input type="checkbox" checked id="cb_is_show_legend" class="mt10"/>图例显示<br/>
+							<input type="checkbox" checked id="cb_is_show_unit" class="mt10"/>单位显示<br/>
+							<input type="checkbox" id="cb_is_reverse" class="mt10"/>倒序显示<br/>
+							<input type="checkbox" checked id="cb_is_updown" class="mt10"/>上下显示
 						</fieldset>
 
 						<div class="btns_legend_colors">
 							<input type="button" value="导入配色方案" id="bt_import_colors"/>
-							<input type="button" value="导出配色方案" id="bt_export_colors"/>
+							<input type="button" value="导出配色方案" id="bt_export_colors" class="mt10"/>
 						</div>
 					</div>
 					
 				</fieldset>
 				<fieldset id="other_setting">
 					<legend>其它设置</legend>
-					<div>
+					<div class="row_h">
 						<label>Logo图片</label>
 						<div class="file_directory">
 				    		<input type="file" class="file_dir_nw" accept=".jpg,.png,.bmp"/>
@@ -164,12 +164,12 @@
 				    		</div>
 				    	</div>
 			    	</div>
-			    	<div class="mt10">
+			    	<div class="mt10 row_h">
 						<input type="checkbox" id="cb_use_bgcolor"/>
 						<label for="cb_use_bgcolor">背景颜色</label>
 						<input type="color" id="color_bg" value="#ffffff"/>
 					</div>
-					<div class="mt10">
+					<div class="mt10 row_h">
 						<input type="checkbox" id="cb_use_bgimg"/>
 						<label for="cb_use_bgimg">背景图片</label>
 						<div class="file_directory" style="width: 603px;">
@@ -180,15 +180,15 @@
 				    		</div>
 				    	</div>
 					</div>
-					<div class="mt10">
+					<div class="mt10 row_h">
 						<input type="checkbox" id="cb_interpolation_all"/>
 						<label for="cb_interpolation_all" title="只有3类数据会进行插值" style="width:150px;cursor:help">是否进地全部插值</label>
 					</div>
 				</fieldset>
 			</div>
 			<div class="btns">
-				<input type="button" value="保存" id="btn_save"/>
-				<input type="button" value="取消" id="btn_cancel"/>
+				<input type="button" value="取消" id="btn_cancel" class="big"/>
+				<input type="button" value="保存" id="btn_save" class="big"/>
 			</div>
 		</div>
 		<script type="text/javascript" src="./js/libs/j.js"></script>

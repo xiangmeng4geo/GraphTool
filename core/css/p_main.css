@@ -185,16 +185,19 @@
 
 /* 添加图片用和图片工具 ｛ */
 .tool_image{
-	position: absolute;
-	left: 2%;
+	position: fixed;
+	right: 0;
 	top: 0;
-	width: 96%;
+	width: 300px;
 	height: 100%;
 	background: white;
+	border: 1px solid #c9c9c9;
 	display: none;
+	overflow-y: auto;
+	box-shadow: -2px 0 5px #ccc;
 }
 .tool_image select{
-	width: 200px;
+	width: 270px;
 	margin: 10px auto;
 	display: block;
 }
@@ -213,7 +216,7 @@
 }
 .tool_image li{
 	float: left;
-	width: 25%;
+	width: 33.33%;
 	margin: 10px auto;
 	text-align: center;
 }

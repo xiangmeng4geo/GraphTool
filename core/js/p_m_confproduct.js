@@ -259,7 +259,7 @@ Core.safe(function(){
 								'<legend>_N_ <input type="button" class="admin btn_dele_lengend" value="删除"/></legend>'+
 								'<div class="legend_value">'+
 									'<form id="form_legend">'+
-										'<div>'+
+										'<div class="mt10">'+
 											'<label>起始颜色</label><input type="color" value="#0000ff" class="color_start"/>'+
 											'<label>终止颜色</label><input type="color" value="#ff0000" class="color_end"/>'+
 											'<label title="雨夹雪时可使用">条纹显示</label><input type="checkbox" class="cb_is_stripe"/>'+
@@ -268,7 +268,7 @@ Core.safe(function(){
 											'<label>最小值</label><input type="number" value="0" class="number_min"/>'+
 											'<label>最大值</label><input type="number" value="40" class="number_max"/>'+
 											'<label>等级数</label><input type="number" value="10" class="number_level"/>'+
-											'<input value="生成等阶颜色值" type="submit" class="btn_gen_colors"/>'+
+											'<input value="生成等阶颜色值" type="button" class="btn_gen_colors"/>'+
 										'</div>'+
 									'</form>'+
 								'</div>'+
@@ -338,14 +338,14 @@ Core.safe(function(){
 		$legend_value.append(getTable(color_arr));
 	});
 	function getTable(color_arr){
-		var html_table = '<table>'+
+		var html_table = '<table cellspacing=1>'+
 								'<tr>'+
 									'<th width="10%">状态</th>'+
 									'<th width="12%">颜色值</th>'+
 									'<th width="12%">文字颜色</th>'+
 									'<th width="30%">值域</th>'+
 									'<th width="30%">显示文字</th>'+
-									'<th title="图例排列顺序\n从小到大排（图例倒序显示时从大到小）" class="cursor_help">顺序</th>'+
+									'<th width="6%" title="图例排列顺序\n从小到大排（图例倒序显示时从大到小）" class="cursor_help">顺序</th>'+
 								'</tr>';
 		$.each(color_arr,function(i,v){
 			var text_color = v.color_text || '#000';

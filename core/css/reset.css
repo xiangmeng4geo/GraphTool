@@ -55,10 +55,53 @@ input[type=radio]{
 input[type=text]:hover, textarea:hover{
 	cursor: text;
 }
+input[type="color"] { border: 0; padding: 0;}
+/*::-webkit-color-swatch-wrapper {width: 100%;}
+::-webkit-color-swatch {width: 100px;  position:relative; left: -2px; top: -2px; background-color: green;}*/
 /*去掉得到焦点时的黄色边框*/
 .no_outline,
 input,button,select,textarea,
 [contenteditable=true]{outline:none}
+/*重置按钮样式*/
+input[type=button]{
+	border: 1px solid #e3e7eb;
+	box-shadow: 0 2px 2px #e3e7eb;
+	background-color: white;
+	text-align: center;
+	border-radius: 5px;
+	cursor: pointer;
+}
+input[disabled]{
+	background-color: #e5eef3;
+}
+input[type=button].big{
+	padding: 3px 0;
+	box-shadow: 0 2px 3px #e3e7eb;
+}
+/*重写checkbox样式*/
+input[type=checkbox]{
+	position: relative;
+}
+input[type=checkbox]:before{
+	content: '';
+	width: 11px;
+	height: 11px;
+	background-color: white;
+	display: block;
+	border: 1px solid #ccc;
+}
+input[type=checkbox]:checked:after{
+	content: '';
+	position: absolute;
+	left: 2px;
+	top: 3px;
+	width: 7px;
+	height: 3px;
+	border: 1px solid #333;
+	border-top: none;
+	border-right: none;
+	-webkit-transform: rotate(-64deg) skewX(-24deg);
+}
 /*不可放大缩小*/
 textarea{resize:none}
 ul,ol{
@@ -69,6 +112,15 @@ ul,ol{
 	list-style:outside none none;
 	padding: 0;
 	margin: 0;
+}
+.bd_top{
+	border-top: 1px solid #c9c9c9;
+}
+.bd_bottom{
+	border-bottom: 1px solid #c9c9c9;
+}
+.p_bottom10{
+	padding-bottom: 10px;
 }
 .cursor_help{
 	cursor: help;

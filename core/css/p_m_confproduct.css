@@ -6,31 +6,37 @@
 	position: relative;
 	overflow: hidden;
 	height: 32px;
-	width: 98%;
+	/*width: 98%;*/
 	margin: 0 auto;
 	top: 1px;
+	color: #969696;
+	border-bottom: 1px solid #c9c9c9;
 }
 #c_top ul{
 	overflow: hidden;
 	padding-left: 5%;
 }
 #c_top li{
+	cursor: pointer;
 	padding: 0 5px;
-	min-width: 80px;
+	/*min-width: 80px;*/
 	text-align: center;
 	height: 28px;
 	line-height: 28px;
 	float: left;
-	border: 1px solid #bbb;
-	border-radius: 5px 5px 0 0;
-	margin-right: 3px;
+	/*border: 1px solid #bbb;*/
+	/*border-radius: 5px 5px 0 0;*/
+	margin-right: 20px;
 	margin-top: 2px;
-	background-color: #eee;
+	/*background-color: #eee;*/
 }
 #c_top li:hover{
-	background-color: #eed;
+	/*background-color: #eed;*/
 }
 #c_top li.on{
+	font-weight: bold;
+	font-size: 16px;
+	color: #282828;
 	margin-top: 0px;
 	height: 30px;
 	line-height: 30px;
@@ -39,16 +45,16 @@
 }
 
 #c_bottom{
-	width: 98%;
 	margin: 0 auto;
-	border: 1px solid #bbb;
+	/*border: 1px solid #bbb;*/
 	border-radius: 3px;
 	padding-bottom: 10px;
 	height: 350px;
 	overflow: auto;
+	border-bottom: 1px solid #c9c9c9;
 }
 #c_bottom>fieldset{
-	width: 94%;
+	width: 727px;
 	margin: 0 auto;
 	display: none;
 	border: none;
@@ -61,12 +67,15 @@
 }
 
 fieldset {
-	padding:10px;
-	margin:10px;
-	color:#333; 
-	border:#ccc solid 1px;
+	padding: 10px;
+	margin: 10px;
+	color: #595959; 
+	border: #ccc solid 1px;
 	border-radius: 3px;
 } 
+fieldset legend{
+	color: #282828;
+}
 
 .file_directory{
 	position: relative;
@@ -88,11 +97,14 @@ fieldset {
 	overflow: hidden;
 }
 .text_file_dir{
-	width: 570px;
+	width: 	570px;
 }
 
 #fieldset_file_rule{
-	width: 92%;
+	border: none;
+	padding: 0;
+	margin: 0;
+	margin-top: 10px;
 }
 #fieldset_file_rule li{
 	overflow: hidden;
@@ -100,6 +112,7 @@ fieldset {
 }
 .file_rule_prefix{
 	float: left;
+	font-size: 12px;
 }
 .file_rule_prefix label{
 	width: 80px;
@@ -112,35 +125,46 @@ fieldset {
 	margin-left: 5px;
 	color: #bbb;
 	margin-bottom: 20px;
-	padding-bottom: 15px;
-	border-bottom: 1px dotted #ccc;
+	padding-bottom: 10px;
+	font-size: 12px;
 }
 #file_rule_example span{
 	text-decoration: underline;
 }
-
+.row_h{
+	height: 30px;
+}
 .btns{
 	width: 300px;
 	margin: 0 auto;
 	text-align: center;
-	margin-top: 30px;
+	margin-top: 24px;
 }
 .btns input{
 	width: 100px;
 	margin: 0 20px;
 }
-
+#fieldset_title{
+	padding-top: 30px;
+}
+#fieldset_title div{
+	margin-top: 10px;
+}
 #fieldset_title input{
-	vertical-align: top;
+	vertical-align: middle;
+}
+#fieldset_title input[type=button]{
+	margin-left: 10px;
 }
 #fieldset_title label{
-	vertical-align: top;
+	vertical-align: middle;
 	display: inline-block;
 	width: 70px;
 }
 #fieldset_title textarea{
 	width: 400px;
 	height: 80px;
+	vertical-align: middle;
 }
 #text_file_rule_custom{
 	width: 260px;
@@ -153,30 +177,64 @@ fieldset {
 .row{
 	margin: 10px 0;
 }
+#fieldset_file_select{
+	padding-top: 10px;
+}
+
 #fieldset_file_select label{
 	display: inline-block;
-	width: 70px;
+	width: 60px;
 }
 .label_newest_days{
-	margin-left: 26px;
+	margin-left: 27px;
 }
 #number_newest_days{
 	width: 40px;
 }
 
+#fieldset_legend,
+#fieldset_legend select,
+#fieldset_legend input
+{
+	font-size: 12px;
+	color: #595959; 
+}
+#fieldset_legend legend{
+	font-size: 14px;
+	font-weight: bold;
+	margin-left: -1px;
+}
+#fieldset_legend fieldset{
+	border: none;
+	padding: 0;
+	margin: 0;
+	margin-top: 15px;
+	padding-bottom: 10px;
+	/*border-bottom: 1px solid #c9c9c9;*/
+}
 #fieldset_legend table{
 	width: 100%;
 	text-align: center;
-	margin-top: 20px;
-	border-radius: 5px;
+	margin-top: 10px;
 }
-
-#fieldset_legend tr:nth-child(2n+1){
+#fieldset_legend table{
+	background-color: #ccc;
+	width: 90%;
+}
+#fieldset_legend td{
+	background-color: white;
+	/*border: 1px solid #dadada;*/
+}
+#fieldset_legend td input[type=number]{
+	border: none;
+	text-align: center;
+}
+/*#fieldset_legend tr:nth-child(2n+1){
 	background-color: #ccc;
 }
 #fieldset_legend tr:nth-child(2n){
 	background-color: #eee;
-}
+}*/
 .legend_value label:first-child{
 	margin-left: 0;
 }
@@ -193,10 +251,11 @@ fieldset {
 }
 .legend_left{
 	float: left;
-	width: 80%;
+	width: 75%;
+	border-right: 1px solid #c9c9c9;
 }
 .legend_right{
-	float: left;
+	float: right;
 	width: 20%;
 }
 .btn_dele_lengend{
@@ -211,8 +270,8 @@ fieldset {
 .btns_legend_colors{
 	width: 100%;
 	text-align: center;
+	margin-top: 20px;
 }
 .btns_legend_colors input{
 	width: 130px;
-	margin: 3px 0;
 }

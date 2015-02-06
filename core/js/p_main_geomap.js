@@ -934,7 +934,7 @@ Core.safe(function(){
 						var cache_file = {};
 						files_loaded = file_util.readdir(icon_path);
 						if(!$tool_image){
-							$tool_image = $('<div class="tool_image"><div class="btn_close_tool_image"></div><div class="tool_image_main"></div></div>').appendTo('#c_left');
+							$tool_image = $('<div class="tool_image"><div class="btn_close_tool_image"></div><div class="tool_image_main"></div></div>').appendTo('body');
 							$tool_image.delegate('select','change',function(){
 								showFiles($tool_image.find('ul'),cache_file[$(this).val()]);
 							});
