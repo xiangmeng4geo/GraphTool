@@ -4,7 +4,7 @@ Core.safe(function(){
 		ConstMsgType = Const.msgType,
 		ConstEvent = Const.Event,
 		ConstFileType = Const.fileRule.file_type;
-	CoreWindow.get().showDevTools();	
+	// CoreWindow.get().showDevTools();	
 	var color_toRGB = Core.Color.toRGB
 
 	var Logger = Core.util.Logger,
@@ -205,9 +205,9 @@ Core.safe(function(){
 			// 	$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomout');
 			// });
 			$('#map_tool_reset').click(function(){
-				gm.draggable({
-				  disabled: true
-				});
+				// gm.draggable({
+				//   disabled: true
+				// });
 				gm.reset(true);
 			});
 			// 根据配色方案进行地图元素初始化
@@ -988,7 +988,7 @@ Core.safe(function(){
 					var cache_file = {};
 					files_loaded = file_util.readdir(icon_path);
 					if(!$tool_image){
-						$tool_image = $('<div class="tool_image"><div class="btn_close_tool_image"></div><div class="tool_image_main"></div></div>').appendTo('body');
+						$tool_image = $('<div class="tool_image"><div class="btn_close_tool_image"></div><div class="tool_image_main"></div></div>').appendTo('#c_right');
 						$tool_image.delegate('select','change',function(){
 							showFiles($tool_image.find('ul'),cache_file[$(this).val()]);
 						});
