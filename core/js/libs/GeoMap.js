@@ -1184,7 +1184,7 @@ define('GeoMap',['zrender',
 				var pixel = map.pointToOverlayPixel(new GeoMap.Point(item.x, item.y));
 				var x_pixel = pixel.x,
 					y_pixel = pixel.y;
-				// if(x_pixel > -space_pixel_x && x_pixel <= c_width && y_pixel > -space_pixel_y && y_pixel <= c_height){
+				if(x_pixel > -space_pixel_x && x_pixel <= c_width && y_pixel > -space_pixel_y && y_pixel <= c_height){
 					arr.push({
 						lng: item.x,
 						lat: item.y,
@@ -1192,7 +1192,7 @@ define('GeoMap',['zrender',
 						y: y_pixel,
 						color: item.c
 					});
-				// }
+				}
 			}
 			new_data.push(arr);
 		}
