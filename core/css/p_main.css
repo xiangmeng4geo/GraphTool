@@ -1,11 +1,12 @@
 #main{
 	height: 100%;
-	margin-top: 10px;
 }
 #c_top{
+	background-color: #e3e3e3;
 	border-bottom: 1px solid #bbb;
 	overflow: hidden;
-	height: 40px;
+	height: 100px;
+	box-shadow: 0 3px 3px #ccc;
 }
 #c_top ul{
 	overflow: hidden;
@@ -33,7 +34,8 @@
 
 #btn_quite{
 	float: right;
-	margin-right: 5%;
+	margin-right: 20px;
+	color: #595959;
 }
 .c_bottom{
 	overflow: hidden;
@@ -54,14 +56,58 @@
 	padding-left: 300px;
 	overflow: auto;
 }
+#btn_setting{
+	width: 300px;
+	height: 96px;
+	margin-top: 2px;
+	border-right: 1px dotted #9e9e9e;
+	background: url(../img/icon_setting.png) no-repeat center 10px;
+	position: relative;
+	cursor: pointer;
+}
+#btn_setting span{
+	position: absolute;
+	left: 50%;
+	bottom: 13px;
+	width: 100px;
+	margin-left: -50px;
+	text-align: center;
+}
 
+.btns_top{
+	padding: 0 20px;
+	height: 90px;
+	background-repeat: no-repeat;
+	background-position: center 25px;
+	position: relative;
+	cursor: pointer;
+}
+.btns_top span,
+#btn_quite{
+	border: 1px solid #bcbcbc;
+	border-radius: 3px;
+	padding: 2px 3px;
+	text-align: center;
+	position: relative;
+	top: 60px;
+	background-color: #eaeaea;
+}
+#btn_add_text{
+	background-image: url(../img/icon_text.png);
+}
+#btn_add_img{
+	background-image: url(../img/icon_img.png);
+}
+#btn_export{
+	background-image: url(../img/icon_export.png);
+}
 #tree{
 	margin: 10px 0;
 }
 #geomap_container{
 	width: 800px;
 	height: 800px;
-	border: 1px solid #333;
+	/*border: 1px solid #333;*/
 	/*background-color: #71B7FD;*/
 	/*background-image: url(http://10.14.85.116/android/ChinaWeatherDecision_assets/assets/img/geomap/map.png);*/
 	/*background-image: url(../img/world.jpg);*/
@@ -71,6 +117,8 @@
 	float: left;
 	position: relative;
 	overflow: hidden;
+	margin: 10px 0 0 10px;
+	box-shadow: 0 0 3px #333;
 }
 #geomap_container .loading{
 	position: absolute;
@@ -121,29 +169,23 @@
 .geomap_mirror.ui-draggable-disabled{
 	cursor: default !important;
 }
-#map_tool{
-	float: left;
-	margin-top: 20px;
-	width: 70px;
-	background: #ccc;
-	border-radius: 0 5px 5px 0;
-	line-height: 30px;
-	color: #333;
-	border: 1px solid #333;
-	border-left: none;
+#geomap_container:hover .map_tool{
+	display: block;
 }
-#map_tool div{
-	width: 96%;
-	text-align: center;
-	margin: 0 auto;
-	border-bottom: 1px solid #bbb;
+.map_tool{
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 201;
+	background-color: #494949;
+	padding: 10px;
+	display: none;
+}
+#map_tool_reset{
+	background: url(../img/icon_reset.png) no-repeat center center;
+	width: 25px;
+	height: 25px;
 	cursor: pointer;
-}
-#map_tool div.on{
-	background-color: #eee;
-}
-#map_tool div:last-child{
-	border-bottom: none;
 }
 /*#geomap,
 #geomap_layer{

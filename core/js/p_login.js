@@ -52,7 +52,7 @@ Core.safe(function(){
 			return afterLogin(login(name,pwd,true));
 		}
 	}
-	win.showDevTools();
+	// win.showDevTools();
 	win.show();
 	win.focus();
 	function afterLogin(login_flag,true_fn,false_fn){
