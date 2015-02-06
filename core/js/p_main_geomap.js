@@ -176,33 +176,36 @@ Core.safe(function(){
 			});
 			// 绑定缩放事件 
 			!function(){
+				var maptt;
 				var zoom_step = 1.2;
-				$geomap_container.click(function(e){
-					if($geomap_container.is('.zoom')){
-						gm.zoom($geomap_container.is('.zoomin')? zoom_step: 1/zoom_step, {x: e.offsetX, y: e.offsetY});
-					}
+				$geomap_container.on('mousewheel', function(e, delta){
+					clearTimeout(maptt);
+					maptt = setTimeout(function(){
+						gm.zoom(e.originalEvent.wheelDelta > 0 ? zoom_step: 1/zoom_step, {x: e.offsetX, y: e.offsetY});
+					}, 30);
 				});
+				gm.draggable();
 			}();
 			
 			var $tools = $('#map_tool div').click(function(){
 				$tools.removeClass('on');
 				$(this).addClass('on');
 			});
-			$('#map_tool_move').click(function(){
-				gm.draggable();
-			});
-			$('#map_tool_zoomin').click(function(){
-				$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomin');
-			});
-			$('#map_tool_zoomout').click(function(){
-				$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomout');
-			});
-			$('#map_tool_reset').click(function(){
-				gm.draggable({
-				  disabled: true
-				});
-				gm.reset(true);
-			});
+			// $('#map_tool_move').click(function(){
+			// 	gm.draggable();
+			// });
+			// $('#map_tool_zoomin').click(function(){
+			// 	$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomin');
+			// });
+			// $('#map_tool_zoomout').click(function(){
+			// 	$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomout');
+			// });
+			// $('#map_tool_reset').click(function(){
+			// 	gm.draggable({
+			// 	  disabled: true
+			// 	});
+			// 	gm.reset(true);
+			// });
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
 				// 添加背景色让地图不透明
