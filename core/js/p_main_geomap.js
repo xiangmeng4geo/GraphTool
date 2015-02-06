@@ -204,12 +204,12 @@ Core.safe(function(){
 			// $('#map_tool_zoomout').click(function(){
 			// 	$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomout');
 			// });
-			// $('#map_tool_reset').click(function(){
-			// 	gm.draggable({
-			// 	  disabled: true
-			// 	});
-			// 	gm.reset(true);
-			// });
+			$('#map_tool_reset').click(function(){
+				gm.draggable({
+				  disabled: true
+				});
+				gm.reset(true);
+			});
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent){
 				// 添加背景色让地图不透明
