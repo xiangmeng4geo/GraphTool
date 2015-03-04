@@ -216,6 +216,9 @@ define('GeoMap',['zrender',
 			}
 		}
 	}
+	GeoMapProp.getZoom = function(){
+		return this._data.zoom;
+	}
 	GeoMapProp.reset = function(){
 		_reset.call(this, RESET_TYPE_RESET);
 	}
@@ -1011,11 +1014,12 @@ define('GeoMap',['zrender',
     }
 	GeoMapInterpolation.prototype = {
 		type: 'mask',
-		setData: function(interpolationArr, c_width, c_height){
+		setData: function(interpolationArr, c_width, c_height, zoom){
 			var _this = this;
 			_this.interpolationArr = interpolationArr;
 			_this.c_width = c_width;
 			_this.c_height = c_height;
+			_this.zoom = zoom;
 		},
 		brush: function(ctx, isHighlight){
 			var _this = this;
@@ -1045,8 +1049,7 @@ define('GeoMap',['zrender',
 				var ctx_interpolat = interpolationCanvas.getContext('2d');
 			    devicePixelRatio != 1 && ctx_interpolat.scale(devicePixelRatio, devicePixelRatio);
 
-				var imagedata = ctx_interpolat.createImageData(c_width, c_height),
-	                _data = imagedata.data;
+				
 
 	            function _get_pixel(x, y){
 	                try{
@@ -1056,49 +1059,125 @@ define('GeoMap',['zrender',
 	                    }
 	                }catch(e){}
 
-	                return {
-	                    x: pixel_x_start + x*space_pixel_x, 
-	                    y: pixel_y_start + y*space_pixel_y, 
-	                    color: [0, 0, 0, 0]
-	                }
+	                // return {
+	                //     x: pixel_x_start + x*space_pixel_x, 
+	                //     y: pixel_y_start + y*space_pixel_y, 
+	                //     color: [0, 0, 0, 0]
+	                // }
 	            }
 
-			    var _set_rgba = function(x, y, color){
+	            var _cache_rgba = {};
+			    var _set_rgba = function(x, y, color, _data){
 			    	if(x >= 0 && y>=0){
+			    		x = Math.round(x),y = Math.round(y);
 				        var index = (y * c_width + x)*4;
-				        _data[index] = color[0];
-				        _data[index + 1] = color[1];
-				        _data[index + 2] = color[2];
-				        _data[index + 3] = color[3];
+				        if(!_cache_rgba[index]){
+					        _data[index] = color[0];
+					        _data[index + 1] = color[1];
+					        _data[index + 2] = color[2];
+					        _data[index + 3] = color[3];
+					        _cache_rgba[index] = 1;
+				        }
 			        }
 			    }
+			    var imagedata = ctx_interpolat.createImageData( c_width, c_height),
+		            _data_gedian = imagedata.data;
 	            for(var i = 0; i < width; i++){
 	                for(var j = 0; j< height; j++){
 	                    var pixel00 = _get_pixel(i, j);
-	                    var c = pixel00.color;
-	                    ctx_interpolat.fillStyle = 'rgba('+c[0]+', '+c[1]+', '+c[2]+', '+c[3]+')';
-                        ctx_interpolat.beginPath();
-                        ctx_interpolat.arc(pixel00.x, pixel00.y, 1, 0, Math.PI*2, 1);
-                        ctx_interpolat.closePath();
-                        ctx_interpolat.fill();
-	                    // var pixel10 = _get_pixel(i+1, j);
-	                    // var pixel01 = _get_pixel(i, j+1);
-	                    // var pixel11 = _get_pixel(i+1, j+1);
-	                    // var x_min = Math.min(pixel00.x, pixel10.x, pixel01.x, pixel11.x), 
-	                    // 	x_max = Math.max(pixel00.x, pixel10.x, pixel01.x, pixel11.x),
-	                    // 	y_min = Math.min(pixel00.y, pixel10.y, pixel01.y, pixel11.y), 
-	                    // 	y_max = Math.max(pixel00.y, pixel10.y, pixel01.y, pixel11.y);
-	                    // for(var p_x = Math.floor(pixel00.x)+1, p_e_x = Math.ceil(pixel10.x); p_x < p_e_x && p_x <= pixel_x_end; p_x++){
-	                    //     for(var p_y = Math.ceil(pixel00.y)+1, p_e_y = Math.floor(pixel01.y); p_y > p_e_y && p_y >= pixel_y_end; p_y--){
-	                    //         var color = _get_pixel_color(p_x, p_y, pixel01, pixel11, pixel00, pixel10);
-	                    //         _set_rgba(p_x, p_y, color);
-	                    //     }
-	                    // }
+	                    if(pixel00){
+		                    var c = pixel00.color;
+		                    _set_rgba(pixel00.x, pixel00.y, c, _data_gedian);
+							// ctx_interpolat.fillStyle = 'rgba('+c[0]+', '+c[1]+', '+c[2]+', '+c[3]+')';
+							// ctx_interpolat.beginPath();
+							// ctx_interpolat.arc(pixel00.x, pixel00.y, 1, 0, Math.PI*2, 1);
+							// ctx_interpolat.closePath();
+							// ctx_interpolat.fill();
+	                    }
 	                }
 	            }
-	            // ctx_interpolat.putImageData(imagedata, 0, 0);
+	            ctx_interpolat.putImageData(imagedata, 0, 0);
+	            var imagedata_new = ctx_interpolat.getImageData(0, 0, c_width, c_height),
+		            _data_new = imagedata_new.data;
 
-	            _doclip.call(_this.gm, ctx);
+	            var radius = Math.ceil(5 * _this.zoom),
+	            	radius_square = Math.pow(radius, 2);
+	            if(radius > 1){
+		            for(var i = 0; i<c_width; i++){
+		            	for(var j = 0; j<c_height; j++){
+		            		var _index = (j * c_width + i)*4;
+		            		var _alpha = _data_gedian[_index + 3];
+		            		if(_alpha == 0){
+		            			var dis_arr = [];
+		            			for(var x_around = Math.max(0, i - radius), x_end = Math.min(c_width, i + radius); x_around < x_end; x_around++){
+		            				for(var y_around = Math.max(0, j - radius), y_end = Math.min(c_height, j + radius); y_around < y_end; y_around++){
+		            					if(x_around != i && y_around != j){
+		            						var _index_check = (y_around * c_width + x_around)*4;
+		            						var _alpha_check = _data_gedian[_index_check + 3];
+		            						if(_alpha_check == 255){
+			            						var dis = Math.pow(i - x_around, 2) + Math.pow(j - y_around, 2);
+				            					if(dis <= radius_square){
+				            						dis_arr.push({
+				            							dis: 1/dis,
+				            							r: _data_gedian[_index_check],
+				            							g: _data_gedian[_index_check + 1],
+				            							b: _data_gedian[_index_check + 2],
+				            							a: _alpha_check
+				            						});
+				            					}
+			            					}
+		            					}
+		            					
+		            				}
+		            			}
+		            			var len = dis_arr.length;
+		            			if(len > 3){
+		            				var r = g = b = a = 0;
+		            				// if(len == 1){
+		            				// 	var item = dis_arr[0];
+		            				// 	r = item.r;
+		            				// 	g = item.g;
+		            				// 	b = item.b;
+		            				// 	// a = item.a * item.dis;
+		            				// }else{
+		            				// 	dis_arr.sort(function(a, b){
+			            			// 		return b.dis - a.dis;
+			            			// 	});
+			            			// 	dis_arr.splice(4);
+		            				// 	var dis_sum = 0;
+		            				// 	len = dis_arr.length;
+		            				// 	for(var i_dis = 0; i_dis < len; i_dis++){
+		            				// 		dis_sum += dis_arr[i_dis].dis;
+		            				// 	}
+		            					
+		            				// 	for(var i_dis = 0; i_dis < len; i_dis++){
+		            				// 		var item = dis_arr[i_dis];
+		            				// 		var per = item.dis/dis_sum;
+		            				// 		r += item.r * per;
+		            				// 		g += item.g * per;
+		            				// 		b += item.b * per;
+		            				// 		// a += item.a * per;
+		            				// 	}
+		            				// 	a = 255;
+		            				// }
+		            				// a = 255;
+		            				dis_arr.sort(function(a, b){
+		            					return a.dis - b.dis;
+		            				});
+		            				var item = dis_arr.pop();
+		            				r = item.r;
+		            				g = item.g;
+		            				b = item.b;
+		            				a = item.a;
+		            				_set_rgba(i, j, [r, g, b, a], _data_new);
+		            			}
+		            		}
+		            	}
+		            }
+		            ctx_interpolat.putImageData(imagedata_new, 0, 0);
+	            }
+
+	            // _doclip.call(_this.gm, ctx);
 	            ctx.drawImage(interpolationCanvas, 0, 0);
 	            ctx.restore();
             }
@@ -1164,7 +1243,7 @@ define('GeoMap',['zrender',
 			}
 			new_data.push(arr);
 		}
-		shape.setData(new_data, c_width, c_height);
+		shape.setData(new_data, c_width, c_height, map.getZoom());
 		shape.gm = map;
 		return shape;
 	}

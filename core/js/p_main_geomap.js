@@ -281,10 +281,20 @@ Core.safe(function(){
                             arr.push({
                             	x: v.x,
                             	y: v.y,
-                            	c: color
+                            	c: color,
+                            	v: v
                             });
                         }
                         _new_interpolate_data.push(arr);  
+                    }
+                    gm.fn_get_color = function(val){
+                    	var color = color_toRGB(getColor(val), true);
+                        if(color){
+                            color.push(255);
+                        }else{
+                            color = [0, 0, 0, 0];
+                        }
+                        return color;
                     }
 					var interpolation_overlay = new GeoMap.Interpolation(_new_interpolate_data);
 					gm.addOverlay(interpolation_overlay);   //渲染插值结果
@@ -672,7 +682,7 @@ Core.safe(function(){
 									Timer.start('read micaps');
 									var conf_interpolation = conf_other.interpolation;
 									file_util.micaps.getData(file_newest, {
-										grid_space: 0.2,
+										grid_space: 0.2, //0.1 - 0.3速度和效率都可以接受
 										interpolation_all: conf_interpolation && conf_interpolation.flag //传入micaps解析需要参数
 									}, function(err, data){
 										// console.log(err, data);
