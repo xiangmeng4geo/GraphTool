@@ -2,5 +2,6 @@
 	"show": false,
 	"width": 820,
 	"height": 500,
-	"resizable": true
+	"resizable": true,
+	"toolbar": true
 }

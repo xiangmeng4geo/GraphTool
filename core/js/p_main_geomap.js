@@ -274,7 +274,7 @@ Core.safe(function(){
                             var v = interpolate[i][j];
                             var color = color_toRGB(getColor(v.v), true);
                             if(color){
-                                color.push(200);
+                                color.push(255);
                             }else{
                                 color = [0, 0, 0, 0];
                             }
@@ -527,18 +527,20 @@ Core.safe(function(){
 							}
 							function _add_title3(pos){
 								var _title_3 = conf_title.title_3;
-								if(!is_updown){
-									var m = /font-size: (\d+)px/.exec(_title_3.style);
-									var height = m? parseFloat(m[1]) + 10: 30;
-									if(!isNaN(pos.top)){
-										pos.top -= height;
-									}else{
-										pos.bottom += height;
+								if(_title_3){
+									if(!is_updown){
+										var m = /font-size: (\d+)px/.exec(_title_3.style);
+										var height = m? parseFloat(m[1]) + 10: 30;
+										if(!isNaN(pos.top)){
+											pos.top -= height;
+										}else{
+											pos.bottom += height;
+										}
 									}
+									
+									$html_title3 = addTitle(_title_3, pos, true);
+									$html_title3 && $html_title3.data('use_mtime', true);
 								}
-								
-								$html_title3 = addTitle(_title_3, pos, true);
-								$html_title3.data('use_mtime', true);
 							}
 							
 							var _width = $geomap_layer.width();
@@ -670,7 +672,7 @@ Core.safe(function(){
 									Timer.start('read micaps');
 									var conf_interpolation = conf_other.interpolation;
 									file_util.micaps.getData(file_newest, {
-										grid_space: 0.1,
+										grid_space: 0.2,
 										interpolation_all: conf_interpolation && conf_interpolation.flag //传入micaps解析需要参数
 									}, function(err, data){
 										// console.log(err, data);
