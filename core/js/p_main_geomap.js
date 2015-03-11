@@ -261,6 +261,7 @@ Core.safe(function(){
 		        // 3类里的插值结果
 				var interpolate = data.interpolate;
 				if(interpolate){
+					var COLOR_TRANSPANT = 'rgba(0,0,0,0)';
 					var _interpolate_width,
 						_interpolate_height;
 					try{
@@ -272,22 +273,34 @@ Core.safe(function(){
                         var arr = [];
                         for(var j = 0; j< _interpolate_height; j++){
                             var v = interpolate[i][j];
-                            var color = color_toRGB(getColor(v.v), true);
-                            if(color){
-                                color.push(255);
-                            }else{
-                                color = [0, 0, 0, 0];
-                            }
+                            var color = getColor(v.v);
                             arr.push({
                             	x: v.x,
                             	y: v.y,
-                            	c: color
+                            	c: color || COLOR_TRANSPANT
                             });
                         }
                         _new_interpolate_data.push(arr);  
                     }
-					var interpolation_overlay = new GeoMap.Interpolation(_new_interpolate_data);
-					gm.addOverlay(interpolation_overlay);   //渲染插值结果
+					var polygons = raster2vector(_new_interpolate_data, COLOR_TRANSPANT);
+					for(var i = 0, j = polygons.length; i<j; i++){
+						var point_arr = [];
+						var polygon = polygons[i];
+						var color = polygon.color;
+						for(var i_p = 0, items = polygon.items, j_p = items.length; i_p<j_p; i_p++){
+							var v = items[i_p];
+							var point = new GeoMap.Point(v.lng, v.lat);
+							point_arr.push(point);
+						}
+						var polygonShape = new GeoMap.Polygon(point_arr, {
+							style: {
+								strokeColor: COLOR_TRANSPANT, 
+								color: color,
+							}
+						});
+						gm.addOverlay(polygonShape);   //增加面
+					}
+					// gm.addOverlay(interpolation_overlay);   //渲染插值结果
 				}
 				// 14类中的面
 				var areas = data.areas;
