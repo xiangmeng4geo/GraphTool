@@ -128,12 +128,14 @@ Core.safe(function(){
 		$file_rule_example_span = $('#file_rule_example span'),
 		$select_file_type = $('#select_file_type'),
 		$select_file_hour = $('#select_file_hour'),
+		$select_value_col = $('#select_value_col'),
 		$cb_use_bgcolor = $('#cb_use_bgcolor'),
 		$cb_use_bgimg = $('#cb_use_bgimg'),
 		$cb_interpolation_all = $('#cb_interpolation_all');
 	/*初始化文件选定*/
 	!function(){
 		var const_file_rule = Core.Const.fileRule,
+			col_index = const_file_rule.col_index,
 			file_rule_time = const_file_rule.time_rule,
 			file_rule_file_postfix = const_file_rule.file_postfix,
 			file_type = const_file_rule.file_type,
@@ -164,6 +166,12 @@ Core.safe(function(){
 			html_file_hour += '<option value="'+v+'">'+v+'</option>';
 		});
 		$select_file_hour.html(html_file_hour);
+
+		var html_value_col = '';
+		for(var i = col_index[0], j = col_index[1]; i<=j; i++){
+			html_value_col += '<option value="'+i+'">'+i+'</option>';
+		}
+		$select_value_col.html(html_value_col);
 
 		var $text_file_dir_in = $('#text_file_dir_in');
 		/*显示选定的文件规则*/
@@ -400,7 +408,8 @@ Core.safe(function(){
 					'custom': $text_file_rule_custom.val(),
 					'type': $('[name=file_rule]:checked').val(),
 					'file_type': $select_file_type.val(),
-					'file_hour': parseInt($select_file_hour.val()) || 0
+					'file_hour': parseInt($select_file_hour.val()) || 0,
+					'col': parseInt($select_value_col.val())
 				},
 				'out_filename': $text_out_filename.val()
 			},
@@ -521,6 +530,7 @@ Core.safe(function(){
 
 				selected_option($select_file_type, file_rule.file_type);
 				selected_option($select_file_hour, file_rule.file_hour);
+				selected_option($select_value_col, file_rule.col);
 
 				var filename = conf_in_out.out_filename || product_name+'_'+map_width+'x'+map_height+'.png';
 				$text_out_filename.val(filename);
