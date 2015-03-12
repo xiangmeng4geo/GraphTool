@@ -211,7 +211,7 @@ Core.safe(function(){
 				gm.reset(true);
 			});
 			// 根据配色方案进行地图元素初始化
-			function render_conf(data, blendent){
+			function render_conf(data, blendent, params){
 				// 添加背景色让地图不透明
 				gm.addOverlay(new GeoMap.Rectangle({
 					style: {
@@ -282,7 +282,10 @@ Core.safe(function(){
                         }
                         _new_interpolate_data.push(arr);  
                     }
-					var polygons = raster2vector(_new_interpolate_data, COLOR_TRANSPANT);
+                    Timer.start('raster2vector');
+                    var polygons = file_util.micaps.raster2vector(_new_interpolate_data, COLOR_TRANSPANT, params);
+					// var polygons = raster2vector(_new_interpolate_data, COLOR_TRANSPANT);
+                    Timer.end('raster2vector', 1);
 					for(var i = 0, j = polygons.length; i<j; i++){
 						var point_arr = [];
 						var polygon = polygons[i];
@@ -687,14 +690,12 @@ Core.safe(function(){
 									file_util.micaps.getData(file_newest, {
 										grid_space: 0.2,
 										interpolation_all: conf_interpolation && conf_interpolation.flag //传入micaps解析需要参数
-									}, function(err, data){
+									}, function(err, data, params){
 										// console.log(err, data);
 										Timer.end('read micaps');
 										if(err){
 											alert(err.msg || '读取数据错误！');
 										}else{
-											data_of_micaps = data;
-											render_conf(data_of_micaps, conf_of_product.legend.blendent);
 											$html_title1 && $html_title1.find('span').text(function(){
 												return _replace_date($(this).text());
 											});
@@ -704,6 +705,8 @@ Core.safe(function(){
 											$html_title3 && $html_title3.find('span').text(function(){
 												return _replace_date($(this).text(), true);
 											});
+											data_of_micaps = data;
+											render_conf(data_of_micaps, conf_of_product.legend.blendent, params);
 										}
 										_afterRender()
 									});

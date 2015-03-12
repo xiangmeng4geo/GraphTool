@@ -23,14 +23,16 @@ define('LegendImage',['zrender',
 			html_title += '<span>'+title+'</span>';
 			html_color += '<ul>';
 			var colors = v.colors;
-			colors = colors.filter(function(v){
+			colors = colors.filter(function(v, i){
 				if(v.is_checked){
+					v._i = i;
 					return v;
 				}
 			});
 			colors.sort(function(a, b){
-				return a.order > b.order;
+				return a.order - b.order || a._i - b._i;
 			});
+			console.log(colors);
 			if(is_reverse){
 				colors.reverse();
 			}

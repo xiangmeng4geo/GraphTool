@@ -498,7 +498,7 @@ define('GeoMap',['zrender',
 		}
     }
 	GeoMapProp.addMask = function(polygons){
-		Timer.start('addMask');
+		// Timer.start('addMask');
 		if(!polygons){
 			polygons = this.polygons;
 		}else{
@@ -510,7 +510,7 @@ define('GeoMap',['zrender',
 		var ctx = this.canvas.painter.getLayer(ZINDEX_LAYER).ctx;
 		_doclip.call(this,ctx);
 
-		Timer.end('addMask');
+		// Timer.end('addMask');
 	}
 	
 	function _createDom(id, type, painter) {
