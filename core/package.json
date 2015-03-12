@@ -1,6 +1,6 @@
 {
   "name": "GraphTool",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "智慧气象服务产品生成系统",
   "main": "login.html",
   "window": {
