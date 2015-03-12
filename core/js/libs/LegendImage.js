@@ -32,7 +32,6 @@ define('LegendImage',['zrender',
 			colors.sort(function(a, b){
 				return a.order - b.order || a._i - b._i;
 			});
-			console.log(colors);
 			if(is_reverse){
 				colors.reverse();
 			}
