@@ -1,6 +1,5 @@
 !function(){
 	var is_admin = true;
-	var CONF_NAME_SYS_PRODUCT_TREE = 'sys_product_tree';
 	var nwCore = Core.require('core'),
 		nwConf = nwCore.conf,
 		Page = Core.Page;
@@ -19,7 +18,7 @@
 	$('#btn_setting').click(Page.setting);
 
 	var Tree = (function(){
-		var tree_data = nwConf.get(CONF_NAME_SYS_PRODUCT_TREE);
+		var tree_data = ConfUser.getTree();
 		
 		function createNode(data,prefix){
 			if(prefix != undefined){
@@ -101,7 +100,7 @@
 		}
 		/*更新文件*/
 		function updateProductTreeConf(){
-			nwConf.write(CONF_NAME_SYS_PRODUCT_TREE,JSON.stringify(tree_data));
+			ConfUser.setTree(JSON.stringify(tree_data));
 		}
 		initTree();
 		

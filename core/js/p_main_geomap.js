@@ -438,12 +438,13 @@ Core.safe(function(){
 			function _resolve(_path){
 				return path_util.resolve(file_util.path.project, _path);
 			}
-			var china_json = '../../../git_project/GeoMap/json/china_mask.geo.json';
-			china_json = '../../../git_project/GeoMap/json/china.geo.json';
-			// china_json = 'shell/data/china_mask.geo.meractor.json';
-			// china_json = _resolve('shell/data/china_province.meractor.json');
-			// china_json = _resolve('shell/data/china.geo.albers.json');
-			china_json = _resolve('shell/data/china_province.'+gm_projector+'.json');
+			// var china_json = '../../../git_project/GeoMap/json/china_mask.geo.json';
+			// var china_json = '../../../git_project/GeoMap/json/china.geo.json';
+			// // china_json = 'shell/data/china_mask.geo.meractor.json';
+			// // china_json = _resolve('shell/data/china_province.meractor.json');
+			// // china_json = _resolve('shell/data/china.geo.albers.json');
+			// var china_json = _resolve('shell/data/china_province.'+gm_projector+'.json');
+			var china_json = './data/china_province.'+gm_projector+'.json';
 			gm.loadGeo([china_json],{
 				style: {
 					// color: '#F5F3F0',
