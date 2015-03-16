@@ -356,25 +356,43 @@ define('GeoMap',['zrender',
 			if('Feature' == type){
 				var geometry = v.geometry;
 				var type_geometry = geometry.type;
+
+				var prop = v.properties;
 				var options = {
 					enname: v.id,
-					properties: v.properties,
-					style: {
-						text: v.properties.name,
-						// color: '#F5F3F0'
-					},
+					properties: prop,
+					// style: {
+					// 	// text: v.properties.name,
+					// 	// color: '#F5F3F0'
+					// },
 					zlevel: ZINDEX_MAP,
 					is_lnglat: is_lnglat,
 					scale: scale
 				}
 
+
+				var cname = prop.name,
+					cp = prop.cp;
+				if(cname && cp){
+					var textShape = new GeoMap.Text(cname, 'font-size:14px;', null, {
+						pos: {
+							x: cp[0],
+							y: cp[1]
+						},
+						offset: {
+							x: -5,
+							y: -5
+						}
+					});
+					gm.addOverlay(textShape);
+				}
 				if('Polygon' == type_geometry ){
 					shapes.push(addGeoPolygon.call(gm,geometry.coordinates,options));
 				}else if('MultiPolygon' == type_geometry){
 					$.each(geometry.coordinates,function(v_i,v_v){
-						if(v_i > 0){
-							delete options.style.text;
-						}
+						// if(v_i > 0){
+						// 	delete options.style.text;
+						// }
 						shapes.push(addGeoPolygon.call(gm,v_v,options));
 					});
 				}else{
@@ -478,24 +496,24 @@ define('GeoMap',['zrender',
 		}
 	}
     function _doclip(ctx){
-		var polygons = this.polygons;
-		if($.isArray(polygons)){
-			ctx.save();
-			ctx.beginPath();
-			$.each(polygons, function(i_polygon, pointList){
-				if (pointList.length < 2) {
-	                // 少于2个点就不画了~
-	                return;
-	            }
-	            ctx.moveTo(pointList[0][0], pointList[0][1]);
-	            for (var i = 1, l = pointList.length; i < l; i++) {
-	                ctx.lineTo(pointList[i][0], pointList[i][1]);
-	            }
-	            ctx.lineTo(pointList[0][0], pointList[0][1]);
-			});
-			ctx.closePath();
-			ctx.clip();
-		}
+		// var polygons = this.polygons;
+		// if($.isArray(polygons)){
+		// 	ctx.save();
+		// 	ctx.beginPath();
+		// 	$.each(polygons, function(i_polygon, pointList){
+		// 		if (pointList.length < 2) {
+	 //                // 少于2个点就不画了~
+	 //                return;
+	 //            }
+	 //            ctx.moveTo(pointList[0][0], pointList[0][1]);
+	 //            for (var i = 1, l = pointList.length; i < l; i++) {
+	 //                ctx.lineTo(pointList[i][0], pointList[i][1]);
+	 //            }
+	 //            ctx.lineTo(pointList[0][0], pointList[0][1]);
+		// 	});
+		// 	ctx.closePath();
+		// 	ctx.clip();
+		// }
     }
 	GeoMapProp.addMask = function(polygons){
 		// Timer.start('addMask');
@@ -940,6 +958,10 @@ define('GeoMap',['zrender',
 					shape.style.x = pixel.x;
 					shape.style.y = pixel.y;
 				}catch(e){}
+			}
+			if(option.offset){
+				shape.style.x += option.offset.x;
+				shape.style.y += option.offset.y;
 			}
 		}
 		return shape;
