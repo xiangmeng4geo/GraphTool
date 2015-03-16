@@ -35,7 +35,7 @@ function changeSuffix(dir){
 				if(ext == '.html'){
 					var content = fs.readFileSync(newPathName, 'utf8');
 					content = content.replace(/\.css/g,'.gtc').replace(/css(?=\/)/g,'c')
-						.replace(/\.js/g,'.gtj').replace(/js(?=\/)/g,'j');
+						.replace(/\.js/g,'.gts').replace(/js(?=\/)/g,'j');
 					fs.writeFileSync(newPathName, content);
 				}
 			}
