@@ -5,9 +5,9 @@
   "main": "login.html",
   "window": {
     "position": "center",
-    "width": 320,
-    "height": 250,
-    "toolbar": true,
+    "width": 400,
+    "height": 310,
+    "toolbar": false,
     "as_desktop": true,
     "show": true,
     "resizable": false
