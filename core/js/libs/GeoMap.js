@@ -603,7 +603,6 @@ define('GeoMap',['zrender',
 	    $.each(noclipShapes, function(i, shape){
 	    	_drawShape(ctx, shape);
 	    });
-console.log(backgroundColor);
         var img_data = maskImageDom.toDataURL(null, backgroundColor);
         maskImageDom = null;
         ctx = null;
