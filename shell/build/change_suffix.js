@@ -6,6 +6,11 @@ var TRANSLATION = {
 	'.js': '.gts',
 	'.css': '.gtc'
 };
+function _replace(file, fn_replace){
+	var content = fs.readFileSync(file, 'utf8');
+		content = fn_replace(content);
+		fs.writeFileSync(file, content);
+}
 function changeSuffix(dir){
 	var files = fs.readdirSync(dir);
 	files.forEach(function(file){
@@ -33,13 +38,32 @@ function changeSuffix(dir){
 				newPathName = newPathName;
 				fs.renameSync(pathname, newPathName);
 				if(ext == '.html'){
-					var content = fs.readFileSync(newPathName, 'utf8');
-					content = content.replace(/\.css/g,'.gtc').replace(/css(?=\/)/g,'c')
-						.replace(/\.js/g,'.gts').replace(/js(?=\/)/g,'j');
-					fs.writeFileSync(newPathName, content);
+					// var content = fs.readFileSync(newPathName, 'utf8');
+					_replace(newPathName, function(content){
+						return content.replace(/\.css/g,'.gtc').replace(/css(?=\/)/g,'c')
+								.replace(/\.js/g,'.gts').replace(/js(?=\/)/g,'j');
+					});
 				}
 			}
 		}
+	});
+	_replace(path.join(dir, 'package.json'), function(content){
+		return content.replace('login.html', 'login.gt');
+	});
+	_replace(path.join(dir, 'j/core.gts'), function(content){
+		return content.replace(/\.html/g, '.gt');
+	});
+	_replace(path.join(dir, 'j/libs/esl.gts'), function(content){
+		return content.replace(/\.js/g, '.gts');
+	});
+	_replace(path.join(dir, 'j/p_main_geomap.gts'), function(content){
+		return content.replace('./js/libs/esl.js', './j/libs/esl.gts').replace(/\js\//g, '/j/');
+	});
+	_replace(path.join(dir, 'j/libs/j-tree.gts'), function(content){
+		return content.replace('../../css/j.tree/tree.css', '../../c/j.tree/tree.gtc').replace(/\js\//g, '/j/');
+	});
+	_replace(path.join(dir, 'j/libs/j-tree.gts'), function(content){
+		return content.replace('../../css/j/ui-1.11.2.css', '../../c/j/ui-1.11.2.gtc').replace(/\js\//g, '/j/');
 	});
 }
 
