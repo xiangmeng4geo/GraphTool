@@ -47,6 +47,9 @@ function changeSuffix(dir){
 			}
 		}
 	});
+}
+
+function _replace_content(dir){
 	_replace(path.join(dir, 'package.json'), function(content){
 		return content.replace('login.html', 'login.gt');
 	});
@@ -62,15 +65,15 @@ function changeSuffix(dir){
 	_replace(path.join(dir, 'j/libs/j-tree.gts'), function(content){
 		return content.replace('../../css/j.tree/tree.css', '../../c/j.tree/tree.gtc').replace(/\js\//g, '/j/');
 	});
-	_replace(path.join(dir, 'j/libs/j-tree.gts'), function(content){
+	_replace(path.join(dir, 'j/libs/j-ui.gts'), function(content){
 		return content.replace('../../css/j/ui-1.11.2.css', '../../c/j/ui-1.11.2.gtc').replace(/\js\//g, '/j/');
 	});
 }
-
 
 var args = [].slice.call(process.argv);
 //命令行进行指定文件压缩
 if(args.length > 2){
 	var dir = args[2];
 	changeSuffix(dir);
+	_replace_content(dir);
 }
