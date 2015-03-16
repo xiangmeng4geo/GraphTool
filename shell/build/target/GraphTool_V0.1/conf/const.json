@@ -1,0 +1,63 @@
+{
+	"msgType": {
+		"ADD_PRODUCT": "addProduct",
+		"CONF_STYLE": "conf_style",
+		"CONF_PRODUCT": "conf_product"
+	},
+	"productType": {
+		"TYPE": {
+			"n": "分类",
+			"v": 1
+		},
+		"PRODUCT": {
+			"n": "产品",
+			"v": 2
+		}
+	},
+	"fileRule": {
+		"time_rule": [
+			"yyyyMMddhh",
+			"yyMMddhh",
+			"yyMMdd",
+			"yyMM",
+			"MMddhh",
+			"MMdd"
+		],
+		"file_postfix": [
+			"000","006","012","024","048","072","084","096","108","120","132","144","156","168","dat"
+		],
+		"file_type": {
+			"shikuang": {
+				"n": "实况",
+				"v": 1
+			},
+			"forecast": {
+				"n": "预报",
+				"v": 2
+			}
+		},
+		"file_hour": [
+			0, 1, 3, 6, 12, 18, 24, 48, 72, 96, 120, 144, 168
+		],
+		"col_index": [3, 30]
+	},
+	"legend": {
+		"unit": [
+			"厘米","cm","毫米","mm","摄氏度","°C"
+		],
+		"product": [
+			{"n": "雨","v": 26},
+			{"n": "雨夹雪","v": 24},
+			{"n": "雪","v": 23},
+			{"n": "霾","v": "100"},
+			{"n": "雾","v": "101"},
+			{"n": "温度","v": "102"},
+			{"n": "湿度","v": "103"},
+			{"n": "能见度","v": "104"}
+		]
+	},
+	"projector": [
+		{"n": "墨卡托投影", "v": "mercator"},
+		{"n": "亚尔伯斯等积圆锥投影", "v": "albers"}
+	]
+}
