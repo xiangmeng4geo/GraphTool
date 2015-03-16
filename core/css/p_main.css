@@ -36,27 +36,8 @@
 	position: relative;
 	background-color: #e5e6e7;
 }
-/*#btn_setting{
-	width: 298px;
-	height: 96px;
-	margin-top: 2px;
-	border-right: 1px solid rgba(9,71,131,0.4);
-	box-shadow: 1px 0 1px rgba(255, 255, 255, 0.1);
-	background: url(../img/icon_setting.png) no-repeat center 11px;
-	position: relative;
-	cursor: pointer;
-}
-#btn_setting span{
-	position: absolute;
-	left: 50%;
-	bottom: 13px;
-	width: 100px;
-	margin-left: -50px;
-	text-align: center;
-}*/
 #c_top{
 	background-color: #2e3035;
-	/*border-bottom: 1px solid #bbb;*/
 	overflow: hidden;
 	height: 40px;
 	width: 100%;
@@ -382,7 +363,9 @@
 	background: url(../img/logo_black.png) no-repeat left center;
 	margin-left: 30px;
 }
-
+.user_icon{
+	height: 30px;
+}
 .user_icon img{
 	width: 30px;
 	height: 30px;
@@ -390,7 +373,7 @@
 }
 .top_right{
 	margin-right: 100px;
-	padding-top: 5px;
+	padding-top: 10px;
 }
 #user_name{
 	margin-left: 10px;
@@ -422,7 +405,7 @@
 	width: 100%;
 	padding: 1px;
 	left: 0px;
-	top: 30px;
+	top: 25px;
 }
 #slide_down div{
 	height: 14px;
