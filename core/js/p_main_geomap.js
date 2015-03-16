@@ -1008,7 +1008,7 @@ Core.safe(function(){
 					var cache_file = {};
 					files_loaded = file_util.readdir(icon_path);
 					if(!$tool_image){
-						$tool_image = $('<div class="tool_image"><div class="btn_close_tool_image"></div><div class="tool_image_main"></div></div>').appendTo('#c_right');
+						$tool_image = $('<div class="tool_image"><div class="btn_close_tool_image"></div><div class="tool_image_main"></div></div>').appendTo('#work_container');
 						$tool_image.delegate('select','change',function(){
 							showFiles($tool_image.find('ul'),cache_file[$(this).val()]);
 						});
@@ -1018,6 +1018,14 @@ Core.safe(function(){
 						$tool_image_main = $tool_image.find('.tool_image_main');
 					}
 					var html_select = '<select>';
+					function _getHeight(){
+						return $tool_image.height() - 80;
+					}
+					$(window).on('resized', function(){
+						$('.list_container').css({
+							height: _getHeight()
+						});
+					})
 					function createOption(val,tab,index){
 						var html = '';
 						var is_dir = !!val.sub;
@@ -1052,7 +1060,7 @@ Core.safe(function(){
 					});
 					html_select += '</select>';
 					$tool_image_main.children().remove();
-					$tool_image_main.html(html_select+'<ul class="clear"></ul>');
+					$tool_image_main.html(html_select+'<div class="list_container" style="height: '+(_getHeight())+'px"><ul class="clear"></ul></div>');
 					showFiles($tool_image_main.find('ul'),cache_file[$tool_image_main.find('select').val()]);
 				}
 			}
@@ -1062,9 +1070,19 @@ Core.safe(function(){
 			}
 		})();
 
+		/*添加外部图片*/
+		var _add_img_external = function(){
+			$('<input type="file" nwworkingdir="'+file_util.path.image+'" />').on('change',function(){
+				add_maplayer_img($(this).val(), {
+					left: $geomap_layer.width()/2,
+					top: $geomap_layer.height()/2
+				});
+			}).click();
+		}
 		$('#btn_add_text').click(_add_text);
 		$('#btn_add_img').click(_show_entrepot_images);
 		$('#btn_export').click(_save_img);
+		$('#btn_add_img_external').click(_add_img_external);
 		$geomap_layer.on('contextmenu',function(e_contextmenu){
 			_cache_e_contextmenu = e_contextmenu; // 暂存事件对象
 			var $this = $(this);
@@ -1075,14 +1093,7 @@ Core.safe(function(){
 				menu_add_text.on('click', _add_text);
 				
 				var menu_add_img_external = new MenuItem({label: '添加外部图片'});
-				menu_add_img_external.on('click',function(){
-					$('<input type="file" nwworkingdir="'+file_util.path.image+'" />').on('change',function(){
-						add_maplayer_img($(this).val(), {
-							left: $geomap_layer.width()/2,
-							top: $geomap_layer.height()/2
-						});
-					}).click();
-				});
+				menu_add_img_external.on('click', _add_img_external);
 				var menu_add_img_entrepot = new MenuItem({label: '添加图片库图片'});
 
 				

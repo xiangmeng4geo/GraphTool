@@ -58,7 +58,7 @@
 			if(is_admin){
 				root = {
 					"id" : 'root',
-				    "text" : '根目录',
+				    "text" : '产品列表',
 				    "showcheck" : false,
 				    "complete" : true,
 				    "isexpand" : true,
@@ -141,7 +141,7 @@
 				updateProductTreeConf();
 			}
 		}
-		function _is_in_tree(name, tree){debugger;
+		function _is_in_tree(name, tree){
 			if(tree){
 				if(tree.name == name){
 					return true;
@@ -261,16 +261,54 @@
 		menu_tree.append(menu_conf);
 	})();
 
+	var $slide_down = $('#slide_down'),
+		$btn_slide = $('#btn_slide');
+	var flag_is_over = false;
+	$slide_down.on('mouseenter', function(){
+		flag_is_over = true;console.log(1);
+	}).on('mouseleave', function(){
+		flag_is_over = false;
+	});
+	var tt;
+	$('.user_info').on('mouseenter', function(){
+		// flag_is_over = true;
+		$slide_down.slideDown();
+		$btn_slide.addClass('open');
+	}).on('mouseleave', function(){
+		clearTimeout(tt);
+		tt = setTimeout(function(){console.log(12);
+			if(!flag_is_over){
+				$slide_down.slideUp();
+				$btn_slide.removeClass('open');
+			}
+		}, 50);
+	});
+	// $('.user_info').on('click', function(){
+	// 	if($slide_down.is(':visible')){
+	// 		$slide_down.slideUp();
+	// 		$btn_slide.removeClass('open');
+	// 	}else{
+	// 		$slide_down.slideDown();
+	// 		$btn_slide.addClass('open');
+	// 	}
+	// });
+	var height_top_container = $('.top_container').height();
 	var $win = $(window);
-	var $c_right = $('#c_right');
+	var $c_right = $('#c_right'),
+		$work_container = $('#work_container');
 	var _init_size_TT;
 	function _init_size(){
 		clearTimeout(_init_size_TT);
 		_init_size_TT = setTimeout(function(){
+			var height_c_right = $win.height() - height_top_container;
 			$c_right.css({
-				width: $win.width() - 300 + 10,
-				height: $win.height() - $c_right.offset().top
+				width: $win.width()+ 10,
+				height: height_c_right
 			});
+			$work_container.css({
+				height: height_c_right - $('#c_top').height() - 2
+			});
+			$win.trigger('resized');
 		}, 10);
 	}
 	_init_size();
