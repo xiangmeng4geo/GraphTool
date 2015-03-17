@@ -390,7 +390,7 @@ Core.safe(function(){
 									strokeColor : '#1010FF',
 									lineWidth : 2,
 								},
-								zlevel: GeoMap.ZLEVEL.NOCLIP
+								// zlevel: GeoMap.ZLEVEL.NOCLIP
 							});
 							gm.addOverlay(polyline);   //增加折线
 						}
