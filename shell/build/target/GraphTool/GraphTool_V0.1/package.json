@@ -1,0 +1,15 @@
+{
+  "name": "GraphTool",
+  "version": "0.3.0",
+  "description": "智慧气象服务产品生成系统",
+  "main": "login.gt",
+  "window": {
+    "position": "center",
+    "width": 320,
+    "height": 250,
+    "toolbar": true,
+    "as_desktop": true,
+    "show": true,
+    "resizable": false
+  }
+}
