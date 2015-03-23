@@ -271,7 +271,7 @@
 			}else{
 				_win = _open(name);
 				if(callback){
-					_win.on('loaded',function(e){console.log('loaded');
+					_win.on('loaded',function(e){
 						callback.call(_win,e);
 					});
 					_win.on('focus',function(){

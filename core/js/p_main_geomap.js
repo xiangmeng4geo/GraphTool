@@ -858,6 +858,11 @@ Core.safe(function(){
 		function ImageLayer(option, callback){
 			var pos = option.position;
 			var src = option.src;
+
+			if(!/^http/.test(src) && !file_util.exists(src.replace(/\?.*$/, ''))){
+				callback();
+				return;
+			}
 			var img = new Image();
 			img.onload = function(){
 				var width = this.width,
@@ -892,6 +897,9 @@ Core.safe(function(){
 					width_show: toWidth,
 					height_show: toHeight
 				});
+			}
+			img.onerror = function(){
+				callback();
 			}
 			img.src = src;
 		}
@@ -1129,7 +1137,7 @@ Core.safe(function(){
 			position: pos,
 			src: src
 		},function($html, param){
-			$geomap_layer.append($html);
+			$html && $geomap_layer.append($html);
 			callback && callback($html, param);
 		});
 	}
