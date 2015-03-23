@@ -4,7 +4,8 @@ var fs = require('fs'),
 var TRANSLATION = {
 	'.html': '.gt',
 	'.js': '.gts',
-	'.css': '.gtc'
+	'.css': '.gtc',
+	'.json': '.json'
 };
 function _replace(file, fn_replace){
 	var content = fs.readFileSync(file, 'utf8');
@@ -35,13 +36,17 @@ function changeSuffix(dir){
 			var toExt = TRANSLATION[ext];
 			if(toExt){
 				var newPathName = path.join(dir, path.basename(pathname, ext) + toExt);
-				newPathName = newPathName;
-				fs.renameSync(pathname, newPathName);
-				if(ext == '.html'){
-					// var content = fs.readFileSync(newPathName, 'utf8');
+				if(pathname != newPathName){
+					fs.renameSync(pathname, newPathName);
+				}
+				if('.html' == ext){
 					_replace(newPathName, function(content){
 						return content.replace(/\.css/g,'.gtc').replace(/css(?=\/)/g,'c')
 								.replace(/\.js/g,'.gts').replace(/js(?=\/)/g,'j');
+					});
+				}else if('.json' == ext){
+					_replace(newPathName, function(content){
+						return content.replace(/"toolbar":\s*true/, '"toolbar": false');
 					});
 				}
 			}

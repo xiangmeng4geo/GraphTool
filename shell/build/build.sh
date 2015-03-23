@@ -1,6 +1,6 @@
-VERSION=V0.1
+VERSION=$1
 PROJECT_NAME=GraphTool
-target_dir=./target/${PROJECT_NAME}/${PROJECT_NAME}_${VERSION}
+target_dir=./target/${PROJECT_NAME}_${VERSION}
 
 mkdir -p $target_dir
 
