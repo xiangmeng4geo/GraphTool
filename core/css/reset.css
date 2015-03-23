@@ -141,7 +141,12 @@ textarea{resize:none}
 	background: rgba(255,0,0,0.4);
 }*/
 /* 设置滚动条的样式 }*/
-
+th{
+	background-color: #eee;
+}
+td{
+	background-color: white;
+}
 
 ul,ol{
 	/*
@@ -179,6 +184,9 @@ ul,ol{
 }
 .mt10{
 	margin-top: 10px;
+}
+.mt20{
+	margin-top: 20px;
 }
 
 /* 图例 { */

@@ -12,7 +12,9 @@ Core.safe(function(){
 	var file_util = core_libs.util.file;
 	var Conf_User = core_libs.conf.User;
 	var CoreWindow = Core.Window;
-	var const_msgtype = Core.Const.msgType;
+	var _const = Core.Const;
+	var const_msgtype = _const.msgType,
+		_template = _const.template;
 	
 	$('.file_dir').click(function(){
 		$(this).parent().prev().click();
@@ -134,7 +136,8 @@ Core.safe(function(){
 		$select_value_col = $('#select_value_col'),
 		$cb_use_bgcolor = $('#cb_use_bgcolor'),
 		$cb_use_bgimg = $('#cb_use_bgimg'),
-		$cb_interpolation_all = $('#cb_interpolation_all');
+		$cb_interpolation_all = $('#cb_interpolation_all'),
+		$select_template = $('#select_template');
 	/*初始化文件选定*/
 	!function(){
 		var const_file_rule = Core.Const.fileRule,
@@ -165,7 +168,7 @@ Core.safe(function(){
 		$select_file_type.html(html_file_type);
 
 		var html_file_hour = '';
-		$.each(file_hour,function(i,v){
+		$.each(file_hour, function(i,v){
 			html_file_hour += '<option value="'+v+'">'+v+'</option>';
 		});
 		$select_file_hour.html(html_file_hour);
@@ -175,6 +178,16 @@ Core.safe(function(){
 			html_value_col += '<option value="'+i+'">'+i+'</option>';
 		}
 		$select_value_col.html(html_value_col);
+
+		var html_template = '';
+		$.each(Conf_User.getSys().templates, function(i, v){
+			if(v.flag){
+				var val = v.t.join('x');
+				html_template += '<option value="'+(val)+'">'+(v.n+'('+val+')')+'</option>';
+			}
+		});
+		$select_template.html(html_template);
+
 
 		var $text_file_dir_in = $('#text_file_dir_in');
 		/*显示选定的文件规则*/
@@ -452,7 +465,8 @@ Core.safe(function(){
 				},
 				'interpolation': {
 					'flag': $cb_interpolation_all.prop('checked')
-				}
+				},
+				'template': $select_template.val().split('x')
 			}
 		};
 		
@@ -604,6 +618,11 @@ Core.safe(function(){
 				var conf_interpolation = conf_other.interpolation;
 				if(conf_interpolation){
 					$cb_interpolation_all.prop('checked', conf_interpolation.flag);
+				}
+
+				var template = conf_other.template || _template;
+				if(template){
+					selected_option($select_template, template.join('x'));
 				}
 			}
 		}
