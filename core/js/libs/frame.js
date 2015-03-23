@@ -10,6 +10,7 @@
 				win.moveBy(x_new-x_old, y_new-y_old);
 				x_old = x_new;
 				y_old = y_new;
+				is_max = false;
 			});
 		});
 		function _off(){
