@@ -1,7 +1,10 @@
 Core.safe(function(){
 	var MAX_VAL = 99999,
 		MIN_VAL = -9999;
-
+	var gui = Core.Window.getGui(),
+		Menu = gui.Menu,
+		MenuItem = gui.MenuItem;
+			
 	var product_name = '',
 		map_width,
 		map_height;
@@ -358,10 +361,10 @@ Core.safe(function(){
 		$.each(color_arr,function(i,v){
 			var text_color = v.color_text || '#000';
 			html_table += '<tr>'+
-								'<td><input type="checkbox" '+(v.is_checked?'checked':'')+'/></td>'+
+								'<td class="fn_contextmenu"><input type="checkbox" '+(v.is_checked?'checked':'')+'/></td>'+
 								'<td><input type="color" value="'+v.color+'"/></td>'+
 								'<td><input type="color" value="'+text_color+'"/></td>'+
-								'<td contentEditable="true">'+v.val[0]+'~'+v.val[1]+'</td>'+
+								'<td><input type="number" value="'+v.val[0]+'"/>~<input type="number" value="'+v.val[1]+'"/></td>'+
 								'<td contentEditable="true" class="no_outline">'+v.text+'</td>'+
 								'<td><input type="number" value="'+(v.order||0)+'"/></td>'
 							'</tr>'
@@ -604,5 +607,34 @@ Core.safe(function(){
 				}
 			}
 		}
+
+		var _contextmenu = (function(){
+			var $_target;
+			var menu = new Menu();
+			var menu_add_above = new MenuItem({label: '在上方添加'});
+			var menu_add_below = new MenuItem({label: '在下方添加'});
+			var menu_delete = new MenuItem({label: '删除'});
+			menu_add_above.on('click', function(){
+				var $p = $_target.parent();
+				$p.clone().insertBefore($p);
+			});
+			menu_add_below.on('click', function(){
+				var $p = $_target.parent();
+				$p.clone().insertAfter($p);
+			});
+			menu_delete.on('click', function(){
+				if(confirm('确定要删除这一项吗？')){
+					$_target.parent().slideUp();
+				}
+			});
+			menu.append(menu_add_above);
+			menu.append(menu_add_below);
+			menu.append(menu_delete);
+			return function(e){
+				$_target = $(e.target);
+				menu.popup(e.clientX, e.clientY);
+			}
+		})();
+		$('.legend_left').delegate('.fn_contextmenu', 'contextmenu', _contextmenu);
 	}
 });

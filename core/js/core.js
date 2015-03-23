@@ -422,15 +422,15 @@
 					}
 				}
 			}
-			tt_check = setTimeout(function(){
-				_check();
-			}, 1000);
-			win.on('_from_', function(data){
-				_from = data;
-				clearTimeout(tt_check);
-				_check();
-			});
-			win.emit('_getF_');
+			// tt_check = setTimeout(function(){
+			// 	_check();
+			// }, 1000);
+			// win.on('_from_', function(data){
+			// 	_from = data;
+			// 	clearTimeout(tt_check);
+			// 	_check();
+			// });
+			// win.emit('_getF_');
 		}
 	}();
 	/*颜色转换*/

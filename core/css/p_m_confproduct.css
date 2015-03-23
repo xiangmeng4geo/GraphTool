@@ -1,3 +1,7 @@
+/**/
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
 #main{
 	height: 100%;
 	margin-top: 10px;
@@ -224,6 +228,9 @@ fieldset legend{
 #fieldset_legend td{
 	background-color: white;
 	/*border: 1px solid #dadada;*/
+}
+#fieldset_legend tr:hover td:first-child{
+	background-color: #ccc;
 }
 #fieldset_legend td input[type=number]{
 	border: none;
