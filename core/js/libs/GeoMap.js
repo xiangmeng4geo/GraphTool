@@ -180,6 +180,48 @@ define('GeoMap',['zrender',
 		NOCLIP: ZINDEX_NO_CLIP
 	};
 	var GeoMapProp = GeoMap.prototype;
+	GeoMapProp.on = function(event_name, event_callback){
+		var _this = this;
+		if(event_name && ({}).toString.call(event_callback) === '[object Function]'){
+			var _events = _this._events;
+			if(!_events){
+				_events = _this._events = {};
+			}
+			(_events[event_name] || (_events[event_name] = [])).push(event_callback);
+		}
+		
+		return _this;
+	}
+	GeoMapProp.off = function(event_name, event_callback){
+		var _this = this;
+		var _events = _this._events;
+		if(!event_callback){
+			delete _events[event_name];
+		}else{
+			var list = _events[event_name];
+			if(list){
+				for(var i = 0, j = list.length; i<j; i++){
+					if(list[i] == event_callback){
+						list.splice(i, 1);
+						j--;
+						i--;
+					}
+				}
+			}
+		}
+		return _this;
+	}
+	GeoMapProp.emit = function(event_name, data){
+		var _this = this;
+		var list = _this._events[event_name];
+		if(list){
+			for(var i = 0, j = list.length; i<j; i++){
+				try{
+					list[i](data);
+				}catch(e){console.log(e.stack)}
+			}
+		}
+	}
 	/*地图拖拽*/
 	GeoMapProp.draggable = function(option){
 		var _this = this,
@@ -311,7 +353,6 @@ define('GeoMap',['zrender',
 				points.push(new GeoMap.Point(v_v[0]/scale,v_v[1]/scale, is_not_lnglat));
 			});
 			var polygon = new GeoMap.Polygon(points, options);
-			// polygon.draw(gm);
 			polygon.points = points;
 			shapes.push(polygon);
 			gm.addOverlay(polygon, 200*Math.random());
@@ -1034,202 +1075,6 @@ define('GeoMap',['zrender',
 	}
 	GeoMap.Rectangle.prototype.draw = function(map){
 		return this.shape;
-	}
-	// 渲染插值后的结果
-	/*格点数组
-	[
-		{x: pixel_x, y: pixel_y, rgba: pixel_rgba}
-	]
-	*/
-	var GeoMapInterpolation = function(){
-		Base.call(this, {
-			zlevel: ZINDEX_LAYER
-		});
-	}
-	function _get_pixel_color(x, y, pixel00, pixel10, pixel01, pixel11){
-        var x1 = pixel00.x,
-            x2 = pixel10.x,
-            y1 = pixel00.y,
-            y2 = pixel01.y;
-
-        // http://zh.wikipedia.org/wiki/%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC
-        var denominator = (x2 - x1)*(y2 - y1)
-        var p1 = (x2 - x)*(y2 - y)/denominator,
-            p2 = (x - x1)*(y2 - y)/ denominator,
-            p3 = (x2 - x)*(y - y1)/denominator,
-            p4 = (x - x1)*(y - y1)/denominator;
-
-
-        var arr = [];
-        for(var i = 0; i < 4; i++){
-            var v00 = pixel00.color[i],
-                v01 = pixel01.color[i],
-                v10 = pixel10.color[i],
-                v11 = pixel11.color[i];
-            var v = v00 * p1 + v10 * p2 + v01 * p3 + v11 * p4;
-            arr.push(v);
-        }
-        // arr.push(100);
-        return arr;
-    }
-	GeoMapInterpolation.prototype = {
-		type: 'mask',
-		setData: function(interpolationArr, c_width, c_height){
-			var _this = this;
-			_this.interpolationArr = interpolationArr;
-			_this.c_width = c_width;
-			_this.c_height = c_height;
-		},
-		brush: function(ctx, isHighlight){
-			var _this = this;
-			var pixel_arr = _this.interpolationArr;
-			var width, height;
-
-			try{
-				width = pixel_arr.length;
-				height = pixel_arr[0].length;
-			}catch(e){}
-			if(width > 0 && height > 0){
-				var pixel_x_start = pixel_arr[0][0].x,//左下点
-	                pixel_y_start = pixel_arr[0][0].y,
-	                last_pixel = pixel_arr[width - 1][height - 1],
-	                pixel_x_end = last_pixel.x,
-	                pixel_y_end = last_pixel.y,
-	                space_pixel_x = pixel_arr[0][1].x - pixel_x_start,
-	                space_pixel_y = pixel_arr[1][0].y - pixel_y_start;
-
-	            var c_width = _this.c_width,
-	            	c_height = _this.c_height;
-
-	            var interpolationCanvas = _createDom('interpolation-image', 'canvas', {
-	            	_width: c_width, 
-	            	_height: c_height
-	            });
-				var ctx_interpolat = interpolationCanvas.getContext('2d');
-			    devicePixelRatio != 1 && ctx_interpolat.scale(devicePixelRatio, devicePixelRatio);
-
-				var imagedata = ctx_interpolat.createImageData(c_width, c_height),
-	                _data = imagedata.data;
-
-	            function _get_pixel(x, y){
-	                try{
-	                    var pixel = pixel_arr[x][y];
-	                    if(pixel){
-	                        return pixel;
-	                    }
-	                }catch(e){}
-
-	                return {
-	                    x: pixel_x_start + x*space_pixel_x, 
-	                    y: pixel_y_start + y*space_pixel_y, 
-	                    color: [0, 0, 0, 0]
-	                }
-	            }
-
-			    var _set_rgba = function(x, y, color){
-			    	if(x >= 0 && y>=0){
-				        var index = (y * c_width + x)*4;
-				        _data[index] = color[0];
-				        _data[index + 1] = color[1];
-				        _data[index + 2] = color[2];
-				        _data[index + 3] = color[3];
-			        }
-			    }
-	            for(var i = 0; i < width; i++){
-	                for(var j = 0; j< height; j++){
-	                    var pixel00 = _get_pixel(i, j);
-	                    var c = pixel00.color;
-	                    ctx_interpolat.fillStyle = 'rgba('+c[0]+', '+c[1]+', '+c[2]+', '+c[3]+')';
-                        ctx_interpolat.beginPath();
-                        ctx_interpolat.arc(pixel00.x, pixel00.y, 1, 0, Math.PI*2, 1);
-                        ctx_interpolat.closePath();
-                        ctx_interpolat.fill();
-	                    // var pixel10 = _get_pixel(i+1, j);
-	                    // var pixel01 = _get_pixel(i, j+1);
-	                    // var pixel11 = _get_pixel(i+1, j+1);
-	                    // var x_min = Math.min(pixel00.x, pixel10.x, pixel01.x, pixel11.x), 
-	                    // 	x_max = Math.max(pixel00.x, pixel10.x, pixel01.x, pixel11.x),
-	                    // 	y_min = Math.min(pixel00.y, pixel10.y, pixel01.y, pixel11.y), 
-	                    // 	y_max = Math.max(pixel00.y, pixel10.y, pixel01.y, pixel11.y);
-	                    // for(var p_x = Math.floor(pixel00.x)+1, p_e_x = Math.ceil(pixel10.x); p_x < p_e_x && p_x <= pixel_x_end; p_x++){
-	                    //     for(var p_y = Math.ceil(pixel00.y)+1, p_e_y = Math.floor(pixel01.y); p_y > p_e_y && p_y >= pixel_y_end; p_y--){
-	                    //         var color = _get_pixel_color(p_x, p_y, pixel01, pixel11, pixel00, pixel10);
-	                    //         _set_rgba(p_x, p_y, color);
-	                    //     }
-	                    // }
-	                }
-	            }
-	            // ctx_interpolat.putImageData(imagedata, 0, 0);
-
-	            _doclip.call(_this.gm, ctx);
-	            ctx.drawImage(interpolationCanvas, 0, 0);
-	            ctx.restore();
-            }
-		}
-	}
-	util.inherits(GeoMapInterpolation, Base);
-
-	GeoMap.Interpolation = function(data){
-		var _this = this;
-		var _width, _height;
-		try{
-			_width = data.length;
-			_height = data[0].length;
-			var first = data[0][0],
-				end = data[_width - 1][_height - 1];
-			_this.data = {
-				x0: first.x,
-				y0: first.y,
-				x1: end.x,
-				y1: end.y,
-				width: _width,
-				height: _height,
-				items: data
-			};
-		}catch(e){
-			_this.data = {};
-		}
-		this.shape = new GeoMapInterpolation();
-	}
-	GeoMap.Interpolation.prototype.draw = function(map){
-		var _this = this,
-			data_conf = map._data,
-			c_width = data_conf.width,
-			c_height = data_conf.height,
-			data = _this.data,
-			_width = data.width,
-			_height = data.height,
-			_items = data.items,
-			shape = _this.shape;
-		var start_point = map.pointToOverlayPixel(new GeoMap.Point(data.x0, data.y0)),
-			end_point = map.pointToOverlayPixel(new GeoMap.Point(data.x1, data.y1));
-		var space_pixel_x = (end_point.x - start_point.x)/(_width - 1),
-			space_pixel_y = (start_point.y - end_point.y)/(_height - 1);
-
-		var new_data = [];
-		for(var i = 0; i< _width; i++){
-			var items = _items[i];
-			var arr = [];
-			for(var y = 0; y < _height; y++){
-				var item = items[y];
-				var pixel = map.pointToOverlayPixel(new GeoMap.Point(item.x, item.y));
-				var x_pixel = pixel.x,
-					y_pixel = pixel.y;
-				// if(x_pixel > -space_pixel_x && x_pixel <= c_width && y_pixel > -space_pixel_y && y_pixel <= c_height){
-					arr.push({
-						lng: item.x,
-						lat: item.y,
-						x: x_pixel, 
-						y: y_pixel,
-						color: item.c
-					});
-				// }
-			}
-			new_data.push(arr);
-		}
-		shape.setData(new_data, c_width, c_height);
-		shape.gm = map;
-		return shape;
 	}
 	// 定义画笔的特殊样式
 	GeoMap.Pattern = {};
