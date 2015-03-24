@@ -162,7 +162,9 @@ define('GeoMap',['zrender',
 		_this.MAX_ZOOM = 3*_scale_size;
 		_this.MIN_ZOOM = 0.5*_scale_size;
 
-		
+		if(!conf.isnotMirror && !_this.mirror){
+			_this.mirror = $('<img class="geomap_mirror" draggable=false>').appendTo(container.parent());
+		}
 	}
 	
 	function _init_mirror(){
@@ -171,9 +173,7 @@ define('GeoMap',['zrender',
 		if(!conf.isnotMirror){
 			var $mirror = _this.mirror;
 			var $container = $(conf.container);
-			if(!$mirror){
-				_this.mirror = $mirror = $('<img class="geomap_mirror" draggable=false>').appendTo($container.parent());
-			}
+			
 			var img_data = _this.toDataURL();
 			var data = _this._data;
 			$mirror.attr('src', img_data).css({
