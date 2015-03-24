@@ -3,7 +3,8 @@ Core.safe(function(){
 	var Const = Core.Const,
 		ConstMsgType = Const.msgType,
 		ConstEvent = Const.Event,
-		ConstFileType = Const.fileRule.file_type;
+		ConstFileType = Const.fileRule.file_type,
+		ConstTemplate = Const.template || [800, 800];
 	// CoreWindow.get().showDevTools();	
 	var color_toRGB = Core.Color.toRGB
 
@@ -29,6 +30,12 @@ Core.safe(function(){
 	var conf_export; //保存导出图片设置
 
 	var $geomap = $('#geomap');
+	var $geomap_container = $('#geomap_container');
+	var $geomap_layer = $geomap_container;//$('#geomap_layer');
+	$geomap_container.css({
+		width: ConstTemplate[0],
+		height: ConstTemplate[1]
+	});
 	var width_geomap = $geomap.width(),
 		height_geomap = $geomap.height();
 	// 替换标题里的时间
@@ -168,13 +175,15 @@ Core.safe(function(){
 		});
 		initing = true;
 		require(['GeoMap', 'LegendImage'],function(GeoMap, LegendImage){
-			var conf_sys = ConfUser.getSys();
-			var gm_projector = conf_sys && conf_sys.projector || GeoMap.PROJECT_MERCATOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+			function _getProjector(){
+				var conf_sys = ConfUser.getSys();
+				return conf_sys && conf_sys.projector || GeoMap.PROJECT_MERCATOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+			}
+			var gm_projector = _getProjector();
 			window.GeoMap = GeoMap;
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
 				container: $geomap,
-				mirror: true,
 				projector: gm_projector,
 				geo: {
 					src: './data/',
@@ -454,7 +463,7 @@ Core.safe(function(){
 					// 清空地图及样式
 					$('.map_layer').remove();
 					gm.clearLayers();
-					$geomap_container.removeAttr('style');
+					// $geomap_container.removeAttr('style');
 
 					Loading.show(function(){
 						conf_of_product = ConfUser.get(product_name);
@@ -463,261 +472,261 @@ Core.safe(function(){
 							return alert('请对该产品进行配置！');
 						}
 						conf_of_product.name = product_name;
-						// console.log(conf_of_product);
+
 						var conf_other = conf_of_product.other;
-						var logo = conf_other.logo;
-						if(logo){
-							add_maplayer_img(logo, {
-								left: 20,
-								top: 20
-							});
-						}
-
-						conf_export = {};
-						var bg_flag = false;
-						
-						var conf_bgimg = conf_other.bg_img;
-						if(conf_bgimg){
-							if(conf_bgimg.flag && conf_bgimg.val){
-								$geomap_container.css('background-image', 'url("'+conf_bgimg.val.replace(/\\/g,'/')+'")');
-								bg_flag = true;
-								conf_export.bgimg = conf_bgimg.val;//$('<img src="'+conf_bgimg.val+'"/>').get(0);
-							}
-						}
-						if(!bg_flag){
-							var conf_bgcolor = conf_other.bg_color;
-							if(conf_bgcolor){
-								if(conf_bgcolor.flag && conf_bgcolor.val){
-									$geomap_container.css('background-color', conf_bgcolor.val);
-									conf_export.bgcolor = conf_bgcolor.val;
-								}
-							}
-						}
-						
-						var conf_title = conf_of_product.title || {};//当没有配置文件时title == undefined
-						var $html_title1 = addTitle(conf_title.title_1, {
-							left: 110,
-							top: 20
-						});
-						var $html_title2 = addTitle(conf_title.title_2, {
-							left: 110,
-							top: 80
-						});
-						var $html_title3;
-
-						var conf_legend = conf_of_product.legend;
-						var is_show_legend = conf_legend.is_show_legend,
-							is_updown = conf_legend.is_updown;
-
-						function _add_southsealogo(pos, callback){
-							var logo_southsea = conf_other.logo_southsea;
-							if(logo_southsea && logo_southsea.flag){
-								add_maplayer_img(logo_southsea.p, pos, callback);
-							}else{
-								callback && callback();
-							}
-						}
-						function _add_title3(pos){
-							var _title_3 = conf_title.title_3;
-							if(_title_3){
-								if(!is_updown){
-									var m = /font-size: (\d+)px/.exec(_title_3.style);
-									var height = m? parseFloat(m[1]) + 10: 30;
-									if(!isNaN(pos.top)){
-										pos.top -= height;
-									}else{
-										pos.bottom += height;
-									}
-								}
-								
-								$html_title3 = addTitle(_title_3, pos, true);
-								$html_title3 && $html_title3.data('use_mtime', true);
-							}
-						}
-						
-						var _width = $geomap_layer.width();
-						if(is_show_legend){
-							var img_src = _get_legend_img(product_name, width_geomap, height_geomap);
-							function _add_legend(pos, width, height, callback){
-								new MapLayer.img({
-									position: pos,
-									width: width,
-									height: height,
-									src: img_src
-								},function($html, param){
-									$geomap_layer.append($html);
-									callback && callback($html, param);
+						function _afterConfig(){
+							var logo = conf_other.logo;
+							if(logo){
+								add_maplayer_img(logo, {
+									left: 20,
+									top: 20
 								});
 							}
-							var img = new Image();
-							img.onload = function(){
-								var width = this.width,
-									height = this.height;
+
+							conf_export = {};
+							var bg_flag = false;
+							
+							var conf_bgimg = conf_other.bg_img;
+							if(conf_bgimg){
+								if(conf_bgimg.flag && conf_bgimg.val){
+									$geomap_container.css('background-image', 'url("'+conf_bgimg.val.replace(/\\/g,'/')+'")');
+									bg_flag = true;
+									conf_export.bgimg = conf_bgimg.val;//$('<img src="'+conf_bgimg.val+'"/>').get(0);
+								}
+							}
+							if(!bg_flag){
+								var conf_bgcolor = conf_other.bg_color;
+								if(conf_bgcolor){
+									if(conf_bgcolor.flag && conf_bgcolor.val){
+										$geomap_container.css('background-color', conf_bgcolor.val);
+										conf_export.bgcolor = conf_bgcolor.val;
+									}
+								}
+							}
+							
+							var conf_title = conf_of_product.title || {};//当没有配置文件时title == undefined
+							var $html_title1 = addTitle(conf_title.title_1, {
+								left: 110,
+								top: 20
+							});
+							var $html_title2 = addTitle(conf_title.title_2, {
+								left: 110,
+								top: 80
+							});
+							var $html_title3;
+
+							var conf_legend = conf_of_product.legend;
+							var is_show_legend = conf_legend.is_show_legend,
+								is_updown = conf_legend.is_updown;
+
+							function _add_southsealogo(pos, callback){
+								var logo_southsea = conf_other.logo_southsea;
+								if(logo_southsea && logo_southsea.flag){
+									add_maplayer_img(logo_southsea.p, pos, callback);
+								}else{
+									callback && callback();
+								}
+							}
+							function _add_title3(pos){
+								var _title_3 = conf_title.title_3;
+								if(_title_3){
+									if(!is_updown){
+										var m = /font-size: (\d+)px/.exec(_title_3.style);
+										var height = m? parseFloat(m[1]) + 10: 30;
+										if(!isNaN(pos.top)){
+											pos.top -= height;
+										}else{
+											pos.bottom += height;
+										}
+									}
+									
+									$html_title3 = addTitle(_title_3, pos, true);
+									$html_title3 && $html_title3.data('use_mtime', true);
+								}
+							}
+							
+							var _width = $geomap_layer.width();
+							if(is_show_legend){
+								var img_src = _get_legend_img(product_name, width_geomap, height_geomap);
+								function _add_legend(pos, width, height, callback){
+									new MapLayer.img({
+										position: pos,
+										width: width,
+										height: height,
+										src: img_src
+									},function($html, param){
+										$geomap_layer.append($html);
+										callback && callback($html, param);
+									});
+								}
+								var img = new Image();
+								img.onload = function(){
+									var width = this.width,
+										height = this.height;
+									if(is_updown){
+										var scale = _width/1024;
+										var toWidth = width * scale,
+											toHeight = height * scale;
+										_add_southsealogo({
+											left: 10,
+											top: 'auto',
+											bottom: 10
+										}, function($html, param){
+											if($html && param){
+												var pos = {
+													left: 10 + param.width_show + 10,
+													top: 'auto',
+													bottom: 10
+												}
+											}else{
+												var pos = {
+													left: 10,
+													top: 'auto',
+													bottom: 10
+												};
+											}
+											_add_legend(pos, toWidth, toHeight);
+											_add_title3({
+												left: 'auto',
+												right: 10,
+												top: 'auto',
+												bottom: 10
+											});
+										});
+									}else{
+										var toWidth = Math.min(width, _width),
+											toHeight = toWidth*height/width;
+
+										_add_legend({
+											left: 0,
+											top: 'auto',
+											bottom: 0
+										},toWidth, toHeight,function($html, param){
+											var pos = $html.position();
+											_add_title3({
+												left: 10, 
+												top: pos.top
+											});
+											_add_southsealogo({
+												left: 'auto',
+												right: 10,
+												top: 'auto',
+												bottom: param.height_show + 10
+											});
+										});
+									}
+								}
+								img.onerror = img.onload;
+								img.src = img_src;
+							}else{
+								var pos_southsea,
+									pos_title3;
 								if(is_updown){
-									var scale = _width/1024;
-									var toWidth = width * scale,
-										toHeight = height * scale;
-									_add_southsealogo({
+									pos_southsea = {
 										left: 10,
 										top: 'auto',
 										bottom: 10
-									}, function($html, param){
-										if($html && param){
-											var pos = {
-												left: 10 + param.width_show + 10,
-												top: 'auto',
-												bottom: 10
-											}
-										}else{
-											var pos = {
-												left: 10,
-												top: 'auto',
-												bottom: 10
-											};
-										}
-										_add_legend(pos, toWidth, toHeight);
-										_add_title3({
-											left: 'auto',
-											right: 10,
-											top: 'auto',
-											bottom: 10
-										});
-									});
-								}else{
-									var toWidth = Math.min(width, _width),
-										toHeight = toWidth*height/width;
-
-									_add_legend({
-										left: 0,
+									};
+									pos_title3 = {
+										left: 'auto',
+										right: 10,
 										top: 'auto',
-										bottom: 0
-									},toWidth, toHeight,function($html, param){
-										var pos = $html.position();
-										_add_title3({
-											left: 10, 
-											top: pos.top
-										});
-										_add_southsealogo({
-											left: 'auto',
-											right: 10,
-											top: 'auto',
-											bottom: param.height_show + 10
-										});
-									});
-								}
-							}
-							img.onerror = img.onload;
-							img.src = img_src;
-						}else{
-							var pos_southsea,
-								pos_title3;
-							if(is_updown){
-								pos_southsea = {
-									left: 10,
-									top: 'auto',
-									bottom: 10
-								};
-								pos_title3 = {
-									left: 'auto',
-									right: 10,
-									top: 'auto',
-									bottom: 10
-								}
-							}else{
-								pos_southsea = {
-									left: 'auto',
-									right: 10,
-									top: 'auto',
-									bottom: 10
-								};
-								pos_title3 = {
-									left: 10,
-									top: 'auto',
-									bottom: 10
-								}
-							}
-							_add_southsealogo(pos_southsea);
-							_add_title3(pos_title3);
-						}
-						
-						var conf_in_out = conf_of_product.in_out;
-						var dir_in = conf_in_out.dir_in;
-						if( file_util.exists(dir_in) ){
-							var param = [dir_in];
-							var conf_file = conf_of_product.file;
-							var conf_file_rule = conf_in_out.file_rule;
-							if(conf_file_rule.type == "1"){
-								var rule_common = conf_file_rule.common;
-								param.push(rule_common.prefix+rule_common.date_format+rule_common.postfix+'.'+rule_common.file_suffix);
-							}else{
-								param.push(conf_file_rule.custom);
-							}
-							if(conf_file.is_newest){
-								param.push(conf_file.newest_days);
-							}else{
-								param.push(conf_file.time_start);
-								param.push(conf_file.time_end);
-							}
-							var file_newest = micaps_file_util.getNewest.apply(null,param);
-							// console.log(file_newest, param);
-							if(file_newest){
-								Timer.start('read micaps');
-								var conf_interpolation = conf_other.interpolation;
-								file_util.micaps.getData(file_newest, {
-									val_col: conf_file_rule.col,
-									grid_space: 0.2,
-									interpolation_all: conf_interpolation && conf_interpolation.flag //传入micaps解析需要参数
-								}, function(err, data, params){
-									// console.log(err, data);
-									Timer.end('read micaps');
-									if(err){
-										alert(err.msg || '读取数据错误！');
-									}else{
-										$html_title1 && $html_title1.find('span').text(function(){
-											return _replace_date($(this).text());
-										});
-										$html_title2 && $html_title2.find('span').text(function(){
-											return _replace_date($(this).text());
-										});
-										$html_title3 && $html_title3.find('span').text(function(){
-											return _replace_date($(this).text(), true);
-										});
-										data_of_micaps = data;
-										render_conf(data_of_micaps, conf_of_product.legend.blendent, params);
+										bottom: 10
 									}
+								}else{
+									pos_southsea = {
+										left: 'auto',
+										right: 10,
+										top: 'auto',
+										bottom: 10
+									};
+									pos_title3 = {
+										left: 10,
+										top: 'auto',
+										bottom: 10
+									}
+								}
+								_add_southsealogo(pos_southsea);
+								_add_title3(pos_title3);
+							}
+							
+							var conf_in_out = conf_of_product.in_out;
+							var dir_in = conf_in_out.dir_in;
+							if( file_util.exists(dir_in) ){
+								var param = [dir_in];
+								var conf_file = conf_of_product.file;
+								var conf_file_rule = conf_in_out.file_rule;
+								if(conf_file_rule.type == "1"){
+									var rule_common = conf_file_rule.common;
+									param.push(rule_common.prefix+rule_common.date_format+rule_common.postfix+'.'+rule_common.file_suffix);
+								}else{
+									param.push(conf_file_rule.custom);
+								}
+								if(conf_file.is_newest){
+									param.push(conf_file.newest_days);
+								}else{
+									param.push(conf_file.time_start);
+									param.push(conf_file.time_end);
+								}
+								var file_newest = micaps_file_util.getNewest.apply(null,param);
+								// console.log(file_newest, param);
+								if(file_newest){
+									Timer.start('read micaps');
+									var conf_interpolation = conf_other.interpolation;
+									file_util.micaps.getData(file_newest, {
+										val_col: conf_file_rule.col,
+										grid_space: 0.2,
+										interpolation_all: conf_interpolation && conf_interpolation.flag //传入micaps解析需要参数
+									}, function(err, data, params){
+										// console.log(err, data);
+										Timer.end('read micaps');
+										if(err){
+											alert(err.msg || '读取数据错误！');
+										}else{
+											$html_title1 && $html_title1.find('span').text(function(){
+												return _replace_date($(this).text());
+											});
+											$html_title2 && $html_title2.find('span').text(function(){
+												return _replace_date($(this).text());
+											});
+											$html_title3 && $html_title3.find('span').text(function(){
+												return _replace_date($(this).text(), true);
+											});
+											data_of_micaps = data;
+											render_conf(data_of_micaps, conf_of_product.legend.blendent, params);
+										}
+										_afterRender()
+									});
+									
+								}else{
+									alert('没有找到符合条件的文件，请检查产品相关配置！');
 									_afterRender()
-								});
-								
+								}
 							}else{
-								alert('没有找到符合条件的文件，请检查产品相关配置！');
+								alert("请配置该产品的数据源路径！");
 								_afterRender()
 							}
+						}
+						var new_projector = _getProjector();
+						var _template = conf_other.template;
+						var new_w = _template[0],
+							new_h = _template[1];
+						if(new_projector != gm_projector || new_w != width_geomap || new_h != height_geomap){
+							width_geomap = new_w;
+							height_geomap = new_h;
+							$geomap_container.css({
+								width: width_geomap,
+								height: height_geomap
+							});
+							gm.config({
+								projector: new_projector
+							}, _afterConfig);
 						}else{
-							alert("请配置该产品的数据源路径！");
-							_afterRender()
+							_afterConfig();
 						}
 					});
 				}
 			});
-			// Loading.show();
-			
-			// function _resolve(_path){
-			// 	return path_util.resolve(file_util.path.project, _path);
-			// }
-			// var china_json = './data/china_province.'+gm_projector+'.json';
-			// gm.loadGeo([china_json],{
-			// 	style: {
-			// 		// color: '#F5F3F0',
-			// 		maskColor: 'white'
-			// 	},
-			// 	is_show_mask: is_show_mask
-			// },function(points){
-			// 	Loading.hide();
-			// 	// gm.addMask(points,{
-			// 	// 	is_lnglat: false
-			// 	// });
-
-			// });
 		});
 	}
 	
@@ -907,8 +916,6 @@ Core.safe(function(){
 		return filename || conf_of_product.name+'_'+width_geomap+'x'+height_geomap+'.png';
 	}
 	/*右侧地图的右键功能*/
-	var $geomap_container = $('#geomap_container');
-	var $geomap_layer = $geomap_container;//$('#geomap_layer');
 	!function(){
 		/*导出图片*/
 		var _save_img = function(){
@@ -921,7 +928,8 @@ Core.safe(function(){
 						var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+width_geomap+'px; height: '+height_geomap+'px"></div>').appendTo($('body'));
 						
 						var gm_export = new GeoMap({
-							container: $div_container
+							container: $div_container,
+							isnotMirror: true
 						});
 						gm_export.addOverlay(new GeoMap.Image(img_data));
 
