@@ -3,7 +3,8 @@ Core.safe(function(){
 	var Const = Core.Const,
 		ConstMsgType = Const.msgType,
 		ConstEvent = Const.Event,
-		ConstFileType = Const.fileRule.file_type;
+		ConstFileType = Const.fileRule.file_type,
+		ConstTemplate = Const.template || [800, 800];
 	// CoreWindow.get().showDevTools();	
 	var color_toRGB = Core.Color.toRGB
 
@@ -29,6 +30,12 @@ Core.safe(function(){
 	var conf_export; //保存导出图片设置
 
 	var $geomap = $('#geomap');
+	var $geomap_container = $('#geomap_container');
+	var $geomap_layer = $geomap_container;//$('#geomap_layer');
+	$geomap_container.css({
+		width: ConstTemplate[0],
+		height: ConstTemplate[1]
+	});
 	var width_geomap = $geomap.width(),
 		height_geomap = $geomap.height();
 	// 替换标题里的时间
@@ -168,17 +175,25 @@ Core.safe(function(){
 		});
 		initing = true;
 		require(['GeoMap', 'LegendImage'],function(GeoMap, LegendImage){
-			var conf_sys = ConfUser.getSys();
-			var gm_projector = conf_sys && conf_sys.projector || GeoMap.PROJECT_MERCATOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+			function _getProjector(){
+				var conf_sys = ConfUser.getSys();
+				return conf_sys && conf_sys.projector || GeoMap.PROJECT_MERCATOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+			}
+			var gm_projector = _getProjector();
 			window.GeoMap = GeoMap;
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
 				container: $geomap,
-				mirror: true,
 				projector: gm_projector,
+				geo: {
+					src: './data/',
+					name: ['china']
+				},
+				onready: function(){
+				}
 				// jsonLoader: file_util.getJson
 			});
-			// 绑定缩放事件 
+			// 绑定缩放事件及重置按钮 
 			!function(){
 				var maptt;
 				var zoom_step = 1.2;
@@ -189,27 +204,19 @@ Core.safe(function(){
 					}, 30);
 				});
 				gm.draggable();
+				var $tools = $('#map_tool div').click(function(){
+					$tools.removeClass('on');
+					$(this).addClass('on');
+				});
+				$('#map_tool_reset').click(function(){
+					// gm.draggable({
+					//   disabled: true
+					// });
+					gm.reset(true);
+				});
 			}();
 			
-			var $tools = $('#map_tool div').click(function(){
-				$tools.removeClass('on');
-				$(this).addClass('on');
-			});
-			// $('#map_tool_move').click(function(){
-			// 	gm.draggable();
-			// });
-			// $('#map_tool_zoomin').click(function(){
-			// 	$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomin');
-			// });
-			// $('#map_tool_zoomout').click(function(){
-			// 	$geomap_container.removeClass('zoom zoomin zoomout').addClass('zoom zoomout');
-			// });
-			$('#map_tool_reset').click(function(){
-				// gm.draggable({
-				//   disabled: true
-				// });
-				gm.reset(true);
-			});
+			
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent, params){
 				// 添加背景色让地图不透明
@@ -432,64 +439,42 @@ Core.safe(function(){
 				}
 				Timer.end('render micaps');
 			}
-			Loading.show();
-			var Color = ['red','blue','#000','#123','#f26','#ccc','#333'];
-			
-			function _resolve(_path){
-				return path_util.resolve(file_util.path.project, _path);
-			}
-			// var china_json = '../../../git_project/GeoMap/json/china_mask.geo.json';
-			// var china_json = '../../../git_project/GeoMap/json/china.geo.json';
-			// // china_json = 'shell/data/china_mask.geo.meractor.json';
-			// // china_json = _resolve('shell/data/china_province.meractor.json');
-			// // china_json = _resolve('shell/data/china.geo.albers.json');
-			// var china_json = _resolve('shell/data/china_province.'+gm_projector+'.json');
-			var china_json = './data/china_province.'+gm_projector+'.json';
-			gm.loadGeo([china_json],{
-				style: {
-					// color: '#F5F3F0',
-					maskColor: 'white'
-				},
-				is_show_mask: is_show_mask
-			},function(points){
-				Loading.hide();
-				// gm.addMask(points,{
-				// 	is_lnglat: false
-				// });
-				function addTitle(conf_title, pos, is_use_publish_time){
-					if(conf_title && conf_title.is_show){
-						var text = conf_title.text;
-						if(text){
-							return MapLayer.text({
-								position: pos,
-								text: _replace_date(text, is_use_publish_time),
-								style: conf_title.style
-							}).appendTo($geomap_layer);
-						}
+			function addTitle(conf_title, pos, is_use_publish_time){
+				if(conf_title && conf_title.is_show){
+					var text = conf_title.text;
+					if(text){
+						return MapLayer.text({
+							position: pos,
+							text: _replace_date(text, is_use_publish_time),
+							style: conf_title.style
+						}).appendTo($geomap_layer);
 					}
 				}
-				function _afterRender(){
-					initing = false;
-					Loading.hide();
-					gm.refresh();
-				}
-				$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
-					// if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
-					if(product_name){
-						// 清空地图及样式
-						$('.map_layer').remove();
-						gm.clearLayers();
-						$geomap_container.removeAttr('style');
+			}
+			function _afterRender(){
+				initing = false;
+				Loading.hide();
+				gm.refresh();
+			}
+			// 当产品更换时触发
+			$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
+				// if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
+				if(gm.isReady && product_name){
+					// 清空地图及样式
+					$('.map_layer').remove();
+					gm.clearLayers();
+					// $geomap_container.removeAttr('style');
 
-						Loading.show(function(){
-							conf_of_product = ConfUser.get(product_name);
-							if(!conf_of_product || !conf_of_product.title || !conf_of_product.legend || !conf_of_product.in_out){
-								Loading.hide();
-								return alert('请对该产品进行配置！');
-							}
-							conf_of_product.name = product_name;
-							// console.log(conf_of_product);
-							var conf_other = conf_of_product.other;
+					Loading.show(function(){
+						conf_of_product = ConfUser.get(product_name);
+						if(!conf_of_product || !conf_of_product.title || !conf_of_product.legend || !conf_of_product.in_out){
+							Loading.hide();
+							return alert('请对该产品进行配置！');
+						}
+						conf_of_product.name = product_name;
+
+						var conf_other = conf_of_product.other;
+						function _afterConfig(){
 							var logo = conf_other.logo;
 							if(logo){
 								add_maplayer_img(logo, {
@@ -721,13 +706,26 @@ Core.safe(function(){
 								alert("请配置该产品的数据源路径！");
 								_afterRender()
 							}
-
-							
-						});
-					}
-				});
-
-				$doc.trigger(ConstEvent.GEOMAP_INITED);
+						}
+						var new_projector = _getProjector();
+						var _template = conf_other.template;
+						var new_w = _template[0],
+							new_h = _template[1];
+						if(new_projector != gm_projector || new_w != width_geomap || new_h != height_geomap){
+							width_geomap = new_w;
+							height_geomap = new_h;
+							$geomap_container.css({
+								width: width_geomap,
+								height: height_geomap
+							});
+							gm.config({
+								projector: new_projector
+							}, _afterConfig);
+						}else{
+							_afterConfig();
+						}
+					});
+				}
 			});
 		});
 	}
@@ -918,8 +916,6 @@ Core.safe(function(){
 		return filename || conf_of_product.name+'_'+width_geomap+'x'+height_geomap+'.png';
 	}
 	/*右侧地图的右键功能*/
-	var $geomap_container = $('#geomap_container');
-	var $geomap_layer = $geomap_container;//$('#geomap_layer');
 	!function(){
 		/*导出图片*/
 		var _save_img = function(){
@@ -932,7 +928,8 @@ Core.safe(function(){
 						var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+width_geomap+'px; height: '+height_geomap+'px"></div>').appendTo($('body'));
 						
 						var gm_export = new GeoMap({
-							container: $div_container
+							container: $div_container,
+							isnotMirror: true
 						});
 						gm_export.addOverlay(new GeoMap.Image(img_data));
 

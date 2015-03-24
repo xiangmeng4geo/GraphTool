@@ -10,8 +10,8 @@
 
 	var gui = nwDispatcher.requireNwGui(),// replace require('nw.gui')
 		Window = gui.Window,
-		win = Window.get();
-	win.focus();
+		win_current = Window.get();
+	win_current.focus();
 	/*常量*/
 	Core.Const = conf.get('const');
 	Core.Const.Event = {
@@ -260,9 +260,10 @@
 		})
 		return win;
 	}
+
+	var _win_cache = {};
 	/*保证只打开一个相同名的窗体*/
 	var _open_only_win = (function (){
-		var _win_cache = {};
 		return function(name, callback){
 			var _win = null;//_win_cache[name];
 			if(_win){
@@ -282,7 +283,8 @@
 					});
 				}
 				
-				_win.on('beforeclose',function(){
+				_win.on('close',function(){
+					win_current.emit('close_sub_window', name);
 					delete _win_cache[name];
 					_win.removeAllListeners();
 					_win = null;
@@ -299,11 +301,12 @@
 	/*窗体页面相关操作*/
 	Core.Page = {
 		inited: function(data){
-			win.emit('inited',data);
-		},logout: function(callback){
+			win_current.emit('inited',data);
+		},
+		logout: function(callback){
 			Store.rm('user_pwd');
 			var win_login = _open('login',callback);
-			win.close();
+			win_current.close();
 			return win_login;
 		},
 		main: function(callback){
@@ -337,13 +340,13 @@
 	/*window相关操作*/
 	var CoreWindow = {
 		get: function(){
-			return win;
+			return win_current;
 		},
 		getGui: function(){
 			return gui;
 		},
 		close: function(){
-			win.close();
+			win_current.close();
 		},
 		/*给当前window添加message事件，用于和其它窗体通信*/
 		onMessage: function(onmessage,isClearAllEvent){
@@ -352,7 +355,7 @@
 			}
 			if(message_listeners.indexOf(onmessage) == -1){
 				message_listeners.push(onmessage);
-				win.window.addEventListener('message', onmessage);
+				win_current.window.addEventListener('message', onmessage);
 			}
 		},
 		/*移除当前window的message事件*/
@@ -368,7 +371,7 @@
 				arr = message_listeners.splice();
 			}
 			$.each(arr,function(i,v){
-				win.window.removeEventListener('message', v);
+				win_current.window.removeEventListener('message', v);
 			});
 		},
 		/*向指定window发送消息,
@@ -389,8 +392,21 @@
 			});
 		}
 	}
+	
+	var href = location.href;
+	function _isLogin(url){
+		return /login\.\w+$/.test(url);
+	}
+	function _isMain(url){
+		return /main\.\w+$/.test(url);
+	}
 	/*窗体关闭的时候清空相关数据及事件*/
-	win.on('close',function(){
+	win_current.on('close',function(){
+		if(!_isLogin(href)){
+			for(var i in _win_cache){
+				_win_cache[i].close();
+			}
+		}
 		this.hide(); // Pretend to be closed already
 		CoreWindow.offMessage();
 		this.close(true);
@@ -401,13 +417,6 @@
 	!function(){
 		// 对入口做验证，防止直接改配置文件进行子模块
 		var tt_check;
-		var href = location.href;
-		function _isLogin(url){
-			return /login\.\w+$/.test(url);
-		}
-		function _isMain(url){
-			return /main\.\w+$/.test(url);
-		}
 		if(!_isLogin(href)){
 			var _from;
 			function _check(type){
@@ -422,15 +431,15 @@
 					}
 				}
 			}
-			// tt_check = setTimeout(function(){
-			// 	_check();
-			// }, 1000);
-			// win.on('_from_', function(data){
-			// 	_from = data;
-			// 	clearTimeout(tt_check);
-			// 	_check();
-			// });
-			// win.emit('_getF_');
+			tt_check = setTimeout(function(){
+				_check();
+			}, 1000);
+			win_current.on('_from_', function(data){
+				_from = data;
+				clearTimeout(tt_check);
+				_check();
+			});
+			win_current.emit('_getF_');
 		}
 	}();
 	/*颜色转换*/
