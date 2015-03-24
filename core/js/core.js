@@ -260,9 +260,10 @@
 		})
 		return win;
 	}
+
+	var _win_cache = {};
 	/*保证只打开一个相同名的窗体*/
 	var _open_only_win = (function (){
-		var _win_cache = {};
 		return function(name, callback){
 			var _win = null;//_win_cache[name];
 			if(_win){
@@ -282,7 +283,7 @@
 					});
 				}
 				
-				_win.on('beforeclose',function(){
+				_win.on('close',function(){
 					delete _win_cache[name];
 					_win.removeAllListeners();
 					_win = null;
@@ -300,7 +301,8 @@
 	Core.Page = {
 		inited: function(data){
 			win.emit('inited',data);
-		},logout: function(callback){
+		},
+		logout: function(callback){
 			Store.rm('user_pwd');
 			var win_login = _open('login',callback);
 			win.close();
@@ -389,8 +391,21 @@
 			});
 		}
 	}
+	
+	var href = location.href;
+	function _isLogin(url){
+		return /login\.\w+$/.test(url);
+	}
+	function _isMain(url){
+		return /main\.\w+$/.test(url);
+	}
 	/*窗体关闭的时候清空相关数据及事件*/
 	win.on('close',function(){
+		if(!_isLogin(href)){
+			for(var i in _win_cache){
+				_win_cache[i].close();
+			}
+		}
 		this.hide(); // Pretend to be closed already
 		CoreWindow.offMessage();
 		this.close(true);
@@ -401,13 +416,6 @@
 	!function(){
 		// 对入口做验证，防止直接改配置文件进行子模块
 		var tt_check;
-		var href = location.href;
-		function _isLogin(url){
-			return /login\.\w+$/.test(url);
-		}
-		function _isMain(url){
-			return /main\.\w+$/.test(url);
-		}
 		if(!_isLogin(href)){
 			var _from;
 			function _check(type){
@@ -422,15 +430,15 @@
 					}
 				}
 			}
-			// tt_check = setTimeout(function(){
-			// 	_check();
-			// }, 1000);
-			// win.on('_from_', function(data){
-			// 	_from = data;
-			// 	clearTimeout(tt_check);
-			// 	_check();
-			// });
-			// win.emit('_getF_');
+			tt_check = setTimeout(function(){
+				_check();
+			}, 1000);
+			win.on('_from_', function(data){
+				_from = data;
+				clearTimeout(tt_check);
+				_check();
+			});
+			win.emit('_getF_');
 		}
 	}();
 	/*颜色转换*/
