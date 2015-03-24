@@ -620,7 +620,7 @@ Core.safe(function(){
 					$cb_interpolation_all.prop('checked', conf_interpolation.flag);
 				}
 
-				var template = conf_other.template || _template;
+				var template = conf_other.template || _template.t;
 				if(template){
 					selected_option($select_template, template.join('x'));
 				}

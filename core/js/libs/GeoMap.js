@@ -182,29 +182,13 @@ define('GeoMap',['zrender',
 		var _this = this;
 		_this.isReady = true;
 		_this.conf = conf = $.extend({},default_conf,conf);
-		_this.projector = conf.projector == 'mercator'? Mercator: Albers;
 		_this.canvas = Zrender.init($(conf.container).get(0));
 		_this.jsonLoader = conf.jsonLoader || $.getJSON;
 		var fn_ready = conf.onready;
 		if(fn_ready){
 			_this.on('ready', fn_ready);
 		}
-		var geo = conf.geo;
-		if(geo){
-			var src = geo.src,
-				name = geo.name;
-			var arr_json = [];
-			if(!$.isArray(name)){
-				name = [name];
-			}
-			$.each(name, function(i, v){
-				arr_json[i] = src + '/' + v + '.'+_this.projector.name+'.json';
-			});
-			_this.loadGeo(arr_json, null, function(){
-				_this.emit('ready');
-			});
-		}
-		_init_geomap.call(_this);
+		_this.configure(conf);
 	};
 	GeoMap.PROJECT_MERCATOR = 'mercator';
 	GeoMap.PROJECT_ALBERS = 'albers';
@@ -220,7 +204,7 @@ define('GeoMap',['zrender',
 		_this.conf = conf = $.extend({}, default_conf, _this.conf, conf);
 		var new_projector = conf.projector == 'mercator'? Mercator: Albers;
 
-		var overlays = _this._data.overlays;
+		var _data = _this._data;
 		if(_this.projector != new_projector){
 			_this.projector = new_projector;
 			// 进行投影数据的相关操作
@@ -238,14 +222,17 @@ define('GeoMap',['zrender',
 				var _canvs = _this.canvas;
 				_canvs.clear();
 				var overlays_weather = [];
-				$.each(overlays, function(i, v){
-					var shape = v.shape;
-					var zlevel = shape.zlevel;
-					if(zlevel == ZINDEX_MAP || zlevel == ZINDEX_MAP_TEXT){
-					}else{
-						overlays_weather.push(v);
-					}
-				});
+				if(_data){
+					var overlays = _data.overlays;
+					$.each(overlays, function(i, v){
+						var shape = v.shape;
+						var zlevel = shape.zlevel;
+						if(zlevel == ZINDEX_MAP || zlevel == ZINDEX_MAP_TEXT){
+						}else{
+							overlays_weather.push(v);
+						}
+					});
+				}
 				_init_geomap.call(_this);
 				_this.loadGeo(arr_json, null, function(){
 					$.each(overlays_weather, function(i, v){
@@ -256,6 +243,9 @@ define('GeoMap',['zrender',
 				});
 			}
 		}else{
+			if(_data){
+				var overlays = _data.overlays;
+			}
 			_init_geomap.call(_this);
 			_this._data.overlays = overlays;
 
