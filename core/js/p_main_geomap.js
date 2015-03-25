@@ -719,7 +719,9 @@ Core.safe(function(){
 								height: height_geomap
 							});
 							gm.config({
-								projector: new_projector
+								projector: new_projector,
+								w: new_w,
+								h: new_h
 							}, _afterConfig);
 						}else{
 							_afterConfig();
