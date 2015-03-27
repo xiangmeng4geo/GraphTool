@@ -351,6 +351,7 @@ Core.safe(function(){
 						// 只对大风降温数据进行处理
 						if(is_bigwindcooling){
 							if(/^0/.test(val_area)){
+								// 02、03表示沙尘；04表示大风
 								if(val_area == '040'){
 									var polyline = new GeoMap.Polyline(point_arr, {
 										style: {
