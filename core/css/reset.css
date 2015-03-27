@@ -60,7 +60,7 @@ select{
 input[type=checkbox],
 input[type=radio]{
 	vertical-align: -2px;
-	margin-left: -1px;
+	margin-left: 1px;
 }
 input[type=text]:hover, textarea:hover{
 	cursor: text;

@@ -219,6 +219,13 @@ Core.safe(function(){
 			
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent, params){
+				var mapbg_color = '#ffffff';
+				try{
+					var conf_map_color = conf_of_product.other.mapbg_color;
+					if(conf_map_color.flag){
+						mapbg_color = conf_map_color.val;
+					}
+				}catch(e){}
 				// 添加背景色让地图不透明
 				gm.addOverlay(new GeoMap.Rectangle({
 					style: {
@@ -226,7 +233,7 @@ Core.safe(function(){
 						y: 0,
 						width: width_geomap,
 						height: height_geomap,
-						color: conf_export.bgcolor || '#ffffff'
+						color: mapbg_color
 					}
 				}));
 				
@@ -483,12 +490,11 @@ Core.safe(function(){
 							}
 
 							conf_export = {};
-							var bg_flag = false;
+							var bg_flag = false, bgcolor_flag = false;
 							
 							var conf_bgimg = conf_other.bg_img;
 							if(conf_bgimg){
 								if(conf_bgimg.flag && conf_bgimg.val){
-									$geomap_container.css('background-image', 'url("'+conf_bgimg.val.replace(/\\/g,'/')+'")');
 									bg_flag = true;
 									conf_export.bgimg = conf_bgimg.val;//$('<img src="'+conf_bgimg.val+'"/>').get(0);
 								}
@@ -497,12 +503,14 @@ Core.safe(function(){
 								var conf_bgcolor = conf_other.bg_color;
 								if(conf_bgcolor){
 									if(conf_bgcolor.flag && conf_bgcolor.val){
-										$geomap_container.css('background-color', conf_bgcolor.val);
 										conf_export.bgcolor = conf_bgcolor.val;
+										bgcolor_flag = true;
 									}
+									
 								}
 							}
-							
+							$geomap_container.css('background-image', bg_flag?'url("'+conf_bgimg.val.replace(/\\/g,'/')+'")': 'none');
+							$geomap_container.css('background-color', bgcolor_flag?conf_bgcolor.val:'');
 							var conf_title = conf_of_product.title || {};//当没有配置文件时title == undefined
 							var $html_title1 = addTitle(conf_title.title_1, {
 								left: 110,

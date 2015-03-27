@@ -174,7 +174,7 @@ fieldset legend{
 	width: 260px;
 }
 #other_setting label{
-	width: 66px;
+	min-width: 66px;
 	display: inline-block;
 }
 

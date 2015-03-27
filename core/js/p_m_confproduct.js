@@ -137,7 +137,9 @@ Core.safe(function(){
 		$cb_use_bgcolor = $('#cb_use_bgcolor'),
 		$cb_use_bgimg = $('#cb_use_bgimg'),
 		$cb_interpolation_all = $('#cb_interpolation_all'),
-		$select_template = $('#select_template');
+		$select_template = $('#select_template'),
+		$cb_use_mapbgcolor = $('#cb_use_mapbgcolor'),
+		$color_mapbg = $('#color_mapbg');
 	/*初始化文件选定*/
 	!function(){
 		var const_file_rule = Core.Const.fileRule,
@@ -466,7 +468,11 @@ Core.safe(function(){
 				'interpolation': {
 					'flag': $cb_interpolation_all.prop('checked')
 				},
-				'template': $select_template.val().split('x')
+				'template': $select_template.val().split('x'),
+				'mapbg_color': {
+					'val': $color_mapbg.val(),
+					'flag': $cb_use_mapbgcolor.prop('checked')
+				}
 			}
 		};
 		
@@ -614,6 +620,11 @@ Core.safe(function(){
 				if(conf_bgimg){
 					$text_file_bgimg.val(conf_bgimg.val);
 					$cb_use_bgimg.prop('checked', conf_bgimg.flag);
+				}
+				var conf_mapbg_color = conf_other.mapbg_color;
+				if(conf_mapbg_color){
+					$color_mapbg.val(conf_mapbg_color.val);
+					$cb_use_mapbgcolor.prop('checked', conf_mapbg_color.flag);
 				}
 				var conf_interpolation = conf_other.interpolation;
 				if(conf_interpolation){
