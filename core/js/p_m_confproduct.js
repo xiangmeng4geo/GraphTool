@@ -499,10 +499,12 @@ Core.safe(function(){
 			$this.find('tr').each(function(tr_i,tr_v){
 				var $td = $(tr_v).find('td');
 				if($td.length > 0){
-					var val_arr = $td.eq(3).text().split('~');
-					val_arr.forEach(function(v, i){
-						val_arr[i] = isNaN(v)? (i == 0?MIN_VAL:MAX_VAL) :parseFloat(v);
+					var val_arr = [];
+					$td.eq(3).find('input').each(function(i){
+						var v = $(this).val();
+						val_arr.push(isNaN(v)? (i == 0?MIN_VAL:MAX_VAL) :parseFloat(v));
 					});
+					
 					colors.push({
 						'is_checked': $td.eq(0).find('input').prop('checked'),
 						'color': $td.eq(1).find('input').val(),
