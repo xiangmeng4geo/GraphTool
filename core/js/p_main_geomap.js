@@ -401,22 +401,25 @@ Core.safe(function(){
 							var point = new GeoMap.Point(v_v.x, v_v.y);
 							point_arr.push(point);
 						});
-						var option = {
+						var option_special = {
 							code: v.code,
 							width: 20, //线上标识图形的大小（如暖锋大小）
 							space_point: 10 //两个线上标识图形的间隔经纬度点数
 						};
-						if(v.code == 38){
-							option.width = 10;
-							option.space_point = 8;
-						}
-						var polyline = new GeoMap.Polyline(point_arr,{
+						var option = {
 							style: {
 								strokeColor : color_symbols[v.code],
 								lineWidth : 2,
 							},
 							zlevel: GeoMap.ZLEVEL.NOCLIP
-						}, option);
+						};
+
+						// 霜冻线在地图内，其它都可在地图区域外
+						if(v.code == 38){
+							delete option.zlevel;
+							option_special.width = 14;
+						}
+						var polyline = new GeoMap.Polyline(point_arr, option, option_special);
 						gm.addOverlay(polyline);   //增加折线
 					});
 				}
