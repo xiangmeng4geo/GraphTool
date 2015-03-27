@@ -321,24 +321,23 @@ Core.safe(function(){
 							var point = new GeoMap.Point(v_v.x,v_v.y);
 							point_arr.push(point);
 						});
-						var radom_color = Color[Math.floor(Math.random()*Color.length)];
-						var strokeColor = 'rgba(0,0,0,0)';
+						var color = 'rgba(0,0,0,0)';
 
 						var symbols = v.symbols;
 						var val_area = symbols? symbols.text : '';
-						strokeColor = getColor(val_area, v.code);
-						radom_color = strokeColor;
+						color = getColor(val_area, v.code);
+						// radom_color = strokeColor;
 						if(v.code == 24){
 							// strokeColor = 'red';
-							radom_color = new GeoMap.Pattern.Streak({
-								strokeStyle: strokeColor,
+							color = new GeoMap.Pattern.Streak({
+								strokeStyle: color,
 								space: 1
 							});
 						}
 						var polygon = new GeoMap.Polygon(point_arr, {
 							style: {
-								strokeColor: strokeColor, 
-								color: radom_color,
+								strokeColor: color, 
+								color: color,
 								lineWidth: 0.2
 							}
 						});
