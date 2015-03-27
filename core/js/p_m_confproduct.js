@@ -139,7 +139,9 @@ Core.safe(function(){
 		$cb_interpolation_all = $('#cb_interpolation_all'),
 		$select_template = $('#select_template'),
 		$cb_use_mapbgcolor = $('#cb_use_mapbgcolor'),
-		$color_mapbg = $('#color_mapbg');
+		$color_mapbg = $('#color_mapbg'),
+		$select_value_arithmetic = $('#select_value_arithmetic'),
+		$num_value_arithmetic = $('#num_value_arithmetic');
 	/*初始化文件选定*/
 	!function(){
 		var const_file_rule = Core.Const.fileRule,
@@ -427,7 +429,11 @@ Core.safe(function(){
 					'type': $('[name=file_rule]:checked').val(),
 					'file_type': $select_file_type.val(),
 					'file_hour': parseInt($select_file_hour.val()) || 0,
-					'col': parseInt($select_value_col.val())
+					'col': parseInt($select_value_col.val()),
+					'arithmetic': {
+						'type': $select_value_arithmetic.val(),
+						'val': parseFloat($num_value_arithmetic.val())
+					}
 				},
 				'out_filename': $text_out_filename.val()
 			},
@@ -559,6 +565,12 @@ Core.safe(function(){
 
 				var filename = conf_in_out.out_filename || product_name+'_'+map_width+'x'+map_height+'.png';
 				$text_out_filename.val(filename);
+
+				var conf_arithmetic = conf_in_out.arithmetic;
+				if(conf_arithmetic){
+					selected_option($select_value_arithmetic, conf_arithmetic.type);
+					$num_value_arithmetic.val(conf_arithmetic.val || '');
+				}
 			}
 			var conf_title = conf_product.title;
 			if(conf_title){

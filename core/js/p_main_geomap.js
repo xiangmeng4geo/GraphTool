@@ -720,7 +720,8 @@ Core.safe(function(){
 									file_util.micaps.getData(file_newest, {
 										val_col: conf_file_rule.col,
 										grid_space: 0.2,
-										interpolation_all: conf_interpolation && conf_interpolation.flag //传入micaps解析需要参数
+										interpolation_all: conf_interpolation && conf_interpolation.flag, //传入micaps解析需要参数
+										arithmetic: conf_file_rule.arithmetic
 									}, function(err, data, params){
 										// console.log(err, data);
 										Timer.end('read micaps');
