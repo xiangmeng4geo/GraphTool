@@ -268,9 +268,8 @@ Core.safe(function(){
 								return getColorByCondition(val, v.colors);
 							}
 						}
-					}else{
-						return getColorByCondition(val, blendent[0].colors);
 					}
+					return getColorByCondition(val, blendent[0].colors);
 				}
 		        // 3类里的插值结果
 				var interpolate = data.interpolate;
@@ -322,6 +321,22 @@ Core.safe(function(){
 				// 14类中的面
 				var areas = data.areas;
 				if(areas){
+					/*判断是不是大风降温数据 {*/
+					var _arr = [];
+					var is_bigwindcooling = false;
+					for(var i = 0, j = areas.length; i<j; i++){
+						var text = areas[i].symbols.text;
+						if(/^0[234]0/.test(text)){
+							_arr[0] = 1;
+						}else{
+							_arr[1] = 1;
+						}
+						if(_arr[0] == 1 && _arr[1] == 1){
+							is_bigwindcooling = true;
+							break;
+						}
+					}
+					/*判断是不是大风降温数据 }*/
 					$.each(areas, function(i,v){
 						var point_arr = [];
 						$.each(v.items,function(v_i,v_v){
@@ -332,23 +347,41 @@ Core.safe(function(){
 
 						var symbols = v.symbols;
 						var val_area = symbols? symbols.text : '';
-						color = getColor(val_area, v.code);
-						// radom_color = strokeColor;
-						if(v.code == 24){
-							// strokeColor = 'red';
-							color = new GeoMap.Pattern.Streak({
-								strokeStyle: color,
-								space: 1
-							});
-						}
-						var polygon = new GeoMap.Polygon(point_arr, {
-							style: {
-								strokeColor: color, 
-								color: color,
-								lineWidth: 0.2
+
+						// 只对大风降温数据进行处理
+						if(is_bigwindcooling){
+							if(/^0/.test(val_area)){
+								if(val_area == '040'){
+									var polyline = new GeoMap.Polyline(point_arr, {
+										style: {
+											strokeColor : '#ff0000',
+											lineWidth : 2,
+										},
+										zlevel: GeoMap.ZLEVEL.NOCLIP
+									});
+									gm.addOverlay(polyline);   //增加折线
+								}
+								return;
 							}
-						});
-						gm.addOverlay(polygon);   //增加面
+						}
+						color = getColor(val_area, v.code);
+						if(color){
+							if(v.code == 24){
+								// strokeColor = 'red';
+								color = new GeoMap.Pattern.Streak({
+									strokeStyle: color,
+									space: 1
+								});
+							}
+							var polygon = new GeoMap.Polygon(point_arr, {
+								style: {
+									strokeColor: color, 
+									color: color,
+									lineWidth: 0.2
+								}
+							});
+							gm.addOverlay(polygon);   //增加面
+						}
 					});
 				}
 				// 14类中的特殊线，如冷锋、暖锋

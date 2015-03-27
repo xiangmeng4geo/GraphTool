@@ -48,7 +48,7 @@ Core.safe(function(){
 	var $input_import_colors = $('<input type="file"/>').on('change',function(){
 		var file_path = $(this).val();
 		var blendent = file_util.readFile(file_path, true);
-
+		
 		$('.btn_dele_lengend').click();// 把原来数据还原
 
 		$.each(blendent, function(i, v){
@@ -61,7 +61,7 @@ Core.safe(function(){
 			$html.find('.number_max').val(v.number_max);
 			$html.find('.number_level').val(v.number_level);
 
-			$html.append(getTable(v.colors));
+			$html.find('.legend_value').append(getTable(v.colors));
 		});
 
 	})
