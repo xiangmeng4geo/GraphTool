@@ -566,7 +566,7 @@ Core.safe(function(){
 				var filename = conf_in_out.out_filename || product_name+'_'+map_width+'x'+map_height+'.png';
 				$text_out_filename.val(filename);
 
-				var conf_arithmetic = conf_in_out.arithmetic;
+				var conf_arithmetic = file_rule.arithmetic;
 				if(conf_arithmetic){
 					selected_option($select_value_arithmetic, conf_arithmetic.type);
 					$num_value_arithmetic.val(conf_arithmetic.val || '');
