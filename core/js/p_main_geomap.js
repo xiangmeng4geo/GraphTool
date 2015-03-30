@@ -51,9 +51,9 @@ Core.safe(function(){
 			
 		if(ConstFileType.forecast.v == file_type && !is_use_publish_time){
 			var one = new Date(time.getTime());
-			one.setHours(one.getHours()+file_hour);
+			one.setHours(one.getHours()+(file_hour-24));
 			var two = new Date(one.getTime());
-			two.setHours(two.getHours()+Math.min(24, file_hour));
+			two.setHours(two.getHours()+24);
 
 			text = one.format(text);
 			text = two.format(text);
