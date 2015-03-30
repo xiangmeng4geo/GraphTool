@@ -659,23 +659,21 @@ Core.safe(function(){
 			var menu_add_below = new MenuItem({label: '在下方添加'});
 			var menu_delete = new MenuItem({label: '删除'});
 			menu_add_above.on('click', function(){
-				var $p = $_target.parent();
-				$p.clone().insertBefore($p);
+				$_target.clone().insertBefore($p);
 			});
 			menu_add_below.on('click', function(){
-				var $p = $_target.parent();
-				$p.clone().insertAfter($p);
+				$_target.clone().insertAfter($p);
 			});
 			menu_delete.on('click', function(){
 				if(confirm('确定要删除这一项吗？')){
-					$_target.parent().slideUp();
+					$_target.slideUp();
 				}
 			});
 			menu.append(menu_add_above);
 			menu.append(menu_add_below);
 			menu.append(menu_delete);
 			return function(e){
-				$_target = $(e.target);
+				$_target = $(e.target).closest('tr');
 				menu.popup(e.clientX, e.clientY);
 			}
 		})();
