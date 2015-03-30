@@ -659,14 +659,14 @@ Core.safe(function(){
 			var menu_add_below = new MenuItem({label: '在下方添加'});
 			var menu_delete = new MenuItem({label: '删除'});
 			menu_add_above.on('click', function(){
-				$_target.clone().insertBefore($p);
+				$_target.clone().insertBefore($_target);
 			});
 			menu_add_below.on('click', function(){
-				$_target.clone().insertAfter($p);
+				$_target.clone().insertAfter($_target);
 			});
 			menu_delete.on('click', function(){
 				if(confirm('确定要删除这一项吗？')){
-					$_target.slideUp();
+					$_target.remove();
 				}
 			});
 			menu.append(menu_add_above);
