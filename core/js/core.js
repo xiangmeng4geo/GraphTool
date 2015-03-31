@@ -1,4 +1,5 @@
 !function(global){
+	var debug = this.debug = true;
 	var nwrequire = global.require;
 	var ext = this.global.require.extensions;
 	ext['.gts'] = ext['.js'];
@@ -250,9 +251,6 @@
 	function _open(page_name){
 
 		var win = Window.open('./'+page_name+'.html',$.extend({},conf_gui_window,conf.get('view_'+page_name)));
-		// win.on('document-start', function(){
-			// win.window.from = 'test';
-		// });
 		win.on('close',function(){
 			win.emit('beforeclose');
 			win.removeAllListeners();
@@ -417,19 +415,19 @@
 	!function(){
 		// 对入口做验证，防止直接改配置文件进行子模块
 		var tt_check;
-		if(!_isLogin(href)){
+		if(!debug && !_isLogin(href)){
 			var _from;
 			function _check(type){
-				// if(_isMain(href)){
-				// 	if(!_isLogin(_from)){
-				// 		Core.Page.logout();
-				// 	}
-				// }else{
-				// 	if(!_isMain(_from)){
-				// 		alert('您的操作不合法！');
-				// 		CoreWindow.close();
-				// 	}
-				// }
+				if(_isMain(href)){
+					if(!_isLogin(_from)){
+						Core.Page.logout();
+					}
+				}else{
+					if(!_isMain(_from)){
+						alert('您的操作不合法！');
+						CoreWindow.close();
+					}
+				}
 			}
 			tt_check = setTimeout(function(){
 				_check();

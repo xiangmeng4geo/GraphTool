@@ -878,14 +878,14 @@ define('GeoMap',['zrender',
 									y_mid = y1 + (y2 - y1)/2;
 								var y = y_mid + _width * Math.cos(radiu),
 									x = x_mid - _width * Math.sin(radiu);
-								if(i == _space_point){
-									ctx.beginPath();
-									// ctx.arc(x, y, 3, 0, Math.PI*2, true);
-									ctx.arc(x1, y1, 3, 0, Math.PI*2, true);
-									// ctx.arc(x2, y2, 3, 0, Math.PI*2, true);
-									ctx.closePath();
-									ctx.fill();
-								}
+								// if(i == _space_point){
+								// 	ctx.beginPath();
+								// 	// ctx.arc(x, y, 3, 0, Math.PI*2, true);
+								// 	ctx.arc(x1, y1, 3, 0, Math.PI*2, true);
+								// 	// ctx.arc(x2, y2, 3, 0, Math.PI*2, true);
+								// 	ctx.closePath();
+								// 	ctx.fill();
+								// }
 
 								ctx.moveTo(x_mid, y_mid);
 								ctx.lineTo(x, y);

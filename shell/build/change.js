@@ -73,6 +73,9 @@ function _repalce_content(dir){
 	_replace(path.join(dir, 'j/libs/j-ui.gts'), function(content){
 		return content.replace('../../css/j/ui-1.11.2.css', '../../c/j/ui-1.11.2.gtc').replace(/\js\//g, '/j/');
 	});
+	_replace(path.join(dir, 'j/core.gts'), function(content){
+		return content.replace(/\.debug=([^,;]+)/, '.debug=false').replace(/\js\//g, '/j/');
+	});
 }
 
 var args = [].slice.call(process.argv);
