@@ -420,16 +420,16 @@
 		if(!_isLogin(href)){
 			var _from;
 			function _check(type){
-				if(_isMain(href)){
-					if(!_isLogin(_from)){
-						Core.Page.logout();
-					}
-				}else{
-					if(!_isMain(_from)){
-						alert('您的操作不合法！');
-						CoreWindow.close();
-					}
-				}
+				// if(_isMain(href)){
+				// 	if(!_isLogin(_from)){
+				// 		Core.Page.logout();
+				// 	}
+				// }else{
+				// 	if(!_isMain(_from)){
+				// 		alert('您的操作不合法！');
+				// 		CoreWindow.close();
+				// 	}
+				// }
 			}
 			tt_check = setTimeout(function(){
 				_check();

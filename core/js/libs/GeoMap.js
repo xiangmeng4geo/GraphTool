@@ -861,9 +861,6 @@ define('GeoMap',['zrender',
 				ctx.fillStyle = color;
 				ctx.strokeStyle = color;
 				var start_point, mid_points = [], end_point;
-				if(pointList[0][0] > pointList[pointList.length-1][0]){
-					pointList.reverse();
-				}
 				if(code == 38){	//霜冻线
 					for(var i = _space_point, j = pointList.length; i < j; i+=_space_point){
 						var start = pointList[i],
@@ -872,20 +869,24 @@ define('GeoMap',['zrender',
 							var x1 = start[0], y1 = start[1],
 								x2 = end[0], y2 = end[1];
 							if(x1 != x2){
-								var radiu = Math.atan((y2 - y1)/(x2 - x1)) + Math.PI;
+								var radiu = Math.atan((y2 - y1)/(x2 - x1));
 								if(x1 < x2){
 									radiu += Math.PI;
 								}
+								// radiu -=  Math.PI/2;
 								var x_mid = x1 + (x2 - x1)/2,
 									y_mid = y1 + (y2 - y1)/2;
-								var y = y_mid - _width * Math.cos(radiu),
-									x = x_mid + _width * Math.sin(radiu);
-								// ctx.beginPath();
-								// ctx.arc(x, y, 3, 0, Math.PI*2, true);
-								// ctx.arc(x1, y1, 3, 0, Math.PI*2, true);
-								// ctx.arc(x2, y2, 3, 0, Math.PI*2, true);
-								// ctx.closePath();
-								// ctx.fill();
+								var y = y_mid + _width * Math.cos(radiu),
+									x = x_mid - _width * Math.sin(radiu);
+								// if(i == _space_point){
+								// 	ctx.beginPath();
+								// 	// ctx.arc(x, y, 3, 0, Math.PI*2, true);
+								// 	ctx.arc(x1, y1, 3, 0, Math.PI*2, true);
+								// 	// ctx.arc(x2, y2, 3, 0, Math.PI*2, true);
+								// 	ctx.closePath();
+								// 	ctx.fill();
+								// }
+
 								ctx.moveTo(x_mid, y_mid);
 								ctx.lineTo(x, y);
 								ctx.stroke();
@@ -893,102 +894,102 @@ define('GeoMap',['zrender',
 						}
 						
 					}
-					return;
-				}
-				for(var i = _space_point, j = pointList.length; i < j; i++){
-					var p = pointList[i];
-					if(!start_point){
-						start_point = p;
-					}else{
-						var dis = Math.pow(p[0] - start_point[0], 2) + Math.pow(p[1] - start_point[1], 2);
-						if(dis >= _width2){
-							if(dis == _width2){
-								end_point = p;
-							}else{
-								if(mid_points.length > 0){
-									var p_prev = mid_points[mid_points.length-1];
-									var x1 = p_prev[0], y1 = p_prev[1],
-										x2 = p[0], y2 = p[1],
-										x0 = start_point[0], y0 = start_point[1];
-
-									if(x1 == x2){
-										var x = x1;
-										var y = Math.sqrt(_width2 - Math.pow(x0 - x, 2));
-										var min_y = Math.min(y1, y2),
-											max_y = Math.max(y1, y2);
-										if(y >= min_y && y <= max_y){
-											end_point = [x, y];
-										}else{
-											end_point = [x, -y];
-										}
-									}else{
-										var k = (y1 - y2)/(x1 - x2),
-											b = (x1*y2 - x2*y1)/(x1 - x2);
-										var A = 1 + k*k,
-											B = 2*k*b - 2*x0 - 2*k*y0,
-											C = x0*x0 + y0*y0 + b*b - 2*b*y0 - _width2;
-										var a1 = -B/(2*A),
-											a2 = Math.sqrt(B*B - 4*A*C)/(2*A);
-										// console.log('x1 = '+x1, 'y1 = '+y1, 'x2 = '+x2, 'y2 = '+y2, 'x0 = '+x0, 'y0 = '+y0, 'k = '+k, 'b = '+b, 'x00 = '+((-B+Math.sqrt(B*B-4*A*C))/2*A), 'x01 = '+((-B-Math.sqrt(B*B-4*A*C))/2*A));
-										if(a2){
-											var min_x = Math.min(x1, x2),
-												max_x = Math.max(x1, x2);
-											var x = a1 + a2;
-											if(x < min_x || x > max_x){
-												x = a1 - a2;
-											}
-											end_point = [x, k*x+b];
-										}else{
-											mid_points.push(p);
-										}
-									}
-								}else{
-									var x1 = start_point[0], y1 = start_point[1],
-										x2 = p[0], y2 = p[1];
-									if(x1 == x2){
-										end_point = [x1, y1 + _width];
-									}else{
-										var radiu = Math.atan((y2 - y1)/(x2 - x1));
-										end_point = [x1 - _width*Math.sin(radiu), y1 - Math.cos(radiu)];
-									}
-								}
-							}
+				}else{
+					for(var i = _space_point, j = pointList.length; i < j; i++){
+						var p = pointList[i];
+						if(!start_point){
+							start_point = p;
 						}else{
-							mid_points.push(p);
-						}
-						if(start_point && end_point){
-							// 画标识
-							ctx.beginPath();
-							ctx.moveTo(start_point[0], start_point[1]);
-							for(var i_p = 0, j_p = mid_points.length; i_p<j_p; i_p++){
-								var p = mid_points[i_p];
-								ctx.lineTo(p[0], p[1]);
-							}
-							var x1 = start_point[0], y1 = start_point[1],
-								x2 = end_point[0], y2 = end_point[1];
-
-							if(code == 2){	//冷锋
-								if(x1 == x2){
-									var to_point = [x1 - _width, y1 + (y2 - y1)/2];
+							var dis = Math.pow(p[0] - start_point[0], 2) + Math.pow(p[1] - start_point[1], 2);
+							if(dis >= _width2){
+								if(dis == _width2){
+									end_point = p;
 								}else{
-									var radiu = -Math.atan((y2 - y1)/(x2 - x1));
-									var w = _width * Math.sin(Math.PI/4);
-									radiu = Math.PI/4 - radiu;
-									var x = x1 + (w * Math.cos(radiu)),
-										y = y1 + (w * Math.sin(radiu));
-									var to_point = [x, y];
-								}
+									if(mid_points.length > 0){
+										var p_prev = mid_points[mid_points.length-1];
+										var x1 = p_prev[0], y1 = p_prev[1],
+											x2 = p[0], y2 = p[1],
+											x0 = start_point[0], y0 = start_point[1];
 
-								ctx.lineTo(to_point[0], to_point[1]);
-							}else if(code == 3){ //暖锋
-								var radiu = x2 == x1? 0 : Math.atan((y2 - y1)/(x2 - x1));
-								ctx.arc(x1 + (x2 - x1)/2, y1 + (y2 - y1)/2, _width/2, radiu, radiu + Math.PI, true);
+										if(x1 == x2){
+											var x = x1;
+											var y = Math.sqrt(_width2 - Math.pow(x0 - x, 2));
+											var min_y = Math.min(y1, y2),
+												max_y = Math.max(y1, y2);
+											if(y >= min_y && y <= max_y){
+												end_point = [x, y];
+											}else{
+												end_point = [x, -y];
+											}
+										}else{
+											var k = (y1 - y2)/(x1 - x2),
+												b = (x1*y2 - x2*y1)/(x1 - x2);
+											var A = 1 + k*k,
+												B = 2*k*b - 2*x0 - 2*k*y0,
+												C = x0*x0 + y0*y0 + b*b - 2*b*y0 - _width2;
+											var a1 = -B/(2*A),
+												a2 = Math.sqrt(B*B - 4*A*C)/(2*A);
+											// console.log('x1 = '+x1, 'y1 = '+y1, 'x2 = '+x2, 'y2 = '+y2, 'x0 = '+x0, 'y0 = '+y0, 'k = '+k, 'b = '+b, 'x00 = '+((-B+Math.sqrt(B*B-4*A*C))/2*A), 'x01 = '+((-B-Math.sqrt(B*B-4*A*C))/2*A));
+											if(a2){
+												var min_x = Math.min(x1, x2),
+													max_x = Math.max(x1, x2);
+												var x = a1 + a2;
+												if(x < min_x || x > max_x){
+													x = a1 - a2;
+												}
+												end_point = [x, k*x+b];
+											}else{
+												mid_points.push(p);
+											}
+										}
+									}else{
+										var x1 = start_point[0], y1 = start_point[1],
+											x2 = p[0], y2 = p[1];
+										if(x1 == x2){
+											end_point = [x1, y1 + _width];
+										}else{
+											var radiu = Math.atan((y2 - y1)/(x2 - x1));
+											end_point = [x1 - _width*Math.sin(radiu), y1 - Math.cos(radiu)];
+										}
+									}
+								}
+							}else{
+								mid_points.push(p);
 							}
-							ctx.closePath();
-							ctx.fill();
-							start_point = end_point = null;
-							mid_points = [];
-							i += _space_point;
+							if(start_point && end_point){
+								// 画标识
+								ctx.beginPath();
+								ctx.moveTo(start_point[0], start_point[1]);
+								for(var i_p = 0, j_p = mid_points.length; i_p<j_p; i_p++){
+									var p = mid_points[i_p];
+									ctx.lineTo(p[0], p[1]);
+								}
+								var x1 = start_point[0], y1 = start_point[1],
+									x2 = end_point[0], y2 = end_point[1];
+
+								if(code == 2){	//冷锋
+									if(x1 == x2){
+										var to_point = [x1 - _width, y1 + (y2 - y1)/2];
+									}else{
+										var radiu = -Math.atan((y2 - y1)/(x2 - x1));
+										var w = _width * Math.sin(Math.PI/4);
+										radiu = Math.PI/4 - radiu;
+										var x = x1 + (w * Math.cos(radiu)),
+											y = y1 + (w * Math.sin(radiu));
+										var to_point = [x, y];
+									}
+
+									ctx.lineTo(to_point[0], to_point[1]);
+								}else if(code == 3){ //暖锋
+									var radiu = x2 == x1? 0 : Math.atan((y2 - y1)/(x2 - x1));
+									ctx.arc(x1 + (x2 - x1)/2, y1 + (y2 - y1)/2, _width/2, radiu, radiu + Math.PI, true);
+								}
+								ctx.closePath();
+								ctx.fill();
+								start_point = end_point = null;
+								mid_points = [];
+								i += _space_point;
+							}
 						}
 					}
 				}
@@ -1042,7 +1043,7 @@ define('GeoMap',['zrender',
 		        lineWidth : 1,
 		        strokeColor : 'red',
 			},
-			zlevel: ZINDEX_LAYER,
+			// zlevel: ZINDEX_LAYER,
 			needTransform: true,
 			needLocalTransform: true,
 			hoverable: false
