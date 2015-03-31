@@ -8,7 +8,9 @@ Core.safe(function(){
 		icon_path = file_path.icon,
 		image_path = file_path.image;
 	var CoreWindow = Core.Window;
-	var const_projector = Core.Const.projector;
+	var _const = Core.Const,
+		const_projector = _const.projector,
+		const_template = _const.template;
 
 	var $c_bottom_fieldset = $('#c_bottom > fieldset');
 	var $c_top_li = $('#c_top li').click(function(){
@@ -32,9 +34,12 @@ Core.safe(function(){
 		$text_file_company_logo = $('#text_file_company_logo'),
 		$checkbox_show_southsea = $('#checkbox_show_southsea'),
 		$checkbox_show_logo = $('#checkbox_show_logo'),
-		$select_map_projector = $('#select_map_projector');
-	var conf_sys = Conf_User.get(CONF_PRODUCTNAME);
+		$select_map_projector = $('#select_map_projector'),
+		$tb_template = $('#tb_template');
+
+	var conf_sys = Conf_User.getSys();
 	var projector_user = '';
+	var arr_template = [];
 	if(conf_sys){
 		var logos = conf_sys.logos;
 		if(logos){
@@ -49,7 +54,10 @@ Core.safe(function(){
 				$text_file_company_logo.val(logo_company.p);
 			}
 		}
+		debugger;
 		projector_user = conf_sys.projector;
+		var templates = conf_sys.templates || [];
+		arr_template = arr_template.concat(templates);
 	}
 	var html_map_projector = '';
 	$.each(const_projector, function(i, v){
@@ -57,8 +65,28 @@ Core.safe(function(){
 		html_map_projector += '<option value="'+val+'" '+(val == projector_user? 'selected': '')+'>'+v.n+'</option>';
 	});
 	$select_map_projector.html(html_map_projector);
+
+	var html_template = '';
+	$.each(arr_template, function(i, v){
+		html_template += '<tr>'+
+							'<td class="fn_contextmenu">'+(v._isSys?'&nbsp;': '<input type="checkbox" '+(v.flag?'checked':'')+' class="t_f"/>')+'</td>'+
+							'<td contentEditable="true" class="t_n">'+v.n+'</td>'+
+							'<td><input type="number" value="'+v.t[0]+'" class="t_t_0"/>X<input type="number" value="'+v.t[1]+'" class="t_t_1"/></td>'+
+						   '</tr>';
+	});
+	$tb_template.append(html_template);
+
 	$('#btn_cancel').click(CoreWindow.close);
 	$('#btn_save').click(function(){
+		var templates = [];
+		$tb_template.find('tr').slice(2).each(function(i, v){
+			var $this = $(this);
+			templates.push({
+				n: $this.find('.t_n').text(),
+				t: [parseInt($this.find('.t_t_0').val()) || 0, parseInt($this.find('.t_t_1').val()) || 0],
+				flag: $this.find('.t_f').prop('checked')
+			});
+		});
 		var save_data = {
 			logos: {
 				southsea: {
@@ -70,17 +98,61 @@ Core.safe(function(){
 					p: $text_file_company_logo.val()
 				}
 			},
-			projector: $select_map_projector.val()
+			projector: $select_map_projector.val(),
+			templates: templates
 		};
 		Conf_User.write(CONF_PRODUCTNAME,save_data,true);
 		CoreWindow.close();
 	});
+
+
 	var is_img = Core.util.isImg;
 	/*初始化右键菜单*/
 	var CoreWindow = Core.Window;
 	var gui = CoreWindow.getGui(),
 		Menu = gui.Menu,
 		MenuItem = gui.MenuItem;
+
+	var _contextmenu = (function(){
+		var $_target;
+		var menu = new Menu();
+		var menu_add_above = new MenuItem({label: '在上方添加'});
+		var menu_add_below = new MenuItem({label: '在下方添加'});
+		var menu_delete = new MenuItem({label: '删除'});
+
+		function _addCheckbox($box){
+			if($box.find('td:first input').length == 0){
+				$box.find('td:first').append('<input type="checkbox" class="t_f" checked/>');
+			}
+			return $box;
+		}
+		menu_add_above.on('click', function(){
+			var $p = $_target.parent();
+			_addCheckbox($p.clone()).hide().insertBefore($p).fadeIn();
+		});
+		menu_add_below.on('click', function(){
+			var $p = $_target.parent();
+			_addCheckbox($p.clone()).hide().insertAfter($p).fadeIn();
+		});
+		menu_delete.on('click', function(){
+			if(confirm('确定要删除这一项吗？')){
+				$_target.parent().fadeOut(function(){
+					$(this).remove();
+				});
+			}
+		});
+		menu.append(menu_add_above);
+		menu.append(menu_add_below);
+		menu.append(menu_delete);
+		return function(e){
+			$_target = $(e.target);
+			var enabled = $_target.find('input').length > 0;
+			menu_add_above.enabled = enabled;
+			menu_delete.enabled = enabled;
+			menu.popup(e.clientX, e.clientY);
+		}
+	})();
+	$('.template').delegate('.fn_contextmenu', 'contextmenu', _contextmenu);
 		
 	var menu_tree = new Menu();
 	var menu_add_files = new MenuItem({ label: '从文件导入' }),

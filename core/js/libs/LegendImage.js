@@ -23,14 +23,18 @@ define('LegendImage',['zrender',
 			html_title += '<span>'+title+'</span>';
 			html_color += '<ul>';
 			var colors = v.colors;
-			if(is_reverse){
-				colors.reverse();
-			}
-			colors = colors.filter(function(v){
+			colors = colors.filter(function(v, i){
 				if(v.is_checked){
+					v._i = i;
 					return v;
 				}
 			});
+			colors.sort(function(a, b){
+				return a.order - b.order || a._i - b._i;
+			});
+			if(is_reverse){
+				colors.reverse();
+			}
 			var c_colors = colors.length;
 			$.each(colors, function(color_i, color_v){
 				var style_width = is_updown? '': 'width: '+(1/c_colors*100)+'%;';

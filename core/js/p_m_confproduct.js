@@ -1,13 +1,20 @@
 Core.safe(function(){
 	var MAX_VAL = 99999,
 		MIN_VAL = -9999;
-
+	var gui = Core.Window.getGui(),
+		Menu = gui.Menu,
+		MenuItem = gui.MenuItem;
+			
 	var product_name = '',
 		map_width,
 		map_height;
-	var Conf_User = Core.Lib.conf.User;
+	var core_libs = Core.Lib;
+	var file_util = core_libs.util.file;
+	var Conf_User = core_libs.conf.User;
 	var CoreWindow = Core.Window;
-	var const_msgtype = Core.Const.msgType;
+	var _const = Core.Const;
+	var const_msgtype = _const.msgType,
+		_template = _const.template;
 	
 	$('.file_dir').click(function(){
 		$(this).parent().prev().click();
@@ -28,6 +35,41 @@ Core.safe(function(){
 				style: current_textarea_title.attr('style')
 			},win_textstyle.window);
 		});
+	});
+	var $input_export_colors = $('<input type="file"/>').on('change',function(){
+		var blendent = _getBlendent();
+		if(blendent.length > 0){
+			file_util.write($(this).val(), JSON.stringify(blendent));
+			alert('配色方案导出成功！');
+		}else{
+			alert('暂时没有可导出的配色方案！');
+		}
+	});
+	var $input_import_colors = $('<input type="file"/>').on('change',function(){
+		var file_path = $(this).val();
+		var blendent = file_util.readFile(file_path, true);
+		
+		$('.btn_dele_lengend').click();// 把原来数据还原
+
+		$.each(blendent, function(i, v){
+			var val = init_legend_product.add(v.val);
+			var $html = $(html_fieldset_color.replace('_N_',val.n)).data('val_c',val).appendTo($legend_left);
+			$html.find('.color_start').val(v.color_start);
+			$html.find('.color_end').val(v.color_end);
+			$html.find('.cb_is_stripe').prop('checked', v.is_stripe);
+			$html.find('.number_min').val(v.number_min);
+			$html.find('.number_max').val(v.number_max);
+			$html.find('.number_level').val(v.number_level);
+
+			$html.find('.legend_value').append(getTable(v.colors));
+		});
+
+	})
+	$('#bt_export_colors').click(function(){
+		$input_export_colors.click();
+	});
+	$('#bt_import_colors').click(function(){
+		$input_import_colors.click();
 	});
 
 	var $number_newest_days = $('#number_newest_days'),
@@ -66,8 +108,9 @@ Core.safe(function(){
 				map_height = data.height;
 
 				$('title').text(product_name);
+				$input_export_colors.attr('nwsaveas', product_name+'(配色方案).db');
 				var conf_product = Conf_User.get(product_name);
-				init(conf_product)
+				init(conf_product);
 			}
 		}
 	},true);
@@ -90,12 +133,19 @@ Core.safe(function(){
 		$file_rule_example_span = $('#file_rule_example span'),
 		$select_file_type = $('#select_file_type'),
 		$select_file_hour = $('#select_file_hour'),
+		$select_value_col = $('#select_value_col'),
 		$cb_use_bgcolor = $('#cb_use_bgcolor'),
 		$cb_use_bgimg = $('#cb_use_bgimg'),
-		$cb_interpolation_all = $('#cb_interpolation_all');
+		$cb_interpolation_all = $('#cb_interpolation_all'),
+		$select_template = $('#select_template'),
+		$cb_use_mapbgcolor = $('#cb_use_mapbgcolor'),
+		$color_mapbg = $('#color_mapbg'),
+		$select_value_arithmetic = $('#select_value_arithmetic'),
+		$num_value_arithmetic = $('#num_value_arithmetic');
 	/*初始化文件选定*/
 	!function(){
 		var const_file_rule = Core.Const.fileRule,
+			col_index = const_file_rule.col_index,
 			file_rule_time = const_file_rule.time_rule,
 			file_rule_file_postfix = const_file_rule.file_postfix,
 			file_type = const_file_rule.file_type,
@@ -122,10 +172,26 @@ Core.safe(function(){
 		$select_file_type.html(html_file_type);
 
 		var html_file_hour = '';
-		$.each(file_hour,function(i,v){
+		$.each(file_hour, function(i,v){
 			html_file_hour += '<option value="'+v+'">'+v+'</option>';
 		});
 		$select_file_hour.html(html_file_hour);
+
+		var html_value_col = '';
+		for(var i = col_index[0], j = col_index[1]; i<=j; i++){
+			html_value_col += '<option value="'+i+'">'+i+'</option>';
+		}
+		$select_value_col.html(html_value_col);
+
+		var html_template = '';
+		$.each(Conf_User.getSys().templates, function(i, v){
+			if(v.flag){
+				var val = v.t.join('x');
+				html_template += '<option value="'+(val)+'">'+(v.n+'('+val+')')+'</option>';
+			}
+		});
+		$select_template.html(html_template);
+
 
 		var $text_file_dir_in = $('#text_file_dir_in');
 		/*显示选定的文件规则*/
@@ -221,7 +287,7 @@ Core.safe(function(){
 								'<legend>_N_ <input type="button" class="admin btn_dele_lengend" value="删除"/></legend>'+
 								'<div class="legend_value">'+
 									'<form id="form_legend">'+
-										'<div>'+
+										'<div class="mt10">'+
 											'<label>起始颜色</label><input type="color" value="#0000ff" class="color_start"/>'+
 											'<label>终止颜色</label><input type="color" value="#ff0000" class="color_end"/>'+
 											'<label title="雨夹雪时可使用">条纹显示</label><input type="checkbox" class="cb_is_stripe"/>'+
@@ -230,7 +296,7 @@ Core.safe(function(){
 											'<label>最小值</label><input type="number" value="0" class="number_min"/>'+
 											'<label>最大值</label><input type="number" value="40" class="number_max"/>'+
 											'<label>等级数</label><input type="number" value="10" class="number_level"/>'+
-											'<input value="生成等阶颜色值" type="submit" class="btn_gen_colors"/>'+
+											'<input value="生成等阶颜色值" type="button" class="btn_gen_colors"/>'+
 										'</div>'+
 									'</form>'+
 								'</div>'+
@@ -300,22 +366,24 @@ Core.safe(function(){
 		$legend_value.append(getTable(color_arr));
 	});
 	function getTable(color_arr){
-		var html_table = '<table>'+
+		var html_table = '<table cellspacing=1>'+
 								'<tr>'+
 									'<th width="10%">状态</th>'+
-									'<th width="15%">颜色值</th>'+
-									'<th width="15%">文字颜色</th>'+
+									'<th width="12%">颜色值</th>'+
+									'<th width="12%">文字颜色</th>'+
 									'<th width="30%">值域</th>'+
 									'<th width="30%">显示文字</th>'+
+									'<th width="6%" title="图例排列顺序\n从小到大排（图例倒序显示时从大到小）" class="cursor_help">顺序</th>'+
 								'</tr>';
 		$.each(color_arr,function(i,v){
 			var text_color = v.color_text || '#000';
 			html_table += '<tr>'+
-								'<td><input type="checkbox" '+(v.is_checked?'checked':'')+'/></td>'+
+								'<td class="fn_contextmenu"><input type="checkbox" '+(v.is_checked?'checked':'')+'/></td>'+
 								'<td><input type="color" value="'+v.color+'"/></td>'+
 								'<td><input type="color" value="'+text_color+'"/></td>'+
-								'<td contentEditable="true">'+v.val[0]+'~'+v.val[1]+'</td>'+
+								'<td><input type="number" value="'+v.val[0]+'"/>~<input type="number" value="'+v.val[1]+'"/></td>'+
 								'<td contentEditable="true" class="no_outline">'+v.text+'</td>'+
+								'<td><input type="number" value="'+(v.order||0)+'"/></td>'
 							'</tr>'
 		});
 		html_table += '</table>';
@@ -360,7 +428,12 @@ Core.safe(function(){
 					'custom': $text_file_rule_custom.val(),
 					'type': $('[name=file_rule]:checked').val(),
 					'file_type': $select_file_type.val(),
-					'file_hour': parseInt($select_file_hour.val()) || 0
+					'file_hour': parseInt($select_file_hour.val()) || 0,
+					'col': parseInt($select_value_col.val()),
+					'arithmetic': {
+						'type': $select_value_arithmetic.val(),
+						'val': parseFloat($num_value_arithmetic.val())
+					}
 				},
 				'out_filename': $text_out_filename.val()
 			},
@@ -400,9 +473,22 @@ Core.safe(function(){
 				},
 				'interpolation': {
 					'flag': $cb_interpolation_all.prop('checked')
+				},
+				'template': $select_template.val().split('x'),
+				'mapbg_color': {
+					'val': $color_mapbg.val(),
+					'flag': $cb_use_mapbgcolor.prop('checked')
 				}
 			}
 		};
+		
+		save_data.legend.blendent = _getBlendent();
+
+		Conf_User.write(product_name,save_data,true);
+		CoreWindow.close();
+	});	
+	
+	function _getBlendent(){
 		var blendent = [];
 		$fieldset_legend.find('.fieldset_color').each(function(i,v){
 			var $this = $(this);
@@ -418,29 +504,28 @@ Core.safe(function(){
 			var colors = [];
 			$this.find('tr').each(function(tr_i,tr_v){
 				var $td = $(tr_v).find('td');
-				if($td.length == 5){
-					var val_arr = $td.eq(3).text().split('~');
-					val_arr.forEach(function(v, i){
-						val_arr[i] = v != ''? parseFloat(v): v
+				if($td.length > 0){
+					var val_arr = [];
+					$td.eq(3).find('input').each(function(i){
+						var v = $(this).val();
+						val_arr.push(isNaN(v)? (i == 0?MIN_VAL:MAX_VAL) :parseFloat(v));
 					});
+					
 					colors.push({
 						'is_checked': $td.eq(0).find('input').prop('checked'),
 						'color': $td.eq(1).find('input').val(),
 						'color_text': $td.eq(2).find('input').val(),
 						'val': val_arr,
-						'text': $td.eq(4).text()
+						'text': $td.eq(4).text(),
+						'order': parseInt($td.eq(5).find('input').val())
 					});
 				}
 			});
 			data.colors = colors;
 			blendent.push(data);
 		});
-		save_data.legend.blendent = blendent;
-
-		Conf_User.write(product_name,save_data,true);
-		CoreWindow.close();
-	});	
-
+		return blendent;
+	}
 	function init(conf_product){
 		function selected_option($select,val){
 			$select.find('option').each(function(i,v){
@@ -476,9 +561,16 @@ Core.safe(function(){
 
 				selected_option($select_file_type, file_rule.file_type);
 				selected_option($select_file_hour, file_rule.file_hour);
+				selected_option($select_value_col, file_rule.col);
 
 				var filename = conf_in_out.out_filename || product_name+'_'+map_width+'x'+map_height+'.png';
 				$text_out_filename.val(filename);
+
+				var conf_arithmetic = file_rule.arithmetic;
+				if(conf_arithmetic){
+					selected_option($select_value_arithmetic, conf_arithmetic.type);
+					$num_value_arithmetic.val(conf_arithmetic.val || '');
+				}
 			}
 			var conf_title = conf_product.title;
 			if(conf_title){
@@ -518,7 +610,6 @@ Core.safe(function(){
 						colors.sort(function(a, b){
 							return a.val[0] > b.val[0]? 1: -1;
 						});
-						console.log(colors);
 						$html_fieldset_color.find('.legend_value').append(getTable(colors));
 					}
 					$legend_left.append($html_fieldset_color);
@@ -544,11 +635,48 @@ Core.safe(function(){
 					$text_file_bgimg.val(conf_bgimg.val);
 					$cb_use_bgimg.prop('checked', conf_bgimg.flag);
 				}
+				var conf_mapbg_color = conf_other.mapbg_color;
+				if(conf_mapbg_color){
+					$color_mapbg.val(conf_mapbg_color.val);
+					$cb_use_mapbgcolor.prop('checked', conf_mapbg_color.flag);
+				}
 				var conf_interpolation = conf_other.interpolation;
 				if(conf_interpolation){
 					$cb_interpolation_all.prop('checked', conf_interpolation.flag);
 				}
+
+				var template = conf_other.template || _template.t;
+				if(template){
+					selected_option($select_template, template.join('x'));
+				}
 			}
 		}
+
+		var _contextmenu = (function(){
+			var $_target;
+			var menu = new Menu();
+			var menu_add_above = new MenuItem({label: '在上方添加'});
+			var menu_add_below = new MenuItem({label: '在下方添加'});
+			var menu_delete = new MenuItem({label: '删除'});
+			menu_add_above.on('click', function(){
+				$_target.clone().insertBefore($_target);
+			});
+			menu_add_below.on('click', function(){
+				$_target.clone().insertAfter($_target);
+			});
+			menu_delete.on('click', function(){
+				if(confirm('确定要删除这一项吗？')){
+					$_target.remove();
+				}
+			});
+			menu.append(menu_add_above);
+			menu.append(menu_add_below);
+			menu.append(menu_delete);
+			return function(e){
+				$_target = $(e.target).closest('tr');
+				menu.popup(e.clientX, e.clientY);
+			}
+		})();
+		$('.legend_left').delegate('.fn_contextmenu', 'contextmenu', _contextmenu);
 	}
 });

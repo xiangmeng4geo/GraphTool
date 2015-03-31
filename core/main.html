@@ -7,14 +7,32 @@
 		<link rel="stylesheet" type="text/css" href="css/p_main.css">
 	</head>
 	<body>
-		<!-- <div id="resizable"></div> -->
 		<div id="main">
-			<div id="c_top">
-				<input type="button" value="注销" id="btn_quite"/>
-				<ul>
-					<li class="on">产品制作</li>
-					<li id="btn_setting">设置</li>
-				</ul>
+			<div class="top_container">
+				<div class="logo logo_black fl">
+				</div>
+				<div class="fr top_right">
+					<div class="user_info fl">
+						<div class="user_icon fl"><img src="./img/demo_icon.png"/></div>
+						<span id="user_name" class="fl">admin</span>
+						<span id="btn_slide" class="fl"></span>
+						<div id="slide_down">
+							<div></div>
+							<ul>
+								<li id="btn_quite">注销</li>
+								<li id="btn_listence">输入序列号</li>
+								<li id="btn_doc">使用说明</li>
+								<li id="btn_about">关于</li>
+							</ul>
+						</div>
+					</div>
+					<div id="btn_setting" class="fl">设置</div>
+					<div class="no_frame fl">
+						<div class="fl btn_min" title="最小化"></div>
+						<div class="fl btn_max" title="最大化"></div>
+						<div class="fl btn_close" title="关闭"></div>
+					</div>
+				</div>
 			</div>
 			<div class="c_bottom">
 				<div id="c_left">
@@ -22,16 +40,28 @@
 					<div id="result"></div>
 				</div>
 				<div id="c_right">
-					<div id="geomap_container">
-						<div id="geomap">
+					<div id="c_top" class="clear">
+						<div class="fl btns_top" id="btn_add_text">
+							<span>添加文字</span>
 						</div>
-						<!-- <div id="geomap_layer"></div> -->
+						<div class="fl btns_top" id="btn_add_img">
+							<span>添加图片库图片</span>
+						</div>
+						<div class="fl btns_top" id="btn_add_img_external">
+							<span>添加外部图片</span>
+						</div>
+						<div class="fl btns_top" id="btn_export">
+							<span>导出图片</span>
+						</div>
 					</div>
-					<div id="map_tool">
-						<div id="map_tool_move">move</div>
-						<div id="map_tool_zoomin">zoomin</div>
-						<div id="map_tool_zoomout">zoomout</div>
-						<div id="map_tool_reset">reset</div>
+					<div id="work_container">
+						<div id="geomap_container">
+							<div class="map_tool">
+								<div id="map_tool_reset" title="还原地图状态"></div>
+							</div>
+							<div id="geomap">
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -40,6 +70,9 @@
 		<script type="text/javascript" src="./js/core.js"></script>
 		<script type="text/javascript" src="./js/libs/j-tree.js"></script>
 		<script type="text/javascript" src="./js/libs/j-ui.js"></script>
+		<script type="text/javascript" src="./node_modules/micaps_parser/utils.js"></script>
+		<script type="text/javascript" src="./node_modules/micaps_parser/utils/raster2vector.js"></script>
+		<script type="text/javascript" src="./js/libs/frame.js"></script>
 		<script type="text/javascript" src="./js/p_main.js"></script>
 		<script type="text/javascript" src="./js/p_main_geomap.js"></script>
 	</body>

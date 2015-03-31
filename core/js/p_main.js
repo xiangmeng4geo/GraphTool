@@ -1,10 +1,16 @@
 !function(){
 	var is_admin = true;
-	var CONF_NAME_SYS_PRODUCT_TREE = 'sys_product_tree';
 	var nwCore = Core.require('core'),
 		nwConf = nwCore.conf,
 		Page = Core.Page;
-
+// Core.Window.get().showDevTools();	
+	var _frame = Core.frame;
+	$('.btn_min').click(_frame.minimize);
+	$('.btn_max').click(_frame.maximize);
+	$('.btn_close').click(_frame.close);
+	_frame.move($('.top_container'));
+	var ConfUser = Core.Lib.conf.User;
+		
 	var CoreWindow = Core.Window;
 	var Const = Core.Const,
 		ConstMsgType = Const.msgType,
@@ -17,15 +23,15 @@
 	$('#btn_setting').click(Page.setting);
 
 	var Tree = (function(){
-		var tree_data = nwConf.get(CONF_NAME_SYS_PRODUCT_TREE);
+		var tree_data = ConfUser.getTree();
 		
-		function createNode(data,prefix){
+		function createNode(data, prefix){
 			if(prefix != undefined){
 				prefix += '_';
 			}else{
 				prefix = '';
 			}
-			prefix != undefined|| (prefix = 'r');
+			var isexpand = prefix.split('_').length < 2;
 			var arr = [];
 			$.each(data,function(i,v){
 				var id = prefix+i;
@@ -35,7 +41,7 @@
 				    "text" : v.name,
 				    "showcheck" : false,
 				    "complete" : true,
-				    "isexpand" : true,
+				    "isexpand" : isexpand,
 				    "checkstate" : 0,
 				    "hasChildren" : is_hasChildren
 				};
@@ -57,7 +63,7 @@
 			if(is_admin){
 				root = {
 					"id" : 'root',
-				    "text" : '根目录',
+				    "text" : '产品列表',
 				    "showcheck" : false,
 				    "complete" : true,
 				    "isexpand" : true,
@@ -99,7 +105,7 @@
 		}
 		/*更新文件*/
 		function updateProductTreeConf(){
-			nwConf.write(CONF_NAME_SYS_PRODUCT_TREE,JSON.stringify(tree_data));
+			ConfUser.setTree(JSON.stringify(tree_data));
 		}
 		initTree();
 		
@@ -140,6 +146,42 @@
 				updateProductTreeConf();
 			}
 		}
+		function _is_in_tree(name, tree){
+			if(tree){
+				if(tree.name == name){
+					return true;
+				}else{
+					var c = tree.childNodes;
+					if(c){
+						for(var i = 0, j = c.length; i < j; i++){
+							var t = c[i];
+							return _is_in_tree(name, t);
+						}
+					}
+				}
+			}
+		}
+		function _is_in_tree(name, tree){
+			if(tree){
+				for(var i = 0, j = tree.length; i < j; i++){
+					var node = tree[i];
+					// alert('name = '+name+', node.name = '+ node.name);
+					if(name == node.name){
+						return true;
+					}else{
+						var c = node.childNodes;
+						if(c && _is_in_tree(name, c)){
+							return true;
+						}
+					}
+				}
+			}
+		}
+		function _is_exists(pro_name){
+			if(_is_in_tree(pro_name, tree_data)){
+				return true;
+			}
+		}
 		/*和其它窗体进行通信*/
 		CoreWindow.onMessage(function(e){
 			var data = e.data;
@@ -154,13 +196,20 @@
 					name: d_name
 				};
 				if(operate_item){
-					if(data.is_modify){
-						operate_item.name = d_name;
+					if(_is_exists(d_name)){//Core.Lib.util.file.exists(ConfUser.getPath(d_name))
+						alert('名称为“'+d_name+'”的产品已经存在，添加会把以前配置文件覆盖,系统将放弃本次操作！');
 					}else{
-						if(!operate_item.childNodes){
-							operate_item.childNodes = [];
+						if(data.is_modify){
+							if(!operate_item.childNodes){
+								ConfUser.rename(operate_item.name, d_name); //重命名配置文件
+							}
+							operate_item.name = d_name;
+						}else{
+							if(!operate_item.childNodes){
+								operate_item.childNodes = [];
+							}
+							operate_item.childNodes.push(add_item);
 						}
-						operate_item.childNodes.push(add_item);
 					}
 				}else{
 					if(!tree_data){
@@ -217,19 +266,65 @@
 		menu_tree.append(menu_conf);
 	})();
 
+	var $slide_down = $('#slide_down'),
+		$btn_slide = $('#btn_slide');
+	var flag_is_over = false;
+	$slide_down.on('mouseenter', function(){
+		flag_is_over = true;
+	}).on('mouseleave', function(){
+		flag_is_over = false;
+	});
+	var tt;
+	$('.user_info').on('mouseenter', function(){
+		// flag_is_over = true;
+		$slide_down.stop().slideDown();
+		$btn_slide.addClass('open');
+	}).on('mouseleave', function(){
+		clearTimeout(tt);
+		tt = setTimeout(function(){
+			if(!flag_is_over){
+				$slide_down.stop().slideUp();
+				$btn_slide.removeClass('open');
+			}
+		}, 50);
+	});
+	var height_top_container = $('.top_container').height();
 	var $win = $(window);
-	var $c_right = $('#c_right');
+	var $c_right = $('#c_right'),
+		$work_container = $('#work_container');
 	var _init_size_TT;
 	function _init_size(){
 		clearTimeout(_init_size_TT);
 		_init_size_TT = setTimeout(function(){
+			var height_c_right = $win.height() - height_top_container;
 			$c_right.css({
-				width: $win.width() - 300 + 10,
-				height: $win.height() - $c_right.offset().top
+				width: $win.width()+ 10,
+				height: height_c_right
 			});
+			$work_container.css({
+				height: height_c_right - $('#c_top').height() - 2
+			});
+			$win.trigger('resized');
 		}, 10);
 	}
 	_init_size();
 	$win.on('resize', _init_size);
+	!function(){
+		// 设置半小时提醒一次
+		var space_notice = 1000*60*30;
+		var last_time = 0;
+		$doc.on('no_v', function(e, listence){
+			if(listence){
+				var now = new Date();
+				if(now - last_time > space_notice){
+					last_time = now;
+					alert('您的软件已经到期，为保证您的使用请联系管理员！');
+				}
+			}
+		});
+	}();
+	$('#btn_listence').click(Page.listence);
+	$('#btn_about').click(Page.about);
+	$('#btn_doc').click(Page.doc);
 	Page.inited();
 }();

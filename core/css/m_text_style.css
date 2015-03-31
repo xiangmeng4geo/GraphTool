@@ -1,8 +1,15 @@
-body{background-color: #F0F0F0;}
+body{background-color: #ffffff;}
 #main{
-	width: 280px;
+	width: 273px;
 	margin: 0 auto;
 	padding: 20px 0;
+}
+#main, 
+input,
+select,
+textarea{
+	font-size: 12px;
+	color: #595959; 
 }
 label{
 	width: 40px;
@@ -10,7 +17,7 @@ label{
 	vertical-align: top;
 }
 textarea{
-	width: 220px;
+	width: 203px;
 	height: 60px;
 	line-height: normal;
 }
@@ -18,14 +25,14 @@ textarea{
 	margin-left: 24px;
 }
 #input_font_size{
-	width: 70px;
+	width: 72px;
 }
 input[type=color]{
 	position: absolute;
 	left: -2000px;
 }
 #cb_is_bg_color{
-	margin-left: 58px;
+	margin-left: 79px;
 }
 .mt10{
 	margin-top: 10px;
@@ -35,7 +42,10 @@ input[type=color]{
 }
 label[for]{
 	width: auto;
-	margin-right: 10px;
+	margin-right: 5px;
+}
+#cb_font_weight{
+	margin-left: 43px;
 }
 label[for=cb_font_weight]{
 	font-weight: bold;
@@ -50,12 +60,21 @@ label[for=cb_text_underline]{
 	text-decoration: underline;
 }
 .btns{
-	margin-top: 30px;
+	margin-top: 20px;
 }
 .btns input{
-	width: 60px;
+	width: 100px;
 	text-align: center;
+	padding: 3px 0 2px;
 }
 #btn_cancel{
-	margin-left: 147px;
+	margin-left: 25px;
+}
+#btn_yes{
+	margin-right: 25px;
+}
+.f14{
+	font-size: 14px;
+	font-weight: bold;
+	color: #282828;
 }

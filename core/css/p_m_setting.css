@@ -6,31 +6,37 @@
 	position: relative;
 	overflow: hidden;
 	height: 32px;
-	width: 98%;
+	/*width: 98%;*/
 	margin: 0 auto;
 	top: 1px;
+	color: #969696;
+	border-bottom: 1px solid #d4e3f2;
 }
 #c_top ul{
 	overflow: hidden;
 	padding-left: 5%;
 }
 #c_top li{
+	cursor: pointer;
 	padding: 0 5px;
-	min-width: 80px;
+	/*min-width: 80px;*/
 	text-align: center;
 	height: 28px;
 	line-height: 28px;
 	float: left;
-	border: 1px solid #bbb;
-	border-radius: 5px 5px 0 0;
-	margin-right: 3px;
+	/*border: 1px solid #bbb;*/
+	/*border-radius: 5px 5px 0 0;*/
+	margin-right: 20px;
 	margin-top: 2px;
-	background-color: #eee;
+	/*background-color: #eee;*/
 }
 #c_top li:hover{
-	background-color: #eed;
+	/*background-color: #eed;*/
 }
 #c_top li.on{
+	font-weight: bold;
+	font-size: 16px;
+	color: #282828;
 	margin-top: 0px;
 	height: 30px;
 	line-height: 30px;
@@ -39,37 +45,46 @@
 }
 
 #c_bottom{
-	width: 98%;
 	margin: 0 auto;
-	border: 1px solid #bbb;
+	/*border: 1px solid #bbb;*/
 	border-radius: 3px;
 	padding-bottom: 10px;
 	height: 350px;
-	overflow: auto;
+	border-bottom: 1px solid #d4e3f2;
 }
 #c_bottom>fieldset{
-	width: 90%;
+	width: 767px;
 	margin: 0 auto;
 	display: none;
-	height: 320px;
+	border: none;
+}
+#c_bottom>fieldset>legend{
+	display: none;
 }
 #c_bottom>fieldset.on{
 	display: block;
 }
+
 fieldset {
-	padding:10px;
-	margin:10px;
-	color:#333; 
-	border:#ccc solid 1px;
+	padding: 10px;
+	margin: 10px;
+	color: #595959; 
+	border: #ccc solid 1px;
 	border-radius: 3px;
+	border: none;
+	font-size: 12px;
 } 
+fieldset legend{
+	color: #282828;
+	font-size: 14px;
+	font-weight: bold;
+}
 
 .file_directory{
 	position: relative;
 	display: inline-block;
 	height: 30px;
-	width: 490px;
-	margin-left: 10px;
+	width: 630px;
 }
 .file_directory input[type=file]{
 	visibility: none;
@@ -85,7 +100,7 @@ fieldset {
 	overflow: hidden;
 }
 .text_file_dir{
-	width: 420px;
+	width: 	570px;
 }
 .tree_left,
 .tree_right{
@@ -95,7 +110,7 @@ fieldset {
 .tree_left{
 	width: 200px;
 	float: left;
-	border-right: 2px solid #ccc;
+	border-right: 2px solid #d4e3f2;
 }
 .tree_right li{
 	float: left;
@@ -130,7 +145,7 @@ fieldset {
 }
 
 .logo_right{
-	width: 116px;
+	width: 130px;
 }
 .btns{
 	width: 300px;
@@ -145,4 +160,37 @@ fieldset {
 /*重写tree样式*/
 .tree_left .bbit-tree-node-leaf .bbit-tree-node-icon{
 	background-image:url(../img/jquery.tree/folder-open.gif);
+}
+
+label{
+	margin-right: 10px;
+}
+.bbit-tree,
+.tree_right{
+	height: 338px;
+	overflow-y: auto;
+}
+.tree_right{
+	padding: 0 40px;
+}
+
+.bbit-tree .bbit-tree-node a span{
+	line-height: 25px;
+}
+
+.template table{
+	text-align: center;
+	background-color: #ccc;
+	width: 90%;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+.template input[type=number]{
+	width: 80px;
+	border: none;
+}
+.template input[type=number]:first-child{
+	text-align: right;
 }

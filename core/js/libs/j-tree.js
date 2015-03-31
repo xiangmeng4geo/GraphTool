@@ -83,7 +83,7 @@
                  * @description {Config} theme  
                  * {String} Tree theme. Three themes provided. 'bbit-tree-lines' ,'bbit-tree-no-lines' and 'bbit-tree-arrows'. 
                  */
-                theme: "bbit-tree-lines" //bbit-tree-lines ,bbit-tree-no-lines,bbit-tree-arrows
+                theme: "bbit-tree-arrows" //bbit-tree-lines ,bbit-tree-no-lines,bbit-tree-arrows
             };
 
         $.extend(dfop, settings);
@@ -643,5 +643,5 @@
         return $(this).find('.bbit-tree-node-leaf:first');
     }
     var src = $('script').last().attr('src');
-    Core.Html.addLink(Core.Path.resolve('../../css/jquery.tree/tree.css',src));
+    Core.Html.addLink(Core.Path.resolve('../../css/j.tree/tree.css',src));
 })(jQuery);
