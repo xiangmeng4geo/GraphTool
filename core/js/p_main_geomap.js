@@ -905,7 +905,6 @@ Core.safe(function(){
 		function ImageLayer(option, callback){
 			var pos = option.position;
 			var src = option.src;
-
 			if(!/^http/.test(src) && !file_util.exists(src.replace(/\?.*$/, ''))){
 				callback();
 				return;
@@ -919,6 +918,12 @@ Core.safe(function(){
 				if(option.width && option.height){
 					toWidth = option.width;
 					toHeight = option.height;
+				}
+				if(!isNaN(pos.left)){
+					pos.left -= toWidth/2;
+				}
+				if(!isNaN(pos.top)){
+					pos.top -= toHeight/2;
 				}
 				var $html = $('<div class="map_layer map_layer_image off"><img src="'+option.src+'"></div>')
 					.css(pos)
@@ -1179,13 +1184,17 @@ Core.safe(function(){
 	
 	// 向地图添加图片
 	function add_maplayer_img(src, pos, callback){
-		MapLayer.img({
-			position: pos,
-			src: src
-		},function($html, param){
-			$html && $geomap_layer.append($html);
-			callback && callback($html, param);
-		});
+		if(is_img(src)){
+			MapLayer.img({
+				position: pos,
+				src: src
+			},function($html, param){console.log($html, param);
+				$html && $geomap_layer.append($html);
+				callback && callback($html, param);
+			});
+		}else{
+			callback && callback();
+		}
 	}
 
 	$geomap_layer.on('dragover',function(e){
@@ -1199,7 +1208,7 @@ Core.safe(function(){
 		var dataTransfer = e.dataTransfer;
 		var drag_img = dataTransfer.getData('Text');
 		var x = e.offsetX,y = e.offsetY;
-		if(drag_img && is_img(drag_img)){
+		if(drag_img){
 			add_maplayer_img(drag_img, {
 				left: x,
 				top: y
