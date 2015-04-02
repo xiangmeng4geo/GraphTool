@@ -40,7 +40,7 @@ Core.safe(function(){
 		height_geomap = $geomap.height();
 	// 替换标题里的时间
 	function _replace_date(text, is_use_publish_time){
-		if(!conf_of_product || !data_of_micaps){
+		if(!conf_of_product || !data_of_micaps || !text){
 			return text;
 		}
 		var file_rule = conf_of_product.in_out.file_rule,
