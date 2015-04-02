@@ -1188,7 +1188,7 @@ Core.safe(function(){
 			MapLayer.img({
 				position: pos,
 				src: src
-			},function($html, param){console.log($html, param);
+			},function($html, param){
 				$html && $geomap_layer.append($html);
 				callback && callback($html, param);
 			});
