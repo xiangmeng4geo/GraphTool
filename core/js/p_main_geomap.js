@@ -127,7 +127,9 @@ Core.safe(function(){
 			if(!$html){
 				$html = $('<div class="loading"><div>正在处理。。。</div></div>').appendTo($geomap_container);
 			}
-			$html.show(callback);
+			$html.show(function(){
+				setTimeout(callback, 0)
+			});
 		}
 		function hide(){
 			$html && $html.hide();
@@ -728,6 +730,7 @@ Core.safe(function(){
 										if(err){
 											alert(err.msg || '读取数据错误！');
 										}else{
+											data_of_micaps = data;
 											$html_title1 && $html_title1.find('span').text(function(){
 												return _replace_date($(this).text());
 											});
@@ -737,7 +740,6 @@ Core.safe(function(){
 											$html_title3 && $html_title3.find('span').text(function(){
 												return _replace_date($(this).text(), true);
 											});
-											data_of_micaps = data;
 											render_conf(data_of_micaps, conf_of_product.legend.blendent, params);
 										}
 										_afterRender()
