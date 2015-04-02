@@ -2,12 +2,12 @@ body{padding: 10px;}
 .logo{
 	height: 70px;
 }
-#version{
+#version,#listence{
 	text-align: center;
 }
 h2{
 	text-align: center;
-	margin-top: 50px;
+	margin-top: 30px;
 }
 p{
 	text-indent: 30px;

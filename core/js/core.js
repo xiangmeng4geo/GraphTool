@@ -205,8 +205,11 @@
 				}
 			}
 		}
+		var listence = _getListence(conf.getVerification().l);
+		Core.safe.listence = listence;
 		function _check(){
 			var listence = _getListence(conf.getVerification().l);
+			Core.safe.listence = listence;
 			if(listence){
 				var time_schedule = Store.get(l_name);
 				if(time_schedule){
