@@ -179,7 +179,7 @@ Core.safe(function(){
 		require(['GeoMap', 'LegendImage'],function(GeoMap, LegendImage){
 			function _getProjector(){
 				var conf_sys = ConfUser.getSys();
-				return conf_sys && conf_sys.projector || GeoMap.PROJECT_MERCATOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+				return conf_sys && conf_sys.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
 			}
 			var gm_projector = _getProjector();
 			window.GeoMap = GeoMap;
