@@ -919,11 +919,13 @@ Core.safe(function(){
 					toWidth = option.width;
 					toHeight = option.height;
 				}
-				if(!isNaN(pos.left)){
-					pos.left -= toWidth/2;
-				}
-				if(!isNaN(pos.top)){
-					pos.top -= toHeight/2;
+				if(pos.center){
+					if(!isNaN(pos.left)){
+						pos.left -= toWidth/2;
+					}
+					if(!isNaN(pos.top)){
+						pos.top -= toHeight/2;
+					}
 				}
 				var $html = $('<div class="map_layer map_layer_image off"><img src="'+option.src+'"></div>')
 					.css(pos)
@@ -1210,6 +1212,7 @@ Core.safe(function(){
 		var x = e.offsetX,y = e.offsetY;
 		if(drag_img){
 			add_maplayer_img(drag_img, {
+				center: true,
 				left: x,
 				top: y
 			});
@@ -1218,6 +1221,7 @@ Core.safe(function(){
 			if(files.length > 0){
 				$.each(files,function(i,file){
 					add_maplayer_img(file.path, {
+						center: true,
 						left: x+i*10,
 						top: y+i*10
 					});
