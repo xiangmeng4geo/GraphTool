@@ -340,5 +340,5 @@ Core.safe(function(){
 	    });
 	}
 	init_tree('tree_icon','file_list_icon',icon_path);
-	init_tree('tree_image','file_list_image',image_path);
+	// init_tree('tree_image','file_list_image',image_path);
 });
