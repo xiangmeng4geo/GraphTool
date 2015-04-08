@@ -324,17 +324,11 @@ Core.safe(function(){
 				var areas = data.areas;
 				if(areas){
 					/*判断是不是大风降温数据 {*/
-					var _arr = [];
-					var is_bigwindcooling = false;
+					var is_bigwind = false;
 					for(var i = 0, j = areas.length; i<j; i++){
 						var text = areas[i].symbols.text;
-						if(/^0[234]0/.test(text)){
-							_arr[0] = 1;
-						}else{
-							_arr[1] = 1;
-						}
-						if(_arr[0] == 1 && _arr[1] == 1){
-							is_bigwindcooling = true;
+						if(/^040$/.test(text.trim())){
+							is_bigwind = true;
 							break;
 						}
 					}
@@ -351,10 +345,10 @@ Core.safe(function(){
 						var val_area = symbols? symbols.text : '';
 
 						// 只对大风降温数据进行处理
-						if(is_bigwindcooling){
+						if(is_bigwind){
 							if(/^0/.test(val_area)){
 								// 02、03表示沙尘；04表示大风
-								if(val_area == '040'){
+								if(val_area === '040'){
 									var polyline = new GeoMap.Polyline(point_arr, {
 										style: {
 											strokeColor : '#ff0000',
