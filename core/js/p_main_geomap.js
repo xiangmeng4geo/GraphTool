@@ -29,6 +29,7 @@ Core.safe(function(){
 	var data_of_micaps; // 用于缓存加载的micaps数据
 	var conf_export; //保存导出图片设置
 
+	var COLOR_TRANSPANT = 'rgba(0,0,0,0)';
 	var $geomap = $('#geomap');
 	var $geomap_container = $('#geomap_container');
 	var $geomap_layer = $geomap_container;//$('#geomap_layer');
@@ -256,11 +257,14 @@ Core.safe(function(){
 				function getColorByCondition(val, range){
 					for(var i = 0,j=range.length;i<j;i++){
 						var case_range = range[i];
-						var val_range = case_range.val;
-						if(val >= val_range[0] && val < val_range[1]){
-							return case_range.color;
+						if(case_range.is_checked){
+							var val_range = case_range.val;
+							if(val >= val_range[0] && val < val_range[1]){
+								return case_range.color;
+							}
 						}
 					}
+					return COLOR_TRANSPANT;
 				}
 				function getColor(val, code){
 					if(isHaveManyBlendent){
@@ -276,7 +280,6 @@ Core.safe(function(){
 		        // 3类里的插值结果
 				var interpolate = data.interpolate;
 				if(interpolate){
-					var COLOR_TRANSPANT = 'rgba(0,0,0,0)';
 					var _interpolate_width,
 						_interpolate_height;
 					try{
