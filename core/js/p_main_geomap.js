@@ -222,6 +222,11 @@ Core.safe(function(){
 			
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent, params){
+				var str_notice = '请先配置产品图例！';
+				var len_blendent = 0;
+				if(!blendent || (len_blendent = blendent.length) == 0){
+					return alert(str_notice);
+				}
 				var mapbg_color = '#ffffff';
 				try{
 					var conf_map_color = conf_of_product.other.mapbg_color;
@@ -240,7 +245,7 @@ Core.safe(function(){
 					}
 				}));
 				
-				for(var i = 0, j = blendent.length; i < j; i++){
+				for(var i = 0; i < len_blendent; i++){
 					var colors = blendent[i].colors;
 					for(var i_c = 0, j_c = colors.length; i_c < j_c; i_c++){
 						var range = colors[i_c].val;
@@ -253,7 +258,14 @@ Core.safe(function(){
 					}
 				}
 				Timer.start('render micaps');
-				var isHaveManyBlendent = blendent.length > 1;
+				// 对图例进行验证
+				for(var i = 0; i<len_blendent; i++){
+					var v = blendent[i];
+					if(!v || !v.colors){
+						return alert(str_notice);
+					}
+				}
+				var isHaveManyBlendent = len_blendent > 1;
 				function getColorByCondition(val, range){
 					for(var i = 0,j=range.length;i<j;i++){
 						var case_range = range[i];
@@ -268,7 +280,7 @@ Core.safe(function(){
 				}
 				function getColor(val, code){
 					if(isHaveManyBlendent){
-						for(var i = 0,j = blendent.length;i<j;i++){
+						for(var i = 0;i<len_blendent;i++){
 							var v = blendent[i];
 							if(code == v.val.v){
 								return getColorByCondition(val, v.colors);
@@ -870,7 +882,9 @@ Core.safe(function(){
 			$html.html('<span>'+(option.text||'')+'</span>')
 				.css(pos)
 				.addClass('off')
-				.resizable()
+				.resizable({
+					handles: 'all'
+				})
 				.draggable()
 				.css('position','absolute')
 				.on('mouseenter',function(){
@@ -930,7 +944,9 @@ Core.safe(function(){
 						width: toWidth,
 						height: toHeight
 					})
-					.resizable()
+					.resizable({
+						handles: 'all'
+					})
 					.draggable()
 					.css('position','absolute');
 				$html.on('mouseenter',function(){
