@@ -190,31 +190,6 @@
 }*/
 
 
-/* jquery.texteditor { */
-.texteditor{
-	position: absolute;
-	left: 10px;
-	top: 10px;
-	z-index: 1;
-	padding: 0 15px 5px 0;
-	display: inline-block;
-	border: 1px solid #ccc;
-	z-index: 101;
-}
-.texteditor.off{
-	z-index: 1;
-	border: 1px solid rgba(0,0,0,0);
-}
-.texteditor.off .ui-resizable-e{
-	cursor: default;
-}
-.texteditor.off .ui-resizable-s{
-	cursor: default;
-}
-.texteditor.off .ui-icon-gripsmall-diagonal-se{
-	background: none;
-}
-/* } jquery.texteditor */
 
 #work_container{
 	position: absolute;
@@ -281,36 +256,50 @@
 }
 /* ｝ 添加图片用和图片工具 */
 
+
 .map_layer{
 	cursor: move;
 }
-.map_layer_image{
+.map_layer{
 	position: absolute;
 	left: 0;
 	top: 0;
 	cursor: move;
 }
-.map_layer_image:after{
+.map_layer:after{
 	content: '';
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	border: 2px solid #ccc;
+	border: 2px dashed #ccc;
 	left: -2px;
 	top: -2px;
 }
-.map_layer_image.off:after{
+.map_layer.off:after{
 	display: none;
 }
-.map_layer_image.off .ui-resizable-e{
-	cursor: default;
+.map_layer.off .ui-resizable-handle{
+	border: none;
 }
-.map_layer_image.off .ui-resizable-s{
-	cursor: default;
+.map_layer .ui-resizable-handle{
+	width: 6px;
+	height: 6px;
+	border: 1px solid #ccc;
+	background-color: white;
 }
-.map_layer_image.off .ui-icon-gripsmall-diagonal-se{
-	background: none;
+.map_layer .ui-resizable-n,
+.map_layer .ui-resizable-s{
+	left: 50%;
 }
+.map_layer .ui-resizable-e,
+.map_layer .ui-resizable-w{
+	top: 50%;
+}
+.map_layer .ui-resizable-se{
+	right: -5px;
+	bottom: -5px;
+}
+
 .map_layer_image img{
 	width: 100%;
 	height: 100%;
