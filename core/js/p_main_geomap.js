@@ -29,6 +29,8 @@ Core.safe(function(){
 	var data_of_micaps; // 用于缓存加载的micaps数据
 	var conf_export; //保存导出图片设置
 
+	var $body = $('body'),
+		$doc = $(document);
 	var COLOR_TRANSPANT = 'rgba(0,0,0,0)';
 	var $geomap = $('#geomap');
 	var $geomap_container = $('#geomap_container');
@@ -77,7 +79,6 @@ Core.safe(function(){
 		}
 	})();
 	
-	var $doc = $(document);
 	var $current_text; // 用于操作当前编辑的文字对象
 	var _cache_e_contextmenu; // 用于缓存contextmenu事件对象
 	var is_img = Core.util.isImg;
@@ -113,6 +114,7 @@ Core.safe(function(){
 		            'zrender/shape/Text': fileLocation,
 		            'zrender/shape/Rectangle': fileLocation,
 		            'GeoMap': './js/libs/GeoMap',
+		            'ShapeBox': './js/libs/ShapeBox',
 		            'LegendImage': './js/libs/LegendImage'
 		        }
 		    });
@@ -138,6 +140,320 @@ Core.safe(function(){
 		return {
 			show: show,
 			hide: hide
+		}
+	})();
+	
+	
+	// 地图添加的图层类
+	var MapLayer = (function(){
+		// 定义文字和图片的右键菜单	
+		var menu_layer = new Menu();
+		var menu_layer_delete = new MenuItem({label: '删除'});
+		menu_layer_delete.on('click',function(){
+			var $layer = menu_layer._layer;
+			if($layer){
+				if($layer.is('.map_layer_box')){
+					var $p = $layer.parent();
+					var zr = $p.data('zr');
+					if(zr){
+						zr.dispose();
+					}
+					$p.remove();
+				}
+				$layer.remove();
+			}
+		});
+
+		/*更改各图层的z-index*/
+		function _changeZ(is_add){
+			var $layer = menu_layer._layer;
+			if($layer){
+				var pos_layer = $layer.position(),
+					left_layer = pos_layer.left,
+					top_layer = pos_layer.top,
+					width_layer = $layer.width(),
+					height_layer = $layer.height(),
+					bottom_layer = top_layer + height_layer,
+					right_layer = left_layer + width_layer,
+					zindex_layer = parseInt($layer.css('z-index')) || 0;
+
+				var zindex_max = Number.MIN_VALUE,
+					zindex_min = Number.MAX_VALUE;
+				var $layer_over = $('.map_layer').filter(function(){
+					var $this = $(this);
+					if(!$this.is($layer)){
+						var w = $this.width(),
+							h = $this.height();
+						var pos = $this.position(),
+							left = pos.left,
+							top = pos.top;
+
+						var lt_x = Math.max(left, left_layer),
+							lt_y = Math.max(top, top_layer),
+							rb_x = Math.min(left+w, right_layer),
+							rb_y = Math.min(top+h, bottom_layer);
+
+						if(lt_x < rb_x && lt_y < rb_y){
+							return $this;
+						}
+					}
+				}).each(function(){
+					var $this = $(this);
+					var zindex = parseInt($this.css('z-index')) || 0;
+					if(zindex > zindex_max){
+						zindex_max = zindex;
+					}else if(zindex < zindex_min){
+						zindex_min = zindex;
+					}
+				});
+				
+				if(zindex_max != Number.MIN_VALUE || zindex_min != Number.MAX_VALUE){
+					var to_zindex = is_add? zindex_max+1: zindex_min-1;
+					if(to_zindex < 0){
+						var zindex_abs = -to_zindex;
+						$layer_over.each(function(){
+							$(this).css('z-index', (parseInt($(this).css('z-index'))||0)+zindex_abs);
+						});
+						to_zindex = 0;
+					}
+					$layer.css('z-index', to_zindex);
+				}
+			}
+		}
+		var menu_layer_add_z = new MenuItem({label: '置于上层'});
+		menu_layer_add_z.on('click',function(){
+			_changeZ(true);
+		});
+		var menu_layer_minus_z = new MenuItem({label: '置于下层'});
+		menu_layer_minus_z.on('click',function(){
+			_changeZ(false);
+		});
+
+		menu_layer.append(menu_layer_delete);
+		menu_layer.append(new gui.MenuItem({ type: 'separator' }));
+		menu_layer.append(menu_layer_add_z);
+		menu_layer.append(menu_layer_minus_z);
+		// 文字图层
+		function TextLayer(option){
+			var pos = option.position;
+			var ondblclick = option.ondblclick;
+			var $html = $('<div class="texteditor map_layer">');
+			var style = option.style;
+			if(style){
+				$html.attr('style',style);
+			}
+
+			$html.html('<span>'+(option.text||'')+'</span>')
+				.css(pos)
+				.addClass('off')
+				.resizable({
+					handles: 'all'
+				})
+				.draggable()
+				.css('position','absolute')
+				.on('mouseenter',function(){
+					$(this).removeClass('off');
+				}).on('mouseleave',function(){
+					$(this).addClass('off');
+				}).on('dblclick',function(){
+					var $this = $(this);
+					var text = $this.text(),
+						style = $this.attr('style');
+
+					var win_textstyle = Core.Page.textStyle(function(e){
+						CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
+							text: text,
+							style: style
+						},win_textstyle.window);
+					});
+					$current_text = $this;
+					ondblclick && ondblclick.call(this);
+				}).on('contextmenu',function(e){
+					e.stopPropagation();
+					menu_layer._layer = $(this);
+					menu_layer.popup(e.clientX, e.clientY);
+				});
+			
+			return $html;
+		}
+		// 图片图层
+		function ImageLayer(option, callback){
+			var pos = option.position;
+			var src = option.src;
+			if(!/^http/.test(src) && !file_util.exists(src.replace(/\?.*$/, ''))){
+				callback();
+				return;
+			}
+			var img = new Image();
+			img.onload = function(){
+				var width = this.width,
+					height = this.height;
+				var toWidth = 80,
+					toHeight = 80*height/width;
+				if(option.width && option.height){
+					toWidth = option.width;
+					toHeight = option.height;
+				}
+				if(pos.center){
+					if(!isNaN(pos.left)){
+						pos.left -= toWidth/2;
+					}
+					if(!isNaN(pos.top)){
+						pos.top -= toHeight/2;
+					}
+				}
+				var $html = $('<div class="map_layer map_layer_image off"><img src="'+option.src+'"></div>')
+					.css(pos)
+					.css({
+						width: toWidth,
+						height: toHeight
+					})
+					.resizable({
+						handles: 'all'
+					})
+					.draggable()
+					.css('position','absolute');
+				$html.on('mouseenter',function(){
+					$(this).removeClass('off');
+				}).on('mouseleave',function(){
+					$(this).addClass('off');
+				}).on('contextmenu',function(e){
+					e.stopPropagation();
+					menu_layer._layer = $(this);
+					menu_layer.popup(e.clientX, e.clientY);
+				});
+				callback($html, {
+					width: width,
+					height: height,
+					width_show: toWidth,
+					height_show: toHeight
+				});
+			}
+			img.onerror = function(){
+				callback();
+			}
+			img.src = src;
+		}
+		var _zrender, _ShapeBox;
+		function BoxLayer(option, callback){
+			var $html = $('<div class="map_layer_box_c"></div>').appendTo($geomap_container);
+			option = $.extend({}, option, {
+            	x: 100,
+            	y: 100,
+            	width: 100,
+            	height: 50,
+            	arrows: {x: 140, y: 190},
+            	radius: [10],
+                brushType : 'both',
+                color: 'rgba(255, 100, 0, 0.5)',
+                strokeColor: '#ccc',
+                lineWidth: 1
+            });
+            option.arrows = {
+            	x: option.x + option.width/3,
+            	y: option.y + option.height*4/3
+            };
+			var zr = _zrender.init($html.get(0));
+			$html.data('zr', zr);
+			var shapeBox = new _ShapeBox({
+                handle_container: $html,
+                style: option,
+                onmovehandle: function(offset){
+                    zr.modShape(shapeBox.id, {style: {arrows: offset}})
+                    zr.refresh();
+                }
+            });
+            zr.addShape(shapeBox);
+        	zr.render();
+
+        	function init_img(){
+        		var rect = shapeBox.getRectAll();
+        		zr.toDataURL()
+        	}
+        	var last_pos_box, last_pos_arrow;
+        	var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text">testasdvb</div></div>').appendTo($html);
+        	var $text = $html_layer.find('.text').css({
+        		width: option.width - 20,
+        		height: option.height - 20
+        	});
+        	$html_layer
+			.css({
+				left: option.x,
+				top: option.y
+			})
+			.css({
+				width: option.width,
+				height: option.height
+			})
+			.resizable({
+				handles: 'all',
+				resize: function(e, ui){
+					var pos = ui.position,
+						size = ui.size;
+					zr.modShape(shapeBox.id, {style: {
+						x: pos.left,
+						y: pos.top,
+						width: size.width,
+						height: size.height
+					}})
+                	zr.refresh();
+
+                	$html_layer.find('.text').css({
+                		width: size.width - 20,
+                		height: size.height - 20
+                	});
+				}
+			})
+			.draggable({
+				start: function(e, ui){
+					last_pos_box = ui.position;
+					var arrow = shapeBox.arrows[0];
+					last_pos_arrow = {
+						x: arrow.x,
+						y: arrow.y
+					}
+				},
+				drag: function(e, ui) {
+					var pos = ui.position;
+					zr.modShape(shapeBox.id, {style: {
+						x: pos.left,
+						y: pos.top,
+						arrows: {
+							x: last_pos_arrow.x + (pos.left - last_pos_box.left),
+							y: last_pos_arrow.y + (pos.top - last_pos_box.top)
+						}
+					}})
+                	zr.refresh();
+				}
+			})
+			.css('position','absolute');
+
+			$html_layer.on('mouseenter',function(){
+				$(this).removeClass('off');
+			}).on('mouseleave',function(){
+				$(this).addClass('off');
+			}).on('contextmenu',function(e){
+				e.stopPropagation();
+				menu_layer._layer = $html_layer;
+				menu_layer.popup(e.clientX, e.clientY);
+			});
+		}
+		// setTimeout(function(){
+		// 	BoxLayer({
+		// 		x: 100,
+		// 		y: 100,
+		// 		width: 200,
+		// 		height: 100
+		// 	});
+		// }, 2000);
+		return {
+			init: function(zrender, ShapeBox){
+				_zrender = zrender;
+				_ShapeBox = ShapeBox;
+			},
+			text: TextLayer,
+			img: ImageLayer,
+			box: BoxLayer
 		}
 	})();
 	function init(is_show_mask){
@@ -177,7 +493,8 @@ Core.safe(function(){
 			}
 		});
 		initing = true;
-		require(['GeoMap', 'LegendImage'],function(GeoMap, LegendImage){
+		require(['GeoMap', 'LegendImage', 'zrender', 'ShapeBox'],function(GeoMap, LegendImage, zrender, ShapeBox){
+			MapLayer.init(zrender, ShapeBox);
 			function _getProjector(){
 				var conf_sys = ConfUser.getSys();
 				return conf_sys && conf_sys.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
@@ -787,195 +1104,6 @@ Core.safe(function(){
 			});
 		});
 	}
-	
-	// 地图添加的图层类
-	var MapLayer = (function(){
-		// 定义文字和图片的右键菜单	
-		var menu_layer = new Menu();
-		var menu_layer_delete = new MenuItem({label: '删除'});
-		menu_layer_delete.on('click',function(){
-			var $layer = menu_layer._layer;
-			if($layer){
-				$layer.remove();
-			}
-		});
-
-		/*更改各图层的z-index*/
-		function _changeZ(is_add){
-			var $layer = menu_layer._layer;
-			if($layer){
-				var pos_layer = $layer.position(),
-					left_layer = pos_layer.left,
-					top_layer = pos_layer.top,
-					width_layer = $layer.width(),
-					height_layer = $layer.height(),
-					bottom_layer = top_layer + height_layer,
-					right_layer = left_layer + width_layer,
-					zindex_layer = parseInt($layer.css('z-index')) || 0;
-
-				var zindex_max = Number.MIN_VALUE,
-					zindex_min = Number.MAX_VALUE;
-				var $layer_over = $('.map_layer').filter(function(){
-					var $this = $(this);
-					if(!$this.is($layer)){
-						var w = $this.width(),
-							h = $this.height();
-						var pos = $this.position(),
-							left = pos.left,
-							top = pos.top;
-
-						var lt_x = Math.max(left, left_layer),
-							lt_y = Math.max(top, top_layer),
-							rb_x = Math.min(left+w, right_layer),
-							rb_y = Math.min(top+h, bottom_layer);
-
-						if(lt_x < rb_x && lt_y < rb_y){
-							return $this;
-						}
-					}
-				}).each(function(){
-					var $this = $(this);
-					var zindex = parseInt($this.css('z-index')) || 0;
-					if(zindex > zindex_max){
-						zindex_max = zindex;
-					}else if(zindex < zindex_min){
-						zindex_min = zindex;
-					}
-				});
-				
-				if(zindex_max != Number.MIN_VALUE || zindex_min != Number.MAX_VALUE){
-					var to_zindex = is_add? zindex_max+1: zindex_min-1;
-					if(to_zindex < 0){
-						var zindex_abs = -to_zindex;
-						$layer_over.each(function(){
-							$(this).css('z-index', (parseInt($(this).css('z-index'))||0)+zindex_abs);
-						});
-						to_zindex = 0;
-					}
-					$layer.css('z-index', to_zindex);
-				}
-			}
-		}
-		var menu_layer_add_z = new MenuItem({label: '置于上层'});
-		menu_layer_add_z.on('click',function(){
-			_changeZ(true);
-		});
-		var menu_layer_minus_z = new MenuItem({label: '置于下层'});
-		menu_layer_minus_z.on('click',function(){
-			_changeZ(false);
-		});
-
-		menu_layer.append(menu_layer_delete);
-		menu_layer.append(new gui.MenuItem({ type: 'separator' }));
-		menu_layer.append(menu_layer_add_z);
-		menu_layer.append(menu_layer_minus_z);
-		// 文字图层
-		function TextLayer(option){
-			var pos = option.position;
-			var ondblclick = option.ondblclick;
-			var $html = $('<div class="texteditor map_layer">');
-			var style = option.style;
-			if(style){
-				$html.attr('style',style);
-			}
-
-			$html.html('<span>'+(option.text||'')+'</span>')
-				.css(pos)
-				.addClass('off')
-				.resizable({
-					handles: 'all'
-				})
-				.draggable()
-				.css('position','absolute')
-				.on('mouseenter',function(){
-					$(this).removeClass('off');
-				}).on('mouseleave',function(){
-					$(this).addClass('off');
-				}).on('dblclick',function(){
-					var $this = $(this);
-					var text = $this.text(),
-						style = $this.attr('style');
-
-					var win_textstyle = Core.Page.textStyle(function(e){
-						CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
-							text: text,
-							style: style
-						},win_textstyle.window);
-					});
-					$current_text = $this;
-					ondblclick && ondblclick.call(this);
-				}).on('contextmenu',function(e){
-					e.stopPropagation();
-					menu_layer._layer = $(this);
-					menu_layer.popup(e.clientX, e.clientY);
-				});
-			
-			return $html;
-		}
-		// 图片图层
-		function ImageLayer(option, callback){
-			var pos = option.position;
-			var src = option.src;
-			if(!/^http/.test(src) && !file_util.exists(src.replace(/\?.*$/, ''))){
-				callback();
-				return;
-			}
-			var img = new Image();
-			img.onload = function(){
-				var width = this.width,
-					height = this.height;
-				var toWidth = 80,
-					toHeight = 80*height/width;
-				if(option.width && option.height){
-					toWidth = option.width;
-					toHeight = option.height;
-				}
-				if(pos.center){
-					if(!isNaN(pos.left)){
-						pos.left -= toWidth/2;
-					}
-					if(!isNaN(pos.top)){
-						pos.top -= toHeight/2;
-					}
-				}
-				var $html = $('<div class="map_layer map_layer_image off"><img src="'+option.src+'"></div>')
-					.css(pos)
-					.css({
-						width: toWidth,
-						height: toHeight
-					})
-					.resizable({
-						handles: 'all'
-					})
-					.draggable()
-					.css('position','absolute');
-				$html.on('mouseenter',function(){
-					$(this).removeClass('off');
-				}).on('mouseleave',function(){
-					$(this).addClass('off');
-				}).on('contextmenu',function(e){
-					e.stopPropagation();
-					menu_layer._layer = $(this);
-					menu_layer.popup(e.clientX, e.clientY);
-				});
-				callback($html, {
-					width: width,
-					height: height,
-					width_show: toWidth,
-					height_show: toHeight
-				});
-			}
-			img.onerror = function(){
-				callback();
-			}
-			img.src = src;
-		}
-		return {
-			text: TextLayer,
-			img: ImageLayer
-		}
-	})();
-	
 	function _get_save_img_name(){
 		var filename;
 		try{

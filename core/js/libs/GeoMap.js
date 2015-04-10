@@ -6,7 +6,8 @@ define('GeoMap',['zrender',
 	'zrender/shape/Text',
 	'zrender/shape/Image',
 	'zrender/shape/Rectangle',
-	'zrender/tool/area'],function(Zrender,Base,Polygon,BrokenLine,util,TextShape,ImageShape,Rectangle,util_area){
+	'zrender/tool/area',
+	'ShapeBox'],function(Zrender, Base, Polygon, BrokenLine, util, TextShape, ImageShape, Rectangle, util_area, ShapeBox){
 
 	var Logger = Core.util.Logger,
 		Timer = Logger.Timer;
