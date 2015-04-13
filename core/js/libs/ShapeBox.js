@@ -385,6 +385,7 @@ define('ShapeBox',
                     _this.modify({arrows: offset});
                 }
             });
+            _this.$html = $html;
             _this.zr = zr;
             _this.shape = myShape;
             zr.addShape(myShape);
@@ -401,7 +402,12 @@ define('ShapeBox',
                     var offset = $container.offset();                
                     var isCover = myShape.isCover(e.clientX - offset.left, e.clientY - offset.top);
                     if(isCover){
-                        $container.addClass('cover');
+                        // $container.addClass('cover');
+                        // $html.addClass('focus');
+                        $html.css({
+                            left: 0,
+                            top: 0
+                        });
                         if(_this.$mirror){
                             _this.$mirror.remove();
                             _this.$mirror = null;
@@ -410,7 +416,9 @@ define('ShapeBox',
                         if(!_this.$mirror){
                             _this.$mirror = _getMirror.call(_this);
                         }
-                        $container.removeClass('cover');
+                        $html.removeAttr('style');
+                        // $container.removeClass('cover');
+                        // $html.removeClass('focus');
                     }
                 }
             });
@@ -429,7 +437,7 @@ define('ShapeBox',
             var imgData = layer.ctx.getImageData(x, y, width, height);
 
             if(is_force_modify){
-                $map_layer.find('.mirror_layer_box').remove();
+                _this.$mirror.remove();
             }
             var $mirror = $('<canvas width="'+width+'" height="'+height+'">').addClass('mirror_layer_box').prependTo($map_layer);
             $mirror.css({
@@ -447,7 +455,11 @@ define('ShapeBox',
         prop.modify = function(style, is_force_modify){
             var _this = this;
             var $container = _this.options.container;
-            $container.addClass('cover');
+            // $container.addClass('cover');
+            _this.$html.css({
+                left: 0,
+                top: 0
+            });
             var zr = _this.zr;
             zr.modShape(_this.shape.id, {style: style})
             zr.refresh();
@@ -458,8 +470,8 @@ define('ShapeBox',
         prop.dispose = function(){
             var _this = this;
             var options = _this.options;
-            options.container.find('.map_layer_box_c').remove();
-            options.map_layer.find('.mirror_layer_box').remove();
+            _this.$html.remove();
+            _this.$mirror.remove();
             _this.stat = 'dispose';
             _this.zr.dispose();
         }

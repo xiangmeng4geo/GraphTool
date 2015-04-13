@@ -25,6 +25,14 @@ Core.safe(function(){
 		icon_path = file_path.icon,
 		image_path = file_path.image;
 
+
+	var LABEL_TYPE_RECT = 1;//圆角矩标注
+	var MY_SHAPES = [{
+		src: 'data:image/png;base64,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',
+		text: '圆角矩标注',
+		type: LABEL_TYPE_RECT
+	}];
+
 	var conf_of_product; // 用于缓存已经加载的当前产品配置
 	var data_of_micaps; // 用于缓存加载的micaps数据
 	var conf_export; //保存导出图片设置
@@ -335,7 +343,8 @@ Core.safe(function(){
 		}
 		var _ShapeBox;
 		function BoxLayer(option, callback){
-			var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text"></div><div class="handle"></div></div>').appendTo($geomap_container);
+			var text = option.text || '';
+			var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text">'+text+'</div><div class="handle"></div></div>').appendTo($geomap_container);
         	
 			option && (option.container = $geomap_container, option.map_layer = $html_layer);
 			var shapeBox = new _ShapeBox(option);
@@ -819,12 +828,12 @@ Core.safe(function(){
 					gm.clearLayers();
 					// $geomap_container.removeAttr('style');
 					// setTimeout(function(){
-					// 	MapLayer.box({
-					// 		x: 100,
-					// 		y: 100,
-					// 		width: 200,
-					// 		height: 100
-					// 	});
+						// MapLayer.box({
+						// 	x: 100,
+						// 	y: 100,
+						// 	width: 200,
+						// 	height: 100
+						// });
 					// }, 10);
 					Loading.show(function(){
 						conf_of_product = ConfUser.get(product_name);
@@ -1220,26 +1229,35 @@ Core.safe(function(){
 			$('#btn_setting').click(function(){
 				isReload = true;
 			});
-			function showFiles($container,files){
+
+			var cache_file = {};
+			function showFiles($container, key){
 				var html = '';
-				$.each(files,function(i,v){
-					var name = path_util.basename(v);
-					if(is_img(name)){
-						name = name.replace(path_util.extname(v),'');
-						html += '<li><img src="'+v+'" draggable="true"/><span>'+name+'</span></li>';
-					}
-				});
+				if(key == 'my_shape'){
+					$.each(MY_SHAPES, function(i, shape){
+						html += '<li><img src="'+shape.src+'" draggable="true"/><span>'+shape.text+'</span></li>';
+					});
+				}else{
+					var files = cache_file[key];
+					$.each(files,function(i,v){
+						var name = path_util.basename(v);
+						if(is_img(name)){
+							name = name.replace(path_util.extname(v),'');
+							html += '<li><img src="'+v+'" draggable="true"/><span>'+name+'</span></li>';
+						}
+					});
+				}
+				
 				$container.html(html);
 			}
 			/*当重新配置图片库时要重新加载*/
 			function reloadFiles(){
 				if(!files_loaded || isReload){
-					var cache_file = {};
 					files_loaded = file_util.readdir(icon_path);
 					if(!$tool_image){
 						$tool_image = $('<div class="tool_image"><div class="btn_close_tool_image"></div><div class="tool_image_main"></div></div>').appendTo('#work_container');
 						$tool_image.delegate('select','change',function(){
-							showFiles($tool_image.find('ul'),cache_file[$(this).val()]);
+							showFiles($tool_image.find('ul'), $(this).val());
 						});
 						$tool_image.delegate('.btn_close_tool_image','click',function(){
 							$tool_image.slideUp();
@@ -1284,13 +1302,15 @@ Core.safe(function(){
 						}
 						return html;
 					}
+					html_select += '<option value="my_shape">标注图形</option>';
 					$.each(files_loaded,function(i,v){
 						html_select += createOption(v,0,i);
 					});
 					html_select += '</select>';
 					$tool_image_main.children().remove();
 					$tool_image_main.html(html_select+'<div class="list_container" style="height: '+(_getHeight())+'px"><ul class="clear"></ul></div>');
-					showFiles($tool_image_main.find('ul'),cache_file[$tool_image_main.find('select').val()]);
+					var val = $tool_image_main.find('select').val();
+					showFiles($tool_image_main.find('ul'), val);
 				}
 			}
 			return function(){
@@ -1371,6 +1391,20 @@ Core.safe(function(){
 		var drag_img = dataTransfer.getData('Text');
 		var x = e.offsetX,y = e.offsetY;
 		if(drag_img){
+			for(var i = 0, j = MY_SHAPES.length; i<j; i++){
+				var shape = MY_SHAPES[i];
+				if(shape.src == drag_img){
+					if(LABEL_TYPE_RECT == shape.type){
+						MapLayer.box({
+							x: x,
+							y: y,
+							width: 200,
+							height: 100
+						});
+						return;
+					}
+				}
+			}
 			add_maplayer_img(drag_img, {
 				center: true,
 				left: x,
