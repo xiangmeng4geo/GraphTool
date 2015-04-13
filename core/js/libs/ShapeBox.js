@@ -277,10 +277,6 @@ define('ShapeBox',
              */
             _getRect : function(style) {
                 style || (style = this.style);
-                if (style.__rect) {
-                    return style.__rect;
-                }
-                
                 var lineWidth;
                 if (style.brushType == 'stroke' || style.brushType == 'fill') {
                     lineWidth = style.lineWidth || 1;
@@ -288,7 +284,7 @@ define('ShapeBox',
                 else {
                     lineWidth = 0;
                 }
-                style.__rect = {
+                return {
                     x : Math.round(style.x - lineWidth / 2),
                     y : Math.round(style.y - lineWidth / 2),
                     width : style.width + lineWidth,
@@ -296,7 +292,6 @@ define('ShapeBox',
                     lineWidth: lineWidth
                 };
                 
-                return style.__rect;
             },
             getRect: function(){
                 var rect = this._getRect();
@@ -422,9 +417,10 @@ define('ShapeBox',
         }
         function _getMirror(is_force_modify){
             var _this = this;
-            var $container = _this.options.container;
+            var $map_layer = _this.options.map_layer;
             var myShape = _this.shape;
             var rect = myShape.getRect();
+            var _rect = myShape._getRect();
             var x = rect.x,
                 y = rect.y,
                 width = rect.width,
@@ -433,13 +429,13 @@ define('ShapeBox',
             var imgData = layer.ctx.getImageData(x, y, width, height);
 
             if(is_force_modify){
-                $container.find('.mirror_layer_box').remove();
+                $map_layer.find('.mirror_layer_box').remove();
             }
-            var $mirror = $('<canvas width="'+width+'" height="'+height+'">').css({
-                position: 'absolute', 
-                left: x,
-                top: y
-            }).addClass('mirror_layer_box').appendTo($container);
+            var $mirror = $('<canvas width="'+width+'" height="'+height+'">').addClass('mirror_layer_box').prependTo($map_layer);
+            $mirror.css({
+                left: rect.x - _rect.x,
+                top: rect.y - _rect.y
+            });
             var ctx = $mirror.get(0).getContext('2d');
             ctx.putImageData(imgData, 0, 0);
             return $mirror;
@@ -461,8 +457,9 @@ define('ShapeBox',
         }
         prop.dispose = function(){
             var _this = this;
-            var $container = _this.options.container;
-            $container.find('.map_layer_box_c,.mirror_layer_box').remove();
+            var options = _this.options;
+            options.container.find('.map_layer_box_c').remove();
+            options.map_layer.find('.mirror_layer_box').remove();
             _this.stat = 'dispose';
             _this.zr.dispose();
         }

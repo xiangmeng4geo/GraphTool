@@ -335,9 +335,10 @@ Core.safe(function(){
 		}
 		var _ShapeBox;
 		function BoxLayer(option, callback){
-			option && (option.container = $geomap_container);
+			var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text"></div><div class="handle"></div></div>').appendTo($geomap_container);
+        	
+			option && (option.container = $geomap_container, option.map_layer = $html_layer);
 			var shapeBox = new _ShapeBox(option);
-			var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text">testasdvb</div></div>').appendTo($geomap_container);
         	$html_layer.data('on_delete', function(){
         		shapeBox.dispose();
         	});
@@ -369,6 +370,7 @@ Core.safe(function(){
                 	});
 				}
 			}).draggable({
+				handle: '.handle',
 				start: function(e, ui){
 					last_pos_box = ui.position;
 					var arrow = shapeBox.shape.arrows[0];
@@ -428,14 +430,14 @@ Core.safe(function(){
 		return {
 			init: function(ShapeBox){
 				_ShapeBox = ShapeBox;
-				setTimeout(function(){
-					BoxLayer({
-						x: 100,
-						y: 100,
-						width: 200,
-						height: 100
-					});
-				}, 10);
+				// setTimeout(function(){
+				// 	BoxLayer({
+				// 		x: 100,
+				// 		y: 100,
+				// 		width: 200,
+				// 		height: 100
+				// 	});
+				// }, 10);
 			},
 			text: TextLayer,
 			img: ImageLayer,
@@ -813,10 +815,17 @@ Core.safe(function(){
 				// if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
 				if(gm.isReady && product_name){
 					// 清空地图及样式
-					$('.map_layer').remove();
+					$('.map_layer, .map_layer_box_c').remove();
 					gm.clearLayers();
 					// $geomap_container.removeAttr('style');
-
+					// setTimeout(function(){
+					// 	MapLayer.box({
+					// 		x: 100,
+					// 		y: 100,
+					// 		width: 200,
+					// 		height: 100
+					// 	});
+					// }, 10);
 					Loading.show(function(){
 						conf_of_product = ConfUser.get(product_name);
 						if(!conf_of_product || !conf_of_product.title || !conf_of_product.legend || !conf_of_product.in_out){
@@ -1129,6 +1138,22 @@ Core.safe(function(){
 								var pos = $layer.position();
 								var img = $layer.find('img').get(0);
 								gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height()));
+							}else if($layer.is('.map_layer_box')){
+								var pos = $layer.position();
+								var $canvas = $layer.find('canvas');
+								gm_export.addOverlay(new GeoMap.Image($canvas.get(0), pos.left, pos.top, $canvas.width(), $canvas.height()));
+								
+								var $text = $layer.find('.text');
+								var text = $text.text();
+								if(text){
+									var pos_text = $text.position();
+									var style = $text.clone().css({
+										left: pos.left + pos_text.left,
+										top: pos.top + pos_text.top
+									}).attr('style');
+									console.log(style);
+									gm_export.addOverlay(new GeoMap.Text(text, style));
+								}
 							}
 						});
 						// 软件到期后对生成的图片进行水印处理
