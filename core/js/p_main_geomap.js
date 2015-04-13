@@ -366,16 +366,35 @@ Core.safe(function(){
             zr.addShape(shapeBox);
         	zr.render();
 
+        	var $canvas;
         	function init_img(){
         		var rect = shapeBox.getRectAll();
-        		zr.toDataURL()
+        		var img = zr.toDataURL(null, 'rgba(0,0,0,0)')
+        		if($canvas){
+        			$canvas.remove();
+        		}
+        		$canvas = $('<canvas width="'+rect.width+'" height="'+rect.height+'""></canvas>').css({
+        			position: 'absolute',
+        			left: 0,
+        			top: 0
+        		}).on('mouseleave', function(){
+        			$canvas.hide();
+        			$html.show();
+        		}).appendTo($html_layer);
+        		var ctx = $canvas.get(0).getContext('2d');
+        		$('<img src="'+img+'">').on('load', function(){
+        			ctx.drawImage(this, -rect.x, -rect.y);
+        			$html.hide();
+        		});
         	}
         	var last_pos_box, last_pos_arrow;
-        	var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text">testasdvb</div></div>').appendTo($html);
+        	var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text">testasdvb</div></div>').appendTo($geomap_container);
         	var $text = $html_layer.find('.text').css({
         		width: option.width - 20,
         		height: option.height - 20
         	});
+
+        	init_img();
         	$html_layer
 			.css({
 				left: option.x,
@@ -402,6 +421,7 @@ Core.safe(function(){
                 		width: size.width - 20,
                 		height: size.height - 20
                 	});
+                	init_img();
 				}
 			})
 			.draggable({
@@ -424,13 +444,20 @@ Core.safe(function(){
 						}
 					}})
                 	zr.refresh();
+				},
+				stop: function(){
+					init_img();
 				}
 			})
 			.css('position','absolute');
 
 			$html_layer.on('mouseenter',function(){
 				$(this).removeClass('off');
+				$canvas.hide();
+				$html.show();
 			}).on('mouseleave',function(){
+				$canvas.show();
+				// $html.hide();
 				$(this).addClass('off');
 			}).on('contextmenu',function(e){
 				e.stopPropagation();
@@ -438,14 +465,14 @@ Core.safe(function(){
 				menu_layer.popup(e.clientX, e.clientY);
 			});
 		}
-		// setTimeout(function(){
-		// 	BoxLayer({
-		// 		x: 100,
-		// 		y: 100,
-		// 		width: 200,
-		// 		height: 100
-		// 	});
-		// }, 2000);
+		setTimeout(function(){
+			BoxLayer({
+				x: 100,
+				y: 100,
+				width: 200,
+				height: 100
+			});
+		}, 2000);
 		return {
 			init: function(zrender, ShapeBox){
 				_zrender = zrender;

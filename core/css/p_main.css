@@ -457,6 +457,7 @@
 	left: 10px;
 	top: 10px;
 	overflow: hidden;
+	z-index: 2;
 }
 .drag_handle{
     width: 6px;
@@ -468,4 +469,5 @@
     border: 1px solid #ccc;
     -webkit-transform: rotate(45deg);
     cursor: default;
+    z-index: 2;
 }
