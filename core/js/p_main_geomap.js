@@ -1150,7 +1150,8 @@ Core.safe(function(){
 							}else if($layer.is('.map_layer_box')){
 								var pos = $layer.position();
 								var $canvas = $layer.find('canvas');
-								gm_export.addOverlay(new GeoMap.Image($canvas.get(0), pos.left, pos.top, $canvas.width(), $canvas.height()));
+								var pos_canvas = $canvas.position();
+								gm_export.addOverlay(new GeoMap.Image($canvas.get(0), pos.left + pos_canvas.left, pos.top + pos_canvas.top, $canvas.width(), $canvas.height()));
 								
 								var $text = $layer.find('.text');
 								var text = $text.text();
@@ -1160,7 +1161,6 @@ Core.safe(function(){
 										left: pos.left + pos_text.left,
 										top: pos.top + pos_text.top
 									}).attr('style');
-									console.log(style);
 									gm_export.addOverlay(new GeoMap.Text(text, style));
 								}
 							}

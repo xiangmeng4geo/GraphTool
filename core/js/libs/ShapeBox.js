@@ -437,7 +437,7 @@ define('ShapeBox',
             var imgData = layer.ctx.getImageData(x, y, width, height);
 
             if(is_force_modify){
-                _this.$mirror.remove();
+                _this.$mirror && _this.$mirror.remove();
             }
             var $mirror = $('<canvas width="'+width+'" height="'+height+'">').addClass('mirror_layer_box').prependTo($map_layer);
             $mirror.css({
