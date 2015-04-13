@@ -80,6 +80,7 @@ Core.safe(function(){
 	})();
 	
 	var $current_text; // 用于操作当前编辑的文字对象
+	var on_receive_style; //全局得到样式后的回调
 	var _cache_e_contextmenu; // 用于缓存contextmenu事件对象
 	var is_img = Core.util.isImg;
 	// 引入amd模块加载器	
@@ -152,15 +153,9 @@ Core.safe(function(){
 		menu_layer_delete.on('click',function(){
 			var $layer = menu_layer._layer;
 			if($layer){
-				if($layer.is('.map_layer_box')){
-					var $p = $layer.parent();
-					var zr = $p.data('zr');
-					if(zr){
-						zr.dispose();
-					}
-					$p.remove();
-				}
+				var fn_on_delete = $layer.data('on_delete');
 				$layer.remove();
+				fn_on_delete && fn_on_delete();
 			}
 		});
 
@@ -266,7 +261,11 @@ Core.safe(function(){
 							style: style
 						},win_textstyle.window);
 					});
-					$current_text = $this;
+					// $current_text = $this;
+					on_receive_style = function(data){
+						$this.css(data.style).find('span').text(data.text);
+					};
+
 					ondblclick && ondblclick.call(this);
 				}).on('contextmenu',function(e){
 					e.stopPropagation();
@@ -334,100 +333,45 @@ Core.safe(function(){
 			}
 			img.src = src;
 		}
-		var _zrender, _ShapeBox;
+		var _ShapeBox;
 		function BoxLayer(option, callback){
-			var $html = $('<div class="map_layer_box_c"></div>').appendTo($geomap_container);
-			option = $.extend({}, option, {
-            	x: 100,
-            	y: 100,
-            	width: 100,
-            	height: 50,
-            	arrows: {x: 140, y: 190},
-            	radius: [10],
-                brushType : 'both',
-                color: 'rgba(255, 100, 0, 0.5)',
-                strokeColor: '#ccc',
-                lineWidth: 1
-            });
-            option.arrows = {
-            	x: option.x + option.width/3,
-            	y: option.y + option.height*4/3
-            };
-			var zr = _zrender.init($html.get(0));
-			$html.data('zr', zr);
-			var shapeBox = new _ShapeBox({
-                handle_container: $html,
-                style: option,
-                onmovehandle: function(offset){
-                    zr.modShape(shapeBox.id, {style: {arrows: offset}})
-                    zr.refresh();
-                }
-            });
-            zr.addShape(shapeBox);
-        	zr.render();
-
-        	var $canvas;
-        	function init_img(){
-        		var rect = shapeBox.getRectAll();
-        		var img = zr.toDataURL(null, 'rgba(0,0,0,0)')
-        		if($canvas){
-        			$canvas.remove();
-        		}
-        		$canvas = $('<canvas width="'+rect.width+'" height="'+rect.height+'""></canvas>').css({
-        			position: 'absolute',
-        			left: 0,
-        			top: 0
-        		}).on('mouseleave', function(){
-        			$canvas.hide();
-        			$html.show();
-        		}).appendTo($html_layer);
-        		var ctx = $canvas.get(0).getContext('2d');
-        		$('<img src="'+img+'">').on('load', function(){
-        			ctx.drawImage(this, -rect.x, -rect.y);
-        			$html.hide();
-        		});
-        	}
-        	var last_pos_box, last_pos_arrow;
-        	var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text">testasdvb</div></div>').appendTo($geomap_container);
+			option && (option.container = $geomap_container);
+			var shapeBox = new _ShapeBox(option);
+			var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text">testasdvb</div></div>').appendTo($geomap_container);
+        	$html_layer.data('on_delete', function(){
+        		shapeBox.dispose();
+        	});
         	var $text = $html_layer.find('.text').css({
         		width: option.width - 20,
         		height: option.height - 20
         	});
-
-        	init_img();
-        	$html_layer
-			.css({
+        	$html_layer.css({
 				left: option.x,
 				top: option.y
-			})
-			.css({
+			}).css({
 				width: option.width,
 				height: option.height
-			})
-			.resizable({
+			}).resizable({
 				handles: 'all',
 				resize: function(e, ui){
 					var pos = ui.position,
 						size = ui.size;
-					zr.modShape(shapeBox.id, {style: {
+					shapeBox.modify({
 						x: pos.left,
 						y: pos.top,
 						width: size.width,
 						height: size.height
-					}})
-                	zr.refresh();
-
+					});
+					
                 	$html_layer.find('.text').css({
                 		width: size.width - 20,
                 		height: size.height - 20
                 	});
-                	init_img();
 				}
-			})
-			.draggable({
+			}).draggable({
 				start: function(e, ui){
 					last_pos_box = ui.position;
-					var arrow = shapeBox.arrows[0];
+					var arrow = shapeBox.shape.arrows[0];
 					last_pos_arrow = {
 						x: arrow.x,
 						y: arrow.y
@@ -435,48 +379,63 @@ Core.safe(function(){
 				},
 				drag: function(e, ui) {
 					var pos = ui.position;
-					zr.modShape(shapeBox.id, {style: {
+					shapeBox.modify({
 						x: pos.left,
 						y: pos.top,
 						arrows: {
 							x: last_pos_arrow.x + (pos.left - last_pos_box.left),
 							y: last_pos_arrow.y + (pos.top - last_pos_box.top)
 						}
-					}})
-                	zr.refresh();
-				},
-				stop: function(){
-					init_img();
+					});
+					
 				}
-			})
-			.css('position','absolute');
-
-			$html_layer.on('mouseenter',function(){
+			}).css('position','absolute').on('mouseenter',function(){
 				$(this).removeClass('off');
-				$canvas.hide();
-				$html.show();
 			}).on('mouseleave',function(){
-				$canvas.show();
-				// $html.hide();
 				$(this).addClass('off');
 			}).on('contextmenu',function(e){
 				e.stopPropagation();
 				menu_layer._layer = $html_layer;
 				menu_layer.popup(e.clientX, e.clientY);
+			}).on('dblclick',function(){
+				var text = $text.text(),
+					style = $text.attr('style');
+				var bg_color = shapeBox.options.color;
+				style += (style?';':'')+'background-color:'+bg_color;
+				var win_textstyle = Core.Page.textStyle(function(e){
+					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
+						text: text,
+						style: style
+					}, win_textstyle.window);
+				});
+				on_receive_style = function(conf){
+					var style = conf.style;
+					if(style){
+						var bg_color = style['background-color'];
+						if(bg_color){
+							shapeBox.modify({
+								color: bg_color
+							}, true);
+						}
+						delete style['background-color']
+					}
+					
+					$text.css(style).text(conf.text);
+				}
 			});
 		}
-		setTimeout(function(){
-			BoxLayer({
-				x: 100,
-				y: 100,
-				width: 200,
-				height: 100
-			});
-		}, 2000);
+		
 		return {
-			init: function(zrender, ShapeBox){
-				_zrender = zrender;
+			init: function(ShapeBox){
 				_ShapeBox = ShapeBox;
+				setTimeout(function(){
+					BoxLayer({
+						x: 100,
+						y: 100,
+						width: 200,
+						height: 100
+					});
+				}, 10);
 			},
 			text: TextLayer,
 			img: ImageLayer,
@@ -503,25 +462,20 @@ Core.safe(function(){
 						}
 					});
 				}
-				if(!$current_text){
-					var pos = _cache_e_contextmenu? {
-						left: _cache_e_contextmenu.offsetX,
-						top: _cache_e_contextmenu.offsetY
-					}:{
-						left: width_geomap/2,
-						top: width_geomap/2
-					};
-					$current_text = MapLayer.text({
-						position: pos
-					}).appendTo($geomap_layer);
+				if(on_receive_style){
+					var fn = on_receive_style;
+					on_receive_style = null;
+					fn({
+						text: text,
+						style: styleObj
+					});
+					return;
 				}
-				$current_text.css(styleObj).find('span').text(text);
-				$current_text = null;
 			}
 		});
 		initing = true;
-		require(['GeoMap', 'LegendImage', 'zrender', 'ShapeBox'],function(GeoMap, LegendImage, zrender, ShapeBox){
-			MapLayer.init(zrender, ShapeBox);
+		require(['GeoMap', 'LegendImage', 'ShapeBox'],function(GeoMap, LegendImage, ShapeBox){
+			MapLayer.init(ShapeBox);
 			function _getProjector(){
 				var conf_sys = ConfUser.getSys();
 				return conf_sys && conf_sys.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
@@ -1216,6 +1170,19 @@ Core.safe(function(){
 		}
 		/*添加文字*/
 		var _add_text = function(){
+			on_receive_style = function(data){
+				var pos = _cache_e_contextmenu? {
+					left: _cache_e_contextmenu.offsetX,
+					top: _cache_e_contextmenu.offsetY
+				}:{
+					left: width_geomap/2,
+					top: width_geomap/2
+				};
+				var $text = MapLayer.text({
+					position: pos
+				}).appendTo($geomap_layer);
+				$text.css(data.style).find('span').text(data.text);
+			}
 			var win_textstyle = Core.Page.textStyle(function(e){
 				CoreWindow.sendMsg(ConstMsgType.CONF_STYLE,{},win_textstyle.window);
 			});

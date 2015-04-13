@@ -1,5 +1,6 @@
 define('ShapeBox',
     function (require) {
+        var _zrender = require('zrender');
         var Base = require('zrender/shape/Base');
         var area = require('zrender/tool/area');
         // var eventTool = require('zrender/tool/event');
@@ -14,12 +15,13 @@ define('ShapeBox',
          * @param {Object} options
          */
         var MyShape = function (options) {
+            var _this = this;
             var onmovehandle = options.onmovehandle;
             try{
                 var arrows = options.style.arrows;
                 if(arrows){
                     arrows = [arrows];
-                    this.arrows = arrows;
+                    _this.arrows = arrows;
                     var handle = [];
                     for(var i = 0, j = arrows.length; i<j; i++){
                         var arrow = arrows[i];
@@ -29,6 +31,11 @@ define('ShapeBox',
                         };
                         var $handle = $('<div class="drag_handle"></div>').appendTo(options.handle_container).css(last_offset);
 
+                        $handle.on('mouseenter', function(){
+                            _this.overHandle = true;
+                        }).on('mouseleave', function(){
+                            _this.overHandle = false;
+                        });
                         $handle.on('mousedown touchstart', function(){
                             $handle.hide();
                             var e_index = event_index++;
@@ -38,9 +45,11 @@ define('ShapeBox',
                                 var toX = e.offsetX,
                                     toY = e.offsetY;
                                 last_offset = {x: toX, y: toY};
-                                onmovehandle && onmovehandle.call(this, last_offset);
-                                
+
+                                _this.moving = true;
+                                onmovehandle && onmovehandle.call(_this, last_offset);
                             }).on(e_end, function(){
+                                _this.moving = false;
                                 $doc.off(e_move);
                                 $doc.off(e_end);
                                 $handle.css({
@@ -51,13 +60,13 @@ define('ShapeBox',
                         });
                         handle.push($handle);
                     }
-                    this.handle = handle;
+                    _this.handle = handle;
                 }
                 
             }catch(e){}
             options.hoverable = false;
             options.highlightStyle = options.style;
-            Base.call(this, options);
+            Base.call(_this, options);
             
             /**
              * 矩形绘制样式
@@ -266,7 +275,7 @@ define('ShapeBox',
              * @param {module:zrender/shape/Rectangle~IRectangleStyle} style
              * @return {module:zrender/shape/Base~IBoundingRect}
              */
-            getRect : function(style) {
+            _getRect : function(style) {
                 style || (style = this.style);
                 if (style.__rect) {
                     return style.__rect;
@@ -289,9 +298,9 @@ define('ShapeBox',
                 
                 return style.__rect;
             },
-            getRectAll: function(){
-                var rect = this.getRect();
-                var line_width = rect.lineWidth,
+            getRect: function(){
+                var rect = this._getRect();
+                var line_width = rect.lineWidth || 0,
                     x_rect = rect.x,
                     y_rect = rect.y,
                     width_rect = rect.width,
@@ -319,10 +328,145 @@ define('ShapeBox',
                     width: x_rect_right - x_rect + line_width,
                     height: y_rect_right - y_rect + line_width
                 }
+            },
+            isCover: function (x, y) {
+                if(this.overHandle){
+                    return true;
+                }
+                var originPos = this.getTansform(x, y);
+                x = originPos[0];
+                y = originPos[1];
+
+                // 快速预判并保留判断矩形
+                var rect = this.style.__rect;
+                if (!rect) {
+                    rect = this.style.__rect = this.getRect(this.style);
+                }
+                if (x >= rect.x
+                    && x <= (rect.x + rect.width)
+                    && y >= rect.y
+                    && y <= (rect.y + rect.height)
+                ) {
+                    // 矩形内
+                    return area.isInside(this, this.style, x, y);
+                }
+                
+                return false;
             }
         };
-
         require('zrender/tool/util').inherits(MyShape, Base);
-        return MyShape;
+
+        var ZLEVEL = 1;
+        var layer_box_index = 0;
+        function Layer_Box(options){
+            var _this = this;
+            var $container = options.container;
+
+            options = $.extend({
+                x: 100,
+                y: 100,
+                width: 100,
+                height: 50,
+                arrows: {x: 140, y: 190},
+                radius: [10],
+                brushType : 'both',
+                color: 'rgb(255, 0, 0)',
+                opacity: 0.5,
+                strokeColor: '#ccc',
+                lineWidth: 1
+            }, options);
+            options.arrows = {
+                x: options.x + options.width/3,
+                y: options.y + options.height*4/3
+            };
+            _this.options = options;
+            var $html = $('<div class="map_layer_box_c"></div>').appendTo($container);
+            var zr = _zrender.init($html.get(0));
+            var myShape = new MyShape({
+                handle_container: $html,
+                style: options,
+                zlevel: ZLEVEL,
+                onmovehandle: function(offset){
+                    _this.modify({arrows: offset});
+                }
+            });
+            _this.zr = zr;
+            _this.shape = myShape;
+            zr.addShape(myShape);
+            zr.render();
+            _this.$mirror;
+
+            var move_name = 'mousemove.'+layer_box_index;
+            $container.on(move_name, function(e){
+                // 删除相应的事件 
+                if(_this.stat){
+                    return $container.off(_this.e_name);
+                }
+                if(!myShape.moving){
+                    var offset = $container.offset();                
+                    var isCover = myShape.isCover(e.clientX - offset.left, e.clientY - offset.top);
+                    if(isCover){
+                        $container.addClass('cover');
+                        if(_this.$mirror){
+                            _this.$mirror.remove();
+                            _this.$mirror = null;
+                        }
+                    }else{
+                        if(!_this.$mirror){
+                            _this.$mirror = _getMirror.call(_this);
+                        }
+                        $container.removeClass('cover');
+                    }
+                }
+            });
+        }
+        function _getMirror(is_force_modify){
+            var _this = this;
+            var $container = _this.options.container;
+            var myShape = _this.shape;
+            var rect = myShape.getRect();
+            var x = rect.x,
+                y = rect.y,
+                width = rect.width,
+                height = rect.height;
+            var layer = _this.zr.painter.getLayer(ZLEVEL);
+            var imgData = layer.ctx.getImageData(x, y, width, height);
+
+            if(is_force_modify){
+                $container.find('.mirror_layer_box').remove();
+            }
+            var $mirror = $('<canvas width="'+width+'" height="'+height+'">').css({
+                position: 'absolute', 
+                left: x,
+                top: y
+            }).addClass('mirror_layer_box').appendTo($container);
+            var ctx = $mirror.get(0).getContext('2d');
+            ctx.putImageData(imgData, 0, 0);
+            return $mirror;
+        }
+        var prop = Layer_Box.prototype;
+        prop.getArect = function(){
+            return this.shape.getRect();
+        }
+        prop.modify = function(style, is_force_modify){
+            var _this = this;
+            var $container = _this.options.container;
+            $container.addClass('cover');
+            var zr = _this.zr;
+            zr.modShape(_this.shape.id, {style: style})
+            zr.refresh();
+            if(is_force_modify){
+                _this.$mirror = _getMirror.call(_this, is_force_modify);
+            }
+        }
+        prop.dispose = function(){
+            var _this = this;
+            var $container = _this.options.container;
+            $container.find('.map_layer_box_c,.mirror_layer_box').remove();
+            _this.stat = 'dispose';
+            _this.zr.dispose();
+        }
+
+        return Layer_Box;
     }
 );
