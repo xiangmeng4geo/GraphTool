@@ -5968,11 +5968,6 @@ $.widget("ui.draggable", $.ui.mouse, {
 			}
 		} catch ( error ) {}
 	},
-	_getCss: function(elem, key){
-		if(elem){
-			return elem.currentStyle? elem.currentStyle[key] : document.defaultView.getComputedStyle(elem, false)[key];
-		}
-	},
 	_mouseStart: function(event) {
 
 		var o = this.options;
@@ -6012,10 +6007,10 @@ $.widget("ui.draggable", $.ui.mouse, {
 		
 		var is_rotate = this.is_rotate = this.helper.css('transform') !== 'none';//暂时不考虑scale及translate
 		if(is_rotate){
-			var elem = this.helper[0];
+			var elem = this.helper;
 			this._rotate_data = {
-				left: parseFloat(this._getCss(elem, 'left')),
-				top: parseFloat(this._getCss(elem, 'top')),
+				left: parseFloat(elem.css('left')),
+				top: parseFloat(elem.css('top')),
 				eX: event.pageX,
 				eY: event.pageY
 			};
