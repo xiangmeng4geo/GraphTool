@@ -12,5 +12,6 @@
     "as_desktop": true,
     "show": true,
     "resizable": false
-  }
+  },
+  "single-instance": false
 }

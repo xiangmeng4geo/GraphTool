@@ -155,6 +155,9 @@ Core.safe(function(){
 	
 	// 地图添加的图层类
 	var MapLayer = (function(){
+		$doc.on('click.maylayer', function(){
+			$('.map_layer').addClass('off');
+		});
 		// 定义文字和图片的右键菜单	
 		var menu_layer = new Menu();
 		var menu_layer_delete = new MenuItem({label: '删除'});
@@ -254,11 +257,14 @@ Core.safe(function(){
 				})
 				.draggable()
 				.css('position','absolute')
-				.on('mouseenter',function(){
+				.on('click', function(e){
+					e.stopPropagation();
 					$(this).removeClass('off');
-				}).on('mouseleave',function(){
-					$(this).addClass('off');
-				}).on('dblclick',function(){
+				})
+				// .on('mouseleave',function(){
+				// 	$(this).addClass('off');
+				// })
+				.on('dblclick',function(){
 					var $this = $(this);
 					var text = $this.text(),
 						style = $this.attr('style');
@@ -315,16 +321,24 @@ Core.safe(function(){
 						width: toWidth,
 						height: toHeight
 					})
+					.rotatable({
+						// rotate: function(){
+						// 	console.log(arguments);
+						// }
+					})
 					.resizable({
 						handles: 'all'
 					})
 					.draggable()
 					.css('position','absolute');
-				$html.on('mouseenter',function(){
+				$html.on('click', function(e){
+					e.stopPropagation();
 					$(this).removeClass('off');
-				}).on('mouseleave',function(){
-					$(this).addClass('off');
-				}).on('contextmenu',function(e){
+				})
+				// .on('mouseleave',function(){
+				// 	$(this).addClass('off');
+				// })
+				.on('contextmenu',function(e){
 					e.stopPropagation();
 					menu_layer._layer = $(this);
 					menu_layer.popup(e.clientX, e.clientY);
@@ -400,11 +414,14 @@ Core.safe(function(){
 					});
 					
 				}
-			}).css('position','absolute').on('mouseenter',function(){
+			}).css('position','absolute').on('click', function(e){
+				e.stopPropagation();
 				$(this).removeClass('off');
-			}).on('mouseleave',function(){
-				$(this).addClass('off');
-			}).on('contextmenu',function(e){
+			})
+			// .on('mouseleave',function(){
+			// 	$(this).addClass('off');
+			// })
+			.on('contextmenu',function(e){
 				e.stopPropagation();
 				menu_layer._layer = $html_layer;
 				menu_layer.popup(e.clientX, e.clientY);

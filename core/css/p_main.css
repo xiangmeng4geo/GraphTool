@@ -495,3 +495,6 @@
     cursor: default;
     z-index: 2;
 }
+.off .ui-rotatable-handle{
+	display: none;
+}
