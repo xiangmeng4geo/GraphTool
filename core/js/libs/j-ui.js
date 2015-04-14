@@ -5968,7 +5968,11 @@ $.widget("ui.draggable", $.ui.mouse, {
 			}
 		} catch ( error ) {}
 	},
-
+	_getCss: function(elem, key){
+		if(elem){
+			return elem.currentStyle? elem.currentStyle[key] : document.defaultView.getComputedStyle(elem, false)[key];
+		}
+	},
 	_mouseStart: function(event) {
 
 		var o = this.options;
@@ -6005,7 +6009,17 @@ $.widget("ui.draggable", $.ui.mouse, {
 		//The element's absolute position on the page minus margins
 		this.positionAbs = this.element.offset();
 		this._refreshOffsets( event );
-
+		
+		var is_rotate = this.is_rotate = this.helper.css('transform') !== 'none';//暂时不考虑scale及translate
+		if(is_rotate){
+			var elem = this.helper[0];
+			this._rotate_data = {
+				left: parseFloat(this._getCss(elem, 'left')),
+				top: parseFloat(this._getCss(elem, 'top')),
+				eX: event.pageX,
+				eY: event.pageY
+			};
+		}
 		//Generate the original position
 		this.originalPosition = this.position = this._generatePosition( event, false );
 		this.originalPageX = event.pageX;
@@ -6061,6 +6075,14 @@ $.widget("ui.draggable", $.ui.mouse, {
 	},
 
 	_mouseDrag: function(event, noPropagation) {
+		if(this.is_rotate){
+			var _d = this._rotate_data;
+			var dis_x = event.pageX - _d.eX,
+				dis_y = event.pageY - _d.eY;
+			this.helper[ 0 ].style.left = _d.left + dis_x + "px";
+			this.helper[ 0 ].style.top = _d.top + dis_y + "px";
+			return;
+		}
 		// reset any necessary cached properties (see #5009)
 		if ( this.hasFixedAncestor ) {
 			this.offset.parent = this._getParentOffset();

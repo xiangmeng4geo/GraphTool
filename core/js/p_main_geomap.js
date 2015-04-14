@@ -347,9 +347,9 @@ Core.safe(function(){
 			var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text">'+text+'</div><div class="handle"></div></div>').appendTo($geomap_container);
         	
 			option && (option.container = $geomap_container, option.map_layer = $html_layer);
-			var shapeBox = new LabelRect(option);
+			var labelRect = new LabelRect(option);
         	$html_layer.data('on_delete', function(){
-        		shapeBox.dispose();
+        		labelRect.dispose();
         	});
         	var $text = $html_layer.find('.text').css({
         		width: option.width - 20,
@@ -366,7 +366,7 @@ Core.safe(function(){
 				resize: function(e, ui){
 					var pos = ui.position,
 						size = ui.size;
-					shapeBox.modify({
+					labelRect.modify({
 						x: pos.left,
 						y: pos.top,
 						width: size.width,
@@ -382,7 +382,7 @@ Core.safe(function(){
 				handle: '.handle',
 				start: function(e, ui){
 					last_pos_box = ui.position;
-					var arrow = shapeBox.shape.arrows[0];
+					var arrow = labelRect.shape.arrows[0];
 					last_pos_arrow = {
 						x: arrow.x,
 						y: arrow.y
@@ -390,7 +390,7 @@ Core.safe(function(){
 				},
 				drag: function(e, ui) {
 					var pos = ui.position;
-					shapeBox.modify({
+					labelRect.modify({
 						x: pos.left,
 						y: pos.top,
 						arrows: {
@@ -411,7 +411,7 @@ Core.safe(function(){
 			}).on('dblclick',function(){
 				var text = $text.text(),
 					style = $text.attr('style');
-				var bg_color = shapeBox.options.color;
+				var bg_color = labelRect.options.color;
 				style += (style?';':'')+'background-color:'+bg_color;
 				var win_textstyle = Core.Page.textStyle(function(e){
 					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
@@ -424,7 +424,7 @@ Core.safe(function(){
 					if(style){
 						var bg_color = style['background-color'];
 						if(bg_color){
-							shapeBox.modify({
+							labelRect.modify({
 								color: bg_color
 							}, true);
 						}
