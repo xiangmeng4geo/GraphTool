@@ -123,7 +123,7 @@ Core.safe(function(){
 		            'zrender/shape/Text': fileLocation,
 		            'zrender/shape/Rectangle': fileLocation,
 		            'GeoMap': './js/libs/GeoMap',
-		            'ShapeBox': './js/libs/ShapeBox',
+		            'LabelRect': './js/libs/LabelRect',
 		            'LegendImage': './js/libs/LegendImage'
 		        }
 		    });
@@ -341,13 +341,13 @@ Core.safe(function(){
 			}
 			img.src = src;
 		}
-		var _ShapeBox;
+		var LabelRect;
 		function BoxLayer(option, callback){
 			var text = option.text || '';
 			var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text">'+text+'</div><div class="handle"></div></div>').appendTo($geomap_container);
         	
 			option && (option.container = $geomap_container, option.map_layer = $html_layer);
-			var shapeBox = new _ShapeBox(option);
+			var shapeBox = new LabelRect(option);
         	$html_layer.data('on_delete', function(){
         		shapeBox.dispose();
         	});
@@ -437,8 +437,8 @@ Core.safe(function(){
 		}
 		
 		return {
-			init: function(ShapeBox){
-				_ShapeBox = ShapeBox;
+			init: function(_labelRect){
+				LabelRect = _labelRect;
 				// setTimeout(function(){
 				// 	BoxLayer({
 				// 		x: 100,
@@ -485,8 +485,8 @@ Core.safe(function(){
 			}
 		});
 		initing = true;
-		require(['GeoMap', 'LegendImage', 'ShapeBox'],function(GeoMap, LegendImage, ShapeBox){
-			MapLayer.init(ShapeBox);
+		require(['GeoMap', 'LegendImage', 'LabelRect'],function(GeoMap, LegendImage, LabelRect){
+			MapLayer.init(LabelRect);
 			function _getProjector(){
 				var conf_sys = ConfUser.getSys();
 				return conf_sys && conf_sys.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
