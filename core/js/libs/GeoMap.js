@@ -1096,6 +1096,10 @@ define('GeoMap',['zrender',
 		if(width){
 			style.width = parseFloat(width);
 		}
+		var height = style_obj.height;
+		if(height){
+			style.height = parseFloat(height);
+		}
 		var left = style_obj.left;
 		var top = style_obj.top;
 		if(left){
@@ -1140,10 +1144,18 @@ define('GeoMap',['zrender',
 		if(text_decoration){
 			style.textDecoration = text_decoration;
 		}
-		this.shape = new GeoMapText({
+
+		var conf = {
 			style: style,
 			zlevel: ZINDEX_LAYER
-		});
+		};
+		if(width && height){
+			var angle = option && option.angle;
+			if(angle){
+				conf.rotation = [angle/180*Math.PI, style.x + style.width/2, style.y + style.height/2];
+			}
+		}
+		this.shape = new GeoMapText(conf);
 		this.shape._option = option;
 	}
 	GeoMap.Text.prototype.draw = function(map){
@@ -1189,9 +1201,6 @@ define('GeoMap',['zrender',
 		if(rotate && !isNaN(rotate)){
 			var angle = rotate/180*Math.PI;
 			option.rotation = [angle, x + width/2, y + height/2];
-			console.log(option.rotation);
-			option.x -= width/2*Math.sin(angle);
-			option.y -= height*Math.cos(angle);
 		}
 		this.shape = new ImageShape(option);
 	}

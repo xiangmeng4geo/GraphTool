@@ -1264,7 +1264,9 @@ Core.safe(function(){
 										top: pos.top + pos_text.top,
 										'line-height': $text.css('line-height')
 									}).attr('style');
-									gm_export.addOverlay(new GeoMap.Text(text, style, angle));
+									gm_export.addOverlay(new GeoMap.Text(text, style, null, {
+										angle: angle
+									}));
 								}
 							}
 						});
