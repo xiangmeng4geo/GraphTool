@@ -1138,7 +1138,7 @@ Core.safe(function(){
 							}else if($layer.is('.map_layer_image')){
 								var pos = $layer.position();
 								var img = $layer.find('img').get(0);
-								gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height()));
+								gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height(), -$layer.data('angle')));
 							}else if($layer.is('.map_layer_box')){
 								var pos = $layer.position();
 								var $canvas = $layer.find('canvas');

@@ -1141,7 +1141,7 @@ define('GeoMap',['zrender',
 		}
 		return shape;
 	}
-	GeoMap.Image = function(src,x,y,width,height){
+	GeoMap.Image = function(src, x, y, width, height, rotate){
 		var style = {
 			image: src,
 			x: x || 0,
@@ -1153,10 +1153,14 @@ define('GeoMap',['zrender',
 		if(height){
 			style.height = height;
 		}
-		this.shape = new ImageShape({
+		var option = {
 			style: style,
 			zlevel: ZINDEX_LAYER
-		});
+		}
+		if(rotate && !isNaN(rotate)){
+			option.rotation = [rotate/180*Math.PI, x + width/2, y + height/2];
+		}
+		this.shape = new ImageShape(option);
 	}
 	GeoMap.Image.prototype.draw = function(map){
 		return this.shape;

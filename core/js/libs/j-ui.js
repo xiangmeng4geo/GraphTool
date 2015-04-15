@@ -6964,10 +6964,10 @@ $.widget("ui.rotatable", $.ui.mouse, {
 	},
 	_create: function() {
 		var _this = this;
-		_this.angle = 0;
 		_this.dragged = false;
 
 		var $element = this.element;
+		$element.data('angle', 0);
 		$element.addClass("ui-rotatable");
 		var $handle = this.handle = $('<div></div>').addClass('ui-rotatable-handle');
 		$element.append($handle);
@@ -6999,9 +6999,11 @@ $.widget("ui.rotatable", $.ui.mouse, {
 		return !this.options.disabled && capture;
 	},
 	_mouseStart: function(e){
-		this.rotating = true;
-		var dis = this.element.height()/2 + this.handle.height();
-		var angle = this.angle/180*Math.PI;
+		var _this = this;
+		var $element = _this.element;
+		_this.rotating = true;
+		var dis = $element.height()/2 + _this.handle.height();
+		var angle = $element.data('angle')/180*Math.PI;
 		this.origin = {
 			x: e.pageX - dis * Math.sin(angle),
 			y: e.pageY + dis * Math.cos(angle)
@@ -7012,25 +7014,25 @@ $.widget("ui.rotatable", $.ui.mouse, {
 		// });
 		// this.element.css('transform', 'rotate('+this.angle+'deg)');
 		
-		var cursor_handle = this.handle.css('cursor');
-		this._trigger("start", e, cursor_handle);
+		var cursor_handle = _this.handle.css('cursor');
+		_this._trigger("start", e, cursor_handle);
 
 		return true;
 	},
 	_mouseDrag: function(e){
-		if(!this.rotating){
+		var _this = this;
+		if(!_this.rotating){
 			return;
 		}
-		var origin = this.origin;
+		var origin = _this.origin;
 		if(origin){
 			var angle = Math.atan2(e.pageY - origin.y, e.pageX - origin.x) + Math.PI/2;
 			if(angle < 0){
 				angle += Math.PI * 2;
 			}
 			angle = angle/Math.PI*180;
-			this.angle = angle;
-			this.element.css('transform', 'rotate('+angle+'deg)');
-			this._trigger("rotate", e, {
+			_this.element.data('angle', angle).css('transform', 'rotate('+angle+'deg)');
+			_this._trigger("rotate", e, {
 				angle: angle
 			});
 		}
