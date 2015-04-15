@@ -6972,7 +6972,7 @@ $.widget("ui.rotatable", $.ui.mouse, {
 		var $handle = this.handle = $('<div></div>').addClass('ui-rotatable-handle');
 		$element.append($handle);
 
-		var $test = this.test = $('<div style="position:absolute;width:10px;height:10px;background:rgba(255, 0, 0, 0.5)"></div>').appendTo($('body'));
+		// var $test = this.test = $('<div style="position:absolute;width:10px;height:10px;background:rgba(255, 0, 0, 0.5)"></div>').appendTo($('body'));
 		this._mouseInit();
 	},
 	_destroy: function() {
@@ -7006,13 +7006,15 @@ $.widget("ui.rotatable", $.ui.mouse, {
 			x: e.pageX - dis * Math.sin(angle),
 			y: e.pageY + dis * Math.cos(angle)
 		}
-		this.test.css({
-			left: this.origin.x,
-			top: this.origin.y
-		});
-		this.element.css('transform', 'rotate('+this.angle+'deg)');
-		this._trigger("start", e);
+		// this.test.css({
+		// 	left: this.origin.x,
+		// 	top: this.origin.y
+		// });
+		// this.element.css('transform', 'rotate('+this.angle+'deg)');
 		
+		var cursor_handle = this.handle.css('cursor');
+		this._trigger("start", e, cursor_handle);
+
 		return true;
 	},
 	_mouseDrag: function(e){
@@ -7032,7 +7034,6 @@ $.widget("ui.rotatable", $.ui.mouse, {
 				angle: angle
 			});
 		}
-		
 	},
 	_mouseStop: function(e){
 		this.rotating = false;

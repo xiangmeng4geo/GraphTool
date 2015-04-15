@@ -14,7 +14,7 @@ define('LabelRect',
          * @extends module:zrender/shape/Base
          * @param {Object} options
          */
-        var MyShape = function (options) {
+        var LabelRect = function (options) {
             var _this = this;
             var onmovehandle = options.onmovehandle;
             try{
@@ -31,12 +31,13 @@ define('LabelRect',
                         };
                         var $handle = $('<div class="drag_handle"></div>').appendTo(options.handle_container).css(last_offset);
 
-                        $handle.on('mouseenter', function(){
-                            _this.overHandle = true;
-                        }).on('mouseleave', function(){
-                            _this.overHandle = false;
-                        });
-                        $handle.on('mousedown touchstart', function(){
+                        // $handle.on('mouseenter', function(){
+                        //     _this.overHandle = true;
+                        // }).on('mouseleave', function(){
+                        //     _this.overHandle = false;
+                        // });
+                        $handle.on('mousedown touchstart', function(e){
+                            e.stopPropagation();
                             $handle.hide();
                             var e_index = event_index++;
                             var e_move = 'mousemove.'+e_index+' touchmove.'+e_index,
@@ -79,7 +80,7 @@ define('LabelRect',
              * @type {module:zrender/shape/Rectangle~IRectangleStyle}
              */
         };
-        MyShape.prototype =  {
+        LabelRect.prototype =  {
             type: 'MyShape',
 
             _buildRadiusPath: function (ctx, style) {
@@ -349,7 +350,7 @@ define('LabelRect',
                 return false;
             }
         };
-        require('zrender/tool/util').inherits(MyShape, Base);
+        require('zrender/tool/util').inherits(LabelRect, Base);
 
         var ZLEVEL = 1;
         var layer_box_index = 0;
@@ -377,7 +378,7 @@ define('LabelRect',
             _this.options = options;
             var $html = $('<div class="map_layer_box_c"></div>').appendTo($container);
             var zr = _zrender.init($html.get(0));
-            var myShape = new MyShape({
+            var myShape = new LabelRect({
                 handle_container: $html,
                 style: options,
                 zlevel: ZLEVEL,
@@ -390,38 +391,38 @@ define('LabelRect',
             _this.shape = myShape;
             zr.addShape(myShape);
             zr.render();
-            _this.$mirror;
+            _this.$mirror = _getMirror.call(_this);
 
-            var move_name = 'mousemove.'+layer_box_index;
-            $container.on(move_name, function(e){
-                // 删除相应的事件 
-                if(_this.stat){
-                    return $container.off(_this.e_name);
-                }
-                if(!myShape.moving){
-                    var offset = $container.offset();                
-                    var isCover = myShape.isCover(e.clientX - offset.left, e.clientY - offset.top);
-                    if(isCover){
-                        // $container.addClass('cover');
-                        // $html.addClass('focus');
-                        $html.css({
-                            left: 0,
-                            top: 0
-                        });
-                        if(_this.$mirror){
-                            _this.$mirror.remove();
-                            _this.$mirror = null;
-                        }
-                    }else{
-                        if(!_this.$mirror){
-                            _this.$mirror = _getMirror.call(_this);
-                        }
-                        $html.removeAttr('style');
-                        // $container.removeClass('cover');
-                        // $html.removeClass('focus');
-                    }
-                }
-            });
+            // var move_name = 'mousemove.'+layer_box_index;
+            // $container.on(move_name, function(e){
+            //     // 删除相应的事件 
+            //     if(_this.stat){
+            //         return $container.off(_this.e_name);
+            //     }
+            //     if(!myShape.moving){
+            //         var offset = $container.offset();                
+            //         var isCover = myShape.isCover(e.clientX - offset.left, e.clientY - offset.top);
+            //         if(isCover){
+            //             // $container.addClass('cover');
+            //             // $html.addClass('focus');
+            //             $html.css({
+            //                 left: 0,
+            //                 top: 0
+            //             });
+            //             if(_this.$mirror){
+            //                 _this.$mirror.remove();
+            //                 _this.$mirror = null;
+            //             }
+            //         }else{
+            //             if(!_this.$mirror){
+            //                 _this.$mirror = _getMirror.call(_this);
+            //             }
+            //             $html.removeAttr('style');
+            //             // $container.removeClass('cover');
+            //             // $html.removeClass('focus');
+            //         }
+            //     }
+            // });
         }
         function _getMirror(is_force_modify){
             var _this = this;
@@ -452,20 +453,17 @@ define('LabelRect',
         prop.getArect = function(){
             return this.shape.getRect();
         }
-        prop.modify = function(style, is_force_modify){
+        prop.modify = function(style){
             var _this = this;
             var $container = _this.options.container;
             // $container.addClass('cover');
-            _this.$html.css({
-                left: 0,
-                top: 0
-            });
+            
             var zr = _this.zr;
             zr.modShape(_this.shape.id, {style: style})
             zr.refresh();
-            if(is_force_modify){
-                _this.$mirror = _getMirror.call(_this, is_force_modify);
-            }
+            // if(is_force_modify){
+            //     _this.$mirror = _getMirror.call(_this, is_force_modify);
+            // }
         }
         prop.dispose = function(){
             var _this = this;
@@ -474,6 +472,21 @@ define('LabelRect',
             _this.$mirror.remove();
             _this.stat = 'dispose';
             _this.zr.dispose();
+        }
+        prop.setEditable = function(editable){
+            var _this = this;
+            var $html = _this.$html;
+            if(editable){
+                $html.css({
+                    left: 0,
+                    top: 0
+                });
+                _this.$mirror.remove();
+            }else{
+                $html.removeAttr('style');
+                _this.$mirror = _getMirror.call(_this, true);
+            }
+            this.editable = editable;
         }
 
         return Layer_Box;

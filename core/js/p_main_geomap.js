@@ -156,7 +156,7 @@ Core.safe(function(){
 	// 地图添加的图层类
 	var MapLayer = (function(){
 		$doc.on('click.maylayer', function(){
-			$('.map_layer').addClass('off');
+			$('.map_layer').addClass('off').trigger('edit', false);
 		});
 		// 定义文字和图片的右键菜单	
 		var menu_layer = new Menu();
@@ -239,54 +239,61 @@ Core.safe(function(){
 		menu_layer.append(new gui.MenuItem({ type: 'separator' }));
 		menu_layer.append(menu_layer_add_z);
 		menu_layer.append(menu_layer_minus_z);
+
+		function _createLayer(option){
+			var css = option.css;
+			var $html = $('<div class="map_layer off"></div>');
+			if(css){
+				if($.isPlainObject(css)){
+					$html.css(css);
+				}else{
+					$html.attr('style', css);
+				}
+			}
+			var rotate_option = option.rotate;
+			if(rotate_option){
+				$html.rotatable(rotate_option);
+			}
+			var resizable_option = option.resize,
+				draggable_option = option.drag;
+			$html.css('position','absolute').resizable($.extend({
+				handles: 'all'
+			}, resizable_option)).draggable(draggable_option).on('click', function(e){
+				e.stopPropagation();
+				$(this).removeClass('off').trigger('edit', true);
+			}).on('contextmenu',function(e){
+				e.stopPropagation();
+				menu_layer._layer = $html;
+				menu_layer.popup(e.clientX, e.clientY);
+			});
+			return $html;
+		}
 		// 文字图层
 		function TextLayer(option){
 			var pos = option.position;
 			var ondblclick = option.ondblclick;
-			var $html = $('<div class="texteditor map_layer">');
-			var style = option.style;
-			if(style){
-				$html.attr('style',style);
-			}
+			var $html = _createLayer({
+				css: option.style
+			});
+			$html.css(pos).addClass('texteditor').append('<span>'+(option.text||'')+'</span>');
+			$html.on('dblclick',function(){
+				var $this = $(this);
+				var text = $this.text(),
+					style = $this.attr('style');
 
-			$html.html('<span>'+(option.text||'')+'</span>')
-				.css(pos)
-				.addClass('off')
-				.resizable({
-					handles: 'all'
-				})
-				.draggable()
-				.css('position','absolute')
-				.on('click', function(e){
-					e.stopPropagation();
-					$(this).removeClass('off');
-				})
-				// .on('mouseleave',function(){
-				// 	$(this).addClass('off');
-				// })
-				.on('dblclick',function(){
-					var $this = $(this);
-					var text = $this.text(),
-						style = $this.attr('style');
-
-					var win_textstyle = Core.Page.textStyle(function(e){
-						CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
-							text: text,
-							style: style
-						},win_textstyle.window);
-					});
-					// $current_text = $this;
-					on_receive_style = function(data){
-						$this.css(data.style).find('span').text(data.text);
-					};
-
-					ondblclick && ondblclick.call(this);
-				}).on('contextmenu',function(e){
-					e.stopPropagation();
-					menu_layer._layer = $(this);
-					menu_layer.popup(e.clientX, e.clientY);
+				var win_textstyle = Core.Page.textStyle(function(e){
+					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
+						text: text,
+						style: style
+					},win_textstyle.window);
 				});
-			
+				on_receive_style = function(data){
+					$this.css(data.style).find('span').text(data.text);
+				};
+
+				ondblclick && ondblclick.call(this);
+			});
+
 			return $html;
 		}
 		// 图片图层
@@ -315,34 +322,15 @@ Core.safe(function(){
 						pos.top -= toHeight/2;
 					}
 				}
-				var $html = $('<div class="map_layer map_layer_image off"><img src="'+option.src+'"></div>')
-					.css(pos)
-					.css({
-						width: toWidth,
-						height: toHeight
-					})
-					.rotatable({
-						// rotate: function(){
-						// 	console.log(arguments);
-						// }
-					})
-					.resizable({
-						handles: 'all'
-					})
-					.draggable()
-					.css('position','absolute');
-				$html.on('click', function(e){
-					e.stopPropagation();
-					$(this).removeClass('off');
-				})
-				// .on('mouseleave',function(){
-				// 	$(this).addClass('off');
-				// })
-				.on('contextmenu',function(e){
-					e.stopPropagation();
-					menu_layer._layer = $(this);
-					menu_layer.popup(e.clientX, e.clientY);
+				var css = pos;
+				css.width = toWidth;
+				css.height = toHeight;
+				var $html = _createLayer({
+					css: css,
+					rotate: {}
 				});
+				$html.addClass('map_layer_image').append('<img src="'+option.src+'"/>');
+				
 				callback($html, {
 					width: width,
 					height: height,
@@ -358,73 +346,56 @@ Core.safe(function(){
 		var LabelRect;
 		function BoxLayer(option, callback){
 			var text = option.text || '';
-			var $html_layer = $('<div class="map_layer map_layer_box off"><div class="text">'+text+'</div><div class="handle"></div></div>').appendTo($geomap_container);
-        	
-			option && (option.container = $geomap_container, option.map_layer = $html_layer);
-			var labelRect = new LabelRect(option);
-        	$html_layer.data('on_delete', function(){
-        		labelRect.dispose();
-        	});
-        	var $text = $html_layer.find('.text').css({
-        		width: option.width - 20,
-        		height: option.height - 20
-        	});
-        	$html_layer.css({
-				left: option.x,
-				top: option.y
-			}).css({
-				width: option.width,
-				height: option.height
-			}).resizable({
-				handles: 'all',
-				resize: function(e, ui){
-					var pos = ui.position,
-						size = ui.size;
-					labelRect.modify({
-						x: pos.left,
-						y: pos.top,
-						width: size.width,
-						height: size.height
-					});
-					
-                	$html_layer.find('.text').css({
-                		width: size.width - 20,
-                		height: size.height - 20
-                	});
-				}
-			}).draggable({
-				handle: '.handle',
-				start: function(e, ui){
-					last_pos_box = ui.position;
-					var arrow = labelRect.shape.arrows[0];
-					last_pos_arrow = {
-						x: arrow.x,
-						y: arrow.y
+
+			var $html = _createLayer({
+				css: {
+					left: option.x,
+					top: option.y,
+					width: option.width,
+					height: option.height
+				},
+				resize: {
+					resize: function(e, ui){
+						var pos = ui.position,
+							size = ui.size;
+						labelRect.modify({
+							x: pos.left,
+							y: pos.top,
+							width: size.width,
+							height: size.height
+						});
+						
+	                	$text.css({
+	                		width: size.width - 20,
+	                		height: size.height - 20
+	                	});
 					}
 				},
-				drag: function(e, ui) {
-					var pos = ui.position;
-					labelRect.modify({
-						x: pos.left,
-						y: pos.top,
-						arrows: {
-							x: last_pos_arrow.x + (pos.left - last_pos_box.left),
-							y: last_pos_arrow.y + (pos.top - last_pos_box.top)
+				drag: {
+					handle: '.handle',
+					start: function(e, ui){
+						last_pos_box = ui.position;
+						var arrow = labelRect.shape.arrows[0];
+						last_pos_arrow = {
+							x: arrow.x,
+							y: arrow.y
 						}
-					});
-					
+					},
+					drag: function(e, ui) {
+						var pos = ui.position;
+						labelRect.modify({
+							x: pos.left,
+							y: pos.top,
+							arrows: {
+								x: last_pos_arrow.x + (pos.left - last_pos_box.left),
+								y: last_pos_arrow.y + (pos.top - last_pos_box.top)
+							}
+						});
+						
+					}
 				}
-			}).css('position','absolute').on('click', function(e){
-				e.stopPropagation();
-				$(this).removeClass('off');
-			})
-			// .on('mouseleave',function(){
-			// 	$(this).addClass('off');
-			// })
-			.on('contextmenu',function(e){
-				e.stopPropagation();
-				menu_layer._layer = $html_layer;
-				menu_layer.popup(e.clientX, e.clientY);
+			}).on('edit', function(e, editable){
+				labelRect.setEditable(editable);
 			}).on('dblclick',function(){
 				var text = $text.text(),
 					style = $text.attr('style');
@@ -450,20 +421,24 @@ Core.safe(function(){
 					
 					$text.css(style).text(conf.text);
 				}
-			});
+			}).appendTo($geomap_container);
+
+			$html.addClass('map_layer_box').append('<div class="text">'+text+'</div><div class="handle"></div>');
+
+			option && (option.container = $geomap_container, option.map_layer = $html);
+			var labelRect = new LabelRect(option);
+			$html.data('on_delete', function(){
+        		labelRect.dispose();
+        	});
+			var $text = $html.find('.text').css({
+        		width: option.width - 20,
+        		height: option.height - 20
+        	});
 		}
 		
 		return {
 			init: function(_labelRect){
 				LabelRect = _labelRect;
-				// setTimeout(function(){
-				// 	BoxLayer({
-				// 		x: 100,
-				// 		y: 100,
-				// 		width: 200,
-				// 		height: 100
-				// 	});
-				// }, 10);
 			},
 			text: TextLayer,
 			img: ImageLayer,
