@@ -786,11 +786,31 @@ define('GeoMap',['zrender',
 	var GeoMapText = function(options){
 		TextShape.call(this, options);
 	}
+	function _formatText(text, width, font){
+		var getWidth = util_area.getTextWidth;
+		if(width > 0 && getWidth(text, font) > width){
+			var text_new = '';
+			var str_tmp = '';
+			for(var i = 0, j = text.length; i<j; i++){
+				var tmp = str_tmp + text[i];
+				if(getWidth(tmp, font) < width){
+					str_tmp = tmp;
+				}else{
+					text_new += str_tmp + '\n';
+					str_tmp = text[i];
+				}
+			}
+			text_new += str_tmp;
+			return text_new;
+		}
+		return text;
+	}
 	GeoMapText.prototype = {
 		type: 'gmtext',
 		brush: function(ctx, isHighlight){
 			var style = this.style;
 			var bgcolor = style.backgroundColor;
+			style.text = _formatText(style.text, style.width, style.textFont);
 			var rect = this.getRect(style);
 			var x = rect.x,
 				y = rect.y,
@@ -834,7 +854,8 @@ define('GeoMap',['zrender',
 				ctx.stroke();
 			}
 			ctx.restore();
-			TextShape.prototype.brush.call(this, ctx, isHighlight);
+
+			return TextShape.prototype.brush.call(this, ctx, isHighlight);
 		}
 	}
 	util.inherits(GeoMapText, TextShape);
@@ -1071,6 +1092,10 @@ define('GeoMap',['zrender',
 	        textAlign : 'left',
 	        textBaseline : 'top'
 		};
+		var width = style_obj.width;
+		if(width){
+			style.width = parseFloat(width);
+		}
 		var left = style_obj.left;
 		var top = style_obj.top;
 		if(left){
@@ -1094,6 +1119,10 @@ define('GeoMap',['zrender',
 			font += ' ' + font_weight;
 		}
 		var font_size = style_obj['font-size'];
+		var line_height = style_obj['line-height'];
+		if(line_height){
+			style.lineHeight = parseFloat(line_height);
+		}
 		if(font_size){
 			font += ' ' + font_size;
 		}
@@ -1161,8 +1190,8 @@ define('GeoMap',['zrender',
 			var angle = rotate/180*Math.PI;
 			option.rotation = [angle, x + width/2, y + height/2];
 			console.log(option.rotation);
-			// option.x -= width/2*Math.sin(angle);
-			// option.y -= height*Math.cos(angle);
+			option.x -= width/2*Math.sin(angle);
+			option.y -= height*Math.cos(angle);
 		}
 		this.shape = new ImageShape(option);
 	}

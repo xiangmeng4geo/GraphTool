@@ -7150,7 +7150,8 @@ define(
                 ctx.textBaseline = style.textBaseline || 'middle';
 
                 var text = (style.text + '').split('\n');
-                var lineHeight = area.getTextHeight('国', style.textFont);
+                
+                var lineHeight = style.lineHeight || area.getTextHeight('国', style.textFont); //修复line-height不准确问题
                 var rect = this.getRect(style);
                 var x = style.x;
                 var y;

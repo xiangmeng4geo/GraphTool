@@ -458,9 +458,15 @@ Core.safe(function(){
 				resize: {
 					resize: function(e, ui){
 						var size = ui.size;
-						var a = size.width/2,
-							b = size.height/2;
+						var w = size.width,
+							h = size.height;
+						var a = w/2,
+							b = h/2;
 
+						$text.css({
+	                		width: w - 20,
+	                		height: h - 20
+	                	});
 						shape.modify({
 							x: a,
 							y: b,
@@ -1255,7 +1261,8 @@ Core.safe(function(){
 									var pos_text = $text.position();
 									var style = $text.clone().css({
 										left: pos.left + pos_text.left,
-										top: pos.top + pos_text.top
+										top: pos.top + pos_text.top,
+										'line-height': $text.css('line-height')
 									}).attr('style');
 									gm_export.addOverlay(new GeoMap.Text(text, style, angle));
 								}
