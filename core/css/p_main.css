@@ -475,7 +475,7 @@
 /*.cover .mirror_layer_box{
 	display: none;
 }*/
-.map_layer_box .text{
+.map_layer .text{
 	position: absolute;
 	left: 10px;
 	top: 10px;

@@ -1158,7 +1158,11 @@ define('GeoMap',['zrender',
 			zlevel: ZINDEX_LAYER
 		}
 		if(rotate && !isNaN(rotate)){
-			option.rotation = [rotate/180*Math.PI, x + width/2, y + height/2];
+			var angle = rotate/180*Math.PI;
+			option.rotation = [angle, x + width/2, y + height/2];
+			console.log(option.rotation);
+			// option.x -= width/2*Math.sin(angle);
+			// option.y -= height*Math.cos(angle);
 		}
 		this.shape = new ImageShape(option);
 	}

@@ -26,11 +26,17 @@ Core.safe(function(){
 		image_path = file_path.image;
 
 
-	var LABEL_TYPE_RECT = 1;//圆角矩标注
+	var BOX_TYPE_LABELRECT = 1,//圆角矩标注
+		BOX_TYPE_ELLIPSE = 2;//椭圆
+
 	var MY_SHAPES = [{
 		src: 'data:image/png;base64,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',
 		text: '圆角矩标注',
-		type: LABEL_TYPE_RECT
+		type: BOX_TYPE_LABELRECT
+	},{
+		src: 'data:image/png;base64,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',
+		text: '椭圆',
+		type: BOX_TYPE_ELLIPSE
 	}];
 
 	var conf_of_product; // 用于缓存已经加载的当前产品配置
@@ -122,8 +128,9 @@ Core.safe(function(){
 		            'zrender/shape/Image': fileLocation,
 		            'zrender/shape/Text': fileLocation,
 		            'zrender/shape/Rectangle': fileLocation,
+		            'zrender/shape/Ellipse': fileLocation,
 		            'GeoMap': './js/libs/GeoMap',
-		            'LabelRect': './js/libs/LabelRect',
+		            'BoxShape': './js/libs/BoxShape',
 		            'LegendImage': './js/libs/LegendImage'
 		        }
 		    });
@@ -155,8 +162,11 @@ Core.safe(function(){
 	
 	// 地图添加的图层类
 	var MapLayer = (function(){
-		$doc.on('click.maylayer', function(){
-			$('.map_layer').addClass('off').trigger('edit', false);
+		$doc.on('mousedown.maylayer', function(e){
+			// var $target = $(e.target);
+			// if(!$target.is('.map_layer') && $target.closest('.map_layer').length == 0){
+				$('.map_layer').addClass('off').trigger('edit', false);
+			// }
 		});
 		// 定义文字和图片的右键菜单	
 		var menu_layer = new Menu();
@@ -258,7 +268,7 @@ Core.safe(function(){
 				draggable_option = option.drag;
 			$html.css('position','absolute').resizable($.extend({
 				handles: 'all'
-			}, resizable_option)).draggable(draggable_option).on('click', function(e){
+			}, resizable_option)).draggable(draggable_option).on('mousedown', function(e){
 				e.stopPropagation();
 				$(this).removeClass('off').trigger('edit', true);
 			}).on('contextmenu',function(e){
@@ -343,8 +353,8 @@ Core.safe(function(){
 			}
 			img.src = src;
 		}
-		var LabelRect;
-		function BoxLayer(option, callback){
+		var BoxShape;
+		function BoxLayer_LableRect(option, callback){
 			var text = option.text || '';
 
 			var $html = _createLayer({
@@ -426,9 +436,9 @@ Core.safe(function(){
 			$html.addClass('map_layer_box').append('<div class="text">'+text+'</div><div class="handle"></div>');
 
 			option && (option.container = $geomap_container, option.map_layer = $html);
-			var labelRect = new LabelRect(option);
+			var labelRect = new BoxShape.LabelRect(option);
 			$html.data('on_delete', function(){
-        		labelRect.dispose();
+        		labelRect.destroy();
         	});
 			var $text = $html.find('.text').css({
         		width: option.width - 20,
@@ -436,13 +446,95 @@ Core.safe(function(){
         	});
 		}
 		
+		function BoxLayer_Ellipse(option){
+			var $html = _createLayer({
+				css: {
+					left: option.x,
+					top: option.y,
+					width: option.width,
+					height: option.height
+				},
+				rotate: {},
+				resize: {
+					resize: function(e, ui){
+						var size = ui.size;
+						var a = size.width/2,
+							b = size.height/2;
+
+						shape.modify({
+							x: a,
+							y: b,
+							a: a,
+							b: b
+						});
+					}
+				}
+			}).on('dblclick',function(){
+				var text = $text.text(),
+					style = $text.attr('style');
+				var bg_color = shape.shape.style.color;
+				style += (style?';':'')+'background-color:'+bg_color;
+				var win_textstyle = Core.Page.textStyle(function(e){
+					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
+						text: text,
+						style: style
+					}, win_textstyle.window);
+				});
+				on_receive_style = function(conf){
+					var style = conf.style;
+					if(style){
+						var bg_color = style['background-color'];
+						if(bg_color){
+							shape.modify({
+								color: bg_color
+							});
+						}
+						delete style['background-color']
+					}
+					
+					$text.css(style).text(conf.text);
+				}
+			}).appendTo($geomap_container);
+
+			var text = option.text || '';
+			$html.addClass('map_layer_box').append('<div class="text">'+text+'</div>');
+
+			var $container = $('<div style="width:100%;height:100%"></div>').appendTo($html);
+			option.container = $container;
+			var shape = new BoxShape.Ellipse(option);
+
+			$html.data('on_delete', function(){
+        		shape.destroy();
+        	});
+			var $text = $html.find('.text').css({
+        		width: option.width - 20,
+        		height: option.height - 20
+        	});
+		}
+		var fn_box = {};
+		fn_box[BOX_TYPE_LABELRECT] = BoxLayer_LableRect;
+		fn_box[BOX_TYPE_ELLIPSE] = BoxLayer_Ellipse;
 		return {
-			init: function(_labelRect){
-				LabelRect = _labelRect;
+			init: function(_BoxShape){
+				BoxShape = _BoxShape;
+				setTimeout(function(){
+					BoxLayer_Ellipse({
+						x: 100,
+						y: 100,
+						width: 100,
+						height: 50
+					});
+				}, 2000);
 			},
 			text: TextLayer,
 			img: ImageLayer,
-			box: BoxLayer
+			box: function(option){
+				var type = option.type;
+				var fn = fn_box[type];
+				if(fn){
+					fn(option);
+				}
+			}
 		}
 	})();
 	function init(is_show_mask){
@@ -477,8 +569,8 @@ Core.safe(function(){
 			}
 		});
 		initing = true;
-		require(['GeoMap', 'LegendImage', 'LabelRect'],function(GeoMap, LegendImage, LabelRect){
-			MapLayer.init(LabelRect);
+		require(['GeoMap', 'LegendImage', 'BoxShape'],function(GeoMap, LegendImage, BoxShape){
+			MapLayer.init(BoxShape);
 			function _getProjector(){
 				var conf_sys = ConfUser.getSys();
 				return conf_sys && conf_sys.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
@@ -1105,6 +1197,17 @@ Core.safe(function(){
 	}
 	/*右侧地图的右键功能*/
 	!function(){
+		// 得到元素的position，防止transform.rotate对元素位置的影响
+		function _getPos($elem){
+			if($elem.data('angle')){
+				return {
+					left: parseFloat($elem.css('left')) || 0,
+					top: parseFloat($elem.css('top')) || 0
+				}
+			}else{
+				return $elem.position();
+			}
+		}
 		/*导出图片*/
 		var _save_img = function(){
 			if(gm && conf_of_product){
@@ -1136,14 +1239,15 @@ Core.safe(function(){
 									padding_left = parseFloat($layer.css('padding-left')) || 0;
 								gm_export.addOverlay(new GeoMap.Text(_replace_date($layer.text()),$layer.attr('style'), [padding_top, padding_right, padding_bottom, padding_left]));
 							}else if($layer.is('.map_layer_image')){
-								var pos = $layer.position();
+								var pos = _getPos($layer);
 								var img = $layer.find('img').get(0);
 								gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height(), -$layer.data('angle')));
 							}else if($layer.is('.map_layer_box')){
-								var pos = $layer.position();
+								var pos = _getPos($layer);
 								var $canvas = $layer.find('canvas');
-								var pos_canvas = $canvas.position();
-								gm_export.addOverlay(new GeoMap.Image($canvas.get(0), pos.left + pos_canvas.left, pos.top + pos_canvas.top, $canvas.width(), $canvas.height()));
+								var pos_canvas = _getPos($canvas);
+								var angle = -$layer.data('angle');
+								gm_export.addOverlay(new GeoMap.Image($canvas.get(0), pos.left + pos_canvas.left, pos.top + pos_canvas.top, $canvas.width(), $canvas.height(), angle));
 								
 								var $text = $layer.find('.text');
 								var text = $text.text();
@@ -1153,7 +1257,7 @@ Core.safe(function(){
 										left: pos.left + pos_text.left,
 										top: pos.top + pos_text.top
 									}).attr('style');
-									gm_export.addOverlay(new GeoMap.Text(text, style));
+									gm_export.addOverlay(new GeoMap.Text(text, style, angle));
 								}
 							}
 						});
@@ -1386,12 +1490,14 @@ Core.safe(function(){
 			for(var i = 0, j = MY_SHAPES.length; i<j; i++){
 				var shape = MY_SHAPES[i];
 				if(shape.src == drag_img){
-					if(LABEL_TYPE_RECT == shape.type){
+					var type = shape.type;
+					if(BOX_TYPE_LABELRECT == type || BOX_TYPE_ELLIPSE == type){
 						MapLayer.box({
 							x: x,
 							y: y,
 							width: 200,
-							height: 100
+							height: 100,
+							type: type
 						});
 						return;
 					}
