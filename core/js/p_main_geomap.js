@@ -523,14 +523,14 @@ Core.safe(function(){
 		return {
 			init: function(_BoxShape){
 				BoxShape = _BoxShape;
-				setTimeout(function(){
-					BoxLayer_Ellipse({
-						x: 100,
-						y: 100,
-						width: 100,
-						height: 50
-					});
-				}, 2000);
+				// setTimeout(function(){
+				// 	BoxLayer_Ellipse({
+				// 		x: 100,
+				// 		y: 100,
+				// 		width: 100,
+				// 		height: 50
+				// 	});
+				// }, 2000);
 			},
 			text: TextLayer,
 			img: ImageLayer,

@@ -2,6 +2,8 @@ VERSION=$1
 PROJECT_NAME=GraphTool
 target_dir=./target/${PROJECT_NAME}_${VERSION}
 
+rm -rf $target_dir
+
 mkdir -p $target_dir
 
 #1. compress files

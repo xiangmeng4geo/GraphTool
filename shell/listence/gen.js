@@ -13,7 +13,7 @@ function gen(time_start, time_end, is_from_command){
 	var listen_str = util.encrypt.encode(source_str);
 	listen_str = listen_str.reverse().toUpperCase();
 	if(is_from_command){
-		return source_str+'\t'+listen_str+'\n\r';
+		return '('+[time_start.format('yyyy-MM-dd'), time_end.format('yyyy-MM-dd')].join('|')+')'+'\t'+listen_str+'\n\r';
 	}else{
 		return listen_str;
 	}
