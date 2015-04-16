@@ -326,5 +326,9 @@
 	$('#btn_listence').click(Page.listence);
 	$('#btn_about').click(Page.about);
 	$('#btn_doc').click(Page.doc);
+	$('#btn_clearcache').click(function(){
+		Core.Lib.util.file.tmp.clear();
+		alert('缓存清除成功！');
+	});
 	Page.inited();
 }();
