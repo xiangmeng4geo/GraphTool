@@ -618,14 +618,25 @@ Core.safe(function(){
 				});
 			}();
 			
-			
-			// 根据配色方案进行地图元素初始化
-			function render_conf(data, blendent, params){
+			function _checkBlendent(blendent){
 				var str_notice = '请先配置产品图例！';
 				var len_blendent = 0;
 				if(!blendent || (len_blendent = blendent.length) == 0){
 					return alert(str_notice);
 				}
+				// 对图例进行验证
+				for(var i = 0; i<len_blendent; i++){
+					var v = blendent[i];
+					if(!v || !v.colors){
+						return alert(str_notice);
+					}
+				}
+				return true;
+			}
+			// 根据配色方案进行地图元素初始化
+			function render_conf(data, blendent, params){
+				var len_blendent = blendent.length;
+				
 				var mapbg_color = '#ffffff';
 				try{
 					var conf_map_color = conf_of_product.other.mapbg_color;
@@ -644,26 +655,8 @@ Core.safe(function(){
 					}
 				}));
 				
-				for(var i = 0; i < len_blendent; i++){
-					var colors = blendent[i].colors;
-					for(var i_c = 0, j_c = colors.length; i_c < j_c; i_c++){
-						var range = colors[i_c].val;
-						if(range[0] === ''){
-							range[0] = Number.NEGATIVE_INFINITY;
-						}
-						if(range[1] === ''){
-							range[1] = Number.POSITIVE_INFINITY;
-						}
-					}
-				}
 				Timer.start('render micaps');
-				// 对图例进行验证
-				for(var i = 0; i<len_blendent; i++){
-					var v = blendent[i];
-					if(!v || !v.colors){
-						return alert(str_notice);
-					}
-				}
+				
 				var isHaveManyBlendent = len_blendent > 1;
 				function getColorByCondition(val, range){
 					for(var i = 0,j=range.length;i<j;i++){
@@ -691,6 +684,9 @@ Core.safe(function(){
 		        // 3类里的插值结果
 				var interpolate = data.interpolate;
 				if(interpolate){
+					if(!_checkBlendent(blendent)){
+						return;
+					}
 					var _interpolate_width,
 						_interpolate_height;
 					try{
@@ -737,63 +733,69 @@ Core.safe(function(){
 				// 14类中的面
 				var areas = data.areas;
 				if(areas){
-					/*判断是不是大风降温数据 {*/
-					var is_bigwind = false;
-					for(var i = 0, j = areas.length; i<j; i++){
-						var text = areas[i].symbols.text;
-						if(/^040$/.test(text.trim())){
-							is_bigwind = true;
-							break;
+					var len = areas.length;
+					if(len > 0){
+						if(!_checkBlendent(blendent)){
+							return;
 						}
-					}
-					/*判断是不是大风降温数据 }*/
-					$.each(areas, function(i,v){
-						var point_arr = [];
-						$.each(v.items,function(v_i,v_v){
-							var point = new GeoMap.Point(v_v.x,v_v.y);
-							point_arr.push(point);
-						});
-						var color = 'rgba(0,0,0,0)';
-
-						var symbols = v.symbols;
-						var val_area = symbols? symbols.text : '';
-
-						// 只对大风降温数据进行处理
-						if(is_bigwind){
-							if(/^0/.test(val_area)){
-								// 02、03表示沙尘；04表示大风
-								if(val_area === '040'){
-									var polyline = new GeoMap.Polyline(point_arr, {
-										style: {
-											strokeColor : '#ff0000',
-											lineWidth : 2,
-										},
-										zlevel: GeoMap.ZLEVEL.NOCLIP
-									});
-									gm.addOverlay(polyline);   //增加折线
-								}
-								return;
+						/*判断是不是大风降温数据 {*/
+						var is_bigwind = false;
+						for(var i = 0, j = areas.length; i<j; i++){
+							var text = areas[i].symbols.text;
+							if(/^040$/.test(text.trim())){
+								is_bigwind = true;
+								break;
 							}
 						}
-						color = getColor(val_area, v.code);
-						if(color){
-							if(v.code == 24){
-								// strokeColor = 'red';
-								color = new GeoMap.Pattern.Streak({
-									strokeStyle: color,
-									space: 1
-								});
-							}
-							var polygon = new GeoMap.Polygon(point_arr, {
-								style: {
-									strokeColor: color, 
-									color: color,
-									lineWidth: 0.2
-								}
+						/*判断是不是大风降温数据 }*/
+						$.each(areas, function(i,v){
+							var point_arr = [];
+							$.each(v.items,function(v_i,v_v){
+								var point = new GeoMap.Point(v_v.x,v_v.y);
+								point_arr.push(point);
 							});
-							gm.addOverlay(polygon);   //增加面
-						}
-					});
+							var color = 'rgba(0,0,0,0)';
+
+							var symbols = v.symbols;
+							var val_area = symbols? symbols.text : '';
+
+							// 只对大风降温数据进行处理
+							if(is_bigwind){
+								if(/^0/.test(val_area)){
+									// 02、03表示沙尘；04表示大风
+									if(val_area === '040'){
+										var polyline = new GeoMap.Polyline(point_arr, {
+											style: {
+												strokeColor : '#ff0000',
+												lineWidth : 2,
+											},
+											zlevel: GeoMap.ZLEVEL.NOCLIP
+										});
+										gm.addOverlay(polyline);   //增加折线
+									}
+									return;
+								}
+							}
+							color = getColor(val_area, v.code);
+							if(color){
+								if(v.code == 24){
+									// strokeColor = 'red';
+									color = new GeoMap.Pattern.Streak({
+										strokeStyle: color,
+										space: 1
+									});
+								}
+								var polygon = new GeoMap.Polygon(point_arr, {
+									style: {
+										strokeColor: color, 
+										color: color,
+										lineWidth: 0.2
+									}
+								});
+								gm.addOverlay(polygon);   //增加面
+							}
+						});
+					}
 				}
 				// 14类中的特殊线，如冷锋、暖锋
 				var line_symbols = data.line_symbols;
