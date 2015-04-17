@@ -232,6 +232,7 @@ define('GeoMap',['zrender',
 			}
 			$.each(name, function(i, v){
 				arr_json[i] = src + '/' + v + '.'+_this.projector.name+'.json';
+				arr_json[i] = '../shell/geo/data-source/china_province.json.reback.json';
 			});
 			var _canvs = _this.canvas;
 			_canvs.clear();
@@ -595,6 +596,7 @@ define('GeoMap',['zrender',
 		$.each(src,function(i, v){
 			_this.jsonLoader(v, function(data){
 				loadedData.push(data);
+					console.log(loadedData, len, src);
 				if(loadedData.length == len){
 					Timer.end('loadGeo');
 					Timer.start('add weather layers');
