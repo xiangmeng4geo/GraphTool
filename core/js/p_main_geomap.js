@@ -285,7 +285,7 @@ Core.safe(function(){
 			var $html = _createLayer({
 				css: option.style
 			});
-			$html.css(pos).addClass('texteditor').append('<span>'+(option.text||'')+'</span>');
+			$html.css(pos).addClass('map_layer_text').append('<span>'+(option.text||'')+'</span>');
 			$html.on('dblclick',function(){
 				var $this = $(this);
 				var text = $this.text(),
@@ -577,21 +577,29 @@ Core.safe(function(){
 		initing = true;
 		require(['GeoMap', 'LegendImage', 'BoxShape'],function(GeoMap, LegendImage, BoxShape){
 			MapLayer.init(BoxShape);
-			function _getProjector(){
+			// function _getProjector(){
+			// 	var conf_sys = ConfUser.getSys();
+			// 	return conf_sys && conf_sys.map && conf_sys.map.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+			// }
+			// var gm_projector = _getProjector();
+
+			function _getConfMap(){
 				var conf_sys = ConfUser.getSys();
-				return conf_sys && conf_sys.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+				return conf_sys && conf_sys.map;
 			}
-			var gm_projector = _getProjector();
 			window.GeoMap = GeoMap;
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
 				container: $geomap,
-				projector: gm_projector,
+				map: _getConfMap(),
 				geo: {
 					src: './data/',
 					name: ['china']
 				},
 				onready: function(){
+				},
+				onafteraddoverlays: function(){
+					gm.refresh();
 				}
 				// jsonLoader: file_util.getJson
 			});
@@ -898,10 +906,16 @@ Core.safe(function(){
 				if(conf_title && conf_title.is_show){
 					var text = conf_title.text;
 					if(text){
+						var is_center = conf_title.center;
+						var style = conf_title.style;
+						if(is_center){
+							pos.left = 0;
+							style += 'text-align: center; width: '+width_geomap+'px;';
+						}
 						return MapLayer.text({
 							position: pos,
 							text: _replace_date(text, is_use_publish_time),
-							style: conf_title.style
+							style: style
 						}).appendTo($geomap_layer);
 					}
 				}
@@ -1171,25 +1185,23 @@ Core.safe(function(){
 								_afterRender()
 							}
 						}
-						var new_projector = _getProjector();
+						// var new_projector = _getProjector();
 						var _template = conf_other.template;
 						var new_w = _template[0],
 							new_h = _template[1];
-						if(new_projector != gm_projector || new_w != width_geomap || new_h != height_geomap){
+						if(new_w != width_geomap || new_h != height_geomap){
 							width_geomap = new_w;
 							height_geomap = new_h;
 							$geomap_container.css({
 								width: width_geomap,
 								height: height_geomap
 							});
-							gm.config({
-								projector: new_projector,
-								w: new_w,
-								h: new_h
-							}, _afterConfig);
-						}else{
-							_afterConfig();
 						}
+						gm.config({
+							map: _getConfMap(),
+							w: width_geomap,
+							h: height_geomap
+						}, _afterConfig);
 					});
 				}
 			});
@@ -1228,7 +1240,20 @@ Core.safe(function(){
 						
 						var gm_export = new GeoMap({
 							container: $div_container,
-							isnotMirror: true
+							isnotMirror: true,
+							onafteraddoverlays: function(){
+								var _bgimg = conf_export.bgimg;
+								if(_bgimg && file_util.exists(_bgimg)){
+									var img = new Image();
+									img.onload = function(){
+										conf_export.bgimg = img;
+										_export();
+									}
+									img.src = _bgimg;
+								}else{
+									_export();
+								}
+							}
 						});
 						gm_export.addOverlay(new GeoMap.Image(img_data));
 
@@ -1239,7 +1264,7 @@ Core.safe(function(){
 						}).each(function(i,v){
 							var $layer = $(this);
 							var layer;
-							if($layer.is('.texteditor')){
+							if($layer.is('.map_layer_text')){
 								$layer.css($layer.position()); // 修复样式里的left和top为auto情况
 								var padding_top = parseFloat($layer.css('padding-top')) || 0,
 									padding_right = parseFloat($layer.css('padding-right')) || 0,
@@ -1291,17 +1316,6 @@ Core.safe(function(){
 							Loading.hide();
 							var time = Timer.end('save image');
 							alert('成功导出图片, 用时'+time+'毫秒!');
-						}
-						var _bgimg = conf_export.bgimg;
-						if(_bgimg && file_util.exists(_bgimg)){
-							var img = new Image();
-							img.onload = function(){
-								conf_export.bgimg = img;
-								_export();
-							}
-							img.src = _bgimg;
-						}else{
-							_export();
 						}
 					});
 				}).click();

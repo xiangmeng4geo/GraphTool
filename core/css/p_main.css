@@ -256,7 +256,10 @@
 }
 /* ｝ 添加图片用和图片工具 */
 
-
+.map_layer_text span{
+	display: inline-block;
+	width: 100%;
+}
 .map_layer{
 	cursor: move;
 }

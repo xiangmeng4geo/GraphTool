@@ -118,18 +118,6 @@ define('GeoMap',['zrender',
 		var width_container = container.width(),
 			height_container = container.height();
 
-		var _data = _this._data;
-		// console.log(_data, width_container, height_container);
-		// if(_data){
-
-		// 	if(width_container != _data.width || height_container != _data.height){
-		// 		_this.canvas.resize();
-		// 		_this.emit('resize', {
-		// 			w: width_container,
-		// 			h: height_container
-		// 		});
-		// 	}
-		// }
 		var px_size_china_left_top = _this.projector.project({x: china_src_size.left, y: china_src_size.top}),
 			px_size_china_right_bottom = _this.projector.project({x: china_src_size.left+china_src_size.width, y: china_src_size.top-china_src_size.height});
 
@@ -195,6 +183,10 @@ define('GeoMap',['zrender',
 		if(fn_ready){
 			_this.on('ready', fn_ready);
 		}
+		var fn_afterAddOverlays = conf.onafteraddoverlays;
+		if(fn_afterAddOverlays){
+			_this.on('afteraddoverlays', fn_afterAddOverlays);
+		}
 		_this.config(conf);
 	};
 	GeoMap.PROJECT_MERCATOR = 'mercator';
@@ -209,7 +201,13 @@ define('GeoMap',['zrender',
 	GeoMapProp.config = function(conf, callback){
 		var _this = this;
 		// _this.conf = conf = $.extend({}, default_conf, _this.conf, conf);
-		var new_projector = conf.projector == 'mercator'? Mercator: Albers;
+		var new_projector = Albers;
+		var conf_map = conf.map;
+		if(conf_map){
+			if(conf_map.projector == 'mercator'){
+				new_projector = Mercator;
+			}
+		}
 		var old_projector = _this.projector;
 		var _data = _this._data;
 		var w_conf = conf.w,
@@ -222,8 +220,13 @@ define('GeoMap',['zrender',
 			}
 		}
 		_this.projector = new_projector;
+		_init_geomap.call(_this);
+
+		//对数据进行缓存
+		_this._data.map = conf_map;
+		_this._data_o.map = conf_map;
 		var geo = _this.conf.geo;
-		if(old_projector != new_projector && geo){
+		if((!old_projector || old_projector.name != new_projector.name) && geo){
 			var src = geo.src,
 				name = geo.name;
 			var arr_json = [];
@@ -248,24 +251,23 @@ define('GeoMap',['zrender',
 					}
 				});
 			}
-			_init_geomap.call(_this);
 			_this.loadGeo(arr_json, null, function(){
 				$.each(overlays_weather, function(i, v){
 					_this.addOverlay(v);
 				});
+				_changeCnameColor.call(_this);
 				_init_mirror.call(_this);
+				_this.reset();
 				callback && callback();
-				// _this.emit('ready');
 			});
 		}else{
 			if(_data){
 				var overlays = _data.overlays;
 			}
-			_init_geomap.call(_this);
 			if(overlays){
 				_this._data.overlays = overlays;
 			}
-			
+			_changeCnameColor.call(_this);
 			_this.reset();
 			callback && callback();
 		}
@@ -360,6 +362,31 @@ define('GeoMap',['zrender',
 	}
 	GeoMapProp.reset_zoom = function(){
 		_reset.call(this, RESET_TYPE_ZOOM);
+	}
+	function _changeCnameColor(){
+		var _this = this,
+			canvas = _this.canvas,
+			_data = _this._data;
+		var overlays = _data.overlays,
+			_map = _data.map;
+		var layers, conf_cname;
+		if(overlays && _map && (layers = _map.layers) && (conf_cname = layers.cname)){
+			var flag = conf_cname.flag;
+			var color_cname = flag? conf_cname.color: 'rgba(0,0,0,0)';
+			var is_have_text = false;
+			$.each(overlays, function(i, v){
+				var shape = v.shape;
+				var zlevel = shape.zlevel;
+				if(zlevel == ZINDEX_MAP_TEXT){
+					is_have_text = true;
+					var id = shape.id;
+					canvas.modShape(id, {style: {
+						color: color_cname
+					}})
+				}
+			});
+			canvas.refresh();
+		}
 	}
 	var RESET_TYPE_ZOOM = 1,
 		RESET_TYPE_DRAG = 2,
@@ -505,7 +532,7 @@ define('GeoMap',['zrender',
 				}
 
 
-				var cname = prop.name,
+				var cname = prop.cname,
 					cp = prop.cp;
 				if(cname && cp){
 					var offset_conf = {
@@ -611,17 +638,17 @@ define('GeoMap',['zrender',
 			});
 		});
 	};
-	GeoMapProp.addOverlay = function(overlay, delay){
+	GeoMapProp.addOverlay = function(overlay){
 		var _this = this;
+		clearTimeout(_this._ttaddoverlay);
 		var shape = overlay.draw(this);
 		_this._data.overlays.push(overlay);
-		delay || (delay = 0);
-		// setTimeout(function(){
-			_this.canvas.addShape(shape);
-		
+		_this.canvas.addShape(shape);
+		_this._ttaddoverlay = setTimeout(function(){
 			_this.canvas.render();
-		// }, delay);
-
+			// _this.refresh();
+			_this.emit('afteraddoverlays');
+		}, 10);
 		return shape;
 	}
 	/*清除所有天气图层*/
@@ -691,7 +718,7 @@ define('GeoMap',['zrender',
     }
 	GeoMapProp.addMask = function(polygons){
 		// Timer.start('addMask');
-		if(!polygons){
+		if(!polygons || polygons.length == 0){
 			polygons = this.polygons;
 		}else{
 			this.polygons = polygons;
@@ -757,37 +784,35 @@ define('GeoMap',['zrender',
 	    var layer_data = maskImageDom.toDataURL();
 
 
-	    maskImageDom = _createDom('mask-image', 'canvas', painter);
-		ctx = maskImageDom.getContext('2d');
-	    devicePixelRatio != 1 && ctx.scale(devicePixelRatio, devicePixelRatio);
+	    var canvas_new = _createDom('c_new', 'canvas', painter);
+		var ctx_new = canvas_new.getContext('2d');
+	    devicePixelRatio != 1 && ctx_new.scale(devicePixelRatio, devicePixelRatio);
 	    
 	    if(conf){
 	    	var bgimg = conf.bgimg;
 	    	if(bgimg){
-	    		ctx.drawImage(bgimg, 0, 0);
+	    		ctx_new.drawImage(bgimg, 0, 0);
 	    	}else{
 	    		/*对透明做默认填色处理*/
 		        var backgroundColor = conf.bgcolor || '#ffffff';
-		        ctx.fillStyle = backgroundColor;
-		        ctx.fillRect(0, 0, width, height);
+		        ctx_new.fillStyle = backgroundColor;
+		        ctx_new.fillRect(0, 0, width, height);
 	    	}
 	    }
-	    var img = new Image();
-	    img.src = layer_data;
-	    ctx.drawImage(img, 0, 0);
+	    ctx_new.drawImage(maskImageDom, 0, 0);
 
 	    $.each(noclipShapes, function(i, shape){
-	    	_drawShape(ctx, shape);
+	    	_drawShape(ctx_new, shape);
 	    });
-        var img_data = maskImageDom.toDataURL(null, backgroundColor);
+        var img_data = canvas_new.toDataURL(null, backgroundColor);
         maskImageDom = null;
-        ctx = null;
+        ctx_new = null;
         return img_data;
 	}
-
 	var GeoMapText = function(options){
 		TextShape.call(this, options);
 	}
+	// 格式化文字，主要用在多行显示文本
 	function _formatText(text, width, font){
 		var getWidth = util_area.getTextWidth;
 		if(width > 0 && getWidth(text, font) > width){
@@ -1091,7 +1116,7 @@ define('GeoMap',['zrender',
 		var style = {
 			text: text,
 			brushType : 'fill',
-	        textAlign : 'left',
+	        textAlign : style_obj['text-align'] || 'left',
 	        textBaseline : 'top'
 		};
 		var width = style_obj.width;
@@ -1106,6 +1131,9 @@ define('GeoMap',['zrender',
 		var top = style_obj.top;
 		if(left){
 			style.x = parseFloat(left);
+		}
+		if(style.textAlign == 'center'){
+			style.x += (style.width || 0)/2;
 		}
 		if(top){
 			style.y = parseFloat(top);
