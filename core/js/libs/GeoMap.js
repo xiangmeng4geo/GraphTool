@@ -446,6 +446,7 @@ define('GeoMap',['zrender',
 				points.push(new GeoMap.Point(v_v[0]/scale,v_v[1]/scale, is_not_lnglat));
 			});
 			var polygon = new GeoMap.Polygon(points, options);
+		
 			polygon.points = points;
 			shapes.push(polygon);
 			gm.addOverlay(polygon, 200*Math.random());
@@ -596,7 +597,6 @@ define('GeoMap',['zrender',
 		$.each(src,function(i, v){
 			_this.jsonLoader(v, function(data){
 				loadedData.push(data);
-					console.log(loadedData, len, src);
 				if(loadedData.length == len){
 					Timer.end('loadGeo');
 					Timer.start('add weather layers');

@@ -2,15 +2,10 @@ var fs = require('fs'),
 	path = require('path');
 var util = require('./util');
 
-var DIS_MIN_SQUART = Math.pow(0.005, 2);
+var DIS_MIN_SQUART = Math.pow(0.1, 2);
 function parseData(data, file_path){
 	var added_point_num = total_point_num = 0;
 	var arc_arr = data.arc_arr;
-	// arc_arr.forEach(function(v, i){
-	// 	console.log(i, v);
-	// })
-	console.log(arc_arr[0]);
-	return;
 	var arc_arr_new = [];
 	arc_arr.forEach(function(arc, i){
 		var len = arc.length;
@@ -27,15 +22,10 @@ function parseData(data, file_path){
 			}
 			total_point_num++;
 		}
-		// console.log(len, '->', new_arc.length);return;
 		arc_arr_new[i] = new_arc;
 	});
 	data.arc_arr = arc_arr_new;
 	console.log(total_point_num, added_point_num);
-	// arc_arr_new.forEach(function(v, i){
-	// 	console.log(i, v);
-	// })
-	// return;
 	reback(data, file_path);
 }
 // 还原数据
@@ -44,10 +34,6 @@ function reback(data, file_path){
 
 	var arc_cache = data.arc_cache;
 	var arc_arr = data.arc_arr;
-	// arc_arr.forEach(function(v){
-	// 	console.log(v);
-	// })
-	// return;
 	var data_new = {
 		"type": "FeatureCollection",
 		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
@@ -64,17 +50,17 @@ function reback(data, file_path){
 		var new_areas = [];
 		v.areas.forEach(function(area){
 			var items = [];
-			area.forEach(function(arc_index){console.log(arc_arr[arc_index].length);
+			area.forEach(function(arc_index){
 				items = items.concat(arc_arr[arc_index]);
 			});
 			num += items.length;
 			new_areas.push(items);
 		});
 		var is_multi = new_areas.length > 1;
-		f.geometry.coordinates = is_multi? [[new_areas]]: [new_areas];
+		new_areas = new_areas.slice(0, 460000 == f.properties.PROV_CODE?1:5); //对海南和小岛屿进行处理
+		f.geometry.coordinates = is_multi? [new_areas]: new_areas;
 		features.push(f);
 	});
-	console.log(num);
 	data_new.features = features;
 	fs.writeFileSync(reback_file_path, JSON.stringify(data_new));
 	console.log('write file', reback_file_path);
@@ -84,11 +70,11 @@ var TYPE_NATION = 1,
 	TYPE_PROVINCE_NODE = 3;
 function format(file_path){
 	var data_file_path = file_path+'.data.json';
-	// if(fs.existsSync(data_file_path)){
-	// 	var data = require(data_file_path);
-	// 	parseData(data, file_path);
-	// 	return;
-	// }
+	if(fs.existsSync(data_file_path)){
+		var data = require(data_file_path);
+		parseData(data, file_path);
+		return;
+	}
 	fs.readFile(file_path, {
 		encoding: 'utf8'
 	}, function(err, data){
@@ -161,13 +147,39 @@ function format(file_path){
 					var indexs = _cache_point[i];
 					var len = indexs.length;
 					var type;
-					if(len == 1){
+					if(len <= 1){
 						type = TYPE_NATION;
 					}else if(len > 2){
 						type = TYPE_PROVINCE_ENDPOINT;
 					}else{
-						
+						var info = indexs[0];
+						var a = info[0],
+							b = info[1],
+							c = info[2];
+						var area = data_new[a].areas[b];
+						var len_area = area.length;
+						var c_prev = c - 1 < 0? len_area - 1: c - 1,
+							c_next = c + 1 < len_area? c + 1: 0;
+
+						var key = _cache_point[c_prev]+'|' + _cache_point[c_next];
+
+						var info = indexs[1];
+						var a = info[0],
+							b = info[1],
+							c = info[2];
+						var area = data_new[a].areas[b];
+						var len_area = area.length;
+						var c_prev = c - 1 < 0? len_area - 1: c - 1,
+							c_next = c + 1 < len_area? c + 1: 0;
+
+						if(_cache_point[c_prev]+'|' + _cache_point[c_next] == key ||
+						   _cache_point[c_next]+'|' + _cache_point[c_prev] == key){
+							type = TYPE_PROVINCE_NODE;
+						}else{
+							type = TYPE_PROVINCE_ENDPOINT;
+						}
 					}
+					_cache_point[i].type = type;
 				}
 				fs.writeFileSync(cachepoint_file_path, JSON.stringify(_cache_point));
 			}
@@ -182,12 +194,15 @@ function format(file_path){
 						var v_area_item = v_area[i];
 						var key = v_area_item[0] + '_' + v_area_item[1];
 						var areas_index = _cache_point[key];
-						if(areas_index && areas_index.length >= 3){
-							console.log(areas_index);
-							endpoint_index.push(i);
+						for(var i_index = 0, j_index = areas_index.length; i_index<j_index; i_index++){
+							var v_index = areas_index[i_index];
+							if(v_index.type == TYPE_PROVINCE_ENDPOINT){
+								endpoint_index.push(i);
+								break;
+							}
 						}
 					}
-					// console.log(endpoint_index);
+					console.log(endpoint_index);
 					var len = endpoint_index.length;
 					console.log(len, v_area.length, v_area.slice().length);
 					var arcs = [];
