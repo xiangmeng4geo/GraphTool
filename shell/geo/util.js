@@ -130,7 +130,23 @@ var projection = (function(){
         Albers: Albers
     }   
 })();
+
+var predigestData = function(items, min_dis){
+    items = items.slice();
+    var DIS_MIN_SQUART = Math.pow(min_dis, 2);
+    var point = items.shift();
+    var items_new = [point];
+    var tmp = null;
+    while((tmp = items.shift())){
+        var dis_squart = Math.pow(point[0] - tmp[0], 2) + Math.pow(point[1] - tmp[1], 2);
+        if(dis_squart >= DIS_MIN_SQUART){
+            items_new.push(tmp);
+        }
+    }
+    return items_new;
+}
 exports.isInsidePolygon = _isInsidePolygon;
 exports.getArea = _getArea;
 exports.number_fixed = _number_fixed;
 exports.Projection = projection;
+exports.predigestData = predigestData;
