@@ -577,21 +577,30 @@ Core.safe(function(){
 		initing = true;
 		require(['GeoMap', 'LegendImage', 'BoxShape'],function(GeoMap, LegendImage, BoxShape){
 			MapLayer.init(BoxShape);
-			function _getProjector(){
+			// function _getProjector(){
+			// 	var conf_sys = ConfUser.getSys();
+			// 	return conf_sys && conf_sys.map && conf_sys.map.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+			// }
+			// var gm_projector = _getProjector();
+
+			function _getConfMap(){
 				var conf_sys = ConfUser.getSys();
-				return conf_sys && conf_sys.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+				return conf_sys && conf_sys.map;
 			}
-			var gm_projector = _getProjector();
 			window.GeoMap = GeoMap;
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
 				container: $geomap,
-				projector: gm_projector,
+				map: _getConfMap(),
 				geo: {
 					src: './data/',
 					name: ['china']
 				},
 				onready: function(){
+				},
+				onafteraddoverlays: function(){
+					console.log('afteraddoverlays');
+					gm.refresh();
 				}
 				// jsonLoader: file_util.getJson
 			});
@@ -1171,25 +1180,23 @@ Core.safe(function(){
 								_afterRender()
 							}
 						}
-						var new_projector = _getProjector();
+						// var new_projector = _getProjector();
 						var _template = conf_other.template;
 						var new_w = _template[0],
 							new_h = _template[1];
-						if(new_projector != gm_projector || new_w != width_geomap || new_h != height_geomap){
+						if(new_w != width_geomap || new_h != height_geomap){
 							width_geomap = new_w;
 							height_geomap = new_h;
 							$geomap_container.css({
 								width: width_geomap,
 								height: height_geomap
 							});
-							gm.config({
-								projector: new_projector,
-								w: new_w,
-								h: new_h
-							}, _afterConfig);
-						}else{
-							_afterConfig();
 						}
+						gm.config({
+							map: _getConfMap(),
+							w: width_geomap,
+							h: height_geomap
+						}, _afterConfig);
 					});
 				}
 			});
@@ -1224,11 +1231,25 @@ Core.safe(function(){
 					var save_file_name = $(this).val();
 					Loading.show(function(){
 						var img_data = gm.toDataURL();
+						$('<img src="'+img_data+'"/>').appendTo($('body'));
 						var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+width_geomap+'px; height: '+height_geomap+'px"></div>').appendTo($('body'));
 						
 						var gm_export = new GeoMap({
 							container: $div_container,
-							isnotMirror: true
+							isnotMirror: true,
+							onafteraddoverlays: function(){
+								var _bgimg = conf_export.bgimg;
+								if(_bgimg && file_util.exists(_bgimg)){
+									var img = new Image();
+									img.onload = function(){
+										conf_export.bgimg = img;
+										_export();
+									}
+									img.src = _bgimg;
+								}else{
+									_export();
+								}
+							}
 						});
 						gm_export.addOverlay(new GeoMap.Image(img_data));
 
@@ -1291,17 +1312,6 @@ Core.safe(function(){
 							Loading.hide();
 							var time = Timer.end('save image');
 							alert('成功导出图片, 用时'+time+'毫秒!');
-						}
-						var _bgimg = conf_export.bgimg;
-						if(_bgimg && file_util.exists(_bgimg)){
-							var img = new Image();
-							img.onload = function(){
-								conf_export.bgimg = img;
-								_export();
-							}
-							img.src = _bgimg;
-						}else{
-							_export();
 						}
 					});
 				}).click();

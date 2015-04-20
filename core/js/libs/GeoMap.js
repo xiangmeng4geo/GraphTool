@@ -195,6 +195,10 @@ define('GeoMap',['zrender',
 		if(fn_ready){
 			_this.on('ready', fn_ready);
 		}
+		var fn_afterAddOverlays = conf.onafteraddoverlays;
+		if(fn_afterAddOverlays){
+			_this.on('afteraddoverlays', fn_afterAddOverlays);
+		}
 		_this.config(conf);
 	};
 	GeoMap.PROJECT_MERCATOR = 'mercator';
@@ -209,7 +213,13 @@ define('GeoMap',['zrender',
 	GeoMapProp.config = function(conf, callback){
 		var _this = this;
 		// _this.conf = conf = $.extend({}, default_conf, _this.conf, conf);
-		var new_projector = conf.projector == 'mercator'? Mercator: Albers;
+		var new_projector = Albers;
+		var conf_map = conf.map;
+		if(conf_map){
+			if(conf_map.projector == 'mercator'){
+				new_projector = Mercator;
+			}
+		}
 		var old_projector = _this.projector;
 		var _data = _this._data;
 		var w_conf = conf.w,
@@ -223,7 +233,7 @@ define('GeoMap',['zrender',
 		}
 		_this.projector = new_projector;
 		var geo = _this.conf.geo;
-		if(old_projector != new_projector && geo){
+		if((!old_projector || old_projector.name != new_projector.name) && geo){
 			var src = geo.src,
 				name = geo.name;
 			var arr_json = [];
@@ -253,6 +263,7 @@ define('GeoMap',['zrender',
 					_this.addOverlay(v);
 				});
 				_init_mirror.call(_this);
+				_this.reset();
 				callback && callback();
 				// _this.emit('ready');
 			});
@@ -359,6 +370,9 @@ define('GeoMap',['zrender',
 	}
 	GeoMapProp.reset_zoom = function(){
 		_reset.call(this, RESET_TYPE_ZOOM);
+	}
+	function _changeCnameColor(){
+
 	}
 	var RESET_TYPE_ZOOM = 1,
 		RESET_TYPE_DRAG = 2,
@@ -609,17 +623,17 @@ define('GeoMap',['zrender',
 			});
 		});
 	};
-	GeoMapProp.addOverlay = function(overlay, delay){
+	GeoMapProp.addOverlay = function(overlay){
 		var _this = this;
+		clearTimeout(_this._ttaddoverlay);
 		var shape = overlay.draw(this);
 		_this._data.overlays.push(overlay);
-		delay || (delay = 0);
-		// setTimeout(function(){
-			_this.canvas.addShape(shape);
-		
+		_this.canvas.addShape(shape);
+		_this._ttaddoverlay = setTimeout(function(){
 			_this.canvas.render();
-		// }, delay);
-
+			// _this.refresh();
+			_this.emit('afteraddoverlays');
+		}, 10);
 		return shape;
 	}
 	/*清除所有天气图层*/
@@ -689,7 +703,7 @@ define('GeoMap',['zrender',
     }
 	GeoMapProp.addMask = function(polygons){
 		// Timer.start('addMask');
-		if(!polygons){
+		if(!polygons || polygons.length == 0){
 			polygons = this.polygons;
 		}else{
 			this.polygons = polygons;
@@ -755,34 +769,54 @@ define('GeoMap',['zrender',
 	    var layer_data = maskImageDom.toDataURL();
 
 
-	    maskImageDom = _createDom('mask-image', 'canvas', painter);
-		ctx = maskImageDom.getContext('2d');
-	    devicePixelRatio != 1 && ctx.scale(devicePixelRatio, devicePixelRatio);
+	    var canvas_new = _createDom('c_new', 'canvas', painter);
+		var ctx_new = canvas_new.getContext('2d');
+	    devicePixelRatio != 1 && ctx_new.scale(devicePixelRatio, devicePixelRatio);
 	    
 	    if(conf){
 	    	var bgimg = conf.bgimg;
 	    	if(bgimg){
-	    		ctx.drawImage(bgimg, 0, 0);
+	    		ctx_new.drawImage(bgimg, 0, 0);
 	    	}else{
 	    		/*对透明做默认填色处理*/
 		        var backgroundColor = conf.bgcolor || '#ffffff';
-		        ctx.fillStyle = backgroundColor;
-		        ctx.fillRect(0, 0, width, height);
+		        ctx_new.fillStyle = backgroundColor;
+		        ctx_new.fillRect(0, 0, width, height);
 	    	}
 	    }
-	    var img = new Image();
-	    img.src = layer_data;
-	    ctx.drawImage(img, 0, 0);
+	    ctx_new.drawImage(maskImageDom, 0, 0);
 
 	    $.each(noclipShapes, function(i, shape){
-	    	_drawShape(ctx, shape);
+	    	_drawShape(ctx_new, shape);
 	    });
-        var img_data = maskImageDom.toDataURL(null, backgroundColor);
+        var img_data = canvas_new.toDataURL(null, backgroundColor);
         maskImageDom = null;
-        ctx = null;
+        ctx_new = null;
         return img_data;
 	}
+	// GeoMapProp.toDataURL = function(conf){
+	// 	var _this = this;
+	// 	var painter = _this.canvas.painter;
+	// 	var width = painter._width;
+ //        var height = painter._height;
+	// 	var maskImageDom = _createDom('mask-image', 'canvas', painter);
+	// 	var ctx = maskImageDom.getContext('2d');
+	//     devicePixelRatio != 1 && ctx.scale(devicePixelRatio, devicePixelRatio);
 
+	//     if(conf){
+	//     	var bgimg = conf.bgimg;
+	//     	if(bgimg){
+	//     		ctx.drawImage(bgimg, 0, 0);
+	//     	}else{
+	//     		/*对透明做默认填色处理*/
+	// 	        var backgroundColor = conf.bgcolor || '#ffffff';
+	// 	        ctx.fillStyle = backgroundColor;
+	// 	        ctx.fillRect(0, 0, width, height);
+	//     	}
+	//     }
+	//     ctx.drawImage(_this.mirror.get(0), 0, 0);
+ //        return maskImageDom.toDataURL(null, backgroundColor);
+	// }
 	var GeoMapText = function(options){
 		TextShape.call(this, options);
 	}

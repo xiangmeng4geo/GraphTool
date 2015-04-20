@@ -35,7 +35,11 @@ Core.safe(function(){
 		$checkbox_show_southsea = $('#checkbox_show_southsea'),
 		$checkbox_show_logo = $('#checkbox_show_logo'),
 		$select_map_projector = $('#select_map_projector'),
-		$tb_template = $('#tb_template');
+		$tb_template = $('#tb_template'),
+		$cb_map_river = $('#cb_map_river'),
+		$cb_map_railway = $('#cb_map_railway'),
+		$cb_map_cname = $('#cb_map_cname'),
+		$color_map_cname = $('#color_map_cname');
 
 	var conf_sys = Conf_User.getSys();
 	var projector_user = '';
@@ -54,10 +58,29 @@ Core.safe(function(){
 				$text_file_company_logo.val(logo_company.p);
 			}
 		}
-		debugger;
-		projector_user = conf_sys.projector;
 		var templates = conf_sys.templates || [];
 		arr_template = arr_template.concat(templates);
+
+		var conf_map = conf_sys.map;
+		if(conf_map){
+			projector_user = conf_map.projector;
+			var conf_map_layers = conf_map.layers;
+			if(conf_map_layers){
+				var conf_river = conf_map_layers.river;
+				if(conf_river){
+					$cb_map_river.prop('checked', conf_river.flag);
+				}
+				var conf_railway = conf_map_layers.railway;
+				if(conf_railway){
+					$cb_map_railway.prop('checked', conf_railway.flag);
+				}
+				var conf_cname = conf_map_layers.cname;
+				if(conf_cname){
+					$cb_map_cname.prop('checked', conf_cname.flag);
+					$color_map_cname.val(conf_cname.color);
+				}
+			}
+		}
 	}
 	var html_map_projector = '';
 	$.each(const_projector, function(i, v){
@@ -98,8 +121,22 @@ Core.safe(function(){
 					p: $text_file_company_logo.val()
 				}
 			},
-			projector: $select_map_projector.val(),
-			templates: templates
+			templates: templates,
+			map: {
+				projector: $select_map_projector.val(),
+				layers: {
+					river: {
+						flag: $cb_map_river.prop('checked')
+					},
+					railway: {
+						flag: $cb_map_railway.prop('checked')
+					},
+					cname: {
+						flag: $cb_map_cname.prop('checked'),
+						color: $color_map_cname.val()
+					}
+				}
+			}
 		};
 		Conf_User.write(CONF_PRODUCTNAME,save_data,true);
 		CoreWindow.close();
