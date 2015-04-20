@@ -118,18 +118,6 @@ define('GeoMap',['zrender',
 		var width_container = container.width(),
 			height_container = container.height();
 
-		var _data = _this._data;
-		// console.log(_data, width_container, height_container);
-		// if(_data){
-
-		// 	if(width_container != _data.width || height_container != _data.height){
-		// 		_this.canvas.resize();
-		// 		_this.emit('resize', {
-		// 			w: width_container,
-		// 			h: height_container
-		// 		});
-		// 	}
-		// }
 		var px_size_china_left_top = _this.projector.project({x: china_src_size.left, y: china_src_size.top}),
 			px_size_china_right_bottom = _this.projector.project({x: china_src_size.left+china_src_size.width, y: china_src_size.top-china_src_size.height});
 
@@ -232,6 +220,11 @@ define('GeoMap',['zrender',
 			}
 		}
 		_this.projector = new_projector;
+		_init_geomap.call(_this);
+
+		//对数据进行缓存
+		_this._data.map = conf_map;
+		_this._data_o.map = conf_map;
 		var geo = _this.conf.geo;
 		if((!old_projector || old_projector.name != new_projector.name) && geo){
 			var src = geo.src,
@@ -257,25 +250,23 @@ define('GeoMap',['zrender',
 					}
 				});
 			}
-			_init_geomap.call(_this);
 			_this.loadGeo(arr_json, null, function(){
 				$.each(overlays_weather, function(i, v){
 					_this.addOverlay(v);
 				});
+				_changeCnameColor.call(_this);
 				_init_mirror.call(_this);
 				_this.reset();
 				callback && callback();
-				// _this.emit('ready');
 			});
 		}else{
 			if(_data){
 				var overlays = _data.overlays;
 			}
-			_init_geomap.call(_this);
 			if(overlays){
 				_this._data.overlays = overlays;
 			}
-			
+			_changeCnameColor.call(_this);
 			_this.reset();
 			callback && callback();
 		}
@@ -372,7 +363,29 @@ define('GeoMap',['zrender',
 		_reset.call(this, RESET_TYPE_ZOOM);
 	}
 	function _changeCnameColor(){
-
+		var _this = this,
+			canvas = _this.canvas,
+			_data = _this._data;
+		var overlays = _data.overlays,
+			_map = _data.map;
+		var layers, conf_cname;
+		if(overlays && _map && (layers = _map.layers) && (conf_cname = layers.cname)){
+			var flag = conf_cname.flag;
+			var color_cname = flag? conf_cname.color: 'rgba(0,0,0,0)';
+			var is_have_text = false;
+			$.each(overlays, function(i, v){
+				var shape = v.shape;
+				var zlevel = shape.zlevel;
+				if(zlevel == ZINDEX_MAP_TEXT){
+					is_have_text = true;
+					var id = shape.id;
+					canvas.modShape(id, {style: {
+						color: color_cname
+					}})
+				}
+			});
+			canvas.refresh();
+		}
 	}
 	var RESET_TYPE_ZOOM = 1,
 		RESET_TYPE_DRAG = 2,
@@ -517,7 +530,7 @@ define('GeoMap',['zrender',
 				}
 
 
-				var cname = prop.name,
+				var cname = prop.cname,
 					cp = prop.cp;
 				if(cname && cp){
 					var offset_conf = {
@@ -794,32 +807,10 @@ define('GeoMap',['zrender',
         ctx_new = null;
         return img_data;
 	}
-	// GeoMapProp.toDataURL = function(conf){
-	// 	var _this = this;
-	// 	var painter = _this.canvas.painter;
-	// 	var width = painter._width;
- //        var height = painter._height;
-	// 	var maskImageDom = _createDom('mask-image', 'canvas', painter);
-	// 	var ctx = maskImageDom.getContext('2d');
-	//     devicePixelRatio != 1 && ctx.scale(devicePixelRatio, devicePixelRatio);
-
-	//     if(conf){
-	//     	var bgimg = conf.bgimg;
-	//     	if(bgimg){
-	//     		ctx.drawImage(bgimg, 0, 0);
-	//     	}else{
-	//     		/*对透明做默认填色处理*/
-	// 	        var backgroundColor = conf.bgcolor || '#ffffff';
-	// 	        ctx.fillStyle = backgroundColor;
-	// 	        ctx.fillRect(0, 0, width, height);
-	//     	}
-	//     }
-	//     ctx.drawImage(_this.mirror.get(0), 0, 0);
- //        return maskImageDom.toDataURL(null, backgroundColor);
-	// }
 	var GeoMapText = function(options){
 		TextShape.call(this, options);
 	}
+	// 格式化文字，主要用在多行显示文本
 	function _formatText(text, width, font){
 		var getWidth = util_area.getTextWidth;
 		if(width > 0 && getWidth(text, font) > width){

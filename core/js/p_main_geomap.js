@@ -599,7 +599,6 @@ Core.safe(function(){
 				onready: function(){
 				},
 				onafteraddoverlays: function(){
-					console.log('afteraddoverlays');
 					gm.refresh();
 				}
 				// jsonLoader: file_util.getJson
@@ -1231,7 +1230,6 @@ Core.safe(function(){
 					var save_file_name = $(this).val();
 					Loading.show(function(){
 						var img_data = gm.toDataURL();
-						$('<img src="'+img_data+'"/>').appendTo($('body'));
 						var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+width_geomap+'px; height: '+height_geomap+'px"></div>').appendTo($('body'));
 						
 						var gm_export = new GeoMap({
