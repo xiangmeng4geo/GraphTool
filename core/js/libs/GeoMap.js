@@ -1281,5 +1281,39 @@ define('GeoMap',['zrender',
 		var pat = ctx_pattern.createPattern(canvas_pattern,options.repeat);
 		return pat;
 	}
+	GeoMap.Pattern.listence = function(options){
+		var w = 100, h = 100,
+			font = '16px "Microsoft Yahei"',
+			text = '蓝π蚂蚁',
+			color = '#000000';
+
+		if(options){
+			w = options.width || w;
+			h = options.width || h;
+			font = options.font || font;
+			text = options.text || text;
+			color = options.color || color;
+		}
+		var h2 = h/2, w2 = w/2;
+
+		
+		var canvas_pattern = document.createElement('canvas');
+		document.body.appendChild(canvas_pattern);
+		canvas_pattern.setAttribute('width', w);
+		canvas_pattern.setAttribute('height', h);
+
+		var ctx_pattern = canvas_pattern.getContext('2d');
+		ctx_pattern.translate(w2, h2);
+		ctx_pattern.rotate(-Math.PI/4);
+		ctx_pattern.translate(-w2, -h2);
+		ctx_pattern.font = font;
+		ctx_pattern.textBaseline = 'middle';
+		ctx_pattern.textAlign = 'center';
+		ctx_pattern.fillStyle = color;
+		ctx_pattern.fillText(text, w2, h2);
+
+		var pat = ctx_pattern.createPattern(canvas_pattern, 'repeat');
+		return pat;
+	}
 	return GeoMap
 });

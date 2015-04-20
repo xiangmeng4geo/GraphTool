@@ -1299,11 +1299,15 @@ Core.safe(function(){
 						});
 						// 软件到期后对生成的图片进行水印处理
 						if(!Core.safe.l){
-							var x = Math.random()* width_geomap*0.7,
-								y = Math.random()*height_geomap*0.7;
-							var text_no_authorization = '华风创新出品';
-							gm_export.addOverlay(new GeoMap.Text(text_no_authorization, 'font-size: 40px;color: red;left:'+x+'px;top:'+y+'px', null, {
-								textAlign: 'center'
+							gm_export.addOverlay(new GeoMap.Rectangle({
+								style: {
+									x: 0,
+									y: 0,
+									width: width_geomap,
+									height: height_geomap,
+									color: new GeoMap.Pattern.listence({
+									})
+								}
 							}));
 						}
 
