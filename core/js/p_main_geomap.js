@@ -285,7 +285,7 @@ Core.safe(function(){
 			var $html = _createLayer({
 				css: option.style
 			});
-			$html.css(pos).addClass('texteditor').append('<span>'+(option.text||'')+'</span>');
+			$html.css(pos).addClass('map_layer_text').append('<span>'+(option.text||'')+'</span>');
 			$html.on('dblclick',function(){
 				var $this = $(this);
 				var text = $this.text(),
@@ -906,10 +906,16 @@ Core.safe(function(){
 				if(conf_title && conf_title.is_show){
 					var text = conf_title.text;
 					if(text){
+						var is_center = conf_title.center;
+						var style = conf_title.style;
+						if(is_center){
+							pos.left = 0;
+							style += 'text-align: center; width: '+width_geomap+'px;';
+						}
 						return MapLayer.text({
 							position: pos,
 							text: _replace_date(text, is_use_publish_time),
-							style: conf_title.style
+							style: style
 						}).appendTo($geomap_layer);
 					}
 				}
@@ -1258,7 +1264,7 @@ Core.safe(function(){
 						}).each(function(i,v){
 							var $layer = $(this);
 							var layer;
-							if($layer.is('.texteditor')){
+							if($layer.is('.map_layer_text')){
 								$layer.css($layer.position()); // 修复样式里的left和top为auto情况
 								var padding_top = parseFloat($layer.css('padding-top')) || 0,
 									padding_right = parseFloat($layer.css('padding-right')) || 0,

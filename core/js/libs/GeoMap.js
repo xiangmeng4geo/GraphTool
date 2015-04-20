@@ -1114,7 +1114,7 @@ define('GeoMap',['zrender',
 		var style = {
 			text: text,
 			brushType : 'fill',
-	        textAlign : 'left',
+	        textAlign : style_obj['text-align'] || 'left',
 	        textBaseline : 'top'
 		};
 		var width = style_obj.width;
@@ -1129,6 +1129,9 @@ define('GeoMap',['zrender',
 		var top = style_obj.top;
 		if(left){
 			style.x = parseFloat(left);
+		}
+		if(style.textAlign == 'center'){
+			style.x += (style.width || 0)/2;
 		}
 		if(top){
 			style.y = parseFloat(top);
