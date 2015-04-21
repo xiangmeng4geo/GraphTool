@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>添加产品</title>
+		<link rel="stylesheet" type="text/css" href="css/reset.css">
+		<style>
+		.row{
+			width: 230px;
+			margin: 10px auto;
+		}
+		.row h1{
+			text-align: center;
+		}
+		.row label{
+			display: inline-block;
+			width: 40px;
+		}
+		input[type=text],
+		select{
+			width: 170px;
+		}
+		#btn_add{
+			float: left;
+			margin-left: 50px;
+		}
+		#btn_cancel{
+			float: right;
+			margin-right: 50px;
+		}
+		</style>
+	</head>
+	<body>
+		<div class="row">
+			<label>类型</label>
+			<select id="product_type">
+			</select>
+		</div>
+		<div class="row">
+			<label>名称</label>
+			<input id="product_name" type="text" placeholder="请输入名称"/>
+		</div>
+		<div class="row">
+			<input id="btn_add" type="button" value="添加"/>
+			<input id="btn_cancel" type="button" value="取消"/>
+		</div>
+		<script type="text/javascript" src="./js/libs/j.js"></script>
+		<script type="text/javascript" src="./js/core.js"></script>
+		<script type="text/javascript">
+		Core.safe(function(){
+			var $product_type = $('#product_type'),
+				$product_name = $('#product_name');
+			var CoreWindow = Core.Window;
+			var flag_is_modify = false;
+			CoreWindow.onMessage(function(e){
+				var data = e.data;
+				var type = data.type;
+				if(Core.Const.msgType.ADD_PRODUCT == type){
+					data = data.data;
+					if(data.name){
+						flag_is_modify = true;
+						$product_name.val(data.name);
+						$('#btn_add').val('修改');
+						document.title = '修改产品';
+					}
+				}
+			}, true);
+			function send(type, data){
+				CoreWindow.sendMsg(type, data, opener);
+			}
+
+			var productType = Core.Const.productType;
+			for(var i in productType){
+				var v = productType[i];
+				$('<option>').val(v.v).text(v.n).appendTo($product_type);
+			}
+			var $btn_add = $('#btn_add').click(function(){
+				var product_name = $product_name.val();
+				if(!product_name){
+					return alert('请输入名称！');
+				}
+				
+				send(Core.Const.msgType.ADD_PRODUCT,{
+					is_modify: flag_is_modify,
+					type: $product_type.val(),
+					name: product_name
+				});
+				$btn_cancel.click();
+			});
+			CoreWindow.onKeyEnter(function(){
+				$btn_add.click();
+			});
+			var $btn_cancel = $('#btn_cancel').click(function(){
+				CoreWindow.close();
+			})
+		});
+		</script>
+	</body>
+</html>

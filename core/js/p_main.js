@@ -20,13 +20,13 @@
 	var Tree = (function(){
 		var tree_data = ConfUser.getTree();
 		
-		function createNode(data,prefix){
+		function createNode(data, prefix){
 			if(prefix != undefined){
 				prefix += '_';
 			}else{
 				prefix = '';
 			}
-			prefix != undefined|| (prefix = 'r');
+			var isexpand = prefix.split('_').length < 2;
 			var arr = [];
 			$.each(data,function(i,v){
 				var id = prefix+i;
@@ -36,7 +36,7 @@
 				    "text" : v.name,
 				    "showcheck" : false,
 				    "complete" : true,
-				    "isexpand" : false,
+				    "isexpand" : isexpand,
 				    "checkstate" : 0,
 				    "hasChildren" : is_hasChildren
 				};
@@ -265,33 +265,24 @@
 		$btn_slide = $('#btn_slide');
 	var flag_is_over = false;
 	$slide_down.on('mouseenter', function(){
-		flag_is_over = true;console.log(1);
+		flag_is_over = true;
 	}).on('mouseleave', function(){
 		flag_is_over = false;
 	});
 	var tt;
 	$('.user_info').on('mouseenter', function(){
 		// flag_is_over = true;
-		$slide_down.slideDown();
+		$slide_down.stop().slideDown();
 		$btn_slide.addClass('open');
 	}).on('mouseleave', function(){
 		clearTimeout(tt);
-		tt = setTimeout(function(){console.log(12);
+		tt = setTimeout(function(){
 			if(!flag_is_over){
-				$slide_down.slideUp();
+				$slide_down.stop().slideUp();
 				$btn_slide.removeClass('open');
 			}
 		}, 50);
 	});
-	// $('.user_info').on('click', function(){
-	// 	if($slide_down.is(':visible')){
-	// 		$slide_down.slideUp();
-	// 		$btn_slide.removeClass('open');
-	// 	}else{
-	// 		$slide_down.slideDown();
-	// 		$btn_slide.addClass('open');
-	// 	}
-	// });
 	var height_top_container = $('.top_container').height();
 	var $win = $(window);
 	var $c_right = $('#c_right'),
@@ -313,5 +304,22 @@
 	}
 	_init_size();
 	$win.on('resize', _init_size);
+	!function(){
+		// 设置半小时提醒一次
+		var space_notice = 1000*60*30;
+		var last_time = 0;
+		$doc.on('no_v', function(e, listence){
+			if(listence){
+				var now = new Date();
+				if(now - last_time > space_notice){
+					last_time = now;
+					alert('您的软件已经到期，为保证您的使用请联系管理员！');
+				}
+			}
+		});
+	}();
+	$('#btn_listence').click(Page.listence);
+	$('#btn_about').click(Page.about);
+	$('#btn_doc').click(Page.doc);
 	Page.inited();
 }();

@@ -10,6 +10,14 @@
 		win = Window.get();
 	win.focus();
 
+	/*常量*/
+	Core.Const = conf.get('const');
+	Core.Const.Event = {
+		'GEOMAP_INITED': '0',
+		'PRODUCT_CHANGE': '1'
+	};
+	var $doc = $(document);
+
 	!function(){
 		var DIRNAME_RE = /[^?#]*\//
 		function dirname(path) {
@@ -89,6 +97,10 @@
 		
 		return format;
 	}
+
+	String.prototype.reverse = function(){
+		return this.split('').reverse().join('');
+	}
 	var $header = $('head');
 	// 可以解决模块依赖css问题
 	Core.Html = {
@@ -161,16 +173,77 @@
 		process.on('uncaughtException',fn_error);
 		window.onerror = fn_error;
 	}();
-	
 	Core.safe = function(auto_fn){
 		try{
 			auto_fn();
 		}catch(e){
 			console.log(e,e.stack);
 		};
-	}
+	};
+	!function(){
+		var l_name = '_v_';
+		var delay = 1000*5;
+		var decode = Core.Lib.util.encrypt.decode;
+		function _getListence(listence){
+			if(listence){
+				listence = listence.reverse();
+				listence = decode(listence);
+				if(listence){
+					var arr = listence.split('|');
+					var time_start = new Date(parseInt(arr[0])),
+						time_end = new Date(parseInt(arr[1]));
+					var time_now = new Date();
+					return {
+						s: time_start, 
+						e: time_end,
+						n: time_now,
+						f: time_end > time_start && time_now > time_start && time_now < time_end
+					}
+				}
+			}
+		}
+		function _check(){
+			var listence = _getListence(conf.getVerification().l);
+			if(listence){
+				var time_schedule = Store.get(l_name);
+				if(time_schedule){
+					time_schedule = new Date(parseInt(time_schedule));
+				}
+				var flag = listence.f && (!time_schedule || time_schedule > listence.s && time_schedule < listence.e);
+				if(!flag){
+					$doc.trigger('no_v', listence);
+				}
+				Core.safe.l = flag;
+				if(!time_schedule || time_schedule < listence.s){
+					time_schedule = listence.s;
+				}
+				Store.set(l_name, time_schedule.getTime()+delay);
+				// console.log(Core.safe.l, time_schedule.getTime(), listence);
+			}
+			setTimeout(_check, delay); //1分钟验证一次
+		}
+		setTimeout(_check, 0);
+		Core.safe.update = function(listence){
+			var encrypt_listence = listence;
+			listence = _getListence(listence);
+			if(listence && listence.f){
+				conf.setVerification(encrypt_listence);
+				var time_schedule = Store.get(l_name);
+				if(time_schedule){
+					time_schedule = new Date(parseInt(time_schedule));
+				}
+				if(!time_schedule || time_schedule < listence.s){
+					time_schedule = listence.s;
+				}
+				Store.set(l_name, time_schedule.getTime());
+				return listence;
+			}
+		}
+	}();
 	
-	var conf_gui_window = gui.App.manifest.window;
+	var manifest = gui.App.manifest;
+	var conf_gui_window = manifest.window;
+	Core.appInfo = manifest;
 	/*按指定文件加载页面*/
 	function _open(page_name){
 		var win = Window.open('./'+page_name+'.html',$.extend({},conf_gui_window,conf.get('view_'+page_name)));
@@ -238,15 +311,18 @@
 		},
 		textStyle: function(callback){
 			return _open_only_win('m_text_style',callback);
+		},
+		listence: function(callback){
+			return _open_only_win('m_listence',callback);
+		},
+		about: function(callback){
+			return _open_only_win('m_about',callback);
+		},
+		doc: function(){
+			var doc_path = Core.Lib.util.file.path.doc;
+			gui.Shell.openItem(doc_path);
 		}
 	}
-	/*常量*/
-	Core.Const = conf.get('const');
-	Core.Const.Event = {
-		'GEOMAP_INITED': '0',
-		'PRODUCT_CHANGE': '1'
-	};
-	var $doc = $(document);
 	var message_listeners = [];
 	
 	/*window相关操作*/

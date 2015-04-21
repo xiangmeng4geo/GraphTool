@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" type="text/css" href="css/reset.css">
+		<link rel="stylesheet" type="text/css" href="css/p_m_confproduct.css">
+		<title></title>
+	</head>
+	<body>
+		<div id="main">
+			<div id="c_top">
+				<ul>
+					<li class="on">文件选定</li>
+					<li>输入输出设置</li>
+					<li>标题设置</li>
+					<li>图例设置</li>
+					<li>其它设置</li>
+				</ul>
+			</div>
+			<div id="c_bottom">
+				<fieldset class="on" id="fieldset_file_select">
+					<legend>文件选定</legend>
+					<div class="row">
+						<label>开始时间</label><input type="date" value="2014-10-21" disabled id="date_start"/>
+					</div>
+					<div class="row">
+						<label>结束时间</label><input type="date" value="2014-10-21" disabled id="date_end"/>
+					</div>
+					<div class="row">
+						<input type="checkbox" id="cb_is_newest" checked/><label for="cb_is_newest">最新时间</label>
+						<label class="label_newest_days">之前天数</label>
+						<input type="number" value="1" min=1 id="number_newest_days"/>
+					</div>
+				</fieldset>
+				<fieldset>
+				    <legend>输入输出设置</legend>
+				    <div>
+				    	<div class="mt10 p_bottom10">
+				    		数据目录：
+					    	<div class="file_directory">
+					    		<input type="file" nwdirectory class="file_dir_nw"/>
+					    		<div>
+						    		<input type="text" class="text_file_dir" id="text_file_dir_in"/>
+						    		<input type="button" value="浏览" class="file_dir"/>
+					    		</div>
+					    	</div>
+					    </div>
+					    <fieldset id="fieldset_file_rule" class="bd_bottom">
+				    		<legend>文件名</legend>
+				    		<ul>
+				    			<li>
+				    				<div class="file_rule_prefix">
+				    					<input type="radio" checked name="file_rule" id="radio_file_rule_common" value="1"/>
+				    					<label for="radio_file_rule_common">普通规则</label>
+				    				</div>
+				    				<div id="file_rule_1">
+								    	<input type="text" value="" id="text_file_rule_common_prefix"/>
+								    	<select id="select_file_rule_common_date">
+								    	</select>
+								    	<input type="text" value="" id="text_file_rule_common_postfix"/>
+								    	<span>.</span>
+								    	<select id="select_file_rule_common_postfix">
+								    	</select>
+								    </div>
+				    			</li>
+				    			<li>
+				    				<div class="file_rule_prefix">
+				    					<input type="radio" name="file_rule" id="radio_file_rule_custom" value="2"/>
+				    					<label for="radio_file_rule_custom">自定义规则</label>
+				    				</div>
+				    				<div id="file_rule_2">
+								    	<input type="text" id="text_file_rule_custom"/>
+								    </div>
+				    			</li>
+				    		</ul>
+				    	</fieldset>
+					    <div id="file_rule_example">
+					    	文件名样例:  <span></span>
+					    </div>
+					    <div class="mt10 row_h">
+				    		输出目录：
+					    	<div class="file_directory">
+					    		<input type="file" nwdirectory class="file_dir_nw"/>
+					    		<div>
+						    		<input type="text" class="text_file_dir" id="text_file_dir_out"/>
+						    		<input type="button" value="浏览" class="file_dir"/>
+					    		</div>
+					    	</div>
+					    </div>
+					    <div class="mt10 row_h">
+					    	输出文件名:
+					    	<input type="text" id="text_out_filename" placeholder=""/>
+					    	<span></span>
+					    </div>
+					    <div class="mt10 row_h">
+					    	数据类型：
+					    	<select id="select_file_type">
+							</select>
+							小时
+							<select id="select_file_hour">
+							</select>
+					    </div>
+					    <div class="mt10 row_h">
+					    	数据列值：
+					    	<select id="select_value_col"></select>
+					    </div>
+				    </div>
+				</fieldset>
+				<fieldset id="fieldset_title">
+					<legend>标题设置</legend>
+					<div>
+						<input type="checkbox" checked id="cb_title_1"/>
+						<label>主标题</label>
+						<textarea id="textarea_title_1" style="font-size: 40px;line-height:40px;font-weight: bold;">示意图</textarea>
+						<input type="button" value="设置样式"/>
+					</div>
+					<div>
+						<input type="checkbox" checked id="cb_title_2"/>
+						<label>副标题</label>
+						<textarea id="textarea_title_2" style="font-size: 30px;line-height:30px;font-weight: bold;">MM月dd日hh时-dd日hh时</textarea>
+						<input type="button" value="设置样式"/>
+					</div>
+					<div>
+						<input type="checkbox" checked id="cb_title_3"/>
+						<label>三级标题</label>
+						<textarea id="textarea_title_3" style="font-size: 24px;line-height:24px;font-weight: bold;">MM月dd日hh时发布</textarea>
+						<input type="button" value="设置样式"/>
+					</div>
+				</fieldset>
+				<fieldset id="fieldset_legend">
+					<legend>图例设置</legend>
+					<div class="legend_left">
+						<fieldset class="admin">
+							<legend>添加新的配色方案</legend>
+							<select id="select_legent_product" class="mt10">
+							</select>
+							<input type="button" value="添加" id="btn_add_new_legend"/>
+						</fieldset>
+					</div>
+					<div class="legend_right">
+						<fieldset>
+							<legend>其它设置</legend>
+							<label>单位</label>
+							<select id="select_legend_unit" class="mt10"></select>
+							<br/>
+							<input type="checkbox" checked id="cb_is_show_legend" class="mt10"/>图例显示<br/>
+							<input type="checkbox" checked id="cb_is_show_unit" class="mt10"/>单位显示<br/>
+							<input type="checkbox" id="cb_is_reverse" class="mt10"/>倒序显示<br/>
+							<input type="checkbox" checked id="cb_is_updown" class="mt10"/>上下显示
+						</fieldset>
+
+						<div class="btns_legend_colors">
+							<input type="button" value="导入配色方案" id="bt_import_colors"/>
+							<input type="button" value="导出配色方案" id="bt_export_colors" class="mt10"/>
+						</div>
+					</div>
+					
+				</fieldset>
+				<fieldset id="other_setting">
+					<legend>其它设置</legend>
+					<div class="mt10 row_h">
+						<label>Logo图片</label>
+						<div class="file_directory">
+				    		<input type="file" class="file_dir_nw" accept=".jpg,.png,.bmp"/>
+				    		<div>
+					    		<input type="text" class="text_file_dir" id="text_file_logo"/>
+					    		<input type="button" value="浏览" class="file_dir"/>
+				    		</div>
+				    	</div>
+			    	</div>
+			    	<div class="mt10 row_h">
+						<input type="checkbox" id="cb_use_bgcolor"/>
+						<label for="cb_use_bgcolor">背景颜色</label>
+						<input type="color" id="color_bg" value="#ffffff"/>
+					</div>
+					<div class="mt10 row_h">
+						<input type="checkbox" id="cb_use_bgimg"/>
+						<label for="cb_use_bgimg">背景图片</label>
+						<div class="file_directory" style="width: 603px;">
+				    		<input type="file" class="file_dir_nw" accept=".jpg,.png,.bmp"/>
+				    		<div>
+					    		<input type="text" class="text_file_dir" id="text_file_bgimg" style="width: 545px;"/>
+					    		<input type="button" value="浏览" class="file_dir"/>
+				    		</div>
+				    	</div>
+					</div>
+					<div class="mt10 row_h">
+						<input type="checkbox" id="cb_interpolation_all"/>
+						<label for="cb_interpolation_all" title="只有3类数据会进行插值" style="width:150px;cursor:help">是否进地全部插值</label>
+					</div>
+				</fieldset>
+			</div>
+			<div class="btns">
+				<input type="button" value="取消" id="btn_cancel" class="big"/>
+				<input type="button" value="保存" id="btn_save" class="big"/>
+			</div>
+		</div>
+		<script type="text/javascript" src="./js/libs/j.js"></script>
+		<script type="text/javascript" src="./js/core.js"></script>
+		<script type="text/javascript" src="./js/p_m_confproduct.js"></script>
+	</body>
+</html>
