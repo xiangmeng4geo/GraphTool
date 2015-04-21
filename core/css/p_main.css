@@ -339,6 +339,11 @@
 #tree .bbit-tree-node .bbit-tree-node-over{
 	background-color: rgba(40, 40, 40, 0.3);
 }
+/*#tree .bbit-tree-arrows .bbit-tree-elbow-end-minus,*/
+#tree .bbit-tree-arrows .bbit-tree-elbow-end-minus{
+	background-position: -16px 3px;
+}
+#tree .bbit-tree-arrows .bbit-tree-elbow-plus,
 #tree .bbit-tree-arrows .bbit-tree-elbow-end-plus{
 	background-position: 0 3px;
 }
