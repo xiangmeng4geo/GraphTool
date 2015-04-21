@@ -70,11 +70,11 @@ var TYPE_NATION = 1,
 	TYPE_PROVINCE_NODE = 3;
 function format(file_path){
 	var data_file_path = file_path+'.data.json';
-	if(fs.existsSync(data_file_path)){
-		var data = require(data_file_path);
-		parseData(data, file_path);
-		return;
-	}
+	// if(fs.existsSync(data_file_path)){
+	// 	var data = require(data_file_path);
+	// 	parseData(data, file_path);
+	// 	return;
+	// }
 	fs.readFile(file_path, {
 		encoding: 'utf8'
 	}, function(err, data){
@@ -89,6 +89,7 @@ function format(file_path){
 				// 保证全部逆时针
 				if(area > 0){
 					item.reverse();
+					console.log('reverse');
 				}
 				item.area = Math.abs(area);
 				arr.push(item);

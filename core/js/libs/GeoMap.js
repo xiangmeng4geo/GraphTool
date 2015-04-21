@@ -8,6 +8,7 @@ define('GeoMap',['zrender',
 	'zrender/shape/Rectangle',
 	'zrender/tool/area'],function(Zrender, Base, Polygon, BrokenLine, util, TextShape, ImageShape, Rectangle, util_area){
 
+	var COLOR_TRANSPARENT = 'rgba(0,0,0,0)';
 	var Logger = Core.util.Logger,
 		Timer = Logger.Timer;
 
@@ -372,7 +373,7 @@ define('GeoMap',['zrender',
 		var layers, conf_cname;
 		if(overlays && _map && (layers = _map.layers) && (conf_cname = layers.cname)){
 			var flag = conf_cname.flag;
-			var color_cname = flag? conf_cname.color: 'rgba(0,0,0,0)';
+			var color_cname = flag? conf_cname.color: COLOR_TRANSPARENT;
 			var is_have_text = false;
 			$.each(overlays, function(i, v){
 				var shape = v.shape;
@@ -882,11 +883,21 @@ define('GeoMap',['zrender',
 			}
 			ctx.restore();
 
-			return TextShape.prototype.brush.call(this, ctx, isHighlight);
+			var flag = TextShape.prototype.brush.call(this, ctx, isHighlight);
+			this.drawCityFlag(ctx);
+			return flag;
 		},
-		afterBrush: function (ctx) {
-            ctx.restore();
-            
+		drawCityFlag: function (ctx) { //画城市标记
+            var style = this.style;
+            if(this.zlevel == ZINDEX_MAP_TEXT && style.color != COLOR_TRANSPARENT){
+            	ctx.save();
+            	ctx.fillStyle = '#B4312E';
+            	ctx.beginPath();
+				ctx.arc(style.x, style.y, 2, 0, Math.PI*2, true);
+				ctx.closePath();
+				ctx.fill();
+				ctx.restore();
+            }
         }
 	}
 	util.inherits(GeoMapText, TextShape);
@@ -1063,7 +1074,7 @@ define('GeoMap',['zrender',
 				brushType : 'both',
 		        lineWidth : 1,
 		        strokeColor : '#3D534E',
-		        color: 'rgba(0,0,0,0)',
+		        color: COLOR_TRANSPARENT,
 		        textColor: 'black',
 		        textFont: '12px "Microsoft Yahei"',
 		        textPosition : 'inside'// default top
@@ -1285,6 +1296,40 @@ define('GeoMap',['zrender',
 		ctx_pattern.closePath();
 
 		var pat = ctx_pattern.createPattern(canvas_pattern,options.repeat);
+		return pat;
+	}
+	GeoMap.Pattern.listence = function(options){
+		var w = 100, h = 100,
+			font = '16px "Microsoft Yahei"',
+			text = '蓝π蚂蚁',
+			color = '#000000';
+
+		if(options){
+			w = options.width || w;
+			h = options.width || h;
+			font = options.font || font;
+			text = options.text || text;
+			color = options.color || color;
+		}
+		var h2 = h/2, w2 = w/2;
+
+		
+		var canvas_pattern = document.createElement('canvas');
+		document.body.appendChild(canvas_pattern);
+		canvas_pattern.setAttribute('width', w);
+		canvas_pattern.setAttribute('height', h);
+
+		var ctx_pattern = canvas_pattern.getContext('2d');
+		ctx_pattern.translate(w2, h2);
+		ctx_pattern.rotate(-Math.PI/4);
+		ctx_pattern.translate(-w2, -h2);
+		ctx_pattern.font = font;
+		ctx_pattern.textBaseline = 'middle';
+		ctx_pattern.textAlign = 'center';
+		ctx_pattern.fillStyle = color;
+		ctx_pattern.fillText(text, w2, h2);
+
+		var pat = ctx_pattern.createPattern(canvas_pattern, 'repeat');
 		return pat;
 	}
 	return GeoMap
