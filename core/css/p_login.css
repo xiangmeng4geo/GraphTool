@@ -68,3 +68,9 @@ input[type=checkbox]{
 #cb_autologin{
 	margin-left: 82px;
 }
+
+.btn_close{
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}

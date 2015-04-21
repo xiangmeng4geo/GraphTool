@@ -261,3 +261,14 @@ ul,ol{
 	background-repeat: no-repeat;
 	background-position: center center;
 }
+/*no frame {*/
+.no_frame .btn_close{
+	width: 10px;
+	height: 10px;
+	background: url(../img/btn_close.png) no-repeat center 0;
+	cursor: pointer;
+}
+.no_frame .btn_close:hover{
+	background-position: center -20px;
+}
+/*no frame }*/

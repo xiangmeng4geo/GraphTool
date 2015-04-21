@@ -3,10 +3,13 @@ Core.safe(function(){
 	var conf = core.conf;
 	var util = core.util,
 		Store = Core.Store;
-
+	// Core.Window.get().showDevTools();	
 	var coreWindow = Core.Window;
 	var win = coreWindow.get();
 
+	var _frame = Core.frame;
+	_frame.move($('.top'));
+	$('.btn_close').on('click', _frame.close);
 	// /*测试 ｛*/
 	// win.close();
 	// return Core.Page.confProduct();

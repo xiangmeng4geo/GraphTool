@@ -3,7 +3,12 @@
 	var nwCore = Core.require('core'),
 		nwConf = nwCore.conf,
 		Page = Core.Page;
-
+Core.Window.get().showDevTools();	
+	var _frame = Core.frame;
+	$('.btn_min').click(_frame.minimize);
+	$('.btn_max').click(_frame.maximize);
+	$('.btn_close').click(_frame.close);
+	_frame.move($('.top_container'));
 	var ConfUser = Core.Lib.conf.User;
 		
 	var CoreWindow = Core.Window;

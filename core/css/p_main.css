@@ -377,7 +377,7 @@
 	border-radius: 30px;
 }
 .top_right{
-	margin-right: 100px;
+	margin-right: 20px;
 	padding-top: 10px;
 }
 #user_name{
@@ -434,4 +434,22 @@
 }
 #slide_down li:hover{
 	color: #ff8c4d;
+}
+
+.btn_max,
+.btn_min{
+	width: 10px;
+	height: 10px;
+	background-position: center center;
+	margin-right: 10px;
+	cursor: pointer;
+}
+.btn_max{
+	background-image: url(../img/btn_max.png);
+}
+.btn_min{
+	background-image: url(../img/btn_min.png);
+}
+.no_frame{
+	margin-left: 60px;
 }

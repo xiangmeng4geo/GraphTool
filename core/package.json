@@ -4,6 +4,7 @@
   "description": "智慧气象服务产品生成系统",
   "main": "login.html",
   "window": {
+    "frame": false,
     "position": "center",
     "width": 400,
     "height": 310,
