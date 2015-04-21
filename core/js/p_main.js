@@ -327,8 +327,7 @@
 			}
 		});
 	}();
-	$('#btn_listence').click(function(){
-		Page.listence();
-	});
+	$('#btn_listence').click(Page.listence);
+	$('#btn_about').click(Page.about);
 	Page.inited();
 }();

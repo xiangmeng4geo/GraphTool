@@ -250,3 +250,14 @@ ul,ol{
 	margin-right: 2px;
 }
 /* } 图例 */
+
+.logo_normal{
+	background-image: url(../img/logo.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+.logo_black{
+	background-image: url(../img/logo_black.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+}

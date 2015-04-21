@@ -241,7 +241,9 @@
 		}
 	}();
 	
-	var conf_gui_window = gui.App.manifest.window;
+	var manifest = gui.App.manifest;
+	var conf_gui_window = manifest.window;
+	Core.appInfo = manifest;
 	/*按指定文件加载页面*/
 	function _open(page_name){
 		var win = Window.open('./'+page_name+'.html',$.extend({},conf_gui_window,conf.get('view_'+page_name)));
@@ -312,6 +314,9 @@
 		},
 		listence: function(callback){
 			return _open_only_win('m_listence',callback);
+		},
+		about: function(callback){
+			return _open_only_win('m_about',callback);
 		}
 	}
 	var message_listeners = [];

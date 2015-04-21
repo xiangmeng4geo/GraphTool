@@ -1,6 +1,6 @@
 Core.safe(function(){
 	var close = Core.Window.close;
-	Core.Window.get().showDevTools();
+	// Core.Window.get().showDevTools();
 	$('#btn_cancel').click(close);
 	var $text_listence = $('#text_listence').focus();
 	$('#btn_save').click(function(){
