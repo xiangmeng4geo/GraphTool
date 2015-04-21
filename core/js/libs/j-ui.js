@@ -16579,6 +16579,6 @@ var tooltip = $.widget( "ui.tooltip", {
 
 
 var src = $('script').last().attr('src');
-Core.Html.addLink(Core.Path.resolve('../../css/jquery/ui-1.11.2.css',src));
+Core.Html.addLink(Core.Path.resolve('../../css/j/ui-1.11.2.css',src));
 
 }));

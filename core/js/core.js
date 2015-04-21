@@ -1,5 +1,8 @@
 !function(global){
 	var nwrequire = global.require;
+	var ext = this.global.require.extensions;
+	ext['.gts'] = ext['.js'];
+	
 	var Core = {};
 	Core.require = nwrequire;
 	Core.Lib = nwrequire('core');

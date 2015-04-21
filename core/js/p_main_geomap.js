@@ -104,8 +104,8 @@ Core.safe(function(){
 		            'zrender/shape/Image': fileLocation,
 		            'zrender/shape/Text': fileLocation,
 		            'zrender/shape/Rectangle': fileLocation,
-		            'GeoMap': 'js/libs/GeoMap',
-		            'LegendImage': 'js/libs/LegendImage'
+		            'GeoMap': './js/libs/GeoMap',
+		            'LegendImage': './js/libs/LegendImage'
 		        }
 		    });
 		// }
