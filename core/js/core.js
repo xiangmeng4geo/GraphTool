@@ -218,22 +218,26 @@
 					time_schedule = listence.s;
 				}
 				Store.set(l_name, time_schedule.getTime()+delay);
-				console.log(Core.safe.l, time_schedule.getTime());
+				// console.log(Core.safe.l, time_schedule.getTime(), listence);
 			}
 			setTimeout(_check, delay); //1分钟验证一次
 		}
-		setTimeout(_check, delay);
+		setTimeout(_check, 0);
 		Core.safe.update = function(listence){
+			var encrypt_listence = listence;
 			listence = _getListence(listence);
-			conf.setVerification(listence);
-			var time_schedule = Store.get(l_name);
-			if(time_schedule){
-				time_schedule = new Date(parseInt(time_schedule));
+			if(listence && listence.f){
+				conf.setVerification(encrypt_listence);
+				var time_schedule = Store.get(l_name);
+				if(time_schedule){
+					time_schedule = new Date(parseInt(time_schedule));
+				}
+				if(!time_schedule || time_schedule < listence.s){
+					time_schedule = listence.s;
+				}
+				Store.set(l_name, time_schedule.getTime());
+				return listence;
 			}
-			if(!time_schedule || time_schedule < listence.s){
-				time_schedule = listence.s;
-			}
-			Store.set(l_name, time_schedule.getTime());
 		}
 	}();
 	
@@ -305,6 +309,9 @@
 		},
 		textStyle: function(callback){
 			return _open_only_win('m_text_style',callback);
+		},
+		listence: function(callback){
+			return _open_only_win('m_listence',callback);
 		}
 	}
 	var message_listeners = [];

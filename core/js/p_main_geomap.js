@@ -953,7 +953,7 @@ console.log(img_data);
 						if(!Core.safe.l){
 							var x = Math.random()* width_geomap*0.7,
 								y = Math.random()*height_geomap*0.7;
-							var text_no_authorization = '创新网络';
+							var text_no_authorization = '华风创新出品';
 							gm_export.addOverlay(new GeoMap.Text(text_no_authorization, 'font-size: 40px;color: red;left:'+x+'px;top:'+y+'px', null, {
 								textAlign: 'center'
 							}));

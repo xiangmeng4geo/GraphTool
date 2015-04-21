@@ -272,13 +272,13 @@
 	var tt;
 	$('.user_info').on('mouseenter', function(){
 		// flag_is_over = true;
-		$slide_down.slideDown();
+		$slide_down.stop().slideDown();
 		$btn_slide.addClass('open');
 	}).on('mouseleave', function(){
 		clearTimeout(tt);
 		tt = setTimeout(function(){console.log(12);
 			if(!flag_is_over){
-				$slide_down.slideUp();
+				$slide_down.stop().slideUp();
 				$btn_slide.removeClass('open');
 			}
 		}, 50);
@@ -327,6 +327,8 @@
 			}
 		});
 	}();
-	
+	$('#btn_listence').click(function(){
+		Page.listence();
+	});
 	Page.inited();
 }();

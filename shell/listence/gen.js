@@ -22,7 +22,7 @@ var args = [].slice.call(process.argv);
 //命令行进行指定文件压缩
 if(args.length >= 2){
 	var time_start = args[2] || '2015-03-17',
-		time_end = args[3] || '2015-04-20';
+		time_end = args[3] || '2015-05-21';
 	fs.appendFileSync(path.join(__dirname, './listence.txt'), gen(time_start, time_end, true));
 }
 
