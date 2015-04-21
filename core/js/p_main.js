@@ -20,13 +20,13 @@
 	var Tree = (function(){
 		var tree_data = ConfUser.getTree();
 		
-		function createNode(data,prefix){
+		function createNode(data, prefix){
 			if(prefix != undefined){
 				prefix += '_';
 			}else{
 				prefix = '';
 			}
-			prefix != undefined|| (prefix = 'r');
+			var isexpand = prefix.split('_').length < 2;
 			var arr = [];
 			$.each(data,function(i,v){
 				var id = prefix+i;
@@ -36,7 +36,7 @@
 				    "text" : v.name,
 				    "showcheck" : false,
 				    "complete" : true,
-				    "isexpand" : false,
+				    "isexpand" : isexpand,
 				    "checkstate" : 0,
 				    "hasChildren" : is_hasChildren
 				};
