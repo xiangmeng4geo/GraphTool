@@ -883,7 +883,11 @@ define('GeoMap',['zrender',
 			ctx.restore();
 
 			return TextShape.prototype.brush.call(this, ctx, isHighlight);
-		}
+		},
+		afterBrush: function (ctx) {
+            ctx.restore();
+            
+        }
 	}
 	util.inherits(GeoMapText, TextShape);
 
