@@ -317,6 +317,10 @@
 		},
 		about: function(callback){
 			return _open_only_win('m_about',callback);
+		},
+		doc: function(){
+			var doc_path = Core.Lib.util.file.path.doc;
+			gui.Shell.openItem(doc_path);
 		}
 	}
 	var message_listeners = [];
