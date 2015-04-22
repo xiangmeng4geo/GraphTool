@@ -1,5 +1,6 @@
 {
 	"width": 320,
 	"height": 250,
-	"show": true
+	"show": true,
+    "frame": true
 }

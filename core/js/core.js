@@ -12,39 +12,6 @@
 		Window = gui.Window,
 		win = Window.get();
 	win.focus();
-	!function(){
-		// 对入口做验证，防止直接改配置文件进行子模块
-		var tt_check;
-		var href = location.href;
-		function _isLogin(url){
-			return /login\.\w+$/.test(url);
-		}
-		function _isMain(url){
-			return /main\.\w+$/.test(url);
-		}
-		if(!_isLogin(href)){
-			var _from;
-			function _check(){
-				if(_isMain(href)){
-					if(!_isLogin(_from)){
-						Core.Page.logout();
-					}
-				}else{
-					alert('您的操作不合法！');
-					CoreWindow.close();
-				}
-			}
-			tt_check = setTimeout(function(){
-				_check();
-			}, 1000);
-			win.on('_from_', function(data){
-				_from = data;
-				clearTimeout(tt_check);
-				_check();
-			});
-			win.emit('_getF_');
-		}
-	}();
 	/*常量*/
 	Core.Const = conf.get('const');
 	Core.Const.Event = {
@@ -430,6 +397,42 @@
 	});
 	Core.Window = CoreWindow;
 
+
+	!function(){
+		// 对入口做验证，防止直接改配置文件进行子模块
+		var tt_check;
+		var href = location.href;
+		function _isLogin(url){
+			return /login\.\w+$/.test(url);
+		}
+		function _isMain(url){
+			return /main\.\w+$/.test(url);
+		}
+		if(!_isLogin(href)){
+			var _from;
+			function _check(type){
+				if(_isMain(href)){
+					if(!_isLogin(_from)){
+						Core.Page.logout();
+					}
+				}else{
+					if(!_isMain(_from)){
+						alert('您的操作不合法！');
+						CoreWindow.close();
+					}
+				}
+			}
+			tt_check = setTimeout(function(){
+				_check();
+			}, 1000);
+			win.on('_from_', function(data){
+				_from = data;
+				clearTimeout(tt_check);
+				_check();
+			});
+			win.emit('_getF_');
+		}
+	}();
 	/*颜色转换*/
 	!function(){
 		var REG_RGB = /rgb\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)/;
