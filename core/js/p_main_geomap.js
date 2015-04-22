@@ -369,7 +369,7 @@ Core.safe(function(){
 								strokeColor : color_symbols[v.code],
 								lineWidth : 2,
 							},
-							zlevel: 10
+							// zlevel: GeoMap.ZLEVEL.NOCLIP
 						}, option);
 						gm.addOverlay(polyline);   //增加折线
 					});
