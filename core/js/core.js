@@ -12,7 +12,39 @@
 		Window = gui.Window,
 		win = Window.get();
 	win.focus();
-
+	!function(){
+		// 对入口做验证，防止直接改配置文件进行子模块
+		var tt_check;
+		var href = location.href;
+		function _isLogin(url){
+			return /login\.\w+$/.test(url);
+		}
+		function _isMain(url){
+			return /main\.\w+$/.test(url);
+		}
+		if(!_isLogin(href)){
+			var _from;
+			function _check(){
+				if(_isMain(href)){
+					if(!_isLogin(_from)){
+						Core.Page.logout();
+					}
+				}else{
+					alert('您的操作不合法！');
+					CoreWindow.close();
+				}
+			}
+			tt_check = setTimeout(function(){
+				_check();
+			}, 1000);
+			win.on('_from_', function(data){
+				_from = data;
+				clearTimeout(tt_check);
+				_check();
+			});
+			win.emit('_getF_');
+		}
+	}();
 	/*常量*/
 	Core.Const = conf.get('const');
 	Core.Const.Event = {
@@ -249,7 +281,11 @@
 	Core.appInfo = manifest;
 	/*按指定文件加载页面*/
 	function _open(page_name){
+
 		var win = Window.open('./'+page_name+'.html',$.extend({},conf_gui_window,conf.get('view_'+page_name)));
+		// win.on('document-start', function(){
+			// win.window.from = 'test';
+		// });
 		win.on('close',function(){
 			win.emit('beforeclose');
 			win.removeAllListeners();
@@ -260,15 +296,15 @@
 	/*保证只打开一个相同名的窗体*/
 	var _open_only_win = (function (){
 		var _win_cache = {};
-		return function(name,callback){
-			var _win = _win_cache[name];
+		return function(name, callback){
+			var _win = null;//_win_cache[name];
 			if(_win){
 				_win.focus_flag = true;
 				_win.focus();
 			}else{
 				_win = _open(name);
 				if(callback){
-					_win.on('loaded',function(e){
+					_win.on('loaded',function(e){console.log('loaded');
 						callback.call(_win,e);
 					});
 					_win.on('focus',function(){
@@ -284,9 +320,12 @@
 					_win.removeAllListeners();
 					_win = null;
 				});
-				
+				_win.once('_getF_', function(){
+					_win.emit('_from_', location.href);
+				});
 				_win_cache[name] = _win;
 			}
+						
 			return _win;
 		}
 	})();

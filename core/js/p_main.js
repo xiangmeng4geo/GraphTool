@@ -3,7 +3,7 @@
 	var nwCore = Core.require('core'),
 		nwConf = nwCore.conf,
 		Page = Core.Page;
-Core.Window.get().showDevTools();	
+// Core.Window.get().showDevTools();	
 	var _frame = Core.frame;
 	$('.btn_min').click(_frame.minimize);
 	$('.btn_max').click(_frame.maximize);

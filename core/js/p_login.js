@@ -1,4 +1,5 @@
 Core.safe(function(){
+	sessionStorage.setItem('test', 123);
 	var core = require('core');
 	var conf = core.conf;
 	var util = core.util,
@@ -65,9 +66,10 @@ Core.safe(function(){
 			var min_init_time = 2000;
 			(true_fn || function(){})();
 			var win_index = Core.Page.main();
+			win_index.name = 'test';
 			var fn_inited = function(){
 				var init_time = (new Date()-start_time)/1000;
-				win_index.removeAllListeners();
+				// win_index.removeAllListeners();
 				setTimeout(function(){
 					win_index.show();
 					win_index.focus();
