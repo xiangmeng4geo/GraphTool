@@ -13,7 +13,8 @@ define('GeoMap',['zrender',
 
 	var ZINDEX_MAP = 2,
 		ZINDEX_LAYER = 1,
-		ZINDEX_NO_CLIP = 3;
+		ZINDEX_NO_CLIP = 3,
+		ZINDEX_MAP_TEXT = 4;
 
 	// retina 屏幕优化
     var devicePixelRatio = window.devicePixelRatio || 1;
@@ -419,7 +420,7 @@ define('GeoMap',['zrender',
 							x: -5,
 							y: -5
 						}),
-						zlevel: ZINDEX_NO_CLIP,
+						zlevel: ZINDEX_MAP_TEXT,
 						textAlign: 'center'
 					}));
 				}
@@ -497,7 +498,8 @@ define('GeoMap',['zrender',
 		var temp_layer;
 		while(temp_layer = overlays.shift()){
 			var shape = temp_layer.shape;
-			if(shape.zlevel == ZINDEX_LAYER){
+			var zlevel = shape.zlevel;
+			if(zlevel == ZINDEX_LAYER || zlevel == ZINDEX_NO_CLIP){
 				canvas.delShape(shape.id);
 			}else{
 				new_overlays.push(temp_layer);
