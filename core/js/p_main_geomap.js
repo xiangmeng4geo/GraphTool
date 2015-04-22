@@ -921,7 +921,6 @@ Core.safe(function(){
 					var save_file_name = $(this).val();
 					Loading.show(function(){
 						var img_data = gm.toDataURL();
-console.log(img_data);
 						var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+width_geomap+'px; height: '+height_geomap+'px"></div>').appendTo($('body'));
 						
 						var gm_export = new GeoMap({
