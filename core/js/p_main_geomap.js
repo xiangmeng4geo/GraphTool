@@ -128,6 +128,7 @@ Core.safe(function(){
 		            'zrender/shape/Image': fileLocation,
 		            'zrender/shape/Text': fileLocation,
 		            'zrender/shape/Rectangle': fileLocation,
+		            'zrender/shape/Circle': fileLocation,
 		            'zrender/shape/Ellipse': fileLocation,
 		            'GeoMap': './js/libs/GeoMap',
 		            'BoxShape': './js/libs/BoxShape',
@@ -600,6 +601,19 @@ Core.safe(function(){
 				},
 				onafteraddoverlays: function(){
 					gm.refresh();
+					// if(!this.flag){
+					// 	this.flag = true;
+					// 	$.getJSON('../shell/geo/data-source/china_province.json.endpoint.json', function(data){
+					// 		$.each(data, function(i, v){
+					// 			gm.addOverlay(new GeoMap.Marker(v.lng, v.lat, {
+					// 				clickable: true,
+					// 				onclick: function(){
+					// 					console.log(v);
+					// 				}
+					// 			}));
+		   //          		});
+					// 	});
+					// }
 				}
 				// jsonLoader: file_util.getJson
 			});

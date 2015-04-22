@@ -6,7 +6,8 @@ define('GeoMap',['zrender',
 	'zrender/shape/Text',
 	'zrender/shape/Image',
 	'zrender/shape/Rectangle',
-	'zrender/tool/area'],function(Zrender, Base, Polygon, BrokenLine, util, TextShape, ImageShape, Rectangle, util_area){
+	'zrender/shape/Circle',
+	'zrender/tool/area'],function(Zrender, Base, Polygon, BrokenLine, util, TextShape, ImageShape, Rectangle, Circle, util_area){
 
 	var COLOR_TRANSPARENT = 'rgba(0,0,0,0)';
 	var Logger = Core.util.Logger,
@@ -269,7 +270,7 @@ define('GeoMap',['zrender',
 				_this._data.overlays = overlays;
 			}
 			_changeCnameColor.call(_this);
-			_this.reset();
+			// _this.reset();
 			callback && callback();
 		}
 	}
@@ -536,53 +537,11 @@ define('GeoMap',['zrender',
 				var cname = prop.cname,
 					cp = prop.cp;
 				if(cname && cp){
-					var offset_conf = {
-						'北京': {
-							x: 0,
-							y: -5
-						},
-						'广东': {
-							x: 0,
-							y: -20
-						},
-						'内蒙古': {
-							x: 0,
-							y: -20
-						},
-						'江苏': {
-							x: 20,
-							y: -10
-						},
-						'黑龙江': {
-							x: 0,
-							y: -10
-						},
-						'宁夏': {
-							x: 0,
-							y: 10
-						},
-						'河北': {
-							x: 10,
-							y: 0
-						},
-						'重庆': {
-							x: 10,
-							y: -5
-						},
-						'青海': {
-							x: -10,
-							y: 0
-						},
-					};
 					gm.addOverlay(new GeoMap.Text(cname, 'font-size:14px;', null, {
 						pos: {
 							x: cp[0],
 							y: cp[1]
 						},
-						offset: (offset_conf[prop.name] ||{
-							x: -5,
-							y: -5
-						}),
 						zlevel: ZINDEX_MAP_TEXT,
 						textAlign: 'center'
 					}));
@@ -902,6 +861,22 @@ define('GeoMap',['zrender',
 	}
 	util.inherits(GeoMapText, TextShape);
 
+	GeoMap.Marker = function(lng, lat, options){
+		this.point = new GeoMap.Point(lng, lat);
+		this.shape = new Circle($.extend({
+			style: {
+				color: 'rgba(0, 0, 255, 1)'
+			}
+		}, options));
+	}
+	GeoMap.Marker.prototype.draw = function(map){
+		var pixel = map.pointToOverlayPixel(this.point);
+		var style = this.shape.style;
+		style.x = pixel.x;
+		style.y = pixel.y;
+		style.r = 4;
+		return this.shape;
+	}
 	var GeoMapPolyline = function(options, special_options){
 		BrokenLine.call(this, options);
 		this.special_options = special_options;
@@ -1082,7 +1057,7 @@ define('GeoMap',['zrender',
 			zlevel: ZINDEX_LAYER,
 			needTransform: true,
 			needLocalTransform: true,
-			hoverable: false
+			// hoverable: false
 		},options));
 	}
 	function _drawPointList(map){
@@ -1225,6 +1200,7 @@ define('GeoMap',['zrender',
 				shape.style.textAlign = option.textAlign;
 			}
 		}
+		shape.map = map;
 		return shape;
 	}
 	GeoMap.Image = function(src, x, y, width, height, rotate){
