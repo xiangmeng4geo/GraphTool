@@ -594,7 +594,7 @@ Core.safe(function(){
 				container: $geomap,
 				map: _getConfMap(),
 				geo: {
-					src: './data/',
+					src: file_path.core + '/data/',
 					name: ['china']
 				},
 				onready: function(){
@@ -614,8 +614,8 @@ Core.safe(function(){
 		   //          		});
 					// 	});
 					// }
-				}
-				// jsonLoader: file_util.getJson
+				},
+				jsonLoader: file_util.getJson
 			});
 			// 绑定缩放事件及重置按钮 
 			!function(){

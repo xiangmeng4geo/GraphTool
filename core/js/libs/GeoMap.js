@@ -236,8 +236,7 @@ define('GeoMap',['zrender',
 				name = [name];
 			}
 			$.each(name, function(i, v){
-				arr_json[i] = src + '/' + v + '.'+_this.projector.name+'.json';
-				arr_json[i] = '../shell/geo/data-source/china_province.json.reback.json';
+				arr_json[i] = src + '/' + v +'.json';
 			});
 			var _canvs = _this.canvas;
 			_canvs.clear();
@@ -449,9 +448,7 @@ define('GeoMap',['zrender',
 			}	
 		});
 		// Timer.start('reset addMask');
-		gm.addMask(points_mask, {
-			'is_lnglat': false
-		});
+		_this.addMask(points_mask);
 		// Timer.end('reset addMask');
 		$.each(shapes_weather, function(i, v){
 			canvas.addShape(v);
@@ -467,12 +464,11 @@ define('GeoMap',['zrender',
 		}
 		var shapes = [];
 		var gm = this;
-		var is_not_lnglat = !options.is_lnglat;
 		var scale = options.scale || 1;
 		$.each(coordinates, function(i,v){
 			var points = [];
 			$.each(v,function(v_i,v_v){
-				points.push(new GeoMap.Point(v_v[0]/scale,v_v[1]/scale, is_not_lnglat));
+				points.push(new GeoMap.Point(v_v[0]/scale,v_v[1]/scale));
 			});
 			var polygon = new GeoMap.Polygon(points, options);
 		
@@ -511,7 +507,6 @@ define('GeoMap',['zrender',
 			data.srcSize = newss;
 		});
 		var shapes = [];
-		var is_lnglat = !data.projector;
 		var scale = data.scale;
 
 		$.each(data.features,function(i,v){
@@ -529,7 +524,6 @@ define('GeoMap',['zrender',
 					// 	// color: '#F5F3F0'
 					// },
 					zlevel: ZINDEX_MAP,
-					is_lnglat: is_lnglat,
 					scale: scale
 				}
 
@@ -567,9 +561,7 @@ define('GeoMap',['zrender',
 				points.push(v_v.shape.style.pointList);
 			});
 		});
-		gm.addMask(points, $.extend(true,{
-			'is_lnglat': false
-		},options));
+		gm.addMask(points, options);
 
 		$.isFunction(callback_after_render_geo) && callback_after_render_geo(points);
 	}
@@ -638,12 +630,8 @@ define('GeoMap',['zrender',
 	}
 	var pointToOverlayPixel = GeoMapProp.pointToOverlayPixel = function(point){
 		var _this = this;
-		var is_lnglat = point.is_lnglat;
 		var p = point;
-		point = {x: point.lng,y: point.lat};
-		if(is_lnglat){
-			point = _this.projector.project(point);
-		}
+		var point = _this.projector.project({x: point.lng,y: point.lat});
 		var data = _this._data;
 		var center = data.center;
 		var scale = data.scale;
@@ -1037,10 +1025,9 @@ define('GeoMap',['zrender',
 	}
 	util.inherits(GeoMapPolyline, BrokenLine);
 
-	GeoMap.Point = function(lng,lat,is_not_lnglat){
+	GeoMap.Point = function(lng,lat){
 		this.lng = lng;
 		this.lat = lat;
-		this.is_lnglat = !is_not_lnglat;
 	}
 	GeoMap.Polygon = function(Points,options){
 		this.points = Points;

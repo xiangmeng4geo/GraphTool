@@ -3,7 +3,7 @@ var fs = require('fs'),
 var util = require('./util');
 
 var DIS_MIN_SQUART = Math.pow(0.05, 2);
-function parseData(data, file_path){
+function parseData(data, file_path, save_path){
 	var added_point_num = total_point_num = 0;
 	var arc_arr = data.arc_arr;
 	var arc_arr_new = [];
@@ -26,7 +26,7 @@ function parseData(data, file_path){
 	});
 	data.arc_arr = arc_arr_new;
 	console.log('total_point_num = '+total_point_num, ',added_point_num = '+added_point_num);
-	reback(data, file_path);
+	reback(data, file_path, save_path);
 }
 function _get_cityname(name){
 	if(name){
@@ -34,7 +34,7 @@ function _get_cityname(name){
 	}
 }
 // 还原数据
-function reback(data, file_path){
+function reback(data, file_path, save_path){
 	var province_pos = require('./lnglat.json');
 	var reback_file_path = file_path+'.reback.json';
 
@@ -91,11 +91,14 @@ function reback(data, file_path){
 	data_new.features = features;
 	fs.writeFileSync(reback_file_path, JSON.stringify(data_new));
 	console.log('write file', reback_file_path);
+	
+	fs.writeFileSync(save_path, JSON.stringify(data_new));
+	console.log('write file', save_path);
 }
 var TYPE_NATION = 1,
 	TYPE_PROVINCE_ENDPOINT = 2,
 	TYPE_PROVINCE_NODE = 3;
-function format(file_path){
+function format(file_path, save_path){
 	var data_file_path = file_path+'.data.json';
 	// if(fs.existsSync(data_file_path)){
 	// 	var data = require(data_file_path);
@@ -358,9 +361,9 @@ function format(file_path){
 			};
 			fs.writeFileSync(data_file_path, JSON.stringify(data_parse));
 			console.log('write file', data_file_path);
-			parseData(data_parse, file_path);
+			parseData(data_parse, file_path, save_path);
 		}
 	});
 }
 
-format('./data-source/china_province.json');
+format('./data-source/china_province.json', '../../core/data/china.json');
