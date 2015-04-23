@@ -32,6 +32,9 @@ body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;}
 
     var url_river = '../data-source/river.result.json';
     var url_river = '../data-source/chian_river_Merge.jsontest1.json';
+    var url_river = './1.result.json';
+    var url_river = './RIVER22.result.json';
+    // var url_river = './3.result.json';
     $.getJSON(url_river, function(data){
         data.sort(function(a, b){
             return b.length - a.length;
@@ -40,6 +43,18 @@ body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;}
             var val = data[i];
             (function(v, delay){
                 setTimeout(function(){
+                    if(v[0].join() == v[v.length-1]){
+                        console.log('remove area');
+                        return;
+                    }
+                    // if(v.length < 30){
+                    //     console.log('remove small line');
+                    //     return;
+                    // }
+                    // if(Math.pow(v[0][0] - v[v.length-1][0], 2) + Math.pow(v[0][1] - v[v.length-1][1], 2) < 0.1){
+                    //     console.log('remove area');
+                    //     return;
+                    // }
                     var point_arr = [];
                     $.each(v, function(p_i, p_v){
                         var point = new BMap.Point(parseFloat(p_v[0]), parseFloat(p_v[1]));

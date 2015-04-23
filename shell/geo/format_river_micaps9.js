@@ -1,8 +1,13 @@
 var fs = require('fs'),
 	util = require('./util');
 var source_path = 'E:/docs/2014工作/SK替代/地图底图及数据/河流及公路/湖泊和四级以上河流';
+var source_path = 'E:/docs/2014工作/SK替代/地图底图及数据/河流及公路/长江黄河';
+var source_path = 'E:/docs/2014工作/SK替代/地图底图及数据/river/RIVER22';
+var source_path = 'E:/docs/2014工作/SK替代/地图底图及数据/river/湖泊和主要河流';
+var source_path = 'E:/docs/2014工作/SK替代/地图底图及数据/river/东北';
 
 var REG_RULE = /(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/;
+// var REG_RULE = /(\d+)\s+map\s+(\d+)\s+(\d+)\s+(\d+)/; //长江黄河
 var REG_DATA = /^(([\d.]+)\s*)+$/;
 
 fs.readFile(source_path, {
@@ -26,8 +31,11 @@ fs.readFile(source_path, {
 				// console.log(line, REG_DATA.test(line));
 				if(REG_DATA.test(line)){
 					var arr = line.split(/\s+/);
-					for(var i = 0, j = arr.length; i<j; i++){
-						current_items.push([arr[i], arr[++i]]);
+
+					if(arr.join('').replace(/0/g, '')){
+						for(var i = 0, j = arr.length; i<j; i++){
+							current_items.push([arr[i], arr[++i]]);
+						}
 					}
 				}
 			} 

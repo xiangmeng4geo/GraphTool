@@ -425,7 +425,7 @@ define('GeoMap',['zrender',
 						var polyline = new GeoMap.Polyline(point_arr, {
 							style: {
 								strokeColor : river_color,
-								lineWidth : 1,
+								lineWidth : 1.1,
 							},
 							zlevel: ZINDEX_LAYER_RIVER
 						});
@@ -571,7 +571,7 @@ define('GeoMap',['zrender',
 					zlevel: ZINDEX_MAP,
 					style: {
 						// strokeColor: '#ff0000',
-						lineWidth: 0.5,
+						lineWidth: 0.8,
 						// shadowBlur: 10,
 						// shadowColor: '#000',
 						// shadowOffsetY: 2,
@@ -583,7 +583,7 @@ define('GeoMap',['zrender',
 				var cname = prop.cname,
 					cp = prop.cp;
 				if(cname && cp){
-					gm.addOverlay(new GeoMap.Text(cname, 'font-size:14px;', null, {
+					gm.addOverlay(new GeoMap.Text(cname, 'font-size:12px;', null, {
 						pos: {
 							x: cp[0],
 							y: cp[1]
@@ -901,7 +901,7 @@ define('GeoMap',['zrender',
             	ctx.save();
             	ctx.fillStyle = '#B4312E';
             	ctx.beginPath();
-				ctx.arc(style.x, style.y, 2, 0, Math.PI*2, true);
+				ctx.arc(style.x, style.y, 1.6, 0, Math.PI*2, true);
 				ctx.closePath();
 				ctx.fill();
 				ctx.restore();
