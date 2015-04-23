@@ -25,10 +25,27 @@ Core.safe(function(){
 		icon_path = file_path.icon,
 		image_path = file_path.image;
 
+
+	var BOX_TYPE_LABELRECT = 1,//圆角矩标注
+		BOX_TYPE_ELLIPSE = 2;//椭圆
+
+	var MY_SHAPES = [{
+		src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHoAAABbCAYAAAC8qZF3AAAILUlEQVR4Xu2de0xTVxzHvRR5KC0PoRT6oCCgUApSEKqINbKJc4kxUed0y/a3M1m2xDm3aUbMEjd1Czgxm4uSRZfheIjzOXkUJghCS4HKQxDtGnQ8dDwEBAS6UxzOF4YezsUe+utfTbi/3/3+vp/Sc+89v57DzHriZTKZ7LRa7dLe3rsrHz7s9bp/v31gaKibGRi4zzWZRh2ePBbeW48Dzs6u9xwcXOy5XB/O7NlOnS4ugktRUVFXGIYZHVfJjL+prq72Hxjo3mg0VghbWnTDPT0tPdZTCiiZrAM8nognEkWbJBJFu5OTa0ZERMQtc+wYaDPkrq7bO2prz410dNR2TDYpHGe9Dnh7y3ghIW/OcXMT7jPDZsxf1+Xll7drtSclANl6weEoM8OOjNzUFhMTf4DRaDTLbt0q2lhXd+YfnGQQY90OhIau4/r7L8thCgvP7tHp0ufCmGzdwHDVmcfsyMh3u5m8vIxDJSWpMC7jOklBXFzcNi8mOzs1Wa/P6KRAL0jEdCA8fCOXSU/fe+D69T/uY+aAMAocWLAgkcukpe1MMxrLDBToBYmYDvj5LfUF0Jjm0RQmkSilAJomYphaATSmcbSFAWjaiGHqBdCYxtEWBqBpI4apF0BjGkdbGICmjRimXgCNaRxtYQCaNmKYegE0pnG0hQFo2ohh6gXQmMbRFgagaSOGqRdAYxpHWxiApo0Ypl4AjWkcbWEAmjZimHoBNKZxtIUBaNqIYeoF0JjG0RYGoGkjhqkXQGMaR1sYgKaNGKZeAI1pHG1hAJo2Yph6ATSmcbSFAWjaiGHqBdCYxtEWBqBpI4apF0BjGkdbGICmjRimXgCNaRxtYQCaNmKYegE0pnG0hY0tbQGL1dCGzXK9Y4vVZGYeTKmtzYZVAy33j5qIseWnYEE5anhhCx1bUA6WiMT2j4rAx0tEmhd9bW4ufKuh4ew9KpSDSIsceLzoKyzjbJFvVB381DLOZuWwMDtV/CYl9rmF2cejxrdaMBjKRXfuVD2EZZ0n5afVHfTSrRbG1f6/eUrrquHhBx7mzVMGB3tm4WyeYmfHYQyGkrH9HNh6oQ1DHAWCMB+28tOS99HmKTx7Ho9vb2/PbXdx8SyYcPOUZ4tCF2meo6Oj3iiSh/5m8Q45Dx50bdFojvV2dbG3CYtMtk4sEikbHBwcKmiBQlrnyMgIw+FwBoeHh3vs7OzaoqOj777oHI93ySEtoLDw4m6N5ii3r6+jj3Rucz6JZIlPYOCKmvj4xMNs5J9pOVkDnZ9/Krm8/Of+oaGuQdKmubsHeMjl60a5XN8k9AnuJp1/JuZjEXTmkdLSY20jI/3DJI3jcObYKxSbxR4eQfuUSmUdydwzOReLoHPSiouTDaTNW7BgjVQqjc1QKlXnSeeeyflYAd3U1ORoNFZ/X1x86DZJ80SiGHFwcIJ5XD5IMq8t5GIFdFlZGa+727C/rOyHO6RMdHUVu0ZEbHAWCIJ3hYSEwONaC41lBXRlZaVXS0vltzrdiWYL9bzwcIbh2CkU74l8fMJS0P1hDYmctpaDFdDoKZuoubl0j16f/hcJQwMDEwPQuJwdF7fyNIl8tpiDFdB6vX7+jRtFO2pqMqf81e3ru8g3OHjVTZVqzTe2CIhUzayALi8vlxmNpVtra09NaYc8NC5z5fL1Huh++fOYmJhWUkXbYh5WQKPHp4rGxosfNjXlTelZd0TE21KxePEhNC5rbREOyZpZAY0uxpbo9dlbDYZi7IuxoKAEv4AA1TmlcnkWyYJtNRcroCsqKlZcu5b1Pu4Oed7e4QK0yXWLWl26Nykp6fH29bYKiUTdrIDWarWJaKviDbdvV7RYKnLuXK+56BEnf968+bvQTuYWx1t6Pls5nhXQZWV/bqiuznqttbX6b0uNlMs3BkgksYfRZMVVS2Ph+IkdYAV0QUHOBw0NuaEdHbUWXXWjMVkslS4vio9POA7QyDrACmi1+uxH6GLMv7Pz5qR/GMDnh/GDg1d3CgT+e2Qy2RDZMiEbK6CLis5/Wll5gt/Tc6dnMhY7O7s7RUZu4fN4kq9iY2OndEs2mfPZ4jGsgLa0uyQsbL2fn9+SY2hcLrZFCNNRMyugc3OzUjWa492T6S6RSuOEUukyjUr1xpHpKNhWz8EK6Ly8rJ+uXPmx1WQaeml3CeoS8QwNXTvo6Sn5Et1KsdJbZqtgn62bOGjUMswUFJw+irpLXjpz5ejIdVi0aLOPu/v8r9G43AhA2HWAOGi1Wu00MtKVUlKS8tKZq5CQtWKJJOo31BJ0id0SIbvZAeKg0YSGa3t743cVFUeME1kMrbrT/+EjDho1HfDRz3r2V1X9cvNF5bi5+bujVl30qwLhF9CqO33AiYNGc9HitjZdUmXlr8/9Rz9q1d0kFgjk+xQKBbTqTh9n8l/daEIj0GC48gmavXpujEZPvqQSSUwmagk6N401wqnYGKOrqqpkTU1FW+vqnu4uEQoXi4KCXr+mUq1KAeen3wHiX93m7pKGhgvbm5vzr4+X4+Ymdg0P3+DM5Qp3T/QjsOkv3bbOSBz0s90lJhPHLirqHRGfLzuI7perbcte66mWOGidTreiqioddZdcNZjLDApKDAgIiMtGLUHQqvsKuRMHja66V9fUZKw3d5cIBOG+CxeuhlbdVwh4/NTEQV++nLulvv5MfH9/R59cvmmeQBD0GZpfhlbdVwybOGi1Omdbff2FEJEoeo5QqEiFVt1XTPi/0xMHXVDw+8ednbeWCoWRJ9G4nGkdZYIK4qBLSvKT0QzWUFxcwk6GYaBV10o+Y/8C/leqVR1s3NQAAAAASUVORK5CYII=',
+		text: '圆角矩标注',
+		type: BOX_TYPE_LABELRECT
+	},{
+		src: 'data:image/png;base64,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',
+		text: '椭圆',
+		type: BOX_TYPE_ELLIPSE
+	}];
+
 	var conf_of_product; // 用于缓存已经加载的当前产品配置
 	var data_of_micaps; // 用于缓存加载的micaps数据
 	var conf_export; //保存导出图片设置
 
+	var $body = $('body'),
+		$doc = $(document);
+	var COLOR_TRANSPANT = 'rgba(0,0,0,0)';
 	var $geomap = $('#geomap');
 	var $geomap_container = $('#geomap_container');
 	var $geomap_layer = $geomap_container;//$('#geomap_layer');
@@ -40,7 +57,7 @@ Core.safe(function(){
 		height_geomap = $geomap.height();
 	// 替换标题里的时间
 	function _replace_date(text, is_use_publish_time){
-		if(!conf_of_product || !data_of_micaps){
+		if(!conf_of_product || !data_of_micaps || !text){
 			return text;
 		}
 		var file_rule = conf_of_product.in_out.file_rule,
@@ -76,8 +93,8 @@ Core.safe(function(){
 		}
 	})();
 	
-	var $doc = $(document);
 	var $current_text; // 用于操作当前编辑的文字对象
+	var on_receive_style; //全局得到样式后的回调
 	var _cache_e_contextmenu; // 用于缓存contextmenu事件对象
 	var is_img = Core.util.isImg;
 	// 引入amd模块加载器	
@@ -111,7 +128,10 @@ Core.safe(function(){
 		            'zrender/shape/Image': fileLocation,
 		            'zrender/shape/Text': fileLocation,
 		            'zrender/shape/Rectangle': fileLocation,
+		            'zrender/shape/Circle': fileLocation,
+		            'zrender/shape/Ellipse': fileLocation,
 		            'GeoMap': './js/libs/GeoMap',
+		            'BoxShape': './js/libs/BoxShape',
 		            'LegendImage': './js/libs/LegendImage'
 		        }
 		    });
@@ -127,7 +147,9 @@ Core.safe(function(){
 			if(!$html){
 				$html = $('<div class="loading"><div>正在处理。。。</div></div>').appendTo($geomap_container);
 			}
-			$html.show(callback);
+			$html.show(function(){
+				setTimeout(callback, 0)
+			});
 		}
 		function hide(){
 			$html && $html.hide();
@@ -135,6 +157,391 @@ Core.safe(function(){
 		return {
 			show: show,
 			hide: hide
+		}
+	})();
+	
+	
+	// 地图添加的图层类
+	var MapLayer = (function(){
+		$doc.on('mousedown.maylayer', function(e){
+			// var $target = $(e.target);
+			// if(!$target.is('.map_layer') && $target.closest('.map_layer').length == 0){
+				$('.map_layer').addClass('off').trigger('edit', false);
+			// }
+		});
+		// 定义文字和图片的右键菜单	
+		var menu_layer = new Menu();
+		var menu_layer_delete = new MenuItem({label: '删除'});
+		menu_layer_delete.on('click',function(){
+			var $layer = menu_layer._layer;
+			if($layer){
+				var fn_on_delete = $layer.data('on_delete');
+				$layer.remove();
+				fn_on_delete && fn_on_delete();
+			}
+		});
+
+		/*更改各图层的z-index*/
+		function _changeZ(is_add){
+			var $layer = menu_layer._layer;
+			if($layer){
+				var pos_layer = $layer.position(),
+					left_layer = pos_layer.left,
+					top_layer = pos_layer.top,
+					width_layer = $layer.width(),
+					height_layer = $layer.height(),
+					bottom_layer = top_layer + height_layer,
+					right_layer = left_layer + width_layer,
+					zindex_layer = parseInt($layer.css('z-index')) || 0;
+
+				var zindex_max = Number.MIN_VALUE,
+					zindex_min = Number.MAX_VALUE;
+				var $layer_over = $('.map_layer').filter(function(){
+					var $this = $(this);
+					if(!$this.is($layer)){
+						var w = $this.width(),
+							h = $this.height();
+						var pos = $this.position(),
+							left = pos.left,
+							top = pos.top;
+
+						var lt_x = Math.max(left, left_layer),
+							lt_y = Math.max(top, top_layer),
+							rb_x = Math.min(left+w, right_layer),
+							rb_y = Math.min(top+h, bottom_layer);
+
+						if(lt_x < rb_x && lt_y < rb_y){
+							return $this;
+						}
+					}
+				}).each(function(){
+					var $this = $(this);
+					var zindex = parseInt($this.css('z-index')) || 0;
+					if(zindex > zindex_max){
+						zindex_max = zindex;
+					}else if(zindex < zindex_min){
+						zindex_min = zindex;
+					}
+				});
+				
+				if(zindex_max != Number.MIN_VALUE || zindex_min != Number.MAX_VALUE){
+					var to_zindex = is_add? zindex_max+1: zindex_min-1;
+					if(to_zindex < 0){
+						var zindex_abs = -to_zindex;
+						$layer_over.each(function(){
+							$(this).css('z-index', (parseInt($(this).css('z-index'))||0)+zindex_abs);
+						});
+						to_zindex = 0;
+					}
+					$layer.css('z-index', to_zindex);
+				}
+			}
+		}
+		var menu_layer_add_z = new MenuItem({label: '置于上层'});
+		menu_layer_add_z.on('click',function(){
+			_changeZ(true);
+		});
+		var menu_layer_minus_z = new MenuItem({label: '置于下层'});
+		menu_layer_minus_z.on('click',function(){
+			_changeZ(false);
+		});
+
+		menu_layer.append(menu_layer_delete);
+		menu_layer.append(new gui.MenuItem({ type: 'separator' }));
+		menu_layer.append(menu_layer_add_z);
+		menu_layer.append(menu_layer_minus_z);
+
+		function _createLayer(option){
+			var css = option.css;
+			var $html = $('<div class="map_layer off"></div>');
+			if(css){
+				if($.isPlainObject(css)){
+					$html.css(css);
+				}else{
+					$html.attr('style', css);
+				}
+			}
+			var rotate_option = option.rotate;
+			if(rotate_option){
+				$html.rotatable(rotate_option);
+			}
+			var resizable_option = option.resize,
+				draggable_option = option.drag;
+			$html.css('position','absolute').resizable($.extend({
+				handles: 'all'
+			}, resizable_option)).draggable(draggable_option).on('mousedown', function(e){
+				e.stopPropagation();
+				$(this).removeClass('off').trigger('edit', true);
+			}).on('contextmenu',function(e){
+				e.stopPropagation();
+				menu_layer._layer = $html;
+				menu_layer.popup(e.clientX, e.clientY);
+			});
+			return $html;
+		}
+		// 文字图层
+		function TextLayer(option){
+			var pos = option.position;
+			var ondblclick = option.ondblclick;
+			var $html = _createLayer({
+				css: option.style
+			});
+			$html.css(pos).addClass('map_layer_text').append('<span>'+(option.text||'')+'</span>');
+			$html.on('dblclick',function(){
+				var $this = $(this);
+				var text = $this.text(),
+					style = $this.attr('style');
+
+				var win_textstyle = Core.Page.textStyle(function(e){
+					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
+						text: text,
+						style: style
+					},win_textstyle.window);
+				});
+				on_receive_style = function(data){
+					$this.css(data.style).find('span').text(data.text);
+				};
+
+				ondblclick && ondblclick.call(this);
+			});
+
+			return $html;
+		}
+		// 图片图层
+		function ImageLayer(option, callback){
+			var pos = option.position;
+			var src = option.src;
+			if(!/^http/.test(src) && !file_util.exists(src.replace(/\?.*$/, ''))){
+				callback();
+				return;
+			}
+			var img = new Image();
+			img.onload = function(){
+				var width = this.width,
+					height = this.height;
+				var toWidth = 80,
+					toHeight = 80*height/width;
+				if(option.width && option.height){
+					toWidth = option.width;
+					toHeight = option.height;
+				}
+				if(pos.center){
+					if(!isNaN(pos.left)){
+						pos.left -= toWidth/2;
+					}
+					if(!isNaN(pos.top)){
+						pos.top -= toHeight/2;
+					}
+				}
+				var css = pos;
+				css.width = toWidth;
+				css.height = toHeight;
+				var $html = _createLayer({
+					css: css,
+					rotate: {}
+				});
+				$html.addClass('map_layer_image').append('<img src="'+option.src+'"/>');
+				
+				callback($html, {
+					width: width,
+					height: height,
+					width_show: toWidth,
+					height_show: toHeight
+				});
+			}
+			img.onerror = function(){
+				callback();
+			}
+			img.src = src;
+		}
+		var BoxShape;
+		function BoxLayer_LableRect(option, callback){
+			var text = option.text || '';
+
+			var $html = _createLayer({
+				css: {
+					left: option.x,
+					top: option.y,
+					width: option.width,
+					height: option.height
+				},
+				resize: {
+					resize: function(e, ui){
+						var pos = ui.position,
+							size = ui.size;
+						labelRect.modify({
+							x: pos.left,
+							y: pos.top,
+							width: size.width,
+							height: size.height
+						});
+						
+	                	$text.css({
+	                		width: size.width - 20,
+	                		height: size.height - 20
+	                	});
+					}
+				},
+				drag: {
+					handle: '.handle',
+					start: function(e, ui){
+						last_pos_box = ui.position;
+						var arrow = labelRect.shape.arrows[0];
+						last_pos_arrow = {
+							x: arrow.x,
+							y: arrow.y
+						}
+					},
+					drag: function(e, ui) {
+						var pos = ui.position;
+						labelRect.modify({
+							x: pos.left,
+							y: pos.top,
+							arrows: {
+								x: last_pos_arrow.x + (pos.left - last_pos_box.left),
+								y: last_pos_arrow.y + (pos.top - last_pos_box.top)
+							}
+						});
+						
+					}
+				}
+			}).on('edit', function(e, editable){
+				labelRect.setEditable(editable);
+			}).on('dblclick',function(){
+				var text = $text.text(),
+					style = $text.attr('style');
+				var bg_color = labelRect.options.color;
+				style += (style?';':'')+'background-color:'+bg_color;
+				var win_textstyle = Core.Page.textStyle(function(e){
+					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
+						text: text,
+						style: style
+					}, win_textstyle.window);
+				});
+				on_receive_style = function(conf){
+					var style = conf.style;
+					if(style){
+						var bg_color = style['background-color'];
+						if(bg_color){
+							labelRect.modify({
+								color: bg_color
+							}, true);
+						}
+						delete style['background-color']
+					}
+					
+					$text.css(style).text(conf.text);
+				}
+			}).appendTo($geomap_container);
+
+			$html.addClass('map_layer_box').append('<div class="text">'+text+'</div><div class="handle"></div>');
+
+			option && (option.container = $geomap_container, option.map_layer = $html);
+			var labelRect = new BoxShape.LabelRect(option);
+			$html.data('on_delete', function(){
+        		labelRect.destroy();
+        	});
+			var $text = $html.find('.text').css({
+        		width: option.width - 20,
+        		height: option.height - 20
+        	});
+		}
+		
+		function BoxLayer_Ellipse(option){
+			var $html = _createLayer({
+				css: {
+					left: option.x,
+					top: option.y,
+					width: option.width,
+					height: option.height
+				},
+				rotate: {},
+				resize: {
+					resize: function(e, ui){
+						var size = ui.size;
+						var w = size.width,
+							h = size.height;
+						var a = w/2,
+							b = h/2;
+
+						$text.css({
+	                		width: w - 20,
+	                		height: h - 20
+	                	});
+						shape.modify({
+							x: a,
+							y: b,
+							a: a,
+							b: b
+						});
+					}
+				}
+			}).on('dblclick',function(){
+				var text = $text.text(),
+					style = $text.attr('style');
+				var bg_color = shape.shape.style.color;
+				style += (style?';':'')+'background-color:'+bg_color;
+				var win_textstyle = Core.Page.textStyle(function(e){
+					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
+						text: text,
+						style: style
+					}, win_textstyle.window);
+				});
+				on_receive_style = function(conf){
+					var style = conf.style;
+					if(style){
+						var bg_color = style['background-color'];
+						if(bg_color){
+							shape.modify({
+								color: bg_color
+							});
+						}
+						delete style['background-color']
+					}
+					
+					$text.css(style).text(conf.text);
+				}
+			}).appendTo($geomap_container);
+
+			var text = option.text || '';
+			$html.addClass('map_layer_box').append('<div class="text">'+text+'</div>');
+
+			var $container = $('<div style="width:100%;height:100%"></div>').appendTo($html);
+			option.container = $container;
+			var shape = new BoxShape.Ellipse(option);
+
+			$html.data('on_delete', function(){
+        		shape.destroy();
+        	});
+			var $text = $html.find('.text').css({
+        		width: option.width - 20,
+        		height: option.height - 20
+        	});
+		}
+		var fn_box = {};
+		fn_box[BOX_TYPE_LABELRECT] = BoxLayer_LableRect;
+		fn_box[BOX_TYPE_ELLIPSE] = BoxLayer_Ellipse;
+		return {
+			init: function(_BoxShape){
+				BoxShape = _BoxShape;
+				// setTimeout(function(){
+				// 	BoxLayer_Ellipse({
+				// 		x: 100,
+				// 		y: 100,
+				// 		width: 100,
+				// 		height: 50
+				// 	});
+				// }, 2000);
+			},
+			text: TextLayer,
+			img: ImageLayer,
+			box: function(option){
+				var type = option.type;
+				var fn = fn_box[type];
+				if(fn){
+					fn(option);
+				}
+			}
 		}
 	})();
 	function init(is_show_mask){
@@ -157,41 +564,65 @@ Core.safe(function(){
 						}
 					});
 				}
-				if(!$current_text){
-					var pos = _cache_e_contextmenu? {
-						left: _cache_e_contextmenu.offsetX,
-						top: _cache_e_contextmenu.offsetY
-					}:{
-						left: width_geomap/2,
-						top: width_geomap/2
-					};
-					$current_text = MapLayer.text({
-						position: pos
-					}).appendTo($geomap_layer);
+				if(on_receive_style){
+					var fn = on_receive_style;
+					on_receive_style = null;
+					fn({
+						text: text,
+						style: styleObj
+					});
+					return;
 				}
-				$current_text.css(styleObj).find('span').text(text);
-				$current_text = null;
 			}
 		});
 		initing = true;
-		require(['GeoMap', 'LegendImage'],function(GeoMap, LegendImage){
-			function _getProjector(){
+		require(['GeoMap', 'LegendImage', 'BoxShape'],function(GeoMap, LegendImage, BoxShape){
+			MapLayer.init(BoxShape);
+			// function _getProjector(){
+			// 	var conf_sys = ConfUser.getSys();
+			// 	return conf_sys && conf_sys.map && conf_sys.map.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+			// }
+			// var gm_projector = _getProjector();
+
+			function _getConfMap(){
 				var conf_sys = ConfUser.getSys();
-				return conf_sys && conf_sys.projector || GeoMap.PROJECT_MERCATOR; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
+				return conf_sys && conf_sys.map;
 			}
-			var gm_projector = _getProjector();
 			window.GeoMap = GeoMap;
 			_LegendImage = LegendImage;
 			gm = new GeoMap({
 				container: $geomap,
-				projector: gm_projector,
+				map: _getConfMap(),
 				geo: {
-					src: './data/',
+					src: file_path.core + '/data/',
 					name: ['china']
 				},
 				onready: function(){
-				}
-				// jsonLoader: file_util.getJson
+				},
+				onafteraddoverlays: function(){
+					gm.refresh();
+					// if(!this.flag){
+					// 	this.flag = true;
+					// 	$.getJSON('../shell/geo/data-source/chian_river_Merge.jsontest1.json', function(data){
+					// 		$.each(data, function(i, v){
+					// 			var point_arr = [];
+					// 			$.each(v, function(v_i,v_v){
+					// 				var point = new GeoMap.Point(v_v[0], v_v[1]);
+					// 				point_arr.push(point);
+					// 			});
+					// 			var polyline = new GeoMap.Polyline(point_arr, {
+					// 				style: {
+					// 					strokeColor : '#353FC3',
+					// 					lineWidth : 1,
+					// 				},
+					// 				zlevel: GeoMap.ZLEVEL.ZINDEX_MAP
+					// 			});
+					// 			gm.addOverlay(polyline);   //增加折线
+		   //          		});
+					// 	});
+					// }
+				},
+				jsonLoader: file_util.getJson
 			});
 			// 绑定缩放事件及重置按钮 
 			!function(){
@@ -216,9 +647,25 @@ Core.safe(function(){
 				});
 			}();
 			
-			
+			function _checkBlendent(blendent){
+				var str_notice = '请先配置产品图例！';
+				var len_blendent = 0;
+				if(!blendent || (len_blendent = blendent.length) == 0){
+					return alert(str_notice);
+				}
+				// 对图例进行验证
+				for(var i = 0; i<len_blendent; i++){
+					var v = blendent[i];
+					if(!v || !v.colors){
+						return alert(str_notice);
+					}
+				}
+				return true;
+			}
 			// 根据配色方案进行地图元素初始化
 			function render_conf(data, blendent, params){
+				var len_blendent = blendent.length;
+				
 				var mapbg_color = '#ffffff';
 				try{
 					var conf_map_color = conf_of_product.other.mapbg_color;
@@ -237,32 +684,24 @@ Core.safe(function(){
 					}
 				}));
 				
-				for(var i = 0, j = blendent.length; i < j; i++){
-					var colors = blendent[i].colors;
-					for(var i_c = 0, j_c = colors.length; i_c < j_c; i_c++){
-						var range = colors[i_c].val;
-						if(range[0] === ''){
-							range[0] = Number.NEGATIVE_INFINITY;
-						}
-						if(range[1] === ''){
-							range[1] = Number.POSITIVE_INFINITY;
-						}
-					}
-				}
 				Timer.start('render micaps');
-				var isHaveManyBlendent = blendent.length > 1;
+				
+				var isHaveManyBlendent = len_blendent > 1;
 				function getColorByCondition(val, range){
 					for(var i = 0,j=range.length;i<j;i++){
 						var case_range = range[i];
-						var val_range = case_range.val;
-						if(val >= val_range[0] && val < val_range[1]){
-							return case_range.color;
+						if(case_range.is_checked){
+							var val_range = case_range.val;
+							if(val >= val_range[0] && val < val_range[1]){
+								return case_range.color;
+							}
 						}
 					}
+					return COLOR_TRANSPANT;
 				}
 				function getColor(val, code){
 					if(isHaveManyBlendent){
-						for(var i = 0,j = blendent.length;i<j;i++){
+						for(var i = 0;i<len_blendent;i++){
 							var v = blendent[i];
 							if(code == v.val.v){
 								return getColorByCondition(val, v.colors);
@@ -274,7 +713,9 @@ Core.safe(function(){
 		        // 3类里的插值结果
 				var interpolate = data.interpolate;
 				if(interpolate){
-					var COLOR_TRANSPANT = 'rgba(0,0,0,0)';
+					if(!_checkBlendent(blendent)){
+						return;
+					}
 					var _interpolate_width,
 						_interpolate_height;
 					try{
@@ -321,69 +762,69 @@ Core.safe(function(){
 				// 14类中的面
 				var areas = data.areas;
 				if(areas){
-					/*判断是不是大风降温数据 {*/
-					var _arr = [];
-					var is_bigwindcooling = false;
-					for(var i = 0, j = areas.length; i<j; i++){
-						var text = areas[i].symbols.text;
-						if(/^0[234]0/.test(text)){
-							_arr[0] = 1;
-						}else{
-							_arr[1] = 1;
+					var len = areas.length;
+					if(len > 0){
+						if(!_checkBlendent(blendent)){
+							return;
 						}
-						if(_arr[0] == 1 && _arr[1] == 1){
-							is_bigwindcooling = true;
-							break;
-						}
-					}
-					/*判断是不是大风降温数据 }*/
-					$.each(areas, function(i,v){
-						var point_arr = [];
-						$.each(v.items,function(v_i,v_v){
-							var point = new GeoMap.Point(v_v.x,v_v.y);
-							point_arr.push(point);
-						});
-						var color = 'rgba(0,0,0,0)';
-
-						var symbols = v.symbols;
-						var val_area = symbols? symbols.text : '';
-
-						// 只对大风降温数据进行处理
-						if(is_bigwindcooling){
-							if(/^0/.test(val_area)){
-								// 02、03表示沙尘；04表示大风
-								if(val_area == '040'){
-									var polyline = new GeoMap.Polyline(point_arr, {
-										style: {
-											strokeColor : '#ff0000',
-											lineWidth : 2,
-										},
-										zlevel: GeoMap.ZLEVEL.NOCLIP
-									});
-									gm.addOverlay(polyline);   //增加折线
-								}
-								return;
+						/*判断是不是大风降温数据 {*/
+						var is_bigwind = false;
+						for(var i = 0, j = areas.length; i<j; i++){
+							var text = areas[i].symbols.text;
+							if(/^040$/.test(text.trim())){
+								is_bigwind = true;
+								break;
 							}
 						}
-						color = getColor(val_area, v.code);
-						if(color){
-							if(v.code == 24){
-								// strokeColor = 'red';
-								color = new GeoMap.Pattern.Streak({
-									strokeStyle: color,
-									space: 1
-								});
-							}
-							var polygon = new GeoMap.Polygon(point_arr, {
-								style: {
-									strokeColor: color, 
-									color: color,
-									lineWidth: 0.2
-								}
+						/*判断是不是大风降温数据 }*/
+						$.each(areas, function(i,v){
+							var point_arr = [];
+							$.each(v.items,function(v_i,v_v){
+								var point = new GeoMap.Point(v_v.x,v_v.y);
+								point_arr.push(point);
 							});
-							gm.addOverlay(polygon);   //增加面
-						}
-					});
+							var color = 'rgba(0,0,0,0)';
+
+							var symbols = v.symbols;
+							var val_area = symbols? symbols.text : '';
+
+							// 只对大风降温数据进行处理
+							if(is_bigwind){
+								if(/^0/.test(val_area)){
+									// 02、03表示沙尘；04表示大风
+									if(val_area === '040'){
+										var polyline = new GeoMap.Polyline(point_arr, {
+											style: {
+												strokeColor : '#ff0000',
+												lineWidth : 2,
+											},
+											zlevel: GeoMap.ZLEVEL.NOCLIP
+										});
+										gm.addOverlay(polyline);   //增加折线
+									}
+									return;
+								}
+							}
+							color = getColor(val_area, v.code);
+							if(color){
+								if(v.code == 24){
+									// strokeColor = 'red';
+									color = new GeoMap.Pattern.Streak({
+										strokeStyle: color,
+										space: 1
+									});
+								}
+								var polygon = new GeoMap.Polygon(point_arr, {
+									style: {
+										strokeColor: color, 
+										color: color,
+										lineWidth: 0.2
+									}
+								});
+								gm.addOverlay(polygon);   //增加面
+							}
+						});
+					}
 				}
 				// 14类中的特殊线，如冷锋、暖锋
 				var line_symbols = data.line_symbols;
@@ -486,10 +927,16 @@ Core.safe(function(){
 				if(conf_title && conf_title.is_show){
 					var text = conf_title.text;
 					if(text){
+						var is_center = conf_title.center;
+						var style = conf_title.style;
+						if(is_center){
+							pos.left = 0;
+							style += 'text-align: center; width: '+width_geomap+'px;';
+						}
 						return MapLayer.text({
 							position: pos,
 							text: _replace_date(text, is_use_publish_time),
-							style: conf_title.style
+							style: style
 						}).appendTo($geomap_layer);
 					}
 				}
@@ -504,10 +951,17 @@ Core.safe(function(){
 				// if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
 				if(gm.isReady && product_name){
 					// 清空地图及样式
-					$('.map_layer').remove();
+					$('.map_layer, .map_layer_box_c').remove();
 					gm.clearLayers();
 					// $geomap_container.removeAttr('style');
-
+					// setTimeout(function(){
+						// MapLayer.box({
+						// 	x: 100,
+						// 	y: 100,
+						// 	width: 200,
+						// 	height: 100
+						// });
+					// }, 10);
 					Loading.show(function(){
 						conf_of_product = ConfUser.get(product_name);
 						if(!conf_of_product || !conf_of_product.title || !conf_of_product.legend || !conf_of_product.in_out){
@@ -728,6 +1182,7 @@ Core.safe(function(){
 										if(err){
 											alert(err.msg || '读取数据错误！');
 										}else{
+											data_of_micaps = data;
 											$html_title1 && $html_title1.find('span').text(function(){
 												return _replace_date($(this).text());
 											});
@@ -737,7 +1192,6 @@ Core.safe(function(){
 											$html_title3 && $html_title3.find('span').text(function(){
 												return _replace_date($(this).text(), true);
 											});
-											data_of_micaps = data;
 											render_conf(data_of_micaps, conf_of_product.legend.blendent, params);
 										}
 										_afterRender()
@@ -752,208 +1206,28 @@ Core.safe(function(){
 								_afterRender()
 							}
 						}
-						var new_projector = _getProjector();
+						// var new_projector = _getProjector();
 						var _template = conf_other.template;
 						var new_w = _template[0],
 							new_h = _template[1];
-						if(new_projector != gm_projector || new_w != width_geomap || new_h != height_geomap){
+						if(new_w != width_geomap || new_h != height_geomap){
 							width_geomap = new_w;
 							height_geomap = new_h;
 							$geomap_container.css({
 								width: width_geomap,
 								height: height_geomap
 							});
-							gm.config({
-								projector: new_projector,
-								w: new_w,
-								h: new_h
-							}, _afterConfig);
-						}else{
-							_afterConfig();
 						}
+						gm.config({
+							map: _getConfMap(),
+							w: width_geomap,
+							h: height_geomap
+						}, _afterConfig);
 					});
 				}
 			});
 		});
 	}
-	
-	// 地图添加的图层类
-	var MapLayer = (function(){
-		// 定义文字和图片的右键菜单	
-		var menu_layer = new Menu();
-		var menu_layer_delete = new MenuItem({label: '删除'});
-		menu_layer_delete.on('click',function(){
-			var $layer = menu_layer._layer;
-			if($layer){
-				$layer.remove();
-			}
-		});
-
-		/*更改各图层的z-index*/
-		function _changeZ(is_add){
-			var $layer = menu_layer._layer;
-			if($layer){
-				var pos_layer = $layer.position(),
-					left_layer = pos_layer.left,
-					top_layer = pos_layer.top,
-					width_layer = $layer.width(),
-					height_layer = $layer.height(),
-					bottom_layer = top_layer + height_layer,
-					right_layer = left_layer + width_layer,
-					zindex_layer = parseInt($layer.css('z-index')) || 0;
-
-				var zindex_max = Number.MIN_VALUE,
-					zindex_min = Number.MAX_VALUE;
-				var $layer_over = $('.map_layer').filter(function(){
-					var $this = $(this);
-					if(!$this.is($layer)){
-						var w = $this.width(),
-							h = $this.height();
-						var pos = $this.position(),
-							left = pos.left,
-							top = pos.top;
-
-						var lt_x = Math.max(left, left_layer),
-							lt_y = Math.max(top, top_layer),
-							rb_x = Math.min(left+w, right_layer),
-							rb_y = Math.min(top+h, bottom_layer);
-
-						if(lt_x < rb_x && lt_y < rb_y){
-							return $this;
-						}
-					}
-				}).each(function(){
-					var $this = $(this);
-					var zindex = parseInt($this.css('z-index')) || 0;
-					if(zindex > zindex_max){
-						zindex_max = zindex;
-					}else if(zindex < zindex_min){
-						zindex_min = zindex;
-					}
-				});
-				
-				if(zindex_max != Number.MIN_VALUE || zindex_min != Number.MAX_VALUE){
-					var to_zindex = is_add? zindex_max+1: zindex_min-1;
-					if(to_zindex < 0){
-						var zindex_abs = -to_zindex;
-						$layer_over.each(function(){
-							$(this).css('z-index', (parseInt($(this).css('z-index'))||0)+zindex_abs);
-						});
-						to_zindex = 0;
-					}
-					$layer.css('z-index', to_zindex);
-				}
-			}
-		}
-		var menu_layer_add_z = new MenuItem({label: '置于上层'});
-		menu_layer_add_z.on('click',function(){
-			_changeZ(true);
-		});
-		var menu_layer_minus_z = new MenuItem({label: '置于下层'});
-		menu_layer_minus_z.on('click',function(){
-			_changeZ(false);
-		});
-
-		menu_layer.append(menu_layer_delete);
-		menu_layer.append(new gui.MenuItem({ type: 'separator' }));
-		menu_layer.append(menu_layer_add_z);
-		menu_layer.append(menu_layer_minus_z);
-		// 文字图层
-		function TextLayer(option){
-			var pos = option.position;
-			var ondblclick = option.ondblclick;
-			var $html = $('<div class="texteditor map_layer">');
-			var style = option.style;
-			if(style){
-				$html.attr('style',style);
-			}
-
-			$html.html('<span>'+(option.text||'')+'</span>')
-				.css(pos)
-				.addClass('off')
-				.resizable()
-				.draggable()
-				.css('position','absolute')
-				.on('mouseenter',function(){
-					$(this).removeClass('off');
-				}).on('mouseleave',function(){
-					$(this).addClass('off');
-				}).on('dblclick',function(){
-					var $this = $(this);
-					var text = $this.text(),
-						style = $this.attr('style');
-
-					var win_textstyle = Core.Page.textStyle(function(e){
-						CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
-							text: text,
-							style: style
-						},win_textstyle.window);
-					});
-					$current_text = $this;
-					ondblclick && ondblclick.call(this);
-				}).on('contextmenu',function(e){
-					e.stopPropagation();
-					menu_layer._layer = $(this);
-					menu_layer.popup(e.clientX, e.clientY);
-				});
-			
-			return $html;
-		}
-		// 图片图层
-		function ImageLayer(option, callback){
-			var pos = option.position;
-			var src = option.src;
-
-			if(!/^http/.test(src) && !file_util.exists(src.replace(/\?.*$/, ''))){
-				callback();
-				return;
-			}
-			var img = new Image();
-			img.onload = function(){
-				var width = this.width,
-					height = this.height;
-				var toWidth = 80,
-					toHeight = 80*height/width;
-				if(option.width && option.height){
-					toWidth = option.width;
-					toHeight = option.height;
-				}
-				var $html = $('<div class="map_layer map_layer_image off"><img src="'+option.src+'"></div>')
-					.css(pos)
-					.css({
-						width: toWidth,
-						height: toHeight
-					})
-					.resizable()
-					.draggable()
-					.css('position','absolute');
-				$html.on('mouseenter',function(){
-					$(this).removeClass('off');
-				}).on('mouseleave',function(){
-					$(this).addClass('off');
-				}).on('contextmenu',function(e){
-					e.stopPropagation();
-					menu_layer._layer = $(this);
-					menu_layer.popup(e.clientX, e.clientY);
-				});
-				callback($html, {
-					width: width,
-					height: height,
-					width_show: toWidth,
-					height_show: toHeight
-				});
-			}
-			img.onerror = function(){
-				callback();
-			}
-			img.src = src;
-		}
-		return {
-			text: TextLayer,
-			img: ImageLayer
-		}
-	})();
-	
 	function _get_save_img_name(){
 		var filename;
 		try{
@@ -964,6 +1238,17 @@ Core.safe(function(){
 	}
 	/*右侧地图的右键功能*/
 	!function(){
+		// 得到元素的position，防止transform.rotate对元素位置的影响
+		function _getPos($elem){
+			if($elem.data('angle')){
+				return {
+					left: parseFloat($elem.css('left')) || 0,
+					top: parseFloat($elem.css('top')) || 0
+				}
+			}else{
+				return $elem.position();
+			}
+		}
 		/*导出图片*/
 		var _save_img = function(){
 			if(gm && conf_of_product){
@@ -976,7 +1261,20 @@ Core.safe(function(){
 						
 						var gm_export = new GeoMap({
 							container: $div_container,
-							isnotMirror: true
+							isnotMirror: true,
+							onafteraddoverlays: function(){
+								var _bgimg = conf_export.bgimg;
+								if(_bgimg && file_util.exists(_bgimg)){
+									var img = new Image();
+									img.onload = function(){
+										conf_export.bgimg = img;
+										_export();
+									}
+									img.src = _bgimg;
+								}else{
+									_export();
+								}
+							}
 						});
 						gm_export.addOverlay(new GeoMap.Image(img_data));
 
@@ -987,7 +1285,7 @@ Core.safe(function(){
 						}).each(function(i,v){
 							var $layer = $(this);
 							var layer;
-							if($layer.is('.texteditor')){
+							if($layer.is('.map_layer_text')){
 								$layer.css($layer.position()); // 修复样式里的left和top为auto情况
 								var padding_top = parseFloat($layer.css('padding-top')) || 0,
 									padding_right = parseFloat($layer.css('padding-right')) || 0,
@@ -995,18 +1293,42 @@ Core.safe(function(){
 									padding_left = parseFloat($layer.css('padding-left')) || 0;
 								gm_export.addOverlay(new GeoMap.Text(_replace_date($layer.text()),$layer.attr('style'), [padding_top, padding_right, padding_bottom, padding_left]));
 							}else if($layer.is('.map_layer_image')){
-								var pos = $layer.position();
+								var pos = _getPos($layer);
 								var img = $layer.find('img').get(0);
-								gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height()));
+								gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height(), -$layer.data('angle')));
+							}else if($layer.is('.map_layer_box')){
+								var pos = _getPos($layer);
+								var $canvas = $layer.find('canvas');
+								var pos_canvas = _getPos($canvas);
+								var angle = -$layer.data('angle');
+								gm_export.addOverlay(new GeoMap.Image($canvas.get(0), pos.left + pos_canvas.left, pos.top + pos_canvas.top, $canvas.width(), $canvas.height(), angle));
+								
+								var $text = $layer.find('.text');
+								var text = $text.text();
+								if(text){
+									var pos_text = $text.position();
+									var style = $text.clone().css({
+										left: pos.left + pos_text.left,
+										top: pos.top + pos_text.top,
+										'line-height': $text.css('line-height')
+									}).attr('style');
+									gm_export.addOverlay(new GeoMap.Text(text, style, null, {
+										angle: angle
+									}));
+								}
 							}
 						});
 						// 软件到期后对生成的图片进行水印处理
 						if(!Core.safe.l){
-							var x = Math.random()* width_geomap*0.7,
-								y = Math.random()*height_geomap*0.7;
-							var text_no_authorization = '华风创新出品';
-							gm_export.addOverlay(new GeoMap.Text(text_no_authorization, 'font-size: 40px;color: red;left:'+x+'px;top:'+y+'px', null, {
-								textAlign: 'center'
+							gm_export.addOverlay(new GeoMap.Rectangle({
+								style: {
+									x: 0,
+									y: 0,
+									width: width_geomap,
+									height: height_geomap,
+									color: new GeoMap.Pattern.listence({
+									})
+								}
 							}));
 						}
 
@@ -1020,17 +1342,6 @@ Core.safe(function(){
 							var time = Timer.end('save image');
 							alert('成功导出图片, 用时'+time+'毫秒!');
 						}
-						var _bgimg = conf_export.bgimg;
-						if(_bgimg && file_util.exists(_bgimg)){
-							var img = new Image();
-							img.onload = function(){
-								conf_export.bgimg = img;
-								_export();
-							}
-							img.src = _bgimg;
-						}else{
-							_export();
-						}
 					});
 				}).click();
 			}else{
@@ -1039,6 +1350,19 @@ Core.safe(function(){
 		}
 		/*添加文字*/
 		var _add_text = function(){
+			on_receive_style = function(data){
+				var pos = _cache_e_contextmenu? {
+					left: _cache_e_contextmenu.offsetX,
+					top: _cache_e_contextmenu.offsetY
+				}:{
+					left: width_geomap/2,
+					top: width_geomap/2
+				};
+				var $text = MapLayer.text({
+					position: pos
+				}).appendTo($geomap_layer);
+				$text.css(data.style).find('span').text(data.text);
+			}
 			var win_textstyle = Core.Page.textStyle(function(e){
 				CoreWindow.sendMsg(ConstMsgType.CONF_STYLE,{},win_textstyle.window);
 			});
@@ -1051,26 +1375,35 @@ Core.safe(function(){
 			$('#btn_setting').click(function(){
 				isReload = true;
 			});
-			function showFiles($container,files){
+
+			var cache_file = {};
+			function showFiles($container, key){
 				var html = '';
-				$.each(files,function(i,v){
-					var name = path_util.basename(v);
-					if(is_img(name)){
-						name = name.replace(path_util.extname(v),'');
-						html += '<li><img src="'+v+'" draggable="true"/><span>'+name+'</span></li>';
-					}
-				});
+				if(key == 'my_shape'){
+					$.each(MY_SHAPES, function(i, shape){
+						html += '<li><img src="'+shape.src+'" draggable="true"/><span>'+shape.text+'</span></li>';
+					});
+				}else{
+					var files = cache_file[key];
+					$.each(files,function(i,v){
+						var name = path_util.basename(v);
+						if(is_img(name)){
+							name = name.replace(path_util.extname(v),'');
+							html += '<li><img src="'+v+'" draggable="true"/><span>'+name+'</span></li>';
+						}
+					});
+				}
+				
 				$container.html(html);
 			}
 			/*当重新配置图片库时要重新加载*/
 			function reloadFiles(){
 				if(!files_loaded || isReload){
-					var cache_file = {};
 					files_loaded = file_util.readdir(icon_path);
 					if(!$tool_image){
 						$tool_image = $('<div class="tool_image"><div class="btn_close_tool_image"></div><div class="tool_image_main"></div></div>').appendTo('#work_container');
 						$tool_image.delegate('select','change',function(){
-							showFiles($tool_image.find('ul'),cache_file[$(this).val()]);
+							showFiles($tool_image.find('ul'), $(this).val());
 						});
 						$tool_image.delegate('.btn_close_tool_image','click',function(){
 							$tool_image.slideUp();
@@ -1115,13 +1448,15 @@ Core.safe(function(){
 						}
 						return html;
 					}
+					html_select += '<option value="my_shape">标注图形</option>';
 					$.each(files_loaded,function(i,v){
 						html_select += createOption(v,0,i);
 					});
 					html_select += '</select>';
 					$tool_image_main.children().remove();
 					$tool_image_main.html(html_select+'<div class="list_container" style="height: '+(_getHeight())+'px"><ul class="clear"></ul></div>');
-					showFiles($tool_image_main.find('ul'),cache_file[$tool_image_main.find('select').val()]);
+					var val = $tool_image_main.find('select').val();
+					showFiles($tool_image_main.find('ul'), val);
 				}
 			}
 			return function(){
@@ -1177,13 +1512,17 @@ Core.safe(function(){
 	
 	// 向地图添加图片
 	function add_maplayer_img(src, pos, callback){
-		MapLayer.img({
-			position: pos,
-			src: src
-		},function($html, param){
-			$html && $geomap_layer.append($html);
-			callback && callback($html, param);
-		});
+		if(is_img(src)){
+			MapLayer.img({
+				position: pos,
+				src: src
+			},function($html, param){
+				$html && $geomap_layer.append($html);
+				callback && callback($html, param);
+			});
+		}else{
+			callback && callback();
+		}
 	}
 
 	$geomap_layer.on('dragover',function(e){
@@ -1197,8 +1536,25 @@ Core.safe(function(){
 		var dataTransfer = e.dataTransfer;
 		var drag_img = dataTransfer.getData('Text');
 		var x = e.offsetX,y = e.offsetY;
-		if(drag_img && is_img(drag_img)){
+		if(drag_img){
+			for(var i = 0, j = MY_SHAPES.length; i<j; i++){
+				var shape = MY_SHAPES[i];
+				if(shape.src == drag_img){
+					var type = shape.type;
+					if(BOX_TYPE_LABELRECT == type || BOX_TYPE_ELLIPSE == type){
+						MapLayer.box({
+							x: x,
+							y: y,
+							width: 200,
+							height: 100,
+							type: type
+						});
+						return;
+					}
+				}
+			}
 			add_maplayer_img(drag_img, {
+				center: true,
 				left: x,
 				top: y
 			});
@@ -1207,6 +1563,7 @@ Core.safe(function(){
 			if(files.length > 0){
 				$.each(files,function(i,file){
 					add_maplayer_img(file.path, {
+						center: true,
 						left: x+i*10,
 						top: y+i*10
 					});

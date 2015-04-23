@@ -194,3 +194,8 @@ input::-webkit-inner-spin-button {
 .template input[type=number]:first-child{
 	text-align: right;
 }
+
+.map_layers label{
+	width: 40px;
+	display: inline-block;
+}

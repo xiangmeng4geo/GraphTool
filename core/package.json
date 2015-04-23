@@ -1,7 +1,7 @@
 {
-  "name": "GraphTool",
-  "version": "v0.3.15",
-  "description": "智慧气象服务产品生成系统",
+  "name": "Blue π Ants",
+  "version": "v0.4.6",
+  "description": "蓝π蚂蚁制图",
   "main": "login.html",
   "window": {
     "frame": false,
@@ -12,5 +12,6 @@
     "as_desktop": true,
     "show": true,
     "resizable": false
-  }
+  },
+  "single-instance": false
 }

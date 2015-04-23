@@ -404,7 +404,9 @@ Core.safe(function(){
 		$color_bg = $('#color_bg'),
 		$fieldset_legend = $('#fieldset_legend'),
 		$text_file_bgimg = $('#text_file_bgimg'),
-		$text_out_filename = $('#text_out_filename');
+		$text_out_filename = $('#text_out_filename'),
+		$cb_title_1_center = $('#cb_title_1_center'),
+		$cb_title_2_center = $('#cb_title_2_center');
 
 	$('#btn_cancel').click(CoreWindow.close);
 	$('#btn_save').click(function(){
@@ -441,12 +443,14 @@ Core.safe(function(){
 				'title_1': {
 					'is_show': $cb_title_1.prop('checked'),
 					'text': $textarea_title_1.val(),
-					'style': $textarea_title_1.attr('style')||''
+					'style': $textarea_title_1.attr('style')||'',
+					'center': $cb_title_1_center.prop('checked')
 				},
 				'title_2': {
 					'is_show': $cb_title_2.prop('checked'),
 					'text': $textarea_title_2.val(),
-					'style': $textarea_title_2.attr('style')||''
+					'style': $textarea_title_2.attr('style')||'',
+					'center': $cb_title_2_center.prop('checked')
 				},
 				'title_3': {
 					'is_show': $cb_title_3.prop('checked'),
@@ -576,11 +580,13 @@ Core.safe(function(){
 			if(conf_title){
 				var conf_title_1 = conf_title.title_1;
 				$textarea_title_1.text(conf_title_1.text).attr('style',conf_title_1.style);
-				$cb_title_1.prop('checked',conf_title_1.is_show);
+				$cb_title_1.prop('checked', conf_title_1.is_show);
+				$cb_title_1_center.prop('checked', conf_title_1.center);
 
 				var conf_title_2 = conf_title.title_2;
 				$textarea_title_2.text(conf_title_2.text).attr('style',conf_title_2.style);
 				$cb_title_2.prop('checked',conf_title_2.is_show);
+				$cb_title_2_center.prop('checked', conf_title_2.center);
 
 				var conf_title_3 = conf_title.title_3;
 				$textarea_title_3.text(conf_title_3.text).attr('style',conf_title_3.style);

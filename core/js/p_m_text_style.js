@@ -36,7 +36,7 @@ Core.safe(function(){
 				var styleObj = {};
 				var styleArr = style.split(/;\s*/);
 				$.each(styleArr,function(i,v){
-					var arr = v.split(/:\s+/);
+					var arr = v.split(/:\s*/);
 					if(arr[0]){
 						styleObj[arr[0]] = arr[1];
 					}

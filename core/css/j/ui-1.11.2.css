@@ -1223,3 +1223,27 @@ body .ui-tooltip {
 	filter: Alpha(Opacity=30); /* support: IE8 */
 	border-radius: 8px;
 }
+
+/* ui.rotatable style {*/
+.ui-rotatable-handle{
+	position: absolute;
+	width: 1px;
+	height: 30px;
+	top: -30px;
+	left: 50%;
+	margin-left: 1px;
+	background-color: black;
+	cursor: url(data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFVJREFUeNpi/P//PwMlgBGfAYyMIOn/jGQZANIMoskyAKYZGeAyiGgX4PIOSWGAzRBGUmMBw1CqGUBMlA1yA4gxhKhYwBnfpKQDqqREquRGYgBAgAEAD8h/4adTIzwAAAAASUVORK5CYII=) 8 8,crosshair;
+}
+.ui-rotatable-handle:after{
+	content: '';
+	position: absolute;
+	left: -5px;
+	top: -5px;
+	width: 10px;
+	height: 10px;
+	border-radius: 10px;
+	background-color: #89E53B;
+	border: 1px solid #595F68;
+}
+/* ui.rotatable style }*/

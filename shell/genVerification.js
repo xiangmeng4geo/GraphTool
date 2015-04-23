@@ -9,8 +9,8 @@ var info = {
 	pwd: '123'
 }
 info.pwd = util.encrypt(info.pwd,info.key);
-info.l = genListence('2015-03-17', '2015-04-20');
-
+info.l = genListence('2015-04-15', '2015-05-20');
+console.log(info);
 var content = JSON.stringify(info);
 content = core.util.encrypt.encode(content);
 fs.writeFile('../core/conf/verification.json', content);

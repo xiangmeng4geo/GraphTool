@@ -13,7 +13,7 @@ function gen(time_start, time_end, is_from_command){
 	var listen_str = util.encrypt.encode(source_str);
 	listen_str = listen_str.reverse().toUpperCase();
 	if(is_from_command){
-		return source_str+'\t'+listen_str+'\n\r';
+		return '('+[time_start.format('yyyy-MM-dd'), time_end.format('yyyy-MM-dd')].join('|')+')'+'\t'+listen_str+'\n\r';
 	}else{
 		return listen_str;
 	}
@@ -21,8 +21,8 @@ function gen(time_start, time_end, is_from_command){
 var args = [].slice.call(process.argv);
 //命令行进行指定文件压缩
 if(args.length >= 2){
-	var time_start = args[2] || '2015-03-17',
-		time_end = args[3] || '2015-05-21';
+	var time_start = args[2] || '2015-04-01',
+		time_end = args[3] || '2017-05-01';
 	fs.appendFileSync(path.join(__dirname, './listence.txt'), gen(time_start, time_end, true));
 }
 

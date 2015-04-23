@@ -5968,7 +5968,6 @@ $.widget("ui.draggable", $.ui.mouse, {
 			}
 		} catch ( error ) {}
 	},
-
 	_mouseStart: function(event) {
 
 		var o = this.options;
@@ -6005,7 +6004,17 @@ $.widget("ui.draggable", $.ui.mouse, {
 		//The element's absolute position on the page minus margins
 		this.positionAbs = this.element.offset();
 		this._refreshOffsets( event );
-
+		
+		var is_rotate = this.is_rotate = this.helper.css('transform') !== 'none';//暂时不考虑scale及translate
+		if(is_rotate){
+			var elem = this.helper;
+			this._rotate_data = {
+				left: parseFloat(elem.css('left')),
+				top: parseFloat(elem.css('top')),
+				eX: event.pageX,
+				eY: event.pageY
+			};
+		}
 		//Generate the original position
 		this.originalPosition = this.position = this._generatePosition( event, false );
 		this.originalPageX = event.pageX;
@@ -6061,6 +6070,14 @@ $.widget("ui.draggable", $.ui.mouse, {
 	},
 
 	_mouseDrag: function(event, noPropagation) {
+		if(this.is_rotate){
+			var _d = this._rotate_data;
+			var dis_x = event.pageX - _d.eX,
+				dis_y = event.pageY - _d.eY;
+			this.helper[ 0 ].style.left = _d.left + dis_x + "px";
+			this.helper[ 0 ].style.top = _d.top + dis_y + "px";
+			return;
+		}
 		// reset any necessary cached properties (see #5009)
 		if ( this.hasFixedAncestor ) {
 			this.offset.parent = this._getParentOffset();
@@ -6937,6 +6954,94 @@ $.ui.plugin.add("draggable", "zIndex", {
 
 var draggable = $.ui.draggable;
 
+/*
+ * jQuery UI rotatable 0.1.0
+ */
+$.widget("ui.rotatable", $.ui.mouse, {
+	version: "0.1.0",
+	widgetEventPrefix: "rotate",
+	options: {
+	},
+	_create: function() {
+		var _this = this;
+		_this.dragged = false;
+
+		var $element = this.element;
+		$element.data('angle', 0);
+		$element.addClass("ui-rotatable");
+		var $handle = this.handle = $('<div></div>').addClass('ui-rotatable-handle');
+		$element.append($handle);
+
+		// var $test = this.test = $('<div style="position:absolute;width:10px;height:10px;background:rgba(255, 0, 0, 0.5)"></div>').appendTo($('body'));
+		this._mouseInit();
+	},
+	_destroy: function() {
+		this._mouseDestroy();
+	},
+	_trigger: function() {
+		if ($.Widget.prototype._trigger.apply(this, arguments) === false) {
+			this.cancel();
+		}
+	},
+	_mouseCapture: function(event) {
+		var i, handle,
+			capture = false;
+		var $element = this.handle;
+
+		for(var i = 0, j = $element.length; i<j; i++){
+			handle = $($element[i])[0];
+			if (handle === event.target || $.contains(handle, event.target)) {
+				capture = true;
+				break;
+			}
+		}
+		
+		return !this.options.disabled && capture;
+	},
+	_mouseStart: function(e){
+		var _this = this;
+		var $element = _this.element;
+		_this.rotating = true;
+		var dis = $element.height()/2 + _this.handle.height();
+		var angle = $element.data('angle')/180*Math.PI;
+		this.origin = {
+			x: e.pageX - dis * Math.sin(angle),
+			y: e.pageY + dis * Math.cos(angle)
+		}
+		// this.test.css({
+		// 	left: this.origin.x,
+		// 	top: this.origin.y
+		// });
+		// this.element.css('transform', 'rotate('+this.angle+'deg)');
+		
+		var cursor_handle = _this.handle.css('cursor');
+		_this._trigger("start", e, cursor_handle);
+
+		return true;
+	},
+	_mouseDrag: function(e){
+		var _this = this;
+		if(!_this.rotating){
+			return;
+		}
+		var origin = _this.origin;
+		if(origin){
+			var angle = Math.atan2(e.pageY - origin.y, e.pageX - origin.x) + Math.PI/2;
+			if(angle < 0){
+				angle += Math.PI * 2;
+			}
+			angle = angle/Math.PI*180;
+			_this.element.data('angle', angle).css('transform', 'rotate('+angle+'deg)');
+			_this._trigger("rotate", e, {
+				angle: angle
+			});
+		}
+	},
+	_mouseStop: function(e){
+		this.rotating = false;
+		this._trigger("stop", e);
+	}
+});
 
 /*!
  * jQuery UI Resizable 1.11.2

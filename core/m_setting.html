@@ -12,7 +12,7 @@
 				<ul>
 					<li class="on">系统</li>
 					<li>图标库管理</li>
-					<li>图片库管理</li>
+					<li>地图相关</li>
 				</ul>
 			</div>
 			<div id="c_bottom">
@@ -43,12 +43,6 @@
 					    	</div>
 				    	</div>
 					</fieldset>
-					<fieldset>
-						<legend>地图投影</legend>
-						<div class="clear">
-							<select id="select_map_projector"></select>
-						</div>
-					</fieldset>
 					<fieldset class="template">
 						<legend>模板</legend>
 						<table id="tb_template">
@@ -70,13 +64,23 @@
 					</div>
 				</fieldset>
 				<fieldset>
-				    <legend>图片库管理</legend>
-				    <div class="tree_left">
-				    	<div id="tree_image"></div>
-					</div>
-					<div class="tree_right">
-						<ul id="file_list_image"></ul>
-					</div>
+					<legend>图标库管理</legend>
+					
+					<fieldset>
+						<legend>地图投影</legend>
+						<div class="clear">
+							<select id="select_map_projector"></select>
+						</div>
+					</fieldset>
+
+					<fieldset class="map_layers">
+						<legend>图层开关</legend>
+						<div class="clear">
+							<div><input type="checkbox" id="cb_map_river"/> <label>水系</label> <input type="color" id="color_map_river" value="#1f3dfa"/></div>
+							<!-- <div><input type="checkbox" id="cb_map_railway"/> 铁路</div> -->
+							<div><input type="checkbox" id="cb_map_cname" checked/> <label>政区名</label> <input type="color" id="color_map_cname" value="#000000"/></div>
+						</div>
+					</fieldset>
 				</fieldset>
 			</div>
 			<div class="btns">
