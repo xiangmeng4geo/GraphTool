@@ -16,7 +16,8 @@ define('GeoMap',['zrender',
 	var ZINDEX_MAP = 2,
 		ZINDEX_LAYER = 1,
 		ZINDEX_NO_CLIP = 3,
-		ZINDEX_MAP_TEXT = 4;
+		ZINDEX_MAP_TEXT = 4,
+		ZINDEX_LAYER_RIVER = 5;
 
 	// retina 屏幕优化
     var devicePixelRatio = window.devicePixelRatio || 1;
@@ -394,12 +395,21 @@ define('GeoMap',['zrender',
 	function _addRiver(){
 		var _this = this;
 		var is_add_river = false,
-			river_color = '#353FC3';
+			river_color = '#353FC3',
+			key;
+		var _data = _this._data;
 		try{
-			var conf_river = _this._data.map.layers.river;
+			var conf_river = _data.map.layers.river;
 			is_add_river = conf_river.flag;
 			river_color = conf_river.color || river_color;
+			key = JSON.stringify(conf_river);
 		}catch(e){}
+
+		if(key && _this.key_river != key){
+			_this.clearLayers(ZINDEX_LAYER_RIVER);
+			_this.key_river = key;
+		}
+		
 		if(is_add_river){
 			var geo = _this.conf.geo;
 			_this.jsonLoader(geo.src+'/'+geo.name+'_river.json', function(data){
@@ -417,7 +427,7 @@ define('GeoMap',['zrender',
 								strokeColor : river_color,
 								lineWidth : 1,
 							},
-							zlevel: ZINDEX_MAP
+							zlevel: ZINDEX_LAYER_RIVER
 						});
 						_this.addOverlay(polyline);   //增加折线
 					}
@@ -645,7 +655,7 @@ define('GeoMap',['zrender',
 		return shape;
 	}
 	/*清除所有天气图层*/
-	GeoMapProp.clearLayers = function(){
+	GeoMapProp.clearLayers = function(zindex){
 		var _this = this;
 		var canvas = _this.canvas;
 		var overlays = _this._data.overlays;
@@ -654,7 +664,17 @@ define('GeoMap',['zrender',
 		while(temp_layer = overlays.shift()){
 			var shape = temp_layer.shape;
 			var zlevel = shape.zlevel;
-			if(zlevel == ZINDEX_LAYER || zlevel == ZINDEX_NO_CLIP){
+			var is_dele = false;
+			if(zindex){
+				if(zindex == zlevel){
+					is_dele = true;
+				}
+			}else{
+				if(zlevel == ZINDEX_LAYER || zlevel == ZINDEX_NO_CLIP){
+					is_dele = true;
+				}
+			}
+			if(is_dele){
 				canvas.delShape(shape.id);
 			}else{
 				new_overlays.push(temp_layer);
