@@ -39,7 +39,8 @@ Core.safe(function(){
 		$cb_map_river = $('#cb_map_river'),
 		$cb_map_railway = $('#cb_map_railway'),
 		$cb_map_cname = $('#cb_map_cname'),
-		$color_map_cname = $('#color_map_cname');
+		$color_map_cname = $('#color_map_cname'),
+		$color_map_river = $('#color_map_river');
 
 	var conf_sys = Conf_User.getSys();
 	var projector_user = '';
@@ -69,6 +70,7 @@ Core.safe(function(){
 				var conf_river = conf_map_layers.river;
 				if(conf_river){
 					$cb_map_river.prop('checked', conf_river.flag);
+					$color_map_river.val(conf_river.color);
 				}
 				var conf_railway = conf_map_layers.railway;
 				if(conf_railway){
@@ -126,7 +128,8 @@ Core.safe(function(){
 				projector: $select_map_projector.val(),
 				layers: {
 					river: {
-						flag: $cb_map_river.prop('checked')
+						flag: $cb_map_river.prop('checked'),
+						color: $color_map_river.val()
 					},
 					railway: {
 						flag: $cb_map_railway.prop('checked')

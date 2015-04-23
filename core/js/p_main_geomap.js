@@ -603,14 +603,21 @@ Core.safe(function(){
 					gm.refresh();
 					// if(!this.flag){
 					// 	this.flag = true;
-					// 	$.getJSON('../shell/geo/data-source/china_province.json.endpoint.json', function(data){
+					// 	$.getJSON('../shell/geo/data-source/chian_river_Merge.jsontest1.json', function(data){
 					// 		$.each(data, function(i, v){
-					// 			gm.addOverlay(new GeoMap.Marker(v.lng, v.lat, {
-					// 				clickable: true,
-					// 				onclick: function(){
-					// 					console.log(v);
-					// 				}
-					// 			}));
+					// 			var point_arr = [];
+					// 			$.each(v, function(v_i,v_v){
+					// 				var point = new GeoMap.Point(v_v[0], v_v[1]);
+					// 				point_arr.push(point);
+					// 			});
+					// 			var polyline = new GeoMap.Polyline(point_arr, {
+					// 				style: {
+					// 					strokeColor : '#353FC3',
+					// 					lineWidth : 1,
+					// 				},
+					// 				zlevel: GeoMap.ZLEVEL.ZINDEX_MAP
+					// 			});
+					// 			gm.addOverlay(polyline);   //增加折线
 		   //          		});
 					// 	});
 					// }

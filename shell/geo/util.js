@@ -131,17 +131,24 @@ var projection = (function(){
     }   
 })();
 
-var predigestData = function(items, min_dis){
+var predigestData = function(items, min_dis, is_retain_last){
     items = items.slice();
     var DIS_MIN_SQUART = Math.pow(min_dis, 2);
     var point = items.shift();
     var items_new = [point];
+    if(is_retain_last){
+        var last_point = items.pop();
+    }
+    
     var tmp = null;
     while((tmp = items.shift())){
         var dis_squart = Math.pow(point[0] - tmp[0], 2) + Math.pow(point[1] - tmp[1], 2);
         if(dis_squart >= DIS_MIN_SQUART){
             items_new.push(tmp);
         }
+    }
+    if(last_point){
+        items_new.push(last_point);
     }
     return items_new;
 }

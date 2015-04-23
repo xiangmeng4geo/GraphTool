@@ -257,6 +257,7 @@ define('GeoMap',['zrender',
 					_this.addOverlay(v);
 				});
 				_changeCnameColor.call(_this);
+				_addRiver.call(_this);
 				_init_mirror.call(_this);
 				_this.reset();
 				callback && callback();
@@ -269,6 +270,7 @@ define('GeoMap',['zrender',
 				_this._data.overlays = overlays;
 			}
 			_changeCnameColor.call(_this);
+			_addRiver.call(_this);
 			// _this.reset();
 			callback && callback();
 		}
@@ -389,6 +391,40 @@ define('GeoMap',['zrender',
 			canvas.refresh();
 		}
 	}
+	function _addRiver(){
+		var _this = this;
+		var is_add_river = false,
+			river_color = '#353FC3';
+		try{
+			var conf_river = _this._data.map.layers.river;
+			is_add_river = conf_river.flag;
+			river_color = conf_river.color || river_color;
+		}catch(e){}
+		if(is_add_river){
+			var geo = _this.conf.geo;
+			_this.jsonLoader(geo.src+'/'+geo.name+'_river.json', function(data){
+				if(data){
+					for(var i = 0, j = data.length; i<j; i++){
+						var point_arr = [];
+						var river = data[i];
+						for(var i_r = 0, j_r = river.length; i_r<j_r; i_r++){
+							var item = river[i_r];
+							var point = new GeoMap.Point(item[0], item[1]);
+							point_arr.push(point);
+						}
+						var polyline = new GeoMap.Polyline(point_arr, {
+							style: {
+								strokeColor : river_color,
+								lineWidth : 1,
+							},
+							zlevel: ZINDEX_MAP
+						});
+						_this.addOverlay(polyline);   //增加折线
+					}
+				}
+			})
+		}
+	}
 	var RESET_TYPE_ZOOM = 1,
 		RESET_TYPE_DRAG = 2,
 		RESET_TYPE_RESET = 3;
@@ -507,7 +543,6 @@ define('GeoMap',['zrender',
 			data.srcSize = newss;
 		});
 		var shapes = [];
-		var scale = data.scale;
 
 		$.each(data.features,function(i,v){
 			var type = v.type;
@@ -524,7 +559,14 @@ define('GeoMap',['zrender',
 					// 	// color: '#F5F3F0'
 					// },
 					zlevel: ZINDEX_MAP,
-					scale: scale
+					style: {
+						// strokeColor: '#ff0000',
+						lineWidth: 0.5,
+						// shadowBlur: 10,
+						// shadowColor: '#000',
+						// shadowOffsetY: 2,
+						// shadowOffsetX: 2
+					}
 				}
 
 
@@ -562,7 +604,6 @@ define('GeoMap',['zrender',
 			});
 		});
 		gm.addMask(points, options);
-
 		$.isFunction(callback_after_render_geo) && callback_after_render_geo(points);
 	}
 	GeoMapProp.loadGeo = function(src,options,callback_after_render_geo){
