@@ -65,7 +65,6 @@ Core.safe(function(){
 			file_hour = file_rule.file_hour || 0;
 
 		var time = new Date(is_use_publish_time? data_of_micaps.mtime: data_of_micaps.time);
-			
 		if(ConstFileType.forecast.v == file_type && !is_use_publish_time){
 			var one = new Date(time.getTime());
 			one.setHours(one.getHours()+(file_hour-24));
@@ -963,6 +962,7 @@ Core.safe(function(){
 						// });
 					// }, 10);
 					Loading.show(function(){
+						data_of_micaps = null; //切换产品时把相关数据清空
 						conf_of_product = ConfUser.get(product_name);
 						if(!conf_of_product || !conf_of_product.title || !conf_of_product.legend || !conf_of_product.in_out){
 							Loading.hide();
