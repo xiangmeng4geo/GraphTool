@@ -100,21 +100,21 @@ Core.safe(function(){
 	// 引入amd模块加载器	
 	Core.Html.addScript('./js/libs/esl.js', false, function(){
 		var developmod = false;
-		// if(developmod){
-		// 	require.config({
-		//         packages: [
-		//             {
-		//                 name: 'zrender',
-		//                 location: '../../../git_project/zrender-2.0.5/src/',
-		//                 main: 'zrender'
-		//             }
-		//         ],
-		//         paths: {
-		//         	'GeoMap': 'js/libs/GeoMap',
-		//         	'LegendImage': 'js/libs/LegendImage'
-		//         }
-		//     });
-		// }else{
+		if(developmod){
+			require.config({
+		        packages: [
+		            {
+		                name: 'zrender',
+		                location: '../../../git_project/zrender-2.0.5/src/',
+		                main: 'zrender'
+		            }
+		        ],
+		        paths: {
+		        	'GeoMap': 'js/libs/GeoMap',
+		        	'LegendImage': 'js/libs/LegendImage'
+		        }
+		    });
+		}else{
 			var fileLocation= './js/libs/zr'
 			require.config({
 		        paths:{
@@ -135,7 +135,7 @@ Core.safe(function(){
 		            'LegendImage': './js/libs/LegendImage'
 		        }
 		    });
-		// }
+		}
 		init(true);
 	});
 	

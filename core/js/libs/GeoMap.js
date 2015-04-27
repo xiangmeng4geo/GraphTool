@@ -250,11 +250,13 @@ define('GeoMap',['zrender',
 		var _data = _this._data;
 		var w_conf = conf.w,
 			h_conf = conf.h;
+		var is_resized = false;
 		if(_data && w_conf && h_conf){
 			var w = _data.width,
 				h = _data.height;
 			if(w != w_conf || h != h_conf){
 				_this.canvas.resize();
+				is_resized = true;
 			}
 		}
 		_this.projector = new_projector;
@@ -264,7 +266,7 @@ define('GeoMap',['zrender',
 		_this._data.map = conf_map;
 		_this._data_o.map = conf_map;
 		var geo = _this.conf.geo;
-		if((!old_projector || old_projector.name != new_projector.name) && geo){
+		if(is_resized || (!old_projector || old_projector.name != new_projector.name) && geo){
 			var src = geo.src,
 				name = geo.name;
 			var arr_json = [];
