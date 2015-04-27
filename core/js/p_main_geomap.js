@@ -577,12 +577,6 @@ Core.safe(function(){
 		initing = true;
 		require(['GeoMap', 'LegendImage', 'BoxShape'],function(GeoMap, LegendImage, BoxShape){
 			MapLayer.init(BoxShape);
-			// function _getProjector(){
-			// 	var conf_sys = ConfUser.getSys();
-			// 	return conf_sys && conf_sys.map && conf_sys.map.projector || GeoMap.PROJECT_ALBERS; // GeoMap.PROJECT_ALBERS, GeoMap.PROJECT_MERCATOR
-			// }
-			// var gm_projector = _getProjector();
-
 			function _getConfMap(){
 				var conf_sys = ConfUser.getSys();
 				return conf_sys && conf_sys.map;
@@ -1199,17 +1193,25 @@ Core.safe(function(){
 							}
 						}
 						// var new_projector = _getProjector();
-						var _template = conf_other.template;
-						var new_w = _template[0],
-							new_h = _template[1];
-						if(new_w != width_geomap || new_h != height_geomap){
-							width_geomap = new_w;
-							height_geomap = new_h;
-							$geomap_container.css({
-								width: width_geomap,
-								height: height_geomap
-							});
-						}
+						var _template_index = parseInt(conf_other.template) || 0;
+						try{
+							var conf_sys = ConfUser.getSys();
+							var templates = conf_sys.templates;
+							if(_template_index < 0 || _template_index >= templates.length){
+								_template_index = 0;
+							}
+							var _template = templates[_template_index].t;
+							var new_w = _template[0],
+								new_h = _template[1];
+							if(new_w != width_geomap || new_h != height_geomap){
+								width_geomap = new_w;
+								height_geomap = new_h;
+								$geomap_container.css({
+									width: width_geomap,
+									height: height_geomap
+								});
+							}
+						}catch(e){}
 						gm.config({
 							map: _getConfMap(),
 							w: width_geomap,
