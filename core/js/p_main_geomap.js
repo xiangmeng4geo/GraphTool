@@ -736,7 +736,7 @@ Core.safe(function(){
                         _new_interpolate_data.push(arr);  
                     }
                     Timer.start('raster2vector');
-                    var polygons = file_util.micaps.raster2vector(_new_interpolate_data, COLOR_TRANSPANT, params);
+                    var polygons = file_util.micaps.raster2vector(_new_interpolate_data, COLOR_TRANSPANT, params, blendent);
 					// var polygons = raster2vector(_new_interpolate_data, COLOR_TRANSPANT);
                     Timer.end('raster2vector', 1);
 					for(var i = 0, j = polygons.length; i<j; i++){
@@ -953,14 +953,6 @@ Core.safe(function(){
 					$('.map_layer, .map_layer_box_c').remove();
 					gm.clearLayers();
 					// $geomap_container.removeAttr('style');
-					// setTimeout(function(){
-						// MapLayer.box({
-						// 	x: 100,
-						// 	y: 100,
-						// 	width: 200,
-						// 	height: 100
-						// });
-					// }, 10);
 					Loading.show(function(){
 						data_of_micaps = null; //切换产品时把相关数据清空
 						conf_of_product = ConfUser.get(product_name);
