@@ -401,6 +401,12 @@
 	function _isMain(url){
 		return /main\.\w+$/.test(url);
 	}
+	function _isConfProduct(url){
+		return /m_confproduct\.\w+$/.test(url);
+	}
+	function _isTextStyle(url){
+		return /m_text_style\.\w+$/.test(url);
+	}
 	/*窗体关闭的时候清空相关数据及事件*/
 	win_current.on('close',function(){
 		if(!_isLogin(href)){
@@ -426,7 +432,7 @@
 						Core.Page.logout();
 					}
 				}else{
-					if(!_isMain(_from)){
+					if(!(_isMain(_from) || (_isConfProduct(_from) && _isTextStyle(href)))){
 						alert('您的操作不合法！');
 						CoreWindow.close();
 					}
