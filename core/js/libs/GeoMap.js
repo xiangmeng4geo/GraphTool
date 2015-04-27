@@ -134,21 +134,56 @@ define('GeoMap',['zrender',
 		var center_xy = _this.projector.project(center);
 		
 		var _scale_size = width_container/800;
-		_this._data = {
+		var _data = _this._data;
+		var _data_reset = {
 			scale: Math.min(scale_x,scale_y),
-			zoom: 1,
 			center: {
 				lng: center.x,
 				lat: center.y,
 				x: center_xy.x,
 				y: center_xy.y
-			},
+			}
+		}
+		_data_reset = $.extend(_data_reset, {
+			zoom: 1,
 			translat: [width_container/2, height_container/2],
 			width: width_container,
 			height: height_container,
 			overlays: []
+		});
+		if(_data){
+			var _data_o = _this._data_o;
+			var is_new = false;
+			if(_data_o){
+				if(_data_o.width != width_container || _data_o.height != height_container){
+					is_new = true;
+				}
+			}
+			if(!is_new){
+				$.extend(_data_reset, {
+					zoom: _data.zoom,
+					translat: _data.translat,
+					overlays: _data.overlays
+				});
+			}
 		}
-		_this._data_o = $.extend(true,{},_this._data);
+
+		// _this._data = {
+		// 	scale: Math.min(scale_x,scale_y),
+		// 	zoom: 1,
+		// 	center: {
+		// 		lng: center.x,
+		// 		lat: center.y,
+		// 		x: center_xy.x,
+		// 		y: center_xy.y
+		// 	},
+		// 	translat: [width_container/2, height_container/2],
+		// 	width: width_container,
+		// 	height: height_container,
+		// 	overlays: []
+		// }
+		_this._data = _data_reset;
+		_this._data_o = $.extend(true,{}, _data_reset);
 
 		_this.MAX_ZOOM = 3*_scale_size;
 		_this.MIN_ZOOM = 0.5*_scale_size;
@@ -402,6 +437,11 @@ define('GeoMap',['zrender',
 			var conf_river = _data.map.layers.river;
 			is_add_river = conf_river.flag;
 			river_color = conf_river.color || river_color;
+			// key = JSON.stringify({
+			// 	c_r: conf_river,
+			// 	z: _data.zoom,
+			// 	t: _data.translat
+			// });
 			key = JSON.stringify(conf_river);
 		}catch(e){}
 
