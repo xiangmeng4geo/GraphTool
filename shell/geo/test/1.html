@@ -30,15 +30,15 @@ body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;}
     //     });
     // });
 
-    var url_river = '../data-source/river.result.json';
-    var url_river = '../data-source/chian_river_Merge.jsontest1.json';
-    var url_river = './1.result.json';
-    var url_river = './RIVER22.result.json';
+    // var url_river = '../data-source/river.result.json';
+    var url_river = '../data-source/chian_river_Merge.json';
+    // var url_river = './1.result.json';
+    // var url_river = './RIVER22.result.json';
     // var url_river = './3.result.json';
     $.getJSON(url_river, function(data){
-        data.sort(function(a, b){
-            return b.length - a.length;
-        });
+        // data.sort(function(a, b){
+        //     return b.length - a.length;
+        // });
         for(var i = 0, j = data.length; i<j; i++){
             var val = data[i];
             (function(v, delay){
@@ -72,7 +72,7 @@ body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;}
                     var polyline = new BMap.Polyline(point_arr, {strokeColor:"#1010FF", strokeWeight: v.weight||1, strokeOpacity:1});
                     map.addOverlay(polyline);   //增加折线
                 }, delay);
-            })(val, 0);
+            })(val, i);
             
         }
     });
