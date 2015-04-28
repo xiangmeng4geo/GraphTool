@@ -1,4 +1,7 @@
 {
   "name": "Blue π Ants",
-  "main": "../autowork.html"
+  "main": "../autowork.html",
+  "window": {
+    "show": false
+  }
 }

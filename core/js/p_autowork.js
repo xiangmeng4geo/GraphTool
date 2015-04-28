@@ -1,4 +1,34 @@
 Core.safe(function(){
+	var util_lib = Core.Lib.util,
+		util_file = util_lib.file,
+		util_path = util_lib.path;
+	var CoreWindow = Core.Window;
+	var gui = CoreWindow.getGui();
+	var tray = new gui.Tray({ title: 'Tray', icon: util_path.join(util_file.path.core, 'img/icon_64x64.png') });
+	tray.tooltip = '自动作业';
+
+	// Give it a menu
+	var menu = new gui.Menu();
+	var MenuItem = gui.MenuItem;
+	var item_start = new MenuItem({ label: '启动' });
+	var item_stop = new MenuItem({ label: '暂停' });
+	var item_log = new MenuItem({ label: '查看日志' });
+	var item_quit = new MenuItem({ label: '退出' });
+	item_quit.on('click',function(){
+		CoreWindow.close();
+	});
+	item_start.on('click',function(){
+		// CoreWindow.close();
+	});
+	item_stop.on('click',function(){
+		// CoreWindow.close();
+	});
+	menu.append(item_start);
+	menu.append(item_stop);
+	menu.append(item_log);
+	menu.append(item_quit);
+	tray.menu = menu;
+
 	var queue = ["降水预报20150415_2", "降水预报20150415"];//执行队列
 	var running = false;
 
@@ -9,7 +39,7 @@ Core.safe(function(){
 	// var $doc_exec;
 	win_index = Core.Page.main();
 	win_index.once('inited', function(){
-		win_index.show();
+		// win_index.show();
 		$doc_exec = $(win_index.window.document);
 		check();
 	});
