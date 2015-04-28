@@ -1539,7 +1539,7 @@ Core.safe(function(){
 		}
 		$('#btn_add_text').click(_add_text);
 		$('#btn_add_img').click(_show_entrepot_images);
-		$('#btn_export').click(function(){
+		var $btn_export = $('#btn_export').click(function(){
 			_save_img(true, function(err, data){
 				if(err){
 					alert(err.msg);
@@ -1566,7 +1566,9 @@ Core.safe(function(){
 				menu_add_img_entrepot.on('click', _show_entrepot_images);
 
 				var menu_save_img = new MenuItem({ label: '导出图片' });
-				menu_save_img.on('click', _save_img);
+				menu_save_img.on('click', function(){
+					$btn_export.click();
+				});
 
 				menu_map.append(menu_add_text);
 				menu_map.append(new gui.MenuItem({ type: 'separator' }));

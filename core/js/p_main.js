@@ -98,11 +98,14 @@
 		        	$doc.trigger(ConstEvent.PRODUCT_CHANGE, {
 		        		name: item.text,
 		        		callback: function(err, data){
-			        		if(err){
-			        			alert("错误："+err.msg);
-			        		}else{
-			        			alert('用时:'+ data.time);
-			        		}
+		        			if(err){
+		        				alert(err.msg);
+		        			}
+			        		// if(err){
+			        		// 	alert("错误："+err.msg);
+			        		// }else{
+			        		// 	alert('用时:'+ data.time);
+			        		// }
 			        	}
 		        	});
 		        }   
