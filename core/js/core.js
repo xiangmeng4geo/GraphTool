@@ -251,9 +251,8 @@
 	var conf_gui_window = manifest.window;
 	Core.appInfo = manifest;
 	/*按指定文件加载页面*/
-	function _open(page_name){
-
-		var win = Window.open('./'+page_name+'.html',$.extend({},conf_gui_window,conf.get('view_'+page_name)));
+	function _open(page_name, options){
+		var win = Window.open('./'+page_name+'.html',$.extend({}, conf_gui_window, conf.get('view_'+page_name), options));
 		win.on('close',function(){
 			win.emit('beforeclose');
 			win.removeAllListeners();
@@ -265,13 +264,17 @@
 	var _win_cache = {};
 	/*保证只打开一个相同名的窗体*/
 	var _open_only_win = (function (){
-		return function(name, callback){
+		return function(name, options, callback){
+			if(({}).toString.call(options) == '[object Function]'){
+				callback = options;
+				options = null;
+			}
 			var _win = null;//_win_cache[name];
 			if(_win){
 				_win.focus_flag = true;
 				_win.focus();
 			}else{
-				_win = _open(name);
+				_win = _open(name, options);
 				if(callback){
 					_win.on('loaded',function(e){
 						callback.call(_win,e);
@@ -310,8 +313,8 @@
 			win_current.close();
 			return win_login;
 		},
-		main: function(callback){
-			return _open_only_win('main',callback);
+		main: function(options, callback){
+			return _open_only_win('main', options, callback);
 		},
 		addProduct: function(callback){
 			return _open_only_win('m_addproduct',callback);
@@ -401,6 +404,9 @@
 	function _isMain(url){
 		return /main\.\w+$/.test(url);
 	}
+	function _isAutoWork(url){
+		return /autowork\.\w+$/.test(url);
+	}
 	function _isConfProduct(url){
 		return /m_confproduct\.\w+$/.test(url);
 	}
@@ -428,7 +434,7 @@
 			var _from;
 			function _check(type){
 				if(_isMain(href)){
-					if(!_isLogin(_from)){
+					if(!_isLogin(_from) || !_isAutoWork(_from)){
 						Core.Page.logout();
 					}
 				}else{
@@ -515,7 +521,7 @@
 			}, 
 			end: function(name, level){
 				level = parseInt(level) || 0;
-				if(!(level >=0 && level < PREFIX_LEVEL.length)){
+				if(!(level >= 0 && level < PREFIX_LEVEL.length)){
 					level = 0;
 				}
 				var start_time = cache_log_time[name];
@@ -526,6 +532,7 @@
 					delete cache_log_time[name];
 					return used_time;
 				}
+				return 0;
 			}
 		};
 		Core.util.Logger = Logger;
