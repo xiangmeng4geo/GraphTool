@@ -151,6 +151,7 @@ define('GeoMap',['zrender',
 			height: height_container,
 			overlays: []
 		});
+		_this._data_o = $.extend(true,{}, _data_reset);
 		if(_data){
 			var _data_o = _this._data_o;
 			var is_new = false;
@@ -183,8 +184,7 @@ define('GeoMap',['zrender',
 		// 	overlays: []
 		// }
 		_this._data = _data_reset;
-		_this._data_o = $.extend(true,{}, _data_reset);
-
+		
 		_this.MAX_ZOOM = 3*_scale_size;
 		_this.MIN_ZOOM = 0.5*_scale_size;
 
@@ -493,6 +493,7 @@ define('GeoMap',['zrender',
 			data = $.extend(true, {}, data_old);
 			data.overlays = overlays;
 			_this._data = data;
+			$mirror.removeData();
 		}else{
 			var zoom = data.zoom,
 				zoom_add = zoom - 1;
