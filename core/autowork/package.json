@@ -2,6 +2,7 @@
   "name": "Blue π Ants",
   "main": "../autowork.html",
   "window": {
-    "show": false
+    // "show": false,
+    // "show_in_taskbar": true
   }
 }

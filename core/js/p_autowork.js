@@ -12,10 +12,11 @@ Core.safe(function(){
 	var MenuItem = gui.MenuItem;
 	var item_start = new MenuItem({ label: '启动' });
 	var item_stop = new MenuItem({ label: '暂停' });
+	var item_setting = new MenuItem({ label: '配置' });
 	var item_log = new MenuItem({ label: '查看日志' });
 	var item_quit = new MenuItem({ label: '退出' });
 	item_quit.on('click',function(){
-		CoreWindow.close();
+		currentWindow.close(true);
 	});
 	item_start.on('click',function(){
 		// CoreWindow.close();
@@ -23,12 +24,18 @@ Core.safe(function(){
 	item_stop.on('click',function(){
 		// CoreWindow.close();
 	});
+	item_setting.on('click', function(){
+		Core.Page.aw_list();
+	});
 	menu.append(item_start);
 	menu.append(item_stop);
+	menu.append(item_setting);
 	menu.append(item_log);
 	menu.append(item_quit);
 	tray.menu = menu;
 
+
+return;
 	var queue = ["降水预报20150415_2", "降水预报20150415"];//执行队列
 	var running = false;
 

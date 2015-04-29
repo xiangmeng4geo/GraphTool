@@ -946,7 +946,6 @@ Core.safe(function(){
 			}
 			// 当产品更换时触发
 			function _fn_callback_event(e, data){
-				console.log(arguments);
 				Timer.start('render product');
 				var product_name = data.name;
 				var callback = data.callback;
