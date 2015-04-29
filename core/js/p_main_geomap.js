@@ -947,6 +947,13 @@ Core.safe(function(){
 								gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height()));
 							}
 						});
+						// 软件到期后对生成的图片进行水印处理
+						if(!Core.safe.l){
+							var x = Math.random()* width_geomap*0.7,
+								y = Math.random()*height_geomap*0.7;
+							var text_no_authorization = '创新网络';
+							gm_export.addOverlay(new GeoMap.Text(text_no_authorization, 'font-size: 40px;color: red;left:'+x+'px;top:'+y+'px'));
+						}
 
 						// 防止背景图片没有加载完成
 						function _export(){

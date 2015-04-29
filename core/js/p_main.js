@@ -276,5 +276,20 @@
 	}
 	_init_size();
 	$win.on('resize', _init_size);
+	!function(){
+		// 设置半小时提醒一次
+		var space_notice = 1000*60*30;
+		var last_time = 0;
+		$doc.on('no_v', function(e, listence){
+			if(listence){
+				var now = new Date();
+				if(now - last_time > space_notice){
+					last_time = now;
+					alert('您的软件已经到期，为保证您的使用请联系管理员！');
+				}
+			}
+		});
+	}();
+	
 	Page.inited();
 }();
