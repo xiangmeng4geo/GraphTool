@@ -11,18 +11,26 @@ Core.safe(function(){
 	var menu = new gui.Menu();
 	var MenuItem = gui.MenuItem;
 	var item_start = new MenuItem({ label: '启动' });
-	var item_stop = new MenuItem({ label: '暂停' });
+	var item_stop = new MenuItem({ label: '停止' });
+	item_stop.enabled = false;
 	var item_setting = new MenuItem({ label: '配置' });
 	var item_log = new MenuItem({ label: '查看日志' });
 	var item_quit = new MenuItem({ label: '退出' });
 	item_quit.on('click',function(){
-		currentWindow.close(true);
+		CoreWindow.close(true);
 	});
 	item_start.on('click',function(){
-		// CoreWindow.close();
+		check();
+		item_start.enabled = false;
+		item_setting.enabled = false;
+		item_stop.enabled = true;
 	});
 	item_stop.on('click',function(){
-		// CoreWindow.close();
+		clearTimeout(run_flag);
+		running = false;
+		item_setting.enabled = true;
+		item_start.enabled = true;
+		item_stop.enabled = false;
 	});
 	item_setting.on('click', function(){
 		Core.Page.aw_list();
@@ -32,12 +40,10 @@ Core.safe(function(){
 	menu.append(item_setting);
 	menu.append(item_log);
 	menu.append(item_quit);
-	tray.menu = menu;
 
-
-return;
 	var queue = ["降水预报20150415_2", "降水预报20150415"];//执行队列
 	var running = false;
+	var run_flag;
 
 	// 检测要自动生成图片的产品，并放入队列
 	function check(){
@@ -46,9 +52,9 @@ return;
 	// var $doc_exec;
 	win_index = Core.Page.main();
 	win_index.once('inited', function(){
-		// win_index.show();
 		$doc_exec = $(win_index.window.document);
-		check();
+
+		tray.menu = menu;
 	});
 	
 	function run(){
@@ -64,7 +70,7 @@ return;
 	        		}
 	        	});
 	        	running = false;
-	        	setTimeout(run, 1000);
+	        	run_flag = setTimeout(run, 1000);
 			}
 			running = false;
 		}

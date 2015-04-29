@@ -1,0 +1,20 @@
+#fieldset_legend table{
+	width: 100%;
+	text-align: center;
+	margin-top: 10px;
+}
+#fieldset_legend table{
+	background-color: #ccc;
+	width: 90%;
+}
+#fieldset_legend td{
+	background-color: white;
+	/*border: 1px solid #dadada;*/
+}
+#fieldset_legend tr:hover td:first-child{
+	background-color: #ccc;
+}
+#fieldset_legend td input[type=number]{
+	border: none;
+	text-align: center;
+}

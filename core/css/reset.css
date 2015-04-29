@@ -157,6 +157,26 @@ ul,ol{
 	padding: 0;
 	margin: 0;
 }
+/*重写table样式 {*/
+table{
+	width: 100%;
+	text-align: center;
+	margin-top: 10px;
+	border-spacing: 1px;
+}
+table{
+	background-color: #ccc;
+	width: 90%;
+}
+td{
+	background-color: white;
+	/*border: 1px solid #dadada;*/
+}
+tr:hover td:first-child{
+	background-color: #ccc;
+}
+/*重写table样式 }*/
+
 .bd_top{
 	border-top: 1px solid #c9c9c9;
 }

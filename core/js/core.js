@@ -332,17 +332,17 @@
 			return _open_only_win('m_listence',callback);
 		},
 		about: function(callback){
-			return _open_only_win('m_about',callback);
+			return _open_only_win('m_about', callback);
 		},
 		doc: function(){
 			var doc_path = Core.Lib.util.file.path.doc;
 			gui.Shell.openItem(doc_path);
 		},
 		aw_list: function(callback){
-			return _open_only_win('m_aw_list',callback);
+			return _open_only_win('m_aw_list', callback);
 		},
 		aw_edit: function(callback){
-			return _open_only_win('m_aw_edit',callback);
+			return _open_only_win('m_aw_edit', callback);
 		}
 	}
 	var message_listeners = [];
