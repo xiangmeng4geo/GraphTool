@@ -4,7 +4,7 @@ Core.safe(function(){
 		util_path = util_lib.path;
 	var CoreWindow = Core.Window;
 	var gui = CoreWindow.getGui();
-	var tray = new gui.Tray({ title: 'Tray', icon: util_path.join(util_file.path.core, 'img/icon_64x64.png') });
+	var tray = new gui.Tray({ title: 'Tray', icon: util_path.join(util_file.path.core, 'img/icon.png') });
 	tray.tooltip = '自动作业';
 
 	// Give it a menu

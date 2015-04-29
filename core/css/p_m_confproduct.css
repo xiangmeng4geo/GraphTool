@@ -217,6 +217,9 @@ fieldset legend{
 	/*border-bottom: 1px solid #c9c9c9;*/
 }
 
+#fieldset_legend tr:hover td:first-child{
+	background-color: #ccc;
+}
 #fieldset_legend td input[type=number]{
 	border: none;
 	text-align: center;

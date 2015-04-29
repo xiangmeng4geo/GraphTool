@@ -6,8 +6,12 @@
 	
 	var Core = {};
 	Core.require = nwrequire;
-	Core.Lib = nwrequire('core');
-	var conf = Core.Lib.conf;
+	var CoreLib = Core.Lib = nwrequire('core');
+	var CoreLibUtil = CoreLib.util,
+		util_path = CoreLibUtil.path,
+		util_file = CoreLibUtil.file;
+
+	var conf = CoreLib.conf;
 
 	var gui = nwDispatcher.requireNwGui(),// replace require('nw.gui')
 		Window = gui.Window,
@@ -250,9 +254,12 @@
 	var manifest = gui.App.manifest;
 	var conf_gui_window = manifest.window;
 	Core.appInfo = manifest;
+	var util_file_path = util_file.path;
 	/*按指定文件加载页面*/
 	function _open(page_name, options){
-		var win = Window.open('./'+page_name+'.html',$.extend({}, conf_gui_window, conf.get('view_'+page_name), options));
+		var win = Window.open('./'+page_name+'.html',$.extend({}, conf_gui_window, conf.get('view_'+page_name), options, {
+			icon: util_path.join(util_file_path.core, 'img/icon.png')
+		}));
 		win.on('close',function(){
 			win.emit('beforeclose');
 			win.removeAllListeners();
@@ -269,7 +276,7 @@
 				callback = options;
 				options = null;
 			}
-			var _win = null;//_win_cache[name];
+			var _win = _win_cache[name];
 			if(_win){
 				_win.focus_flag = true;
 				_win.focus();
@@ -335,7 +342,7 @@
 			return _open_only_win('m_about', callback);
 		},
 		doc: function(){
-			var doc_path = Core.Lib.util.file.path.doc;
+			var doc_path = util_file_path.doc;
 			gui.Shell.openItem(doc_path);
 		},
 		aw_list: function(callback){

@@ -26,13 +26,14 @@ input, textarea, select, button{
 input[type=text],
 input[type=color],
 input[type=date],
+input[type=time],
 input[type=number],
 input[type=password],
 textarea{
 	border: 1px solid #d4e3f2;
 	height: 20px;
 	line-height: 20px;
-	border-radius: 14px;
+	border-radius: 3px;
 	padding: 2px 10px;
 }
 /*input::-webkit-outer-spin-button,
@@ -172,9 +173,7 @@ td{
 	background-color: white;
 	/*border: 1px solid #dadada;*/
 }
-tr:hover td:first-child{
-	background-color: #ccc;
-}
+
 /*重写table样式 }*/
 
 .bd_top{

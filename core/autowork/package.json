@@ -2,7 +2,9 @@
   "name": "Blue π Ants",
   "main": "../autowork.html",
   "window": {
-    // "show": false,
+  	"title": "蓝π蚂蚁制图",
+    "icon": "./img/icon.png",
+    "show": true
     // "show_in_taskbar": true
   }
 }
