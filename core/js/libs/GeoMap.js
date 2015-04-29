@@ -369,19 +369,58 @@ define('GeoMap',['zrender',
 				}
 
 
-				var cname = prop.cname,
+				var cname = prop.name,
 					cp = prop.cp;
 				if(cname && cp){
+					var offset_conf = {
+						'北京': {
+							x: 0,
+							y: -5
+						},
+						'广东': {
+							x: 0,
+							y: -20
+						},
+						'内蒙古': {
+							x: 0,
+							y: -20
+						},
+						'江苏': {
+							x: 20,
+							y: -10
+						},
+						'黑龙江': {
+							x: 0,
+							y: -10
+						},
+						'宁夏': {
+							x: 0,
+							y: 10
+						},
+						'河北': {
+							x: 10,
+							y: 0
+						},
+						'重庆': {
+							x: 10,
+							y: -5
+						},
+						'青海': {
+							x: -10,
+							y: 0
+						},
+					};
 					gm.addOverlay(new GeoMap.Text(cname, 'font-size:14px;', null, {
 						pos: {
 							x: cp[0],
 							y: cp[1]
 						},
-						offset: {
+						offset: (offset_conf[prop.name] ||{
 							x: -5,
 							y: -5
-						},
-						zlevel: ZINDEX_NO_CLIP
+						}),
+						zlevel: ZINDEX_NO_CLIP,
+						textAlign: 'center'
 					}));
 				}
 				if('Polygon' == type_geometry ){
@@ -959,6 +998,9 @@ define('GeoMap',['zrender',
 			if(option.offset){
 				shape.style.x += option.offset.x;
 				shape.style.y += option.offset.y;
+			}
+			if(option.textAlign){
+				shape.style.textAlign = option.textAlign;
 			}
 		}
 		return shape;
