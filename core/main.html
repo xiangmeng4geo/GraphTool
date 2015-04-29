@@ -7,22 +7,24 @@
 		<link rel="stylesheet" type="text/css" href="css/p_main.css">
 	</head>
 	<body>
-		<!-- <div id="resizable"></div> -->
 		<div id="main">
-			<div id="c_top" class="clear">
-				<div id="btn_setting" class="fl">
-					<span>设置</span>
+			<div class="top_container">
+				<div class="logo fl">
 				</div>
-				<div class="fl btns_top" id="btn_add_text">
-					<span>添加文字</span>
+				<div class="fr top_right">
+					<div class="user_info fl">
+						<div class="user_icon fl"><img src="./img/demo_icon.png"/></div>
+						<span id="user_name" class="fl">admin</span>
+						<span id="btn_slide" class="fl"></span>
+						<div id="slide_down">
+							<div></div>
+							<ul>
+								<li id="btn_quite">注销</li>
+							</ul>
+						</div>
+					</div>
+					<div id="btn_setting" class="fl">设置</div>
 				</div>
-				<div class="fl btns_top" id="btn_add_img">
-					<span>添加图片库图片</span>
-				</div>
-				<div class="fl btns_top" id="btn_export">
-					<span>导出图片</span>
-				</div>
-				<input type="button" value="" id="btn_quite"/>
 			</div>
 			<div class="c_bottom">
 				<div id="c_left">
@@ -30,11 +32,27 @@
 					<div id="result"></div>
 				</div>
 				<div id="c_right">
-					<div id="geomap_container">
-						<div class="map_tool">
-							<div id="map_tool_reset" title="还原地图状态"></div>
+					<div id="c_top" class="clear">
+						<div class="fl btns_top" id="btn_add_text">
+							<span>添加文字</span>
 						</div>
-						<div id="geomap">
+						<div class="fl btns_top" id="btn_add_img">
+							<span>添加图片库图片</span>
+						</div>
+						<div class="fl btns_top" id="btn_add_img_external">
+							<span>外部添加图片</span>
+						</div>
+						<div class="fl btns_top" id="btn_export">
+							<span>导出图片</span>
+						</div>
+					</div>
+					<div id="work_container">
+						<div id="geomap_container">
+							<div class="map_tool">
+								<div id="map_tool_reset" title="还原地图状态"></div>
+							</div>
+							<div id="geomap">
+							</div>
 						</div>
 					</div>
 				</div>

@@ -114,9 +114,8 @@ Core.safe(function(){
 			text_decoration += ' underline';
 		}
 		cssObj['text-decoration'] = text_decoration || 'none';
-		
 		$textarea_content.removeAttr('style').css(cssObj);
 
-		setTimeout(init,100);
+		setTimeout(init, 200);
 	}
 });

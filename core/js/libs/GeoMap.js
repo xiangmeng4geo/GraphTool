@@ -13,7 +13,7 @@ define('GeoMap',['zrender',
 
 	var ZINDEX_MAP = 2,
 		ZINDEX_LAYER = 1,
-		ZINDEX_NO_CLIP = 0;
+		ZINDEX_NO_CLIP = 3;
 
 	// retina 屏幕优化
     var devicePixelRatio = window.devicePixelRatio || 1;
@@ -152,9 +152,7 @@ define('GeoMap',['zrender',
 	
 	function _init_mirror(){
 		var _this = this;
-		var img_data = _this.toDataURL({
-			bgcolor: 'rgba(0,0,0,0)'
-		});
+		var img_data = _this.toDataURL();
 		var data = _this._data;
 		var mirror = _this.mirror;
 		mirror.attr('src', img_data).css({
@@ -356,25 +354,43 @@ define('GeoMap',['zrender',
 			if('Feature' == type){
 				var geometry = v.geometry;
 				var type_geometry = geometry.type;
+
+				var prop = v.properties;
 				var options = {
 					enname: v.id,
-					properties: v.properties,
-					style: {
-						text: v.properties.name,
-						// color: '#F5F3F0'
-					},
+					properties: prop,
+					// style: {
+					// 	// text: v.properties.name,
+					// 	// color: '#F5F3F0'
+					// },
 					zlevel: ZINDEX_MAP,
 					is_lnglat: is_lnglat,
 					scale: scale
 				}
 
+
+				var cname = prop.cname,
+					cp = prop.cp;
+				if(cname && cp){
+					gm.addOverlay(new GeoMap.Text(cname, 'font-size:14px;', null, {
+						pos: {
+							x: cp[0],
+							y: cp[1]
+						},
+						offset: {
+							x: -5,
+							y: -5
+						},
+						zlevel: ZINDEX_NO_CLIP
+					}));
+				}
 				if('Polygon' == type_geometry ){
 					shapes.push(addGeoPolygon.call(gm,geometry.coordinates,options));
 				}else if('MultiPolygon' == type_geometry){
 					$.each(geometry.coordinates,function(v_i,v_v){
-						if(v_i > 0){
-							delete options.style.text;
-						}
+						// if(v_i > 0){
+						// 	delete options.style.text;
+						// }
 						shapes.push(addGeoPolygon.call(gm,v_v,options));
 					});
 				}else{
@@ -442,7 +458,7 @@ define('GeoMap',['zrender',
 		var temp_layer;
 		while(temp_layer = overlays.shift()){
 			var shape = temp_layer.shape;
-			if(shape.zlevel != ZINDEX_MAP){
+			if(shape.zlevel == ZINDEX_LAYER){
 				canvas.delShape(shape.id);
 			}else{
 				new_overlays.push(temp_layer);
@@ -587,7 +603,6 @@ define('GeoMap',['zrender',
 	    $.each(noclipShapes, function(i, shape){
 	    	_drawShape(ctx, shape);
 	    });
-
         var img_data = maskImageDom.toDataURL(null, backgroundColor);
         maskImageDom = null;
         ctx = null;
@@ -940,6 +955,10 @@ define('GeoMap',['zrender',
 					shape.style.x = pixel.x;
 					shape.style.y = pixel.y;
 				}catch(e){}
+			}
+			if(option.offset){
+				shape.style.x += option.offset.x;
+				shape.style.y += option.offset.y;
 			}
 		}
 		return shape;

@@ -217,6 +217,7 @@ var format = (function(){
 		var prov_code = properties.prov_code;
 		return prov_code == 820000 || prov_code == 810000 || prov_code == 710000;
 	}
+	var province_pos = {"新疆":[84.9023,41.748],"西藏":[88.7695,31.6846],"内蒙古":[117.5977,44.3408],"青海":[96.2402,35.4199],"四川":[102.9199,30.1904],"黑龙江":[128.1445,48.5156],"甘肃":[95.7129,40.166],"云南":[101.8652,25.1807],"广西":[108.2813,23.6426],"湖南":[111.5332,27.3779],"陕西":[109.5996,35.6396],"广东":[113.4668,22.8076],"吉林":[126.4746,43.5938],"河北":[115.4004,37.9688],"湖北":[112.2363,31.1572],"贵州":[106.6113,26.9385],"山东":[118.7402,36.4307],"江西":[116.0156,27.29],"河南":[113.4668,33.8818],"辽宁":[122.3438,41.0889],"山西":[112.4121,37.6611],"安徽":[117.2461,32.0361],"福建":[118.3008,25.9277],"浙江":[120.498,29.0918],"江苏":[120.0586,32.915],"重庆":[107.7539,30.1904],"宁夏":[105.9961,37.3096],"海南":[109.9512,19.2041],"台湾":[121.0254,23.5986],"北京":[116.4551,40.2539],"天津":[117.4219,39.4189],"上海":[121.4648,31.2891],"香港":[114.2578,22.3242],"澳门":[113.5547,22.1484]};
 	function formatFile(file_path,format_path_fn){
 		fs.readFile(file_path, {
 			encoding: 'utf8'
@@ -248,7 +249,9 @@ var format = (function(){
 					var name = properties['NAME'],
 						cname = properties['CAPNAME'],
 						prov_code = properties['PROV_CODE'];
-					var new_properties = {name: _get_cityname(name), cname: _get_cityname(cname), prov_code: prov_code};
+
+					name = _get_cityname(name);
+					var new_properties = {name: name, cname: _get_cityname(cname), prov_code: prov_code, cp: province_pos[name]};
 					var _flag_is_small_prov = _is_small_prov(new_properties);
 
 					var geometry = v.geometry;
@@ -277,10 +280,10 @@ var format = (function(){
 							coordinates.push(arr);
 						});
 					}
-					var geometry_meractor = {type: type,coordinates: coordinates};
+					var geometry = {type: type,coordinates: coordinates};
 					newData.features.push({
 						type: v.type,
-						geometry: geometry_meractor,
+						geometry: geometry,
 						properties: new_properties
 					});
 				});

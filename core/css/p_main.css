@@ -1,51 +1,17 @@
 #main{
 	height: 100%;
 }
-#c_top{
-	background-color: #32689c;
-	/*border-bottom: 1px solid #bbb;*/
-	overflow: hidden;
-	height: 100px;
-	box-shadow: 0 3px 3px #ccc;
-	position: relative;
-}
-#c_top ul{
-	overflow: hidden;
-	padding-left: 10%;
-	position: absolute;
-}
-#c_top li{
-	min-width: 80px;
-	text-align: center;
-	height: 38px;
-	line-height: 38px;
-	float: left;
-	border: 1px solid #bbb;
-	border-bottom: none;
-	border-radius: 5px 5px 0 0;
-	margin-right: 3px;
-	margin-top: 2px;
-}
-#c_top li.on{
-	margin-top: 0px;
-	height: 40px;
-	line-height: 40px;
-	background-color: #ccc;
-}
-#c_top span{
-	display: none;
-}
-#btn_quite{
+
+/*#btn_quite{
 	position: absolute;
 	right: 20px;
 	bottom: 20px;
-	/*color: #595959;*/
 	background: url(../img/icon_logout.png) no-repeat;
 	width: 44px;
 	height: 24px;
 	border: none;
 	box-shadow: none;
-}
+}*/
 .c_bottom{
 	overflow: hidden;
 	position: relative;
@@ -59,55 +25,67 @@
 	width: 300px;
 	height: 100%;
 	overflow: auto;
-	background-color: #565656;
+	background-color: #3d424e;
+	box-shadow: 1px 0 1px rgba(0,0,0,0.38)
 }
 #c_right{
-	padding-left: 300px;
+	position: absolute;
+	top: 0;
+	left: 300px;
 	overflow: auto;
 	position: relative;
+	background-color: #e5e6e7;
 }
-#btn_setting{
-	width: 298px;
-	height: 96px;
-	margin-top: 2px;
-	border-right: 1px solid rgba(9,71,131,0.4);
-	box-shadow: 1px 0 1px rgba(255, 255, 255, 0.1);
-	background: url(../img/icon_setting.png) no-repeat center 11px;
+#c_top{
+	background-color: #2e3035;
+	overflow: hidden;
+	height: 40px;
+	width: 100%;
+	box-shadow: 0 3px 3px #ccc;
 	position: relative;
-	cursor: pointer;
-}
-#btn_setting span{
+	font-size: 12px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
 	position: absolute;
-	left: 50%;
-	bottom: 13px;
-	width: 100px;
-	margin-left: -50px;
-	text-align: center;
+	left: 0; 
+	top: 0;
 }
-
+#c_top:before{
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 1px;
+	height: 100%;
+	background-color: #25262a;
+}
+#c_top:after{
+	content: '';
+	position: absolute;
+	left: 1px;
+	top: 0;
+	width: 1px;
+	height: 100%;
+	background-color: #37383c;
+}
 .btns_top{
-	padding: 0 20px;
-	height: 90px;
+	padding-left: 25px;
+	height: 40px;
+	line-height: 40px;
+	background-position: center left;
 	background-repeat: no-repeat;
-	background-position: center 25px;
-	position: relative;
+	margin: 0 20px;
+	color: rgba(255, 255, 255, 0.7);
 	cursor: pointer;
-	width: 80px;
 }
 .btns_top span{
-	border: 1px solid #bcbcbc;
-	border-radius: 3px;
-	padding: 2px 3px;
 	text-align: center;
-	position: relative;
-	top: 60px;
-	background-color: #eaeaea;
+	display: inline-block;
 }
 #btn_add_text{
-	margin-left: 20px;
 	background-image: url(../img/icon_text.png);
 }
-#btn_add_img{
+#btn_add_img,
+#btn_add_img_external{
 	background-image: url(../img/icon_img.png);
 }
 #btn_export{
@@ -129,8 +107,9 @@
 	float: left;
 	position: relative;
 	overflow: hidden;
-	margin: 10px 0 0 10px;
-	box-shadow: 0 0 3px #333;
+	margin: 30px 0 0 30px;
+	box-shadow: 0 0 5px #bbc2c9;
+	background-color: white;
 }
 #geomap_container .loading{
 	position: absolute;
@@ -237,48 +216,48 @@
 }
 /* } jquery.texteditor */
 
+#work_container{
+	position: absolute;
+	top: 40px;
+	left: 0;
+	width: 100%;
+}
 /* 添加图片用和图片工具 ｛ */
 .tool_image{
 	position: absolute;
-	right: 9px;
-	top: 0;
+	right: 310px;
+	top: 1px;
 	width: 300px;
-	height: 96%;
-	background: white;
-	border: 1px solid rgba(185,193,200,0.6);
+	height: 100%;
+	background: #3d424e;
+	/*border: 1px solid rgba(185,193,200,0.6);*/
 	display: none;
 	overflow-y: auto;
-	box-shadow: -2px 0 2px rgba(185,193,200,0.1);
+	/*box-shadow: -2px 0 2px rgba(185,193,200,0.1);*/
 }
 .tool_image select{
 	border: 1px solid rgba(185,193,200,0.6);
 	width: 270px;
-	margin: 10px auto;
+	border-radius: 8px 8px 0 0;
+	height: 30px;
 	display: block;
 }
 .btn_close_tool_image{
 	width: 100%;
-	height: 14px;
-	background-color: #32689c;
-	color: white;
-	box-shadow: 1px 1px 4px #333;
+	height: 40px;
+	background: url(../img/arrow_top.png) no-repeat center center;
 }
-.btn_close_tool_image:after{
-	content: '▲';
-	position: absolute;
-	left: 50%;
-	top: -5px;
-}
+
 .tool_image li{
 	float: left;
-	width: 33.33%;
+	width: 50%;
 	margin: 0px auto;
 	text-align: center;
 }
 .tool_image li img{
 	display: block;
-	width: 60px;
-	height: 60px;
+	width: 70px;
+	height: 70px;
 	margin: 0 auto;
 }
 .tool_image li span{
@@ -286,6 +265,19 @@
 	line-height: 20px;
 	display: inline-block;
 	word-break: break-all;
+}
+.tool_image_main{
+	background-color: rgba(255,255,255,0.2);
+	width: 270px;
+	margin: 0 auto;
+	border-radius: 8px;
+	color: white;
+}
+.tool_image_main ul{
+	margin-top: 10px;
+}
+.list_container{
+	overflow-y: auto;
 }
 /* ｝ 添加图片用和图片工具 */
 
@@ -349,4 +341,92 @@
 }
 #tree .bbit-tree-arrows .bbit-tree-elbow-end-plus{
 	background-position: 0 3px;
+}
+
+.top_container{
+	height: 50px;
+	background-color: white;
+	color: #aeaeae;
+}
+.user_info{
+	border-left: 1px solid #eeefef;
+	border-right: 1px solid #eeefef;
+	padding: 0 15px;
+	position: relative;
+	z-index: 100;
+	cursor: pointer;
+}
+
+.logo{
+	width: 110px;
+	height: 100%;
+	background: url(../img/logo_black.png) no-repeat left center;
+	margin-left: 30px;
+}
+.user_icon{
+	height: 30px;
+}
+.user_icon img{
+	width: 30px;
+	height: 30px;
+	border-radius: 30px;
+}
+.top_right{
+	margin-right: 100px;
+	padding-top: 10px;
+}
+#user_name{
+	margin-left: 10px;
+	line-height: 30px;
+}
+#btn_setting{
+	background: url(../img/bg_setting.png) no-repeat center left;
+	padding-left: 20px;
+	height: 30px;
+	line-height: 30px;
+	margin-left: 15px;
+	cursor: pointer;
+}
+#btn_slide{
+	width: 11px;
+	height: 7px;
+	background: url(../img/arrow.png) no-repeat center center;
+	transform: rotate(180deg);
+	margin-top: 11px;
+	margin-left: 10px;
+	transition: all 0.5s;
+}
+#btn_slide.open{
+	transform: rotate(0deg);
+}
+#slide_down{
+	display: none;
+	position: absolute;
+	width: 100%;
+	padding: 1px;
+	left: 0px;
+	top: 25px;
+}
+#slide_down div{
+	height: 14px;
+}
+#slide_down ul{
+	background-color: white;
+	border-radius: 0 0 8px 8px;
+	border: 1px solid #d5d6d7;
+}
+#slide_down li{
+	color: #aeaeae;
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+	text-align: center;
+	cursor: pointer;
+	border-bottom: 1px solid #d5d6d7;
+}
+#slide_down li:last-child{
+	border: none;
+}
+#slide_down li:hover{
+	color: #ff8c4d;
 }
