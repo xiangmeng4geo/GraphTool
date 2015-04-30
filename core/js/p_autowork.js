@@ -1,8 +1,10 @@
 Core.safe(function(){
-	var util_lib = Core.Lib.util,
+	var C = Core;
+	var util_lib = C.Lib.util,
 		util_file = util_lib.file,
 		util_path = util_lib.path;
-	var CoreWindow = Core.Window;
+	var ConfUser = C.Lib.conf.User;
+	var CoreWindow = C.Window;
 	var gui = CoreWindow.getGui();
 	var tray = new gui.Tray({ title: 'Tray', icon: util_path.join(util_file.path.core, 'img/icon.png') });
 	tray.tooltip = '自动作业';
@@ -27,13 +29,14 @@ Core.safe(function(){
 	});
 	item_stop.on('click',function(){
 		clearTimeout(run_flag);
+		clearTimeout(check_flag);
 		running = false;
 		item_setting.enabled = true;
 		item_start.enabled = true;
 		item_stop.enabled = false;
 	});
 	item_setting.on('click', function(){
-		Core.Page.aw_list();
+		C.Page.aw_list();
 	});
 	menu.append(item_start);
 	menu.append(item_stop);
@@ -41,22 +44,68 @@ Core.safe(function(){
 	menu.append(item_log);
 	menu.append(item_quit);
 
-	var queue = ["降水预报20150415_2", "降水预报20150415"];//执行队列
+	var queue = [];//执行队列
 	var running = false;
-	var run_flag;
+	var run_flag, check_flag;
 
+	var TYPE_EVERYDAY = 1,
+		TYPE_EVERYWEEK = 2,
+		TYPE_EVERYMONTH = 3;
+	var delay_check = 10*1000;
+
+	var lasttime_check = new Date();
 	// 检测要自动生成图片的产品，并放入队列
 	function check(){
+		console.log('check');
+		var now = new Date();
+		var tasks = ConfUser.getTasks();
+		for(var i = 0, j = tasks.length; i<j; i++){
+			var task = tasks[i];
+			if(!task || !task.open){
+				continue;
+			}
+			var crontab = task.crontab;
+			var type = crontab.type;
+			var extra = crontab.extra;
+			// if(type == TYPE_EVERYWEEK){
+			// 	if(7 - now.getDay() != extra){
+			// 		continue;
+			// 	}
+			// }else if(type == TYPE_EVERYMONTH){
+			// 	if(now.getDate() != extra){
+			// 		continue;
+			// 	}
+			// }
+			// var arr_time = crontab.time.split(':');
+			// var time_check = new Date(now.getTime());
+			// time_check.setHours(arr_time[0]);
+			// time_check.setMinutes(arr_time[1]);
+			// time_check.setSeconds(0);
+			// var cha = now - time_check;console.log(cha, cha >= 0 && cha <= delay_check, time_check, now);
+			// if(cha >= 0 && cha <= Math.max(delay_check, lasttime_check - now)){
+				var products = task.p;
+				for(var i = 0, j = products.length; i<j; i++){
+					var pro = products[i];
+					if(queue.indexOf(pro) == -1){
+						queue.push(pro);
+					}
+				}
+			// }
+		}
 		run();
+		lasttime_check = now;
+		// check_flag = setTimeout(check, delay_check);
 	}
+	window.check = check;
 	// var $doc_exec;
 	win_index = Core.Page.main();
 	win_index.once('inited', function(){
+		win_index.show();
 		$doc_exec = $(win_index.window.document);
 
 		tray.menu = menu;
 	});
-	
+	// win_index.emit('debug')
 	function run(){
 		if(queue.length > 0 && !running){
 			running = true;
@@ -64,15 +113,16 @@ Core.safe(function(){
 			if(item_exec){
 				win_index.emit(Core.Const.Event.PRODUCT_CHANGE, item_exec, function(err, data){
 	        		if(err){
-	        			alert("错误1："+err.msg);
+	        			console.log("error:"+err.msg);
 	        		}else{
-	        			console.log('用时1:'+ data.time+'ms!保存在:'+data.path);
+	        			console.log('takes:'+ data.time+'ms!save at:'+data.path);
 	        		}
+	        		running = false;
+	        		run_flag = setTimeout(run, 500);
 	        	});
-	        	running = false;
-	        	run_flag = setTimeout(run, 1000);
+			}else{
+				running = false;
 			}
-			running = false;
 		}
 	}
 });

@@ -99,28 +99,28 @@ Core.safe(function(){
 	var is_img = Core.util.isImg;
 	// 引入amd模块加载器	
 	Core.Html.addScript('./js/libs/esl.js', false, function(){
-		var developmod = false;
-		if(developmod){
-			require.config({
-		        packages: [
-		            {
-		                name: 'zrender',
-		                location: '../../../git_project/zrender-2.0.5/src/',
-		                main: 'zrender'
-		            }
-		        ],
-		        paths: {
-		        	'GeoMap': 'js/libs/GeoMap',
-		        	'LegendImage': 'js/libs/LegendImage'
-		        }
-		    });
-		}else{
+		// var developmod = false;
+		// if(developmod){
+		// 	require.config({
+		//         packages: [
+		//             {
+		//                 name: 'zrender',
+		//                 location: '../../../git_project/zrender-2.0.5/src/',
+		//                 main: 'zrender'
+		//             }
+		//         ],
+		//         paths: {
+		//         	'GeoMap': 'js/libs/GeoMap',
+		//         	'LegendImage': 'js/libs/LegendImage'
+		//         }
+		//     });
+		// }else{
 			var fileLocation= './js/libs/zr'
 			require.config({
 		        paths:{
 		            'zrender': fileLocation,
 		            'zrender/shape/Base': fileLocation,
-		            'zrender/shape/BrokenLine': fileLocation,
+		            'zrender/shape/Polyline': fileLocation,
 		            'zrender/shape/Polygon': fileLocation,
 		            'zrender/Group': fileLocation,
 		            'zrender/tool/util': fileLocation,
@@ -135,7 +135,7 @@ Core.safe(function(){
 		            'LegendImage': './js/libs/LegendImage'
 		        }
 		    });
-		}
+		// }
 		init(true);
 	});
 	
@@ -758,6 +758,7 @@ Core.safe(function(){
 				}
 				// 14类中的面
 				var areas = data.areas;
+
 				if(areas){
 					var len = areas.length;
 					if(len > 0){
@@ -803,6 +804,9 @@ Core.safe(function(){
 								}
 							}
 							color = getColor(val_area, v.code);
+							if(is_debug){
+								console.log(color);
+							}
 							if(color){
 								if(v.code == 24){
 									// strokeColor = 'red';
@@ -810,6 +814,9 @@ Core.safe(function(){
 										strokeStyle: color,
 										space: 1
 									});
+									if(is_debug){
+										console.log('Pattern', color);
+									}
 								}
 								var polygon = new GeoMap.Polygon(point_arr, {
 									style: {
@@ -1174,7 +1181,9 @@ Core.safe(function(){
 										interpolation_all: conf_interpolation && conf_interpolation.flag, //传入micaps解析需要参数
 										arithmetic: conf_file_rule.arithmetic
 									}, function(err, data, params){
-										// console.log(err, data);
+										if(is_debug){
+											console.log(err, data);
+										}
 										Timer.end('read micaps');
 										var err_obj;
 										if(err){
@@ -1258,11 +1267,18 @@ Core.safe(function(){
 						if(err){
 							callback(err, data);
 						}else{
-							fn_global.save(false, callback);
+							fn_global.save(false, function(e, data_save){
+								data_save.time += data.time;
+								callback(e, data_save);
+							});
 						}
 					}
 				});
 			});
+			var is_debug = false;
+			CoreWindow.get().on('debug', function(){
+				is_debug = true;
+			})
 			// CoreWindow.get().on(event_name, function(err, data){
 			// 	if(err){
 			// 		_fn_callback_event(err, data);

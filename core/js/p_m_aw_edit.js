@@ -41,7 +41,7 @@ Core.safe(function(){
 	var $tree = $('#tree');
 	CoreWindow.get().show();
 	CoreWindow.onMessage(function(e){
-		var data = e.data;console.log(data);
+		var data = e.data;
 		var type = data.type;
 		if(type == MsgTypeAW_EDIT){
 			data = data.data;
