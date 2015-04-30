@@ -12,7 +12,7 @@ input[type=time]{
 	line-height: 18px;
 }
 .row{
-	margin: 3px 0;
+	margin: 10px 0;
 }
 .row span.fl{
 	margin-right: 5px;
@@ -36,4 +36,7 @@ input[type=time]{
 .sizes{
 	max-height: 66px;
 	overflow: auto;
+}
+.type div{
+	margin-bottom: 5px;
 }

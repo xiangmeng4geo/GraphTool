@@ -286,7 +286,7 @@
 					_win.on('loaded',function(e){
 						callback.call(_win,e);
 					});
-					_win.on('focus',function(){
+					_win.on('focus',function(e){
 						if(_win.focus_flag){
 							_win.focus_flag = false;
 							callback.call(_win,e);

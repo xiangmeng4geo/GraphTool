@@ -2,18 +2,11 @@ Core.safe(function(){
 	var C = Core;
 	var CoreWindow = C.Window;
 	var ConfUser = C.Lib.conf.User;
-	var MsgType = Core.Const.msgType;
+	var MsgTypeAW_EDIT = Core.Const.msgType.AW_EDIT;
 
-	var time = new Date();
-	var hours = time.getHours();
-	var minutes = time.getMinutes();
-	if(hours < 10){
-		hours = '0'+hours;
-	}
-	if(minutes < 10){
-		minutes = '0'+minutes;
-	}
-	$('[type=time]').val(hours+':'+minutes);
+
+	var $text_taskname = $('#text_taskname');
+	var $task_type = $('[name=task_type]');
 
 	var weeks = ['一', '二', '三', '四', '五', '六', '日'];
 	var html = '';
@@ -27,21 +20,50 @@ Core.safe(function(){
 		html += '<option value="'+i+'">'+i+'</option>';
 	}
 	$('#select_day').html(html);
+	var $cb_open = $('#cb_open');
+	function reset(){
+		var time = new Date();
+		var hours = time.getHours();
+		var minutes = time.getMinutes();
+		if(hours < 10){
+			hours = '0'+hours;
+		}
+		if(minutes < 10){
+			minutes = '0'+minutes;
+		}
+		$('[type=time]').val(hours+':'+minutes);
 
-	
+		$text_taskname.val('');
+		
+	}
+	reset();
+
 	var $tree = $('#tree');
 	CoreWindow.get().show();
 	CoreWindow.onMessage(function(e){
-		var data = e.data;
+		var data = e.data;console.log(data);
 		var type = data.type;
-		if(type == MsgType.AW_EDIT){
+		if(type == MsgTypeAW_EDIT){
+			data = data.data;
 			var index = data.index;
 			
 			var products = [];
 			if(index != undefined){
 				var tasks = ConfUser.getTasks();
 				var task = tasks[index] || {};
-				products = task.list || [];
+				var crontab = task.crontab;
+				if(crontab){
+					var $task_type_check = $task_type.filter('[value='+crontab.type+']');
+					$task_type_check.prop('checked', true);
+					var $p = $task_type_check.parent();
+					$p.find('select option[value='+crontab.extra+']').attr('selected', true);
+					$p.find('[type=time]').val(crontab.time);
+				}
+				$text_taskname.val(task.name);
+				$cb_open.prop('checked', task.open);
+				products = task.p || [];
+			}else{
+				reset();
 			}
 			var Tree = (function(){
 				var tree_data = ConfUser.getTree();
@@ -134,8 +156,6 @@ Core.safe(function(){
 			})();
 		}
 	});
-	var $text_taskname = $('#text_taskname');
-	var $task_type = $('[name=task_type]');
 	$('#btn_save').click(function(){
 		var name = $text_taskname.val().trim();
 		if(!name){
@@ -162,11 +182,13 @@ Core.safe(function(){
 				time: time,
 				extra: $cb_type.parent().find('select').val() || 0
 			},
-			p: products
+			p: products,
+			open: $cb_open.prop('checked')
 		}
-		console.log(data);
+		CoreWindow.sendMsg(MsgTypeAW_EDIT, data, opener);
+		$btn_cancel.click();
 	});
-	$('#btn_cancel').click(function(){
+	var $btn_cancel = $('#btn_cancel').click(function(){
 		CoreWindow.close();
 	});
 });

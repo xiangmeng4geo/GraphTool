@@ -1,0 +1,1 @@
+[{"name":"b","crontab":{"type":"2","time":"12:00","extra":"5"},"p":["基本反射率","a"],"open":true},{"name":"a","crontab":{"type":"3","time":"10:26","extra":"6"},"p":["测试","b"],"open":false},{"name":"c","crontab":{"type":"2","time":"10:30","extra":"1"},"p":["24小时变温实况","a"],"open":true}]

@@ -8,24 +8,24 @@
 	</head>
 	<body>
 		<div class="main">
-			自动作业名称: <input type="text" id="text_taskname"/>
+			作业名称: <input type="text" id="text_taskname"/> <input type="checkbox" checked id="cb_open"/>开启
 			<div class="row">
-				<input type="radio" name="task_type" value="1"/> 每天 <input type="time"/>
+				<span class="fl">执行频率:</span>
+				<div class="fl type">
+					<div><input type="radio" name="task_type" value="1"/> 每天 <input type="time"/></div>
+					<div><input type="radio" name="task_type" value="2"/> 每周 <select id="select_week"></select><input type="time"/></div>
+					<div><input type="radio" name="task_type" value="3"/> 每月 <select id="select_day"></select><input type="time"/></div>
+				</div>
+				
 			</div>
-			<div class="row">
-				<input type="radio" name="task_type" value="2"/> 每周 <select id="select_week"></select><input type="time"/>
-			</div>
-			<div class="row">
-				<input type="radio" name="task_type" value="3"/> 每月 <select id="select_day"></select><input type="time"/>
-			</div>
-			<div class="row clear sizes">
+			<!-- <div class="row clear sizes">
 				<span class="fl">产品尺寸:</span> 
 				<div class="fl">
 					<input type="checkbox" value=""/><label>400X400</label><br/>
 					<input type="checkbox" value=""/><label>400X400</label><br/>
 					<input type="checkbox" value=""/><label>400X400</label><br/>
 				</div>
-			</div>
+			</div> -->
 			<div class="row clear tree_row">
 				<span class="fl">产品列表:</span> 
 				<div class="fl" id="tree">
@@ -34,7 +34,7 @@
 			</div>
 			<div class="btns">
 				<input type="button" value="取消" id="btn_cancel" class="big"/>
-				<input type="button" value="保存" id="btn_save" class="big"/>
+				<input type="button" value="确定" id="btn_save" class="big"/>
 			</div>
 		</div>
 		<script type="text/javascript" src="./js/libs/j.js"></script>
