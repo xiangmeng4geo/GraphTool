@@ -932,7 +932,7 @@ Core.safe(function(){
 							};
 							// color = '#1010FF';
 
-							var textShape = new GeoMap.Text('x', 'color:'+color+';left:'+(v.x)+'px;top:'+v.y+'px;font-size: '+fontSize+'px;', null, {
+							var textShape = new GeoMap.Text('╳', 'color:'+color+';left:'+(v.x)+'px;top:'+v.y+'px;font-size: '+fontSize+'px;', null, {
 								pos: {
 									x: v.x,
 									y: v.y
