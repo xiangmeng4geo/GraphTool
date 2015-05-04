@@ -893,7 +893,11 @@ Core.safe(function(){
 						var type = v.type;
 						
 						var text = '',
-							color = '#1010FF';
+							color = '',
+							fontSize = 30,
+							styleExtra = null,
+							offset = null,
+							fontWeight = '';
 						
 						if('60' == type){
 							text = 'H';
@@ -903,15 +907,45 @@ Core.safe(function(){
 						}else if('37' == type){
 							text = '台';
 							color = 'green';
+						}else if('48' == type){
+							fontWeight = 'font-weight: bold;';
+							text = v.text;
+							fontSize = 14;
+							styleExtra = {
+								shadowBlur: 4,
+								shadowColor: '#ffffff'
+							};
+							offset = {
+								x: 0,
+								y: -24
+							};
+							// color = '#1010FF';
+
+							var textShape = new GeoMap.Text('x', 'color:'+color+';left:'+(v.x)+'px;top:'+v.y+'px;font-size: '+fontSize+'px;', null, {
+								pos: {
+									x: v.x,
+									y: v.y
+								},
+								offset: {
+									x: -6,
+									y: -12
+								},
+								zlevel: GeoMap.ZLEVEL.NOCLIP
+							});
+							gm.addOverlay(textShape);
 						}
-						var textShape = new GeoMap.Text(text, 'color:'+color+';left:'+(v.x)+'px;top:'+v.y+'px;font-size: 30px', null, {
-							pos: {
-								x: v.x,
-								y: v.y
-							},
-							zlevel: GeoMap.ZLEVEL.NOCLIP
-						});
-						gm.addOverlay(textShape);
+						if(text){
+							var textShape = new GeoMap.Text(text, 'color:'+color+';left:'+(v.x)+'px;top:'+v.y+'px;font-size: '+fontSize+'px;'+fontWeight, null, {
+								pos: {
+									x: v.x,
+									y: v.y
+								},
+								offset: offset,
+								zlevel: GeoMap.ZLEVEL.NOCLIP,
+								style: styleExtra
+							});
+							gm.addOverlay(textShape);
+						}
 					});
 				}
 				Timer.end('render micaps');

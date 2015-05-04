@@ -1256,6 +1256,10 @@ define('GeoMap',['zrender',
 			style.textDecoration = text_decoration;
 		}
 
+		var style_extra = option.style;
+		if(style_extra){
+			$.extend(style, style_extra);
+		}
 		var conf = {
 			style: style,
 			zlevel: ZINDEX_LAYER
