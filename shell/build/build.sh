@@ -13,7 +13,8 @@ node ../../../../compresser/ ../../core/ $target_dir/
 node ./change.js $target_dir
 
 #3. copy node-webkit exe
-cp -R /d/soft/node-webkit-v0.11.2-win-x64/* $target_dir/
+mkdir -p $target_dir/bin
+cp -R /d/soft/node-webkit-v0.11.2-win-x64/* $target_dir/bin
 
 #4. remove files
 rm -rf $target_dir/config

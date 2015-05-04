@@ -9,7 +9,8 @@ Core.safe(function(){
 	var color_toRGB = Core.Color.toRGB
 
 	var Logger = Core.util.Logger,
-		Timer = Logger.Timer;
+		Timer = Logger.Timer,
+		Page = Core.Page;
 		
 	var ConfUser = Core.Lib.conf.User;	
 
@@ -98,28 +99,28 @@ Core.safe(function(){
 	var is_img = Core.util.isImg;
 	// 引入amd模块加载器	
 	Core.Html.addScript('./js/libs/esl.js', false, function(){
-		var developmod = false;
-		if(developmod){
-			require.config({
-		        packages: [
-		            {
-		                name: 'zrender',
-		                location: '../../../git_project/zrender-2.0.5/src/',
-		                main: 'zrender'
-		            }
-		        ],
-		        paths: {
-		        	'GeoMap': 'js/libs/GeoMap',
-		        	'LegendImage': 'js/libs/LegendImage'
-		        }
-		    });
-		}else{
+		// var developmod = false;
+		// if(developmod){
+		// 	require.config({
+		//         packages: [
+		//             {
+		//                 name: 'zrender',
+		//                 location: '../../../git_project/zrender-2.0.5/src/',
+		//                 main: 'zrender'
+		//             }
+		//         ],
+		//         paths: {
+		//         	'GeoMap': 'js/libs/GeoMap',
+		//         	'LegendImage': 'js/libs/LegendImage'
+		//         }
+		//     });
+		// }else{
 			var fileLocation= './js/libs/zr'
 			require.config({
 		        paths:{
 		            'zrender': fileLocation,
 		            'zrender/shape/Base': fileLocation,
-		            'zrender/shape/BrokenLine': fileLocation,
+		            'zrender/shape/Polyline': fileLocation,
 		            'zrender/shape/Polygon': fileLocation,
 		            'zrender/Group': fileLocation,
 		            'zrender/tool/util': fileLocation,
@@ -134,7 +135,7 @@ Core.safe(function(){
 		            'LegendImage': './js/libs/LegendImage'
 		        }
 		    });
-		}
+		// }
 		init(true);
 	});
 	
@@ -291,7 +292,7 @@ Core.safe(function(){
 				var text = $this.text(),
 					style = $this.attr('style');
 
-				var win_textstyle = Core.Page.textStyle(function(e){
+				var win_textstyle = Page.textStyle(function(e){
 					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
 						text: text,
 						style: style
@@ -411,7 +412,7 @@ Core.safe(function(){
 					style = $text.attr('style');
 				var bg_color = labelRect.options.color;
 				style += (style?';':'')+'background-color:'+bg_color;
-				var win_textstyle = Core.Page.textStyle(function(e){
+				var win_textstyle = Page.textStyle(function(e){
 					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
 						text: text,
 						style: style
@@ -480,7 +481,7 @@ Core.safe(function(){
 					style = $text.attr('style');
 				var bg_color = shape.shape.style.color;
 				style += (style?';':'')+'background-color:'+bg_color;
-				var win_textstyle = Core.Page.textStyle(function(e){
+				var win_textstyle = Page.textStyle(function(e){
 					CoreWindow.sendMsg(ConstMsgType.CONF_STYLE, {
 						text: text,
 						style: style
@@ -640,17 +641,20 @@ Core.safe(function(){
 				});
 			}();
 			
+			var err_obj_blendent = {
+				msg: '请先配置产品图例！'
+			};
+
 			function _checkBlendent(blendent){
-				var str_notice = '请先配置产品图例！';
 				var len_blendent = 0;
 				if(!blendent || (len_blendent = blendent.length) == 0){
-					return alert(str_notice);
+					return false;
 				}
 				// 对图例进行验证
 				for(var i = 0; i<len_blendent; i++){
 					var v = blendent[i];
 					if(!v || !v.colors){
-						return alert(str_notice);
+						return false;
 					}
 				}
 				return true;
@@ -707,7 +711,7 @@ Core.safe(function(){
 				var interpolate = data.interpolate;
 				if(interpolate){
 					if(!_checkBlendent(blendent)){
-						return;
+						return err_obj_blendent;
 					}
 					var _interpolate_width,
 						_interpolate_height;
@@ -754,11 +758,12 @@ Core.safe(function(){
 				}
 				// 14类中的面
 				var areas = data.areas;
+
 				if(areas){
 					var len = areas.length;
 					if(len > 0){
 						if(!_checkBlendent(blendent)){
-							return;
+							return err_obj_blendent;
 						}
 						/*判断是不是大风降温数据 {*/
 						var is_bigwind = false;
@@ -852,7 +857,7 @@ Core.safe(function(){
 						// 霜冻线在地图内，其它都可在地图区域外
 						if(v.code == 38){
 							delete option.zlevel;
-							option_special.width = 14;
+							option_special.width = 8;
 						}
 						var polyline = new GeoMap.Polyline(point_arr, option, option_special);
 						gm.addOverlay(polyline);   //增加折线
@@ -921,7 +926,7 @@ Core.safe(function(){
 							};
 							// color = '#1010FF';
 
-							var textShape = new GeoMap.Text('x', 'color:'+color+';left:'+(v.x)+'px;top:'+v.y+'px;font-size: '+fontSize+'px;', null, {
+							var textShape = new GeoMap.Text('╳', 'color:'+color+';left:'+(v.x)+'px;top:'+v.y+'px;font-size: '+fontSize+'px;', null, {
 								pos: {
 									x: v.x,
 									y: v.y
@@ -968,13 +973,17 @@ Core.safe(function(){
 					}
 				}
 			}
-			function _afterRender(){
+			function _afterRender(callback){
 				initing = false;
 				Loading.hide();
 				gm.refresh();
+				callback && callback();
 			}
 			// 当产品更换时触发
-			$doc.on(ConstEvent.PRODUCT_CHANGE, function(e, product_name){
+			function _fn_callback_event(e, data){
+				Timer.start('render product');
+				var product_name = data.name;
+				var callback = data.callback;
 				// if(product_name && (!conf_of_product || conf_of_product.name != product_name)){
 				if(gm.isReady && product_name){
 					// 清空地图及样式
@@ -986,7 +995,10 @@ Core.safe(function(){
 						conf_of_product = ConfUser.get(product_name);
 						if(!conf_of_product || !conf_of_product.title || !conf_of_product.legend || !conf_of_product.in_out){
 							Loading.hide();
-							return alert('请对该产品进行配置！');
+							return callback({
+								msg: '请对该产品进行配置！'
+							});
+							// return alert('请对该产品进行配置！');
 						}
 						conf_of_product.name = product_name;
 
@@ -1197,10 +1209,13 @@ Core.safe(function(){
 										interpolation_all: conf_interpolation && conf_interpolation.flag, //传入micaps解析需要参数
 										arithmetic: conf_file_rule.arithmetic
 									}, function(err, data, params){
-										// console.log(err, data);
 										Timer.end('read micaps');
+										var err_obj;
 										if(err){
-											alert(err.msg || '读取数据错误！');
+											err_obj = {
+												msg: err.msg || '读取数据错误！'
+											};
+											// alert(err.msg || '读取数据错误！');
 										}else{
 											data_of_micaps = data;
 											$html_title1 && $html_title1.find('span').text(function(){
@@ -1212,18 +1227,32 @@ Core.safe(function(){
 											$html_title3 && $html_title3.find('span').text(function(){
 												return _replace_date($(this).text(), true);
 											});
-											render_conf(data_of_micaps, conf_of_product.legend.blendent, params);
+											err_obj = render_conf(data_of_micaps, conf_of_product.legend.blendent, params);
+											var used_time = Timer.end('render product');
 										}
-										_afterRender()
+
+										_afterRender(function(){
+											callback(err_obj, {
+												time: used_time
+											});
+										})
 									});
 									
 								}else{
-									alert('没有找到符合条件的文件，请检查产品相关配置！');
-									_afterRender()
+									// alert('没有找到符合条件的文件，请检查产品相关配置！');
+									_afterRender(function(){
+										callback({
+											msg: '没有找到符合条件的文件，请检查产品相关配置！'
+										});
+									})
 								}
 							}else{
-								alert("请配置该产品的数据源路径！");
-								_afterRender()
+								// alert("请配置该产品的数据源路径！");
+								_afterRender(function(){
+									callback({
+										msg: '请配置该产品的数据源路径！'
+									});
+								})
 							}
 						}
 						// var new_projector = _getProjector();
@@ -1253,7 +1282,25 @@ Core.safe(function(){
 						}, _afterConfig);
 					});
 				}
+			}
+			var event_name = ConstEvent.PRODUCT_CHANGE;
+			$doc.on(event_name, _fn_callback_event);
+			CoreWindow.get().on(event_name, function(name, callback){
+				_fn_callback_event(null, {
+					name: name,
+					callback: function(err, data){
+						if(err){
+							callback(err, data);
+						}else{
+							fn_global.save(false, function(e, data_save){
+								data_save.time += data.time;
+								callback(e, data_save);
+							});
+						}
+					}
+				});
 			});
+			Page.inited();
 		});
 	}
 	function _get_save_img_name(){
@@ -1264,6 +1311,7 @@ Core.safe(function(){
 
 		return filename || conf_of_product.name+'_'+width_geomap+'x'+height_geomap+'.png';
 	}
+	var fn_global = {};
 	/*右侧地图的右键功能*/
 	!function(){
 		// 得到元素的position，防止transform.rotate对元素位置的影响
@@ -1277,105 +1325,121 @@ Core.safe(function(){
 				return $elem.position();
 			}
 		}
-		/*导出图片*/
-		var _save_img = function(){
-			if(gm && conf_of_product){
-				$('<input type="file" nwsaveas="'+_get_save_img_name()+'" nwworkingdir="'+conf_of_product.in_out.dir_out+'"/>').on('change',function(){
-					Timer.start('save image');
-					var save_file_name = $(this).val();
-					Loading.show(function(){
-						var img_data = gm.toDataURL();
-						var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+width_geomap+'px; height: '+height_geomap+'px"></div>').appendTo($('body'));
-						
-						var gm_export = new GeoMap({
-							container: $div_container,
-							isnotMirror: true,
-							onafteraddoverlays: function(){
-								var _bgimg = conf_export.bgimg;
-								if(_bgimg && file_util.exists(_bgimg)){
-									var img = new Image();
-									img.onload = function(){
-										conf_export.bgimg = img;
-										_export();
-									}
-									img.src = _bgimg;
-								}else{
-									_export();
-								}
+		var _save_img_inner = function(save_file_name, callback){
+			Timer.start('save image');
+			Loading.show(function(){
+				var img_data = gm.toDataURL();
+				var $div_container = $('<div style="position: absolute; left: -999px;top: 0;width: '+width_geomap+'px; height: '+height_geomap+'px"></div>').appendTo($('body'));
+				
+				var gm_export = new GeoMap({
+					container: $div_container,
+					isnotMirror: true,
+					onafteraddoverlays: function(){
+						var _bgimg = conf_export.bgimg;
+						if(_bgimg && file_util.exists(_bgimg)){
+							var img = new Image();
+							img.onload = function(){
+								conf_export.bgimg = img;
+								_export();
 							}
-						});
-						gm_export.addOverlay(new GeoMap.Image(img_data));
+							img.src = _bgimg;
+						}else{
+							_export();
+						}
+					}
+				});
+				gm_export.addOverlay(new GeoMap.Image(img_data));
 
-						var imgnum_waiting_draw = 0;
-						var tt_draw;
-						$geomap_layer.find('.map_layer').sort(function(a, b){
-							return $(a).css('z-index') > $(b).css('z-index');
-						}).each(function(i,v){
-							var $layer = $(this);
-							var layer;
-							if($layer.is('.map_layer_text')){
-								$layer.css($layer.position()); // 修复样式里的left和top为auto情况
-								var padding_top = parseFloat($layer.css('padding-top')) || 0,
-									padding_right = parseFloat($layer.css('padding-right')) || 0,
-									padding_bottom = parseFloat($layer.css('padding-bottom')) || 0,
-									padding_left = parseFloat($layer.css('padding-left')) || 0;
-								gm_export.addOverlay(new GeoMap.Text(_replace_date($layer.text()),$layer.attr('style'), [padding_top, padding_right, padding_bottom, padding_left]));
-							}else if($layer.is('.map_layer_image')){
-								var pos = _getPos($layer);
-								var img = $layer.find('img').get(0);
-								gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height(), -$layer.data('angle')));
-							}else if($layer.is('.map_layer_box')){
-								var pos = _getPos($layer);
-								var $canvas = $layer.find('canvas');
-								var pos_canvas = _getPos($canvas);
-								var angle = -$layer.data('angle');
-								gm_export.addOverlay(new GeoMap.Image($canvas.get(0), pos.left + pos_canvas.left, pos.top + pos_canvas.top, $canvas.width(), $canvas.height(), angle));
-								
-								var $text = $layer.find('.text');
-								var text = $text.text();
-								if(text){
-									var pos_text = $text.position();
-									var style = $text.clone().css({
-										left: pos.left + pos_text.left,
-										top: pos.top + pos_text.top,
-										'line-height': $text.css('line-height')
-									}).attr('style');
-									gm_export.addOverlay(new GeoMap.Text(text, style, null, {
-										angle: angle
-									}));
-								}
-							}
-						});
-						// 软件到期后对生成的图片进行水印处理
-						if(!Core.safe.l){
-							gm_export.addOverlay(new GeoMap.Rectangle({
-								style: {
-									x: 0,
-									y: 0,
-									width: width_geomap,
-									height: height_geomap,
-									color: new GeoMap.Pattern.listence({
-									})
-								}
+				var imgnum_waiting_draw = 0;
+				var tt_draw;
+				$geomap_layer.find('.map_layer').sort(function(a, b){
+					return $(a).css('z-index') > $(b).css('z-index');
+				}).each(function(i,v){
+					var $layer = $(this);
+					var layer;
+					if($layer.is('.map_layer_text')){
+						$layer.css($layer.position()); // 修复样式里的left和top为auto情况
+						var padding_top = parseFloat($layer.css('padding-top')) || 0,
+							padding_right = parseFloat($layer.css('padding-right')) || 0,
+							padding_bottom = parseFloat($layer.css('padding-bottom')) || 0,
+							padding_left = parseFloat($layer.css('padding-left')) || 0;
+						gm_export.addOverlay(new GeoMap.Text(_replace_date($layer.text()),$layer.attr('style'), [padding_top, padding_right, padding_bottom, padding_left]));
+					}else if($layer.is('.map_layer_image')){
+						var pos = _getPos($layer);
+						var img = $layer.find('img').get(0);
+						gm_export.addOverlay(new GeoMap.Image(img, pos.left, pos.top, $layer.width(), $layer.height(), -$layer.data('angle')));
+					}else if($layer.is('.map_layer_box')){
+						var pos = _getPos($layer);
+						var $canvas = $layer.find('canvas');
+						var pos_canvas = _getPos($canvas);
+						var angle = -$layer.data('angle');
+						gm_export.addOverlay(new GeoMap.Image($canvas.get(0), pos.left + pos_canvas.left, pos.top + pos_canvas.top, $canvas.width(), $canvas.height(), angle));
+						
+						var $text = $layer.find('.text');
+						var text = $text.text();
+						if(text){
+							var pos_text = $text.position();
+							var style = $text.clone().css({
+								left: pos.left + pos_text.left,
+								top: pos.top + pos_text.top,
+								'line-height': $text.css('line-height')
+							}).attr('style');
+							gm_export.addOverlay(new GeoMap.Text(text, style, null, {
+								angle: angle
 							}));
 						}
-
-						// 防止背景图片没有加载完成
-						function _export(){
-							img_data = gm_export.toDataURL(conf_export);
-
-							file_util.img.saveBase64(save_file_name, img_data);
-							$div_container.remove();
-							Loading.hide();
-							var time = Timer.end('save image');
-							alert('成功导出图片, 用时'+time+'毫秒!');
+					}
+				});
+				// 软件到期后对生成的图片进行水印处理
+				if(!Core.safe.l){
+					gm_export.addOverlay(new GeoMap.Rectangle({
+						style: {
+							x: 0,
+							y: 0,
+							width: width_geomap,
+							height: height_geomap,
+							color: new GeoMap.Pattern.listence({
+							})
 						}
+					}));
+				}
+
+				// 防止背景图片没有加载完成
+				function _export(){
+					img_data = gm_export.toDataURL(conf_export);
+
+					file_util.img.saveBase64(save_file_name, img_data);
+					$div_container.remove();
+					Loading.hide();
+					var time = Timer.end('save image');
+					callback(null, {
+						time: time,
+						path: save_file_name
 					});
-				}).click();
+					// alert('成功导出图片, 用时'+time+'毫秒!');
+				}
+			});
+		}
+		/*导出图片*/
+		var _save_img = function(is_show_select_dialog, callback){
+			if(gm && conf_of_product){
+				var file_name_save = _get_save_img_name();
+				var dir_save = conf_of_product.in_out.dir_out;
+				if(is_show_select_dialog){
+					$('<input type="file" nwsaveas="'+file_name_save+'" nwworkingdir="'+dir_save+'"/>').on('change',function(){
+						_save_img_inner($(this).val(), callback);
+					}).click();
+				}else{
+					_save_img_inner(path_util.join(dir_save, file_name_save), callback);
+				}
 			}else{
-				alert('请先选择要操作的产品！');
+				callback({
+					msg: '请先选择要操作的产品！'
+				});
+				// alert('请先选择要操作的产品！');
 			}
 		}
+		fn_global.save = _save_img;
 		/*添加文字*/
 		var _add_text = function(){
 			on_receive_style = function(data){
@@ -1391,7 +1455,7 @@ Core.safe(function(){
 				}).appendTo($geomap_layer);
 				$text.css(data.style).find('span').text(data.text);
 			}
-			var win_textstyle = Core.Page.textStyle(function(e){
+			var win_textstyle = Page.textStyle(function(e){
 				CoreWindow.sendMsg(ConstMsgType.CONF_STYLE,{},win_textstyle.window);
 			});
 		}
@@ -1504,7 +1568,15 @@ Core.safe(function(){
 		}
 		$('#btn_add_text').click(_add_text);
 		$('#btn_add_img').click(_show_entrepot_images);
-		$('#btn_export').click(_save_img);
+		var $btn_export = $('#btn_export').click(function(){
+			_save_img(true, function(err, data){
+				if(err){
+					alert(err.msg);
+				}else{
+					alert('成功导出图片, 用时'+data.time+'毫秒!');
+				}
+			});
+		});
 		$('#btn_add_img_external').click(_add_img_external);
 		$geomap_layer.on('contextmenu',function(e_contextmenu){
 			_cache_e_contextmenu = e_contextmenu; // 暂存事件对象
@@ -1523,7 +1595,9 @@ Core.safe(function(){
 				menu_add_img_entrepot.on('click', _show_entrepot_images);
 
 				var menu_save_img = new MenuItem({ label: '导出图片' });
-				menu_save_img.on('click', _save_img);
+				menu_save_img.on('click', function(){
+					$btn_export.click();
+				});
 
 				menu_map.append(menu_add_text);
 				menu_map.append(new gui.MenuItem({ type: 'separator' }));
