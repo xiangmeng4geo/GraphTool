@@ -67,22 +67,23 @@ Core.safe(function(){
 			var crontab = task.crontab;
 			var type = crontab.type;
 			var extra = crontab.extra;
-			// if(type == TYPE_EVERYWEEK){
-			// 	if(7 - now.getDay() != extra){
-			// 		continue;
-			// 	}
-			// }else if(type == TYPE_EVERYMONTH){
-			// 	if(now.getDate() != extra){
-			// 		continue;
-			// 	}
-			// }
-			// var arr_time = crontab.time.split(':');
-			// var time_check = new Date(now.getTime());
-			// time_check.setHours(arr_time[0]);
-			// time_check.setMinutes(arr_time[1]);
-			// time_check.setSeconds(0);
-			// var cha = now - time_check;console.log(cha, cha >= 0 && cha <= delay_check, time_check, now);
-			// if(cha >= 0 && cha <= Math.max(delay_check, lasttime_check - now)){
+			if(type == TYPE_EVERYWEEK){
+				if(7 - now.getDay() != extra){
+					continue;
+				}
+			}else if(type == TYPE_EVERYMONTH){
+				if(now.getDate() != extra){
+					continue;
+				}
+			}
+			var arr_time = crontab.time.split(':');
+			var time_check = new Date(now.getTime());
+			time_check.setHours(arr_time[0]);
+			time_check.setMinutes(arr_time[1]);
+			time_check.setSeconds(0);
+			var cha = now - time_check;
+			console.log(cha, cha >= 0 && cha <= delay_check, time_check, now);
+			if(cha >= 0 && cha <= Math.max(delay_check, lasttime_check - now)){
 				var products = task.p;
 				for(var i = 0, j = products.length; i<j; i++){
 					var pro = products[i];
@@ -90,18 +91,16 @@ Core.safe(function(){
 						queue.push(pro);
 					}
 				}
-			// }
+			}
 		}
 		run();
 		lasttime_check = now;
-		// check_flag = setTimeout(check, delay_check);
+		check_flag = setTimeout(check, delay_check);
 	}
 	window.check = check;
-	// var $doc_exec;
 	win_index = Core.Page.main();
 	win_index.once('inited', function(){
 		win_index.show();
-		$doc_exec = $(win_index.window.document);
 
 		tray.menu = menu;
 	});

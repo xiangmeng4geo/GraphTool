@@ -804,9 +804,6 @@ Core.safe(function(){
 								}
 							}
 							color = getColor(val_area, v.code);
-							if(is_debug){
-								console.log(color);
-							}
 							if(color){
 								if(v.code == 24){
 									// strokeColor = 'red';
@@ -814,9 +811,6 @@ Core.safe(function(){
 										strokeStyle: color,
 										space: 1
 									});
-									if(is_debug){
-										console.log('Pattern', color);
-									}
 								}
 								var polygon = new GeoMap.Polygon(point_arr, {
 									style: {
@@ -863,7 +857,7 @@ Core.safe(function(){
 						// 霜冻线在地图内，其它都可在地图区域外
 						if(v.code == 38){
 							delete option.zlevel;
-							option_special.width = 14;
+							option_special.width = 8;
 						}
 						var polyline = new GeoMap.Polyline(point_arr, option, option_special);
 						gm.addOverlay(polyline);   //增加折线
@@ -1215,9 +1209,6 @@ Core.safe(function(){
 										interpolation_all: conf_interpolation && conf_interpolation.flag, //传入micaps解析需要参数
 										arithmetic: conf_file_rule.arithmetic
 									}, function(err, data, params){
-										if(is_debug){
-											console.log(err, data);
-										}
 										Timer.end('read micaps');
 										var err_obj;
 										if(err){
@@ -1309,17 +1300,6 @@ Core.safe(function(){
 					}
 				});
 			});
-			var is_debug = false;
-			CoreWindow.get().on('debug', function(){
-				is_debug = true;
-			})
-			// CoreWindow.get().on(event_name, function(err, data){
-			// 	if(err){
-			// 		_fn_callback_event(err, data);
-			// 	}else{
-			// 		fn_global.save(_fn_callback_event);
-			// 	}
-			// });
 			Page.inited();
 		});
 	}
