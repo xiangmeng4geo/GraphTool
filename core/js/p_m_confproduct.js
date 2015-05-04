@@ -187,7 +187,7 @@ Core.safe(function(){
 		$.each(Conf_User.getSys().templates, function(i, v){
 			if(v.flag){
 				var val = v.t.join('x');
-				html_template += '<option value="'+(val)+'">'+(v.n+'('+val+')')+'</option>';
+				html_template += '<option value="'+i+'">'+(v.n+'('+val+')')+'</option>';
 			}
 		});
 		$select_template.html(html_template);
@@ -478,7 +478,7 @@ Core.safe(function(){
 				'interpolation': {
 					'flag': $cb_interpolation_all.prop('checked')
 				},
-				'template': $select_template.val().split('x'),
+				'template': parseInt($select_template.val()),
 				'mapbg_color': {
 					'val': $color_mapbg.val(),
 					'flag': $cb_use_mapbgcolor.prop('checked')
@@ -651,10 +651,8 @@ Core.safe(function(){
 					$cb_interpolation_all.prop('checked', conf_interpolation.flag);
 				}
 
-				var template = conf_other.template || _template.t;
-				if(template){
-					selected_option($select_template, template.join('x'));
-				}
+				var template_index = parseInt(conf_other.template) || 0;
+				selected_option($select_template, template_index);
 			}
 		}
 

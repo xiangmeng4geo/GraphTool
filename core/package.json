@@ -1,9 +1,11 @@
 {
   "name": "Blue π Ants",
-  "version": "v0.4.6",
+  "version": "v0.4.9",
   "description": "蓝π蚂蚁制图",
   "main": "login.html",
   "window": {
+    "title": "蓝π蚂蚁制图",
+    "icon": "./img/icon.png",
     "frame": false,
     "position": "center",
     "width": 400,

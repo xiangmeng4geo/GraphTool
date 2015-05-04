@@ -1,13 +1,17 @@
 !function(global){
-	var debug = this.debug = true;
+	var debug = this.debug = false;
 	var nwrequire = global.require;
 	var ext = this.global.require.extensions;
 	ext['.gts'] = ext['.js'];
 	
 	var Core = {};
 	Core.require = nwrequire;
-	Core.Lib = nwrequire('core');
-	var conf = Core.Lib.conf;
+	var CoreLib = Core.Lib = nwrequire('core');
+	var CoreLibUtil = CoreLib.util,
+		util_path = CoreLibUtil.path,
+		util_file = CoreLibUtil.file;
+
+	var conf = CoreLib.conf;
 
 	var gui = nwDispatcher.requireNwGui(),// replace require('nw.gui')
 		Window = gui.Window,
@@ -250,10 +254,12 @@
 	var manifest = gui.App.manifest;
 	var conf_gui_window = manifest.window;
 	Core.appInfo = manifest;
+	var util_file_path = util_file.path;
 	/*按指定文件加载页面*/
-	function _open(page_name){
-
-		var win = Window.open('./'+page_name+'.html',$.extend({},conf_gui_window,conf.get('view_'+page_name)));
+	function _open(page_name, options){
+		var win = Window.open('./'+page_name+'.html',$.extend({}, conf_gui_window, conf.get('view_'+page_name), options, {
+			icon: util_path.join(util_file_path.core, 'img/icon.png')
+		}));
 		win.on('close',function(){
 			win.emit('beforeclose');
 			win.removeAllListeners();
@@ -265,18 +271,22 @@
 	var _win_cache = {};
 	/*保证只打开一个相同名的窗体*/
 	var _open_only_win = (function (){
-		return function(name, callback){
-			var _win = null;//_win_cache[name];
+		return function(name, options, callback){
+			if(({}).toString.call(options) == '[object Function]'){
+				callback = options;
+				options = null;
+			}
+			var _win = _win_cache[name];
 			if(_win){
 				_win.focus_flag = true;
 				_win.focus();
 			}else{
-				_win = _open(name);
+				_win = _open(name, options);
 				if(callback){
 					_win.on('loaded',function(e){
 						callback.call(_win,e);
 					});
-					_win.on('focus',function(){
+					_win.on('focus',function(e){
 						if(_win.focus_flag){
 							_win.focus_flag = false;
 							callback.call(_win,e);
@@ -310,8 +320,8 @@
 			win_current.close();
 			return win_login;
 		},
-		main: function(callback){
-			return _open_only_win('main',callback);
+		main: function(options, callback){
+			return _open_only_win('main', options, callback);
 		},
 		addProduct: function(callback){
 			return _open_only_win('m_addproduct',callback);
@@ -329,11 +339,17 @@
 			return _open_only_win('m_listence',callback);
 		},
 		about: function(callback){
-			return _open_only_win('m_about',callback);
+			return _open_only_win('m_about', callback);
 		},
 		doc: function(){
-			var doc_path = Core.Lib.util.file.path.doc;
+			var doc_path = util_file_path.doc;
 			gui.Shell.openItem(doc_path);
+		},
+		aw_list: function(callback){
+			return _open_only_win('m_aw_list', callback);
+		},
+		aw_edit: function(callback){
+			return _open_only_win('m_aw_edit', callback);
 		}
 	}
 	var message_listeners = [];
@@ -401,6 +417,21 @@
 	function _isMain(url){
 		return /main\.\w+$/.test(url);
 	}
+	function _isAutoWork(url){
+		return /autowork\.\w+$/.test(url);
+	}
+	function _isConfProduct(url){
+		return /m_confproduct\.\w+$/.test(url);
+	}
+	function _isTextStyle(url){
+		return /m_text_style\.\w+$/.test(url);
+	}
+	function _isAWEdit(url){
+		return /m_aw_edit\.\w+$/.test(url);
+	}
+	function _isAWList(url){
+		return /m_aw_list\.\w+$/.test(url);
+	}
 	/*窗体关闭的时候清空相关数据及事件*/
 	win_current.on('close',function(){
 		if(!_isLogin(href)){
@@ -418,15 +449,20 @@
 	!function(){
 		// 对入口做验证，防止直接改配置文件进行子模块
 		var tt_check;
-		if(!debug && !_isLogin(href)){
+		if(!debug && !(_isLogin(href) || _isAutoWork(href))){
 			var _from;
 			function _check(type){
 				if(_isMain(href)){
-					if(!_isLogin(_from)){
+					if(!(_isLogin(_from) || _isAutoWork(_from))){
 						Core.Page.logout();
 					}
 				}else{
-					if(!_isMain(_from)){
+					if(!(
+						_isMain(_from) || 
+						(_isConfProduct(_from) && _isTextStyle(href)) ||
+						(_isAutoWork(_from) && _isAWList(href)) ||
+						(_isAWList(_from) && _isAWEdit(href))
+					)){
 						alert('您的操作不合法！');
 						CoreWindow.close();
 					}
@@ -509,7 +545,7 @@
 			}, 
 			end: function(name, level){
 				level = parseInt(level) || 0;
-				if(!(level >=0 && level < PREFIX_LEVEL.length)){
+				if(!(level >= 0 && level < PREFIX_LEVEL.length)){
 					level = 0;
 				}
 				var start_time = cache_log_time[name];
@@ -520,6 +556,7 @@
 					delete cache_log_time[name];
 					return used_time;
 				}
+				return 0;
 			}
 		};
 		Core.util.Logger = Logger;

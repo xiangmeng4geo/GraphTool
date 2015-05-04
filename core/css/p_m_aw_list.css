@@ -1,0 +1,35 @@
+.main{
+	width: 96%;
+	margin: 10px auto;
+}
+.tasks{
+	margin-top: 20px;
+	height: 260px;
+	overflow: auto;
+}
+table{
+	width: 100%;
+	margin: 0;
+}
+table tr.has:hover td,
+table tr.has.on td{
+	background-color: #3399FF;
+}
+.btns_operate{
+	width: 50%;
+	margin: 0 auto;
+}
+.btns_operate input{
+	width: 20%;
+	margin: 0 6%;
+}
+.btns{
+	width: 300px;
+	margin: 0 auto;
+	text-align: center;
+	margin-top: 24px;
+}
+.btns input{
+	width: 100px;
+	margin: 0 20px;
+}

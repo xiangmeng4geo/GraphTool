@@ -95,7 +95,19 @@
 		        	}
 		        },
 		        onnodedblclick: function(e,item){
-		        	$doc.trigger(ConstEvent.PRODUCT_CHANGE,item.text);
+		        	$doc.trigger(ConstEvent.PRODUCT_CHANGE, {
+		        		name: item.text,
+		        		callback: function(err, data){
+		        			if(err){
+		        				alert(err.msg);
+		        			}
+			        		// if(err){
+			        		// 	alert("错误："+err.msg);
+			        		// }else{
+			        		// 	alert('用时:'+ data.time);
+			        		// }
+			        	}
+		        	});
 		        }   
 		    });
 		    // $doc.on(ConstEvent.GEOMAP_INITED,function(){
@@ -330,5 +342,5 @@
 		Core.Lib.util.file.tmp.clear();
 		alert('缓存清除成功！');
 	});
-	Page.inited();
+	// Page.inited();
 }();

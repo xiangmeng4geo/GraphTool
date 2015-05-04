@@ -2,7 +2,8 @@
 	"msgType": {
 		"ADD_PRODUCT": "addProduct",
 		"CONF_STYLE": "conf_style",
-		"CONF_PRODUCT": "conf_product"
+		"CONF_PRODUCT": "conf_product",
+		"AW_EDIT": "aw"
 	},
 	"productType": {
 		"TYPE": {

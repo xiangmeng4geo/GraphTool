@@ -58,6 +58,9 @@ function _repalce_content(dir){
 	_replace(path.join(dir, 'package.json'), function(content){
 		return content.replace('login.html', 'login.gt');
 	});
+	_replace(path.join(dir, 'autowork/package.json'), function(content){
+		return content.replace('autowork.html', 'autowork.gt');
+	});
 	_replace(path.join(dir, 'j/core.gts'), function(content){
 		return content.replace(/\.html/g, '.gt');
 	});
