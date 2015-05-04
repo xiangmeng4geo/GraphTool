@@ -1,6 +1,5 @@
 Core.safe(function(){
-	sessionStorage.setItem('test', 123);
-	var core = require('core');
+	var core = Core.Lib;
 	var conf = core.conf;
 	var util = core.util,
 		Store = Core.Store;
@@ -67,6 +66,7 @@ Core.safe(function(){
 			(true_fn || function(){})();
 			var win_index = Core.Page.main();
 			var fn_inited = function(){
+				Core.require('child_process').exec(process.execPath+' '+Core.Lib.util.file.path.core+'/autowork');
 				var init_time = (new Date()-start_time)/1000;
 				// win_index.removeAllListeners();
 				setTimeout(function(){

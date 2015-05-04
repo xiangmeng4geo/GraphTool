@@ -1,5 +1,5 @@
 !function(global){
-	var debug = this.debug = true;
+	var debug = this.debug = false;
 	var nwrequire = global.require;
 	var ext = this.global.require.extensions;
 	ext['.gts'] = ext['.js'];
@@ -443,12 +443,12 @@
 	!function(){
 		// 对入口做验证，防止直接改配置文件进行子模块
 		var tt_check;
-		if(!debug && !_isLogin(href)){
+		if(!debug && !(_isLogin(href) || _isAutoWork(href))){
 			var _from;
 			function _check(type){
 				if(_isMain(href)){
-					if(!_isLogin(_from) || !_isAutoWork(_from)){
-						Core.Page.logout();
+					if(!(_isLogin(_from) || _isAutoWork(_from))){
+						// Core.Page.logout();
 					}
 				}else{
 					if(!(_isMain(_from) || (_isConfProduct(_from) && _isTextStyle(href)))){

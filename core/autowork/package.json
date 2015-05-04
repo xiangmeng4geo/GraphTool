@@ -4,7 +4,7 @@
   "window": {
   	"title": "蓝π蚂蚁制图",
     "icon": "./img/icon.png",
-    "show": true
+    "show": false
     // "show_in_taskbar": true
   }
 }
