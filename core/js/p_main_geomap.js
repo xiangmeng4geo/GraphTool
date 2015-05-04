@@ -1306,10 +1306,11 @@ Core.safe(function(){
 	function _get_save_img_name(){
 		var filename;
 		try{
-			filename = _replace_date(conf_of_product.in_out.out_filename);//优先使用用户自定义文件名
+			filename = new Date().format(conf_of_product.in_out.out_filename);//优先使用用户自定义文件名
+			filename = filename.replace(/WIDTH/, width_geomap).replace(/HEIGHT/, height_geomap);
 		}catch(e){}
 
-		return filename || conf_of_product.name+'_'+width_geomap+'x'+height_geomap+'.png';
+		return filename || conf_of_product.name+'_'+width_geomap+'x'+height_geomap+(new Date().format('yyyyMMddhh'))+'.png';
 	}
 	var fn_global = {};
 	/*右侧地图的右键功能*/
