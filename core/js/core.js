@@ -426,6 +426,12 @@
 	function _isTextStyle(url){
 		return /m_text_style\.\w+$/.test(url);
 	}
+	function _isAWEdit(url){
+		return /m_aw_edit\.\w+$/.test(url);
+	}
+	function _isAWList(url){
+		return /m_aw_list\.\w+$/.test(url);
+	}
 	/*窗体关闭的时候清空相关数据及事件*/
 	win_current.on('close',function(){
 		if(!_isLogin(href)){
@@ -448,10 +454,15 @@
 			function _check(type){
 				if(_isMain(href)){
 					if(!(_isLogin(_from) || _isAutoWork(_from))){
-						// Core.Page.logout();
+						Core.Page.logout();
 					}
 				}else{
-					if(!(_isMain(_from) || (_isConfProduct(_from) && _isTextStyle(href)))){
+					if(!(
+						_isMain(_from) || 
+						(_isConfProduct(_from) && _isTextStyle(href)) ||
+						(_isAutoWork(_from) && _isAWList(href)) ||
+						(_isAWList(_from) && _isAWEdit(href))
+					)){
 						alert('您的操作不合法！');
 						CoreWindow.close();
 					}

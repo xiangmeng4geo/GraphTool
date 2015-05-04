@@ -3,6 +3,8 @@ Core.safe(function(){
 	var util_lib = C.Lib.util,
 		util_file = util_lib.file,
 		util_path = util_lib.path;
+	var util_tmp_autowork = util_file.tmp.autowork;
+
 	var ConfUser = C.Lib.conf.User;
 	var CoreWindow = C.Window;
 	var gui = CoreWindow.getGui();
@@ -10,21 +12,30 @@ Core.safe(function(){
 	var title = '自动作业'
 	tray.tooltip = title;
 
-	// 一般程序是以单例模式运行
-	// (function(){
-	// 	var Store = Core.Store;
-	// 	var pid_current = process.pid;
-	// 	var cache_name = 'pid';
-	// 	Store.set(cache_name, pid_current);
-	// 	function heardbeat(){
-	// 		console.log(Store.get(cache_name) ,pid_current);
-	// 		if(Store.get(cache_name) != pid_current){
-	// 			process.exit();
-	// 		}
-	// 		setTimeout(heardbeat, 500);
-	// 	}
-	// 	heardbeat();
-	// })();
+	// 保证自动作业只启动一个实例
+	(function(){
+		var Store = Core.Store;
+		var pid_current = process.pid;
+		var cache_name = 'pids';
+		var delay = 500;
+		function heardbeat(){
+			var cache_val = util_tmp_autowork.get();
+			var time = new Date().getTime();
+			if(cache_val){
+				// console.log(cache_val, pid_current, time - cache_val.time);
+				if(cache_val.pid != pid_current && time - cache_val.time < delay+20){
+					process.exit();
+					return;
+				}
+			}
+			util_tmp_autowork.set({
+				pid: pid_current,
+				time: time
+			});
+			setTimeout(heardbeat, delay);
+		}
+		heardbeat();
+	})();
 	// Give it a menu
 	var menu = new gui.Menu();
 	var MenuItem = gui.MenuItem;
@@ -32,7 +43,7 @@ Core.safe(function(){
 	var item_stop = new MenuItem({ label: '停止' });
 	item_stop.enabled = false;
 	var item_setting = new MenuItem({ label: '配置' });
-	var item_log = new MenuItem({ label: '查看日志' });
+	// var item_log = new MenuItem({ label: '查看日志' });
 	var item_quit = new MenuItem({ label: '退出' });
 	item_quit.on('click',function(){
 		CoreWindow.close(true);
@@ -60,7 +71,7 @@ Core.safe(function(){
 	menu.append(item_start);
 	menu.append(item_stop);
 	menu.append(item_setting);
-	menu.append(item_log);
+	// menu.append(item_log);
 	menu.append(item_quit);
 
 	var queue = [];//执行队列
