@@ -536,7 +536,8 @@
 		var Logger = {
 			log: function(){
 				console.log.apply(console, arguments);
-			}
+			},
+			getWriter: CoreLibUtil.Logger
 		};
 		var PREFIX_LEVEL = ['', '# ', '## '];
 		Logger.Timer = {

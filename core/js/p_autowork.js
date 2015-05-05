@@ -43,7 +43,7 @@ Core.safe(function(){
 	var item_stop = new MenuItem({ label: '停止' });
 	item_stop.enabled = false;
 	var item_setting = new MenuItem({ label: '配置' });
-	// var item_log = new MenuItem({ label: '查看日志' });
+	var item_log = new MenuItem({ label: '查看日志' });
 	var item_quit = new MenuItem({ label: '退出' });
 	item_quit.on('click',function(){
 		CoreWindow.close(true);
@@ -71,7 +71,7 @@ Core.safe(function(){
 	menu.append(item_start);
 	menu.append(item_stop);
 	menu.append(item_setting);
-	// menu.append(item_log);
+	menu.append(item_log);
 	menu.append(item_quit);
 
 	var queue = [];//执行队列
@@ -136,17 +136,25 @@ Core.safe(function(){
 
 		tray.menu = menu;
 	});
+	function _getWriter(){
+		return C.util.Logger.getWriter('autowork');
+	}
+	var writer = _getWriter();
+	
 	function run(){
 		if(queue.length > 0 && !running){
 			running = true;
 			var item_exec = queue.shift();
 			if(item_exec){
 				win_index.emit(Core.Const.Event.PRODUCT_CHANGE, item_exec, function(err, data){
-	        		// if(err){
-	        		// 	console.log("error:"+err.msg);
-	        		// }else{
-	        		// 	console.log('takes:'+ data.time+'ms!save at:'+data.path);
-	        		// }
+					var msg = [item_exec];
+					if(err){
+						msg.push('!!!!'+err.msg);
+					}else{
+						msg.push(data.time+'ms');
+						msg.push(data.path);
+					}
+					writer.apply(null, msg);
 	        		running = false;
 	        		run_flag = setTimeout(run, 500);
 	        	});
@@ -157,4 +165,18 @@ Core.safe(function(){
 	}
 
 	item_start.emit('click');//默认开启
+
+	!function(){
+		// 保证每天凌晨时writer更新
+		var lastDate = new Date();
+		function checkDate(){
+			var newDate = new Date();
+			if(newDate.getDate() != lastDate.getDate()){
+				writer = _getWriter();
+			}
+			lastDate = newDate;
+			setTimeout(checkDate, 1000);
+		}
+		checkDate();
+	}();
 });
