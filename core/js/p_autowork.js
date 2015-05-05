@@ -8,6 +8,9 @@ Core.safe(function(){
 	var ConfUser = C.Lib.conf.User;
 	var CoreWindow = C.Window;
 	var gui = CoreWindow.getGui();
+	var Shell = gui.Shell;
+	var logs_path = util_file.path.tmp_logs;
+
 	var tray = new gui.Tray({ title: 'Tray', icon: util_path.join(util_file.path.core, 'img/icon.png') });
 	var title = '自动作业'
 	tray.tooltip = title;
@@ -74,14 +77,13 @@ Core.safe(function(){
 	item_setting.on('click', function(){
 		C.Page.aw_list();
 	});
-	var Shell = gui.Shell;
 	item_log.on('click', function(){
 		var log_name = writer.path;
 		if(util_file.exists(log_name)){
 			Shell.openItem(log_name)
 		}else{
 			if(confirm('没有今天的日志，是否打开所有日志所在目录？')){
-				Shell.openItem(util_file.path.tmp_logs);
+				Shell.openItem(logs_path);
 			}
 		}
 	});
@@ -186,6 +188,17 @@ Core.safe(function(){
 			var newDate = new Date();
 			if(newDate.getDate() != lastDate.getDate()){
 				writer = _getWriter();
+				var log_files = util_file.readdir(logs_path, {
+					is_not_recursive: true,
+					mtime: true
+				});
+				var gap_time = 1000*60*60*24*2;
+				var now = new Date().getTime()
+				log_files.forEach(function(file){
+					if(now - file.mtime > gap_time){
+						util_file.rm(file.name);
+					}
+				});
 			}
 			lastDate = newDate;
 			setTimeout(checkDate, 1000);

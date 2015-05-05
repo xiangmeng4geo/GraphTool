@@ -1425,7 +1425,7 @@ Core.safe(function(){
 		var _save_img = function(is_show_select_dialog, callback){
 			if(gm && conf_of_product){
 				var file_name_save = _get_save_img_name();
-				var dir_save = conf_of_product.in_out.dir_out;
+				var dir_save = conf_of_product.in_out.dir_out || file_util.path.tmp_img; //没有保存目录时使用临时目录
 				if(is_show_select_dialog){
 					$('<input type="file" nwsaveas="'+file_name_save+'" nwworkingdir="'+dir_save+'"/>').on('change',function(){
 						_save_img_inner($(this).val(), callback);
