@@ -1,5 +1,5 @@
 !function(global){
-	var debug = this.debug = false;
+	var debug = this.debug = true;
 	var nwrequire = global.require;
 	var ext = this.global.require.extensions;
 	ext['.gts'] = ext['.js'];
