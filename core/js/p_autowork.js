@@ -109,8 +109,8 @@ Core.safe(function(){
 		var now = new Date();
 		var tasks = ConfUser.getTasks();
 		if(tasks){
-			for(var i = 0, j = tasks.length; i<j; i++){
-				var task = tasks[i];
+			for(var i_task = 0, j_task = tasks.length; i_task<j_task; i_task++){
+				var task = tasks[i_task];
 				if(!task || !task.open){
 					continue;
 				}
@@ -132,7 +132,7 @@ Core.safe(function(){
 				time_check.setMinutes(arr_time[1]);
 				time_check.setSeconds(0);
 				var cha = now - time_check;
-				// console.log(cha, cha >= 0 && cha <= delay_check, time_check, now);
+				// console.log(i_task, task.name, cha, cha >= 0 && cha <= delay_check, time_check, now);
 				if(cha >= 0 && cha <= Math.max(delay_check, lasttime_check - now)){
 					var products = task.p;
 					for(var i = 0, j = products.length; i<j; i++){
