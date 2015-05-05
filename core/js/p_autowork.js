@@ -36,6 +36,12 @@ Core.safe(function(){
 		}
 		heardbeat();
 	})();
+
+	function _getWriter(){
+		return C.util.Logger.getWriter('autowork');
+	}
+	var writer = _getWriter();
+
 	// Give it a menu
 	var menu = new gui.Menu();
 	var MenuItem = gui.MenuItem;
@@ -67,6 +73,17 @@ Core.safe(function(){
 	});
 	item_setting.on('click', function(){
 		C.Page.aw_list();
+	});
+	var Shell = gui.Shell;
+	item_log.on('click', function(){
+		var log_name = writer.path;
+		if(util_file.exists(log_name)){
+			Shell.openItem(log_name)
+		}else{
+			if(confirm('没有今天的日志，是否打开所有日志所在目录？')){
+				Shell.openItem(util_file.path.tmp_logs);
+			}
+		}
 	});
 	menu.append(item_start);
 	menu.append(item_stop);
@@ -136,10 +153,6 @@ Core.safe(function(){
 
 		tray.menu = menu;
 	});
-	function _getWriter(){
-		return C.util.Logger.getWriter('autowork');
-	}
-	var writer = _getWriter();
 	
 	function run(){
 		if(queue.length > 0 && !running){
