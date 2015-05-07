@@ -64,5 +64,13 @@
 	"template": {
 		"n": "系统默认",
 		"t": [800, 800]
+	},
+	"map1": {
+		"name": ["china"],
+		"river": "china_river"
+	},
+	"map": {
+		"name": ["hebei"],
+		"river": "china_river"
 	}
 }

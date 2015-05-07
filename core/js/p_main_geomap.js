@@ -1,6 +1,7 @@
 Core.safe(function(){
 	var CoreWindow = Core.Window;
 	var Const = Core.Const,
+		ConstMap = Const.map,
 		ConstMsgType = Const.msgType,
 		ConstEvent = Const.Event,
 		ConstFileType = Const.fileRule.file_type,
@@ -601,7 +602,8 @@ Core.safe(function(){
 				map: _getConfMap(),
 				geo: {
 					src: file_path.core + '/data/',
-					name: ['china']
+					name: ConstMap.name,
+					river: ConstMap.river
 				},
 				onready: function(){
 				},
