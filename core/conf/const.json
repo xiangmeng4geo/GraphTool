@@ -71,6 +71,6 @@
 	},
 	"map": {
 		"name": ["hebei"],
-		"river": "china_river"
+		"river": null
 	}
 }

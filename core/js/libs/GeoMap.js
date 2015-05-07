@@ -454,11 +454,6 @@ define('GeoMap',['zrender',
 			var conf_river = _data.map.layers.river;
 			is_add_river = conf_river.flag;
 			river_color = conf_river.color || river_color;
-			// key = JSON.stringify({
-			// 	c_r: conf_river,
-			// 	z: _data.zoom,
-			// 	t: _data.translat
-			// });
 			key = JSON.stringify(conf_river);
 		}catch(e){}
 
@@ -469,27 +464,30 @@ define('GeoMap',['zrender',
 		
 		if(is_add_river){
 			var geo = _this.conf.geo;
-			_this.jsonLoader(geo.src+'/'+geo.river+'.json', function(data){
-				if(data){
-					for(var i = 0, j = data.length; i<j; i++){
-						var point_arr = [];
-						var river = data[i];
-						for(var i_r = 0, j_r = river.length; i_r<j_r; i_r++){
-							var item = river[i_r];
-							var point = new GeoMap.Point(item[0], item[1]);
-							point_arr.push(point);
+			var river_name = geo.river;
+			if(river_name){
+				_this.jsonLoader(geo.src+'/'+river_name+'.json', function(data){
+					if(data){
+						for(var i = 0, j = data.length; i<j; i++){
+							var point_arr = [];
+							var river = data[i];
+							for(var i_r = 0, j_r = river.length; i_r<j_r; i_r++){
+								var item = river[i_r];
+								var point = new GeoMap.Point(item[0], item[1]);
+								point_arr.push(point);
+							}
+							var polyline = new GeoMap.Polyline(point_arr, {
+								style: {
+									strokeColor : river_color,
+									lineWidth : 1.1,
+								},
+								zlevel: ZINDEX_LAYER_RIVER
+							});
+							_this.addOverlay(polyline);   //增加折线
 						}
-						var polyline = new GeoMap.Polyline(point_arr, {
-							style: {
-								strokeColor : river_color,
-								lineWidth : 1.1,
-							},
-							zlevel: ZINDEX_LAYER_RIVER
-						});
-						_this.addOverlay(polyline);   //增加折线
 					}
-				}
-			})
+				})
+			}
 		}
 	}
 	var RESET_TYPE_ZOOM = 1,
