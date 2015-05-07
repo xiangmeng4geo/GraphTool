@@ -66,7 +66,11 @@ Core.safe(function(){
 			file_hour = file_rule.file_hour || 0;
 
 		var time = new Date(is_use_publish_time? data_of_micaps.mtime: data_of_micaps.time);
-		if(ConstFileType.forecast.v == file_type && !is_use_publish_time){
+		if(is_use_publish_time){
+			return time.format(text);
+		}
+
+		if(ConstFileType.forecast.v == file_type){
 			var one = new Date(time.getTime());
 			one.setHours(one.getHours()+(file_hour-24));
 			var two = new Date(one.getTime());
@@ -76,7 +80,15 @@ Core.safe(function(){
 			text = two.format(text);
 			// text = two.format(text.replace(/y1/g,'yy').replace(/M1/g,'MM').replace(/d1/g,'dd').replace(/h1/g,'hh'));
 		}else{
-			text = time.format(text);
+			if(file_hour == 0){
+				text = time.format(text);
+			}else{
+				var one = new Date(time.getTime());
+				one.setHours(one.getHours() - file_hour);
+
+				text = one.format(text);
+				text = time.format(text);
+			}
 		}
 		return text;
 	}
@@ -1425,7 +1437,7 @@ Core.safe(function(){
 		var _save_img = function(is_show_select_dialog, callback){
 			if(gm && conf_of_product){
 				var file_name_save = _get_save_img_name();
-				var dir_save = conf_of_product.in_out.dir_out;
+				var dir_save = conf_of_product.in_out.dir_out || file_util.path.tmp_img; //没有保存目录时使用临时目录
 				if(is_show_select_dialog){
 					$('<input type="file" nwsaveas="'+file_name_save+'" nwworkingdir="'+dir_save+'"/>').on('change',function(){
 						_save_img_inner($(this).val(), callback);

@@ -8,6 +8,9 @@ Core.safe(function(){
 	var ConfUser = C.Lib.conf.User;
 	var CoreWindow = C.Window;
 	var gui = CoreWindow.getGui();
+	var Shell = gui.Shell;
+	var logs_path = util_file.path.tmp_logs;
+
 	var tray = new gui.Tray({ title: 'Tray', icon: util_path.join(util_file.path.core, 'img/icon.png') });
 	var title = '自动作业'
 	tray.tooltip = title;
@@ -74,14 +77,13 @@ Core.safe(function(){
 	item_setting.on('click', function(){
 		C.Page.aw_list();
 	});
-	var Shell = gui.Shell;
 	item_log.on('click', function(){
 		var log_name = writer.path;
 		if(util_file.exists(log_name)){
 			Shell.openItem(log_name)
 		}else{
 			if(confirm('没有今天的日志，是否打开所有日志所在目录？')){
-				Shell.openItem(util_file.path.tmp_logs);
+				Shell.openItem(logs_path);
 			}
 		}
 	});
@@ -107,8 +109,8 @@ Core.safe(function(){
 		var now = new Date();
 		var tasks = ConfUser.getTasks();
 		if(tasks){
-			for(var i = 0, j = tasks.length; i<j; i++){
-				var task = tasks[i];
+			for(var i_task = 0, j_task = tasks.length; i_task<j_task; i_task++){
+				var task = tasks[i_task];
 				if(!task || !task.open){
 					continue;
 				}
@@ -130,7 +132,7 @@ Core.safe(function(){
 				time_check.setMinutes(arr_time[1]);
 				time_check.setSeconds(0);
 				var cha = now - time_check;
-				// console.log(cha, cha >= 0 && cha <= delay_check, time_check, now);
+				// console.log(i_task, task.name, cha, cha >= 0 && cha <= delay_check, time_check, now);
 				if(cha >= 0 && cha <= Math.max(delay_check, lasttime_check - now)){
 					var products = task.p;
 					for(var i = 0, j = products.length; i<j; i++){
@@ -186,6 +188,17 @@ Core.safe(function(){
 			var newDate = new Date();
 			if(newDate.getDate() != lastDate.getDate()){
 				writer = _getWriter();
+				var log_files = util_file.readdir(logs_path, {
+					is_not_recursive: true,
+					mtime: true
+				});
+				var gap_time = 1000*60*60*24*2;
+				var now = new Date().getTime()
+				log_files.forEach(function(file){
+					if(now - file.mtime > gap_time){
+						util_file.rm(file.name);
+					}
+				});
 			}
 			lastDate = newDate;
 			setTimeout(checkDate, 1000);
