@@ -65,9 +65,18 @@ function _format(zone_name){
 		features: features_new
 	}
 
-	fs.writeFileSync(path.join(dir_zone_min, zone_name+'.json'), JSON.stringify(data_new));
+	var save_path = path.join(dir_zone_min, zone_name+'.json');
+	fs.writeFileSync(save_path, JSON.stringify(data_new));
+	console.log(save_path);
 }
 
-['dongbei'].forEach(function(v){
+['dongbei', 
+'huabei',
+'huadong',
+'huanan',
+'huazhong',
+'xibei',
+'xinan',
+'xinjiang'].forEach(function(v){
 	_format(v);
 });
