@@ -76,7 +76,7 @@ Core.safe(function(){
 					setTimeout(function(){
 						win_index.show();
 						win_index.focus();
-						win.close();
+						win.hide(); // 兼容32位写法（在main.html里关闭）
 					},min_init_time-init_time);
 				}
 				win_index.once('inited',fn_inited);

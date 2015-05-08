@@ -439,6 +439,9 @@
 				_win_cache[i].close();
 			}
 		}
+		if(_isMain(href)){
+			opener.close();
+		}
 		this.hide(); // Pretend to be closed already
 		CoreWindow.offMessage();
 		this.close(true);

@@ -518,7 +518,6 @@ define('GeoMap',['zrender',
 			
 			data.translat = [data.width/2*zoom + translat_x, data.height/2*zoom + translat_y];
 		}
-		console.log(data);
 		var $container = $(_this.conf.container);
 		var points_mask = [],
 			shapes_weather = [];
