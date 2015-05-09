@@ -317,7 +317,7 @@ define('GeoMap',['zrender',
 			}
 
 			_this.loadGeo(arr_json, {
-				provinces: conf_map.provinces
+				provinces: conf_map && conf_map.provinces
 			}, function(){
 				$.each(overlays_weather, function(i, v){
 					_this.addOverlay(v);
