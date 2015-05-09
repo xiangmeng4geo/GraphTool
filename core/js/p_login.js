@@ -70,13 +70,14 @@ Core.safe(function(){
 				(true_fn || function(){})();
 				var win_index = Core.Page.main();
 				var fn_inited = function(){
-					Core.require('child_process').exec(process.execPath+' '+Core.Lib.util.file.path.core+'/autowork');
+					var command = '"'+process.execPath+'" "'+Core.Lib.util.file.path.core + '/autowork'+'"';
+					Core.require("child_process").exec(command);
 					var init_time = (new Date()-start_time)/1000;
 					// win_index.removeAllListeners();
 					setTimeout(function(){
 						win_index.show();
 						win_index.focus();
-						win.close();
+						win.hide(); // 兼容32位写法（在main.html里关闭）
 					},min_init_time-init_time);
 				}
 				win_index.once('inited',fn_inited);

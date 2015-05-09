@@ -1,6 +1,8 @@
 Core.safe(function(){
 	var CoreWindow = Core.Window;
 	var Const = Core.Const,
+		ConstMap = Const.map,
+		ConstMapZone = ConstMap && ConstMap.zones || [],
 		ConstMsgType = Const.msgType,
 		ConstEvent = Const.Event,
 		ConstFileType = Const.fileRule.file_type,
@@ -592,7 +594,23 @@ Core.safe(function(){
 			MapLayer.init(BoxShape);
 			function _getConfMap(){
 				var conf_sys = ConfUser.getSys();
-				return conf_sys && conf_sys.map;
+				if(conf_sys){
+					var conf_map = conf_sys.map;
+					if(conf_map){
+						var zone = conf_map.zone;
+						if(zone){
+							for(var i = 0, j = ConstMapZone.length; i<j; i++){
+								var v = ConstMapZone[i];
+								if(v.name == zone){
+									return $.extend({}, conf_map, {
+										provinces: v.provinces
+									});
+								}
+							}
+						}
+						return conf_map;
+					}
+				}
 			}
 			window.GeoMap = GeoMap;
 			_LegendImage = LegendImage;
@@ -601,7 +619,8 @@ Core.safe(function(){
 				map: _getConfMap(),
 				geo: {
 					src: file_path.core + '/data/',
-					name: ['china']
+					name: ConstMap.name,
+					river: ConstMap.river
 				},
 				onready: function(){
 				},

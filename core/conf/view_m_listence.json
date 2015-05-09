@@ -1,6 +1,7 @@
 {
 	"width": 330,
     "height": 280,
+    "show": true,
     "toolbar": false,
     "frame": true
 }

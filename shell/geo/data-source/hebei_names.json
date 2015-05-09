@@ -1,0 +1,18 @@
+﻿{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "NAME": "保定市", "POINT_X": 115.168374, "POINT_Y": 39.022610 }, "geometry": { "type": "Point", "coordinates": [ 115.168374242856103, 39.022609683065596 ] } },
+{ "type": "Feature", "properties": { "NAME": "石家庄市", "POINT_X": 114.440901, "POINT_Y": 38.129446 }, "geometry": { "type": "Point", "coordinates": [ 114.44090068866123, 38.129445699312235 ] } },
+{ "type": "Feature", "properties": { "NAME": "廊坊市", "POINT_X": 116.629055, "POINT_Y": 39.261265 }, "geometry": { "type": "Point", "coordinates": [ 116.629055147478638, 39.261265306782498 ] } },
+{ "type": "Feature", "properties": { "NAME": "承德市", "POINT_X": 117.545681, "POINT_Y": 41.343664 }, "geometry": { "type": "Point", "coordinates": [ 117.545680915300792, 41.343663630186114 ] } },
+{ "type": "Feature", "properties": { "NAME": "秦皇岛市", "POINT_X": 119.183639, "POINT_Y": 40.091022 }, "geometry": { "type": "Point", "coordinates": [ 119.183638856305009, 40.091021729057104 ] } },
+{ "type": "Feature", "properties": { "NAME": "邢台市", "POINT_X": 114.818429, "POINT_Y": 37.211086 }, "geometry": { "type": "Point", "coordinates": [ 114.818428595497423, 37.211086356823664 ] } },
+{ "type": "Feature", "properties": { "NAME": "衡水市", "POINT_X": 115.823372, "POINT_Y": 37.760957 }, "geometry": { "type": "Point", "coordinates": [ 115.823372251849733, 37.76095745233269 ] } },
+{ "type": "Feature", "properties": { "NAME": "张家口市", "POINT_X": 115.030524, "POINT_Y": 40.864618 }, "geometry": { "type": "Point", "coordinates": [ 115.030524480689309, 40.864618450882745 ] } },
+{ "type": "Feature", "properties": { "NAME": "邯郸市", "POINT_X": 114.543768, "POINT_Y": 36.550235 }, "geometry": { "type": "Point", "coordinates": [ 114.543768109134959, 36.550235225568663 ] } },
+{ "type": "Feature", "properties": { "NAME": "沧州市", "POINT_X": 116.745026, "POINT_Y": 38.265639 }, "geometry": { "type": "Point", "coordinates": [ 116.745025697914556, 38.265639135315318 ] } },
+{ "type": "Feature", "properties": { "NAME": "唐山市", "POINT_X": 118.334501, "POINT_Y": 39.748137 }, "geometry": { "type": "Point", "coordinates": [ 118.334500614628382, 39.748137241136348 ] } }
+]
+}

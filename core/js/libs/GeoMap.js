@@ -9,6 +9,9 @@ define('GeoMap',['zrender',
 	'zrender/shape/Circle',
 	'zrender/tool/area'],function(Zrender, Base, Polygon, Polyline, util, TextShape, ImageShape, Rectangle, Circle, util_area){
 
+	var MIN_VALUE = Number.MIN_VALUE,
+		MAX_VALUE = Number.MAX_VALUE;
+
 	var COLOR_TRANSPARENT = 'rgba(0,0,0,0)';
 	var Logger = Core.util.Logger,
 		Timer = Logger.Timer;
@@ -104,33 +107,48 @@ define('GeoMap',['zrender',
 		return albers(35, 105, 27, 45);
 	})();
 
-	var china_src_size = {
-		height: 35.4638,
-		left: 73.4766,
-		top: 53.5693,
-		width: 61.6113
-	};
+	// var china_src_size = {
+	// 	height: 35.4638,
+	// 	left: 73.4766,
+	// 	top: 53.5693,
+	// 	width: 61.6113
+	// };
 	var default_conf = {
 		container: 'body'
 	};
+	function _getDefaultData(width, height){
+		return {
+			zoom: 1,
+			translat: [width/2, height/2],
+			width: width,
+			height: height,
+			overlays: []
+		}
+	}
 	/*初始化一些配置*/
-	var _init_geomap = function(){
+	var _init_geomap = function(srcSize){
 		var _this = this;
 		var conf = _this.conf;
 		var container = $(conf.container);
 		var width_container = container.width(),
 			height_container = container.height();
 
-		var px_size_china_left_top = _this.projector.project({x: china_src_size.left, y: china_src_size.top}),
-			px_size_china_right_bottom = _this.projector.project({x: china_src_size.left+china_src_size.width, y: china_src_size.top-china_src_size.height});
+		var px_size_left_top = _this.projector.project({x: srcSize.left, y: srcSize.top}),
+			px_size_right_bottom = _this.projector.project({x: srcSize.left+srcSize.width, y: srcSize.top-srcSize.height});
 
-		var px_size_china = {width: px_size_china_right_bottom.x - px_size_china_left_top.x,height: px_size_china_left_top.y - px_size_china_right_bottom.y};
-	
-		var scale_x = width_container/px_size_china.width,
-			scale_y = height_container/(px_size_china.height);
+		var _factor = 1;
+		if(srcSize.width * srcSize.height < 2000){
+			_factor = 1.2;
+		}
+		var px_size = {
+			width: Math.abs(px_size_right_bottom.x - px_size_left_top.x) * _factor,
+			height: Math.abs(px_size_left_top.y - px_size_right_bottom.y) * _factor
+		};
+		var scale_x = width_container/px_size.width,
+			scale_y = height_container/(px_size.height);
 
 		
-		var center = conf.center||{x: china_src_size.left+china_src_size.width/2,y: china_src_size.top - china_src_size.height/2};
+		var center = conf.center||{x: srcSize.left+srcSize.width/2,y: srcSize.top - srcSize.height/2};
 		var center_xy = _this.projector.project(center);
 		
 		var _scale_size = width_container/800;
@@ -142,15 +160,10 @@ define('GeoMap',['zrender',
 				lat: center.y,
 				x: center_xy.x,
 				y: center_xy.y
-			}
+			},
+			srcSize: srcSize
 		}
-		_data_reset = $.extend(_data_reset, {
-			zoom: 1,
-			translat: [width_container/2, height_container/2],
-			width: width_container,
-			height: height_container,
-			overlays: []
-		});
+		_data_reset = $.extend(_data_reset, _getDefaultData(width_container, height_container));
 		_this._data_o = $.extend(true,{}, _data_reset);
 		if(_data){
 			var _data_o = _this._data_o;
@@ -185,8 +198,8 @@ define('GeoMap',['zrender',
 		// }
 		_this._data = _data_reset;
 		
-		_this.MAX_ZOOM = 3*_scale_size;
-		_this.MIN_ZOOM = 0.5*_scale_size;
+		_this.MAX_ZOOM = 3*_scale_size*_factor;
+		_this.MIN_ZOOM = 0.5*_scale_size/(_factor);
 
 		if(!conf.isnotMirror && !_this.mirror){
 			_this.mirror = $('<img class="geomap_mirror" draggable=false>').appendTo(container.parent());
@@ -215,7 +228,8 @@ define('GeoMap',['zrender',
 		var _this = this;
 		_this.isReady = true;
 		_this.conf = conf = $.extend({},default_conf,conf);
-		_this.canvas = Zrender.init($(conf.container).get(0));
+		var $container = $(conf.container);
+		_this.canvas = Zrender.init($container.get(0));
 		_this.jsonLoader = conf.jsonLoader || $.getJSON;
 		var fn_ready = conf.onready;
 		if(fn_ready){
@@ -225,6 +239,9 @@ define('GeoMap',['zrender',
 		if(fn_afterAddOverlays){
 			_this.on('afteraddoverlays', fn_afterAddOverlays);
 		}
+		var data_empty = _getDefaultData($container.width(), $container.height());
+		_this._data = data_empty;
+		_this._data_o = data_empty;
 		_this.config(conf);
 	};
 	GeoMap.PROJECT_MERCATOR = 'mercator';
@@ -238,16 +255,23 @@ define('GeoMap',['zrender',
 	// 对配置进行更改，主要用于投影及尺寸
 	GeoMapProp.config = function(conf, callback){
 		var _this = this;
+		var _data = _this._data;
 		// _this.conf = conf = $.extend({}, default_conf, _this.conf, conf);
 		var new_projector = Albers;
 		var conf_map = conf.map;
+		var is_new_zone = true;
 		if(conf_map){
 			if(conf_map.projector == 'mercator'){
 				new_projector = Mercator;
 			}
+			if(_data){
+				var _conf_map = _data.map;
+				if(_conf_map && _conf_map.zone == conf_map.zone){
+					is_new_zone = false;
+				}
+			}
 		}
 		var old_projector = _this.projector;
-		var _data = _this._data;
 		var w_conf = conf.w,
 			h_conf = conf.h;
 		var is_resized = false;
@@ -260,12 +284,12 @@ define('GeoMap',['zrender',
 			}
 		}
 		_this.projector = new_projector;
-		_init_geomap.call(_this);
+		// _init_geomap.call(_this);
 		//对数据进行缓存
 		_this._data.map = conf_map;
 		_this._data_o.map = conf_map;
 		var geo = _this.conf.geo;
-		if(is_resized || (!old_projector || old_projector.name != new_projector.name) && geo){
+		if((is_new_zone || is_resized || (!old_projector || old_projector.name != new_projector.name)) && geo){
 			var src = geo.src,
 				name = geo.name;
 			var arr_json = [];
@@ -279,18 +303,22 @@ define('GeoMap',['zrender',
 			var overlays_weather = [];
 			if(_data){
 				var overlays = _data.overlays;
-				$.each(overlays, function(i, v){
-					var shape = v.shape;
-					var zlevel = shape.zlevel;
-					if(zlevel == ZINDEX_MAP || zlevel == ZINDEX_MAP_TEXT){
-					}else{
-						overlays_weather.push(v);
-					}
-				});
+				if(overlays && overlays.length > 0){
+					$.each(overlays, function(i, v){
+						var shape = v.shape;
+						var zlevel = shape.zlevel;
+						if(zlevel == ZINDEX_MAP || zlevel == ZINDEX_MAP_TEXT){
+						}else{
+							overlays_weather.push(v);
+						}
+					});
+				}
 				_this._data.overlays = overlays_weather;
 			}
 
-			_this.loadGeo(arr_json, null, function(){
+			_this.loadGeo(arr_json, {
+				provinces: conf_map && conf_map.provinces
+			}, function(){
 				$.each(overlays_weather, function(i, v){
 					_this.addOverlay(v);
 				});
@@ -395,6 +423,59 @@ define('GeoMap',['zrender',
 			}
 		}
 	}
+	GeoMapProp.location = function(bound){
+		var _this = this,
+			_data = _this._data;
+		var left_bottom = bound[0],
+			right_top = bound[1];
+		var left_bottom_point = new GMPoint(left_bottom[0], left_bottom[1]),
+			right_top_point = new GMPoint(right_top[0], right_top[1]);
+		var width = right_top_point.lng - left_bottom_point.lng,
+			height = right_top_point.lat - left_bottom_point.lat;
+				
+		gm.addOverlay(new GeoMap.Marker(left_bottom_point.lng, left_bottom_point.lat));	
+		gm.addOverlay(new GeoMap.Marker(right_top_point.lng, right_top_point.lat));
+
+		var px_left_bottom = _this.projector.project({x: left_bottom_point.lng, y: left_bottom_point.lat}),
+			px_right_top = _this.projector.project({x: right_top_point.lng, y: right_top_point.lat});
+
+		var px_width = Math.abs(px_left_bottom.x - px_right_top.x),
+			px_height = Math.abs(px_left_bottom.y - px_right_top.y);
+
+		var width_data = _data.width,
+			height_data = _data.height;
+		var scale_x = width_data/px_width,
+			scale_y = height_data/px_height;	
+
+		var scale = Math.min(scale_x, scale_y);
+		var zoom = scale/_data.scale;
+		var max_zoom = _this.MAX_ZOOM;
+		if(zoom > max_zoom){
+			zoom = max_zoom;
+		}
+		gm.addOverlay(new GeoMap.Marker(_data.center.lng, _data.center.lat, {
+			style: {
+				color: 'red'
+			}
+		}));
+		var options = {
+			zoom: zoom
+		};
+		var pixel_center = gm.pointToOverlayPixel(_data.center, options);
+		var point_center_zone = new GMPoint(left_bottom_point.lng + width/2, left_bottom_point.lat + height/2);
+		gm.addOverlay(new GeoMap.Marker(point_center_zone.lng, point_center_zone.lat));
+		var pixel_center_zone = gm.pointToOverlayPixel(point_center_zone, options);
+
+		var factor = (1 - 1)/2;
+		var x_add = width_data * factor,
+			y_add = height_data * factor;
+		var x_move = pixel_center.x - pixel_center_zone.x - x_add,
+			y_move = pixel_center.y - pixel_center_zone.y + y_add;
+		_data.zoom = zoom;
+		_data.translat = [width_data/2 + x_move, height_data/2 + y_move];
+
+		_reset.call(_this, RESET_TYPE_LOCATION);
+	}
 	GeoMapProp.reset = function(){
 		_reset.call(this, RESET_TYPE_RESET);
 	}
@@ -404,82 +485,10 @@ define('GeoMap',['zrender',
 	GeoMapProp.reset_zoom = function(){
 		_reset.call(this, RESET_TYPE_ZOOM);
 	}
-	function _changeCnameColor(){
-		var _this = this,
-			canvas = _this.canvas,
-			_data = _this._data;
-		var overlays = _data.overlays,
-			_map = _data.map;
-		var layers, conf_cname;
-		if(overlays && _map && (layers = _map.layers) && (conf_cname = layers.cname)){
-			var flag = conf_cname.flag;
-			var color_cname = flag? conf_cname.color: COLOR_TRANSPARENT;
-			var is_have_text = false;
-			$.each(overlays, function(i, v){
-				var shape = v.shape;
-				var zlevel = shape.zlevel;
-				if(zlevel == ZINDEX_MAP_TEXT){
-					is_have_text = true;
-					var id = shape.id;
-					canvas.modShape(id, {style: {
-						color: color_cname
-					}})
-				}
-			});
-			canvas.refresh();
-		}
-	}
-	function _addRiver(){
-		var _this = this;
-		var is_add_river = false,
-			river_color = '#353FC3',
-			key;
-		var _data = _this._data;
-		try{
-			var conf_river = _data.map.layers.river;
-			is_add_river = conf_river.flag;
-			river_color = conf_river.color || river_color;
-			// key = JSON.stringify({
-			// 	c_r: conf_river,
-			// 	z: _data.zoom,
-			// 	t: _data.translat
-			// });
-			key = JSON.stringify(conf_river);
-		}catch(e){}
-
-		if(key && _this.key_river != key){
-			_this.clearLayers(ZINDEX_LAYER_RIVER);
-			_this.key_river = key;
-		}
-		
-		if(is_add_river){
-			var geo = _this.conf.geo;
-			_this.jsonLoader(geo.src+'/'+geo.name+'_river.json', function(data){
-				if(data){
-					for(var i = 0, j = data.length; i<j; i++){
-						var point_arr = [];
-						var river = data[i];
-						for(var i_r = 0, j_r = river.length; i_r<j_r; i_r++){
-							var item = river[i_r];
-							var point = new GeoMap.Point(item[0], item[1]);
-							point_arr.push(point);
-						}
-						var polyline = new GeoMap.Polyline(point_arr, {
-							style: {
-								strokeColor : river_color,
-								lineWidth : 1.1,
-							},
-							zlevel: ZINDEX_LAYER_RIVER
-						});
-						_this.addOverlay(polyline);   //增加折线
-					}
-				}
-			})
-		}
-	}
 	var RESET_TYPE_ZOOM = 1,
 		RESET_TYPE_DRAG = 2,
-		RESET_TYPE_RESET = 3;
+		RESET_TYPE_RESET = 3,
+		RESET_TYPE_LOCATION = 4;
 	var _reset = function(reset_type){
 		var _this = this,
 			canvas = _this.canvas,
@@ -494,7 +503,7 @@ define('GeoMap',['zrender',
 			data.overlays = overlays;
 			_this._data = data;
 			$mirror.removeData();
-		}else{
+		}else if(RESET_TYPE_LOCATION != reset_type){
 			var zoom = data.zoom,
 				zoom_add = zoom - 1;
 
@@ -545,6 +554,77 @@ define('GeoMap',['zrender',
 			_init_mirror.call(_this);
 		// });
 	}
+	function _changeCnameColor(){
+		var _this = this,
+			canvas = _this.canvas,
+			_data = _this._data;
+		var overlays = _data.overlays,
+			_map = _data.map;
+		var layers, conf_cname;
+		if(overlays && _map && (layers = _map.layers) && (conf_cname = layers.cname)){
+			var flag = conf_cname.flag;
+			var color_cname = flag? conf_cname.color: COLOR_TRANSPARENT;
+			var is_have_text = false;
+			$.each(overlays, function(i, v){
+				var shape = v.shape;
+				var zlevel = shape.zlevel;
+				if(zlevel == ZINDEX_MAP_TEXT){
+					is_have_text = true;
+					var id = shape.id;
+					canvas.modShape(id, {style: {
+						color: color_cname
+					}})
+				}
+			});
+			canvas.refresh();
+		}
+	}
+	function _addRiver(){
+		var _this = this;
+		var is_add_river = false,
+			river_color = '#353FC3',
+			key;
+		var _data = _this._data;
+		try{
+			var conf_river = _data.map.layers.river;
+			is_add_river = conf_river.flag;
+			river_color = conf_river.color || river_color;
+			key = JSON.stringify(conf_river);
+		}catch(e){}
+
+		if(key && _this.key_river != key){
+			_this.clearLayers(ZINDEX_LAYER_RIVER);
+			_this.key_river = key;
+		}
+		
+		if(is_add_river){
+			var geo = _this.conf.geo;
+			var river_name = geo.river;
+			if(river_name){
+				_this.jsonLoader(geo.src+'/'+river_name+'.json', function(data){
+					if(data){
+						for(var i = 0, j = data.length; i<j; i++){
+							var point_arr = [];
+							var river = data[i];
+							for(var i_r = 0, j_r = river.length; i_r<j_r; i_r++){
+								var item = river[i_r];
+								var point = new GMPoint(item[0], item[1]);
+								point_arr.push(point);
+							}
+							var polyline = new GeoMap.Polyline(point_arr, {
+								style: {
+									strokeColor : river_color,
+									lineWidth : 1.1,
+								},
+								zlevel: ZINDEX_LAYER_RIVER
+							});
+							_this.addOverlay(polyline);   //增加折线
+						}
+					}
+				})
+			}
+		}
+	}
 	function addGeoPolygon(coordinates,options){
 		if(options){
 			options.zlevel = ZINDEX_MAP;
@@ -555,7 +635,7 @@ define('GeoMap',['zrender',
 		$.each(coordinates, function(i,v){
 			var points = [];
 			$.each(v,function(v_i,v_v){
-				points.push(new GeoMap.Point(v_v[0]/scale,v_v[1]/scale));
+				points.push(new GMPoint(v_v[0]/scale,v_v[1]/scale));
 			});
 			var polygon = new GeoMap.Polygon(points, options);
 		
@@ -565,7 +645,7 @@ define('GeoMap',['zrender',
 		});
 		return shapes;
 	}
-	function callback_loaedGeo(loadedData,options,callback_after_render_geo){
+	function callback_loaedGeo(loadedData, options, callback_after_render_geo){
 		Timer.start('render geo');
 		var gm = this;
 		var data = loadedData.shift();
@@ -593,9 +673,60 @@ define('GeoMap',['zrender',
 			newss.height = newss.top - b;
 			data.srcSize = newss;
 		});
+		var features = data.features.slice();
+		var srcSize = data.srcSize;
+		if(options){
+			var provinces = options.provinces;
+			if(provinces && provinces.length > 0){
+				features = features.filter(function(v){
+					if(provinces.indexOf(v.properties.prov_code) > -1){
+						return v;
+					}
+				});
+				var min_x = min_y = MAX_VALUE,
+					max_x = max_y = MIN_VALUE;
+
+				$.each(features, function(i, v){
+					var _ss = v.properties.srcSize;
+					if(_ss){
+						var _left = _ss.left,
+							_top = _ss.top,
+							_width = _ss.width,
+							_height = _ss.height;
+
+						var min_x_test = _left,
+							min_y_test = _top - _height,
+							max_x_test = _left + _width,
+							max_y_test = _top;
+
+						if(min_x > min_x_test){
+							min_x = min_x_test;
+						}
+						if(min_y > min_y_test){
+							min_y = min_y_test;
+						}
+						if(max_x < max_x_test){
+							max_x = max_x_test;
+						}
+						if(max_y < max_y_test){
+							max_y = max_y_test;
+						}
+					}
+				});
+				if(min_x != MIN_VALUE && min_y != MIN_VALUE && max_x != MAX_VALUE && max_y != MAX_VALUE){
+					srcSize = {
+						width: max_x - min_x,
+						height: max_y - min_y,
+						left: min_x,
+						top: max_y
+					}
+				}
+			}
+		}
+		_init_geomap.call(gm, srcSize);
 		var shapes = [];
 
-		$.each(data.features,function(i,v){
+		$.each(features, function(i,v){
 			var type = v.type;
 			if('Feature' == type){
 				var geometry = v.geometry;
@@ -657,7 +788,7 @@ define('GeoMap',['zrender',
 		gm.addMask(points, options);
 		$.isFunction(callback_after_render_geo) && callback_after_render_geo(points);
 	}
-	GeoMapProp.loadGeo = function(src,options,callback_after_render_geo){
+	GeoMapProp.loadGeo = function(src, options, callback_after_render_geo){
 		var _this = this;
 		if(!$.isArray(src)){
 			src = [src];
@@ -671,7 +802,7 @@ define('GeoMap',['zrender',
 				if(loadedData.length == len){
 					Timer.end('loadGeo');
 					Timer.start('add weather layers');
-					callback_loaedGeo.call(_this, loadedData,options, callback_after_render_geo);
+					callback_loaedGeo.call(_this, loadedData, options, callback_after_render_geo);
 					Timer.end('add weather layers');
 					Timer.start('init mirror');
 					_init_mirror.call(_this);
@@ -730,7 +861,7 @@ define('GeoMap',['zrender',
 	GeoMapProp.refresh = function(){
 		_init_mirror.call(this);
 	}
-	var pointToOverlayPixel = GeoMapProp.pointToOverlayPixel = function(point){
+	var pointToOverlayPixel = GeoMapProp.pointToOverlayPixel = function(point, options){
 		var _this = this;
 		var p = point;
 		var point = _this.projector.project({x: point.lng,y: point.lat});
@@ -741,6 +872,10 @@ define('GeoMap',['zrender',
 			height = data.height,
 			zoom = data.zoom,
 			translat = data.translat;
+		if(options){
+			scale = options.scale || scale;
+			zoom = options.zoom || zoom;
+		}
 		return {
 			x: (point.x - center.x)*scale*zoom + translat[0],
 			y: (center.y - point.y)*scale*zoom + translat[1]//这里出来的数据暂时有一个整体偏移,(-20保证多个图例时不遮挡地图)
@@ -941,7 +1076,7 @@ define('GeoMap',['zrender',
 	util.inherits(GeoMapText, TextShape);
 
 	GeoMap.Marker = function(lng, lat, options){
-		this.point = new GeoMap.Point(lng, lat);
+		this.point = new GMPoint(lng, lat);
 		this.shape = new Circle($.extend({
 			style: {
 				color: 'rgba(0, 0, 255, 1)'
@@ -954,6 +1089,7 @@ define('GeoMap',['zrender',
 		style.x = pixel.x;
 		style.y = pixel.y;
 		style.r = 4;
+		// console.log(123, pixel);
 		return this.shape;
 	}
 	var GeoMapPolyline = function(options, special_options){
@@ -1046,7 +1182,6 @@ define('GeoMap',['zrender',
 												C = x0*x0 + y0*y0 + b*b - 2*b*y0 - _width2;
 											var a1 = -B/(2*A),
 												a2 = Math.sqrt(B*B - 4*A*C)/(2*A);
-											// console.log('x1 = '+x1, 'y1 = '+y1, 'x2 = '+x2, 'y2 = '+y2, 'x0 = '+x0, 'y0 = '+y0, 'k = '+k, 'b = '+b, 'x00 = '+((-B+Math.sqrt(B*B-4*A*C))/2*A), 'x01 = '+((-B-Math.sqrt(B*B-4*A*C))/2*A));
 											if(a2){
 												var min_x = Math.min(x1, x2),
 													max_x = Math.max(x1, x2);
@@ -1116,7 +1251,7 @@ define('GeoMap',['zrender',
 	}
 	util.inherits(GeoMapPolyline, Polyline);
 
-	GeoMap.Point = function(lng,lat){
+	var GMPoint = GeoMap.Point = function(lng,lat){
 		this.lng = lng;
 		this.lat = lat;
 	}
@@ -1271,7 +1406,7 @@ define('GeoMap',['zrender',
 			}
 			if(option.pos){
 				try{
-					var pixel = map.pointToOverlayPixel(new GeoMap.Point(option.pos.x, option.pos.y));
+					var pixel = map.pointToOverlayPixel(new GMPoint(option.pos.x, option.pos.y));
 					shape.style.x = pixel.x;
 					shape.style.y = pixel.y;
 				}catch(e){}
