@@ -9,9 +9,19 @@ Core.safe(function(){
 		image_path = file_path.image;
 	var CoreWindow = Core.Window;
 	var _const = Core.Const,
+		const_map = _const.map,
+		const_map_zones = const_map && const_map.zones || [],
 		const_projector = _const.projector,
 		const_template = _const.template;
 
+	function selected_option($select, val){
+		$select.find('option').each(function(i,v){
+			var $this = $(this);
+			if($this.val() == val){
+				$this.attr('selected','selected');
+			}
+		});
+	}
 	var $c_bottom_fieldset = $('#c_bottom > fieldset');
 	var $c_top_li = $('#c_top li').click(function(){
 		var $this = $(this);
@@ -40,7 +50,15 @@ Core.safe(function(){
 		$cb_map_railway = $('#cb_map_railway'),
 		$cb_map_cname = $('#cb_map_cname'),
 		$color_map_cname = $('#color_map_cname'),
-		$color_map_river = $('#color_map_river');
+		$color_map_river = $('#color_map_river'),
+		$select_map_zone = $('#select_map_zone');
+
+	var html_zone = '';
+	$.each(const_map_zones, function(i, zone){
+		var name = zone.name;
+		html_zone += '<option value="'+name+'">'+name+'</option>';
+	});
+	$select_map_zone.append(html_zone);
 
 	var conf_sys = Conf_User.getSys();
 	var projector_user = '';
@@ -81,6 +99,10 @@ Core.safe(function(){
 					$cb_map_cname.prop('checked', conf_cname.flag);
 					$color_map_cname.val(conf_cname.color);
 				}
+			}
+			var conf_map_zone = conf_map.zone;
+			if(conf_map_zone){
+				selected_option($select_map_zone, conf_map_zone);
 			}
 		}
 	}
@@ -138,7 +160,8 @@ Core.safe(function(){
 						flag: $cb_map_cname.prop('checked'),
 						color: $color_map_cname.val()
 					}
-				}
+				},
+				zone: $select_map_zone.val() || ''
 			}
 		};
 		Conf_User.write(CONF_PRODUCTNAME,save_data,true);

@@ -33,6 +33,35 @@ function _get_cityname(name){
 		return name.replace(/(壮族|回族|维吾尔)?(省|市|自治区|特别行政区)/,'');
 	}
 }
+function _getSrcSize(areas){
+	var min_x = min_y = Number.MAX_VALUE,
+		max_x = max_y = Number.MIN_VALUE;
+
+	areas.forEach(function(items){
+		items.forEach(function(v){
+			var x = v[0],
+				y = v[1];
+			if(min_x > x){
+				min_x = x;
+			}
+			if(max_x < x){
+				max_x = x;
+			}
+			if(min_y > y){
+				min_y = y;
+			}
+			if(max_y < y){
+				max_y  = y;
+			}
+		});
+	});
+	return {
+		width: max_x - min_x,
+		height: max_y - min_y,
+		left: min_x,
+		top: max_y
+	}
+}
 // 还原数据
 function reback(data, file_path, save_path){
 	var province_pos = require('./lnglat.json');
@@ -69,6 +98,7 @@ function reback(data, file_path, save_path){
 				items = items.concat(points);
 			});
 			num += items.length;
+
 			new_areas.push(items);
 		});
 		var is_multi = new_areas.length > 1;
@@ -84,7 +114,13 @@ function reback(data, file_path, save_path){
 			cname = properties['CAPNAME'],
 			prov_code = properties['PROV_CODE'];
 		name = _get_cityname(name);
-		var new_properties = {name: name, cname: _get_cityname(cname), prov_code: prov_code, cp: province_pos[name]};
+		var new_properties = {
+			name: name, 
+			cname: _get_cityname(cname), 
+			prov_code: prov_code, 
+			cp: province_pos[name],
+			srcSize: _getSrcSize(new_areas)
+		};
 		f.properties = new_properties;
 		features.push(f);
 	});

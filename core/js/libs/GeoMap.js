@@ -9,6 +9,9 @@ define('GeoMap',['zrender',
 	'zrender/shape/Circle',
 	'zrender/tool/area'],function(Zrender, Base, Polygon, Polyline, util, TextShape, ImageShape, Rectangle, Circle, util_area){
 
+	var MIN_VALUE = Number.MIN_VALUE,
+		MAX_VALUE = Number.MAX_VALUE;
+
 	var COLOR_TRANSPARENT = 'rgba(0,0,0,0)';
 	var Logger = Core.util.Logger,
 		Timer = Logger.Timer;
@@ -252,16 +255,23 @@ define('GeoMap',['zrender',
 	// 对配置进行更改，主要用于投影及尺寸
 	GeoMapProp.config = function(conf, callback){
 		var _this = this;
+		var _data = _this._data;
 		// _this.conf = conf = $.extend({}, default_conf, _this.conf, conf);
 		var new_projector = Albers;
 		var conf_map = conf.map;
+		var is_new_zone = true;
 		if(conf_map){
 			if(conf_map.projector == 'mercator'){
 				new_projector = Mercator;
 			}
+			if(_data){
+				var _conf_map = _data.map;
+				if(_conf_map && _conf_map.zone == conf_map.zone){
+					is_new_zone = false;
+				}
+			}
 		}
 		var old_projector = _this.projector;
-		var _data = _this._data;
 		var w_conf = conf.w,
 			h_conf = conf.h;
 		var is_resized = false;
@@ -279,7 +289,7 @@ define('GeoMap',['zrender',
 		_this._data.map = conf_map;
 		_this._data_o.map = conf_map;
 		var geo = _this.conf.geo;
-		if(is_resized || (!old_projector || old_projector.name != new_projector.name) && geo){
+		if((is_new_zone || is_resized || (!old_projector || old_projector.name != new_projector.name)) && geo){
 			var src = geo.src,
 				name = geo.name;
 			var arr_json = [];
@@ -306,7 +316,9 @@ define('GeoMap',['zrender',
 				_this._data.overlays = overlays_weather;
 			}
 
-			_this.loadGeo(arr_json, null, function(){
+			_this.loadGeo(arr_json, {
+				provinces: conf_map.provinces
+			}, function(){
 				$.each(overlays_weather, function(i, v){
 					_this.addOverlay(v);
 				});
@@ -633,7 +645,7 @@ define('GeoMap',['zrender',
 		});
 		return shapes;
 	}
-	function callback_loaedGeo(loadedData,options,callback_after_render_geo){
+	function callback_loaedGeo(loadedData, options, callback_after_render_geo){
 		Timer.start('render geo');
 		var gm = this;
 		var data = loadedData.shift();
@@ -661,10 +673,60 @@ define('GeoMap',['zrender',
 			newss.height = newss.top - b;
 			data.srcSize = newss;
 		});
-		_init_geomap.call(gm, data.srcSize);
+		var features = data.features.slice();
+		var srcSize = data.srcSize;
+		if(options){
+			var provinces = options.provinces;
+			if(provinces && provinces.length > 0){
+				features = features.filter(function(v){
+					if(provinces.indexOf(v.properties.prov_code) > -1){
+						return v;
+					}
+				});
+				var min_x = min_y = MAX_VALUE,
+					max_x = max_y = MIN_VALUE;
+
+				$.each(features, function(i, v){
+					var _ss = v.properties.srcSize;
+					if(_ss){
+						var _left = _ss.left,
+							_top = _ss.top,
+							_width = _ss.width,
+							_height = _ss.height;
+
+						var min_x_test = _left,
+							min_y_test = _top - _height,
+							max_x_test = _left + _width,
+							max_y_test = _top;
+
+						if(min_x > min_x_test){
+							min_x = min_x_test;
+						}
+						if(min_y > min_y_test){
+							min_y = min_y_test;
+						}
+						if(max_x < max_x_test){
+							max_x = max_x_test;
+						}
+						if(max_y < max_y_test){
+							max_y = max_y_test;
+						}
+					}
+				});
+				if(min_x != MIN_VALUE && min_y != MIN_VALUE && max_x != MAX_VALUE && max_y != MAX_VALUE){
+					srcSize = {
+						width: max_x - min_x,
+						height: max_y - min_y,
+						left: min_x,
+						top: max_y
+					}
+				}
+			}
+		}
+		_init_geomap.call(gm, srcSize);
 		var shapes = [];
 
-		$.each(data.features,function(i,v){
+		$.each(features, function(i,v){
 			var type = v.type;
 			if('Feature' == type){
 				var geometry = v.geometry;
@@ -726,7 +788,7 @@ define('GeoMap',['zrender',
 		gm.addMask(points, options);
 		$.isFunction(callback_after_render_geo) && callback_after_render_geo(points);
 	}
-	GeoMapProp.loadGeo = function(src,options,callback_after_render_geo){
+	GeoMapProp.loadGeo = function(src, options, callback_after_render_geo){
 		var _this = this;
 		if(!$.isArray(src)){
 			src = [src];
@@ -740,7 +802,7 @@ define('GeoMap',['zrender',
 				if(loadedData.length == len){
 					Timer.end('loadGeo');
 					Timer.start('add weather layers');
-					callback_loaedGeo.call(_this, loadedData,options, callback_after_render_geo);
+					callback_loaedGeo.call(_this, loadedData, options, callback_after_render_geo);
 					Timer.end('add weather layers');
 					Timer.start('init mirror');
 					_init_mirror.call(_this);
