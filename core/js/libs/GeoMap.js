@@ -166,6 +166,7 @@ define('GeoMap',['zrender',
 		_data_reset = $.extend(_data_reset, _getDefaultData(width_container, height_container));
 		_this._data_o = $.extend(true,{}, _data_reset);
 		if(_data){
+			_data_reset.map = _data.map;
 			var _data_o = _this._data_o;
 			var is_new = false;
 			if(_data_o){
@@ -319,11 +320,11 @@ define('GeoMap',['zrender',
 			_this.loadGeo(arr_json, {
 				provinces: conf_map && conf_map.provinces
 			}, function(){
+				_changeCnameColor.call(_this);
+				_addRiver.call(_this);
 				$.each(overlays_weather, function(i, v){
 					_this.addOverlay(v);
 				});
-				_changeCnameColor.call(_this);
-				_addRiver.call(_this);
 				_init_mirror.call(_this);
 				_this.reset();
 				callback && callback();

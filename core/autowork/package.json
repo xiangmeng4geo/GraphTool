@@ -4,8 +4,8 @@
   "window": {
   	"title": "蓝π蚂蚁制图",
     "icon": "./img/icon.png",
-    "show": false
-    // "show_in_taskbar": true
+    "show": false,
+    "toolbar": true
   },
   "single-instance": false
 }

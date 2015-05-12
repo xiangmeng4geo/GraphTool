@@ -1,1 +1,1 @@
-{"logos":{"southsea":{"flag":true,"p":""},"company":{"flag":true,"p":""}},"templates":[],"map":{"projector":"albers","layers":{"river":{"flag":false,"color":"#1f3dfa"},"railway":{},"cname":{"flag":true,"color":"#000000"}},"zone":"全国"}}
+{"logos":{"southsea":{"flag":true,"p":""},"company":{"flag":true,"p":""}},"templates":[],"map":{"projector":"albers","layers":{"river":{"flag":true,"color":"#1f3dfa"},"railway":{},"cname":{"flag":true,"color":"#000000"}},"zone":"全国"}}
