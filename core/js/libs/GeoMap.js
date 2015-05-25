@@ -883,24 +883,24 @@ define('GeoMap',['zrender',
 		}
 	}
     function _doclip(ctx){
-		var polygons = this.polygons;
-		if($.isArray(polygons)){
-			ctx.save();
-			ctx.beginPath();
-			$.each(polygons, function(i_polygon, pointList){
-				if (pointList.length < 2) {
-	                // 少于2个点就不画了~
-	                return;
-	            }
-	            ctx.moveTo(pointList[0][0], pointList[0][1]);
-	            for (var i = 1, l = pointList.length; i < l; i++) {
-	                ctx.lineTo(pointList[i][0], pointList[i][1]);
-	            }
-	            ctx.lineTo(pointList[0][0], pointList[0][1]);
-			});
-			ctx.closePath();
-			ctx.clip();
-		}
+		// var polygons = this.polygons;
+		// if($.isArray(polygons)){
+		// 	ctx.save();
+		// 	ctx.beginPath();
+		// 	$.each(polygons, function(i_polygon, pointList){
+		// 		if (pointList.length < 2) {
+	 //                // 少于2个点就不画了~
+	 //                return;
+	 //            }
+	 //            ctx.moveTo(pointList[0][0], pointList[0][1]);
+	 //            for (var i = 1, l = pointList.length; i < l; i++) {
+	 //                ctx.lineTo(pointList[i][0], pointList[i][1]);
+	 //            }
+	 //            ctx.lineTo(pointList[0][0], pointList[0][1]);
+		// 	});
+		// 	ctx.closePath();
+		// 	ctx.clip();
+		// }
     }
 	GeoMapProp.addMask = function(polygons){
 		// Timer.start('addMask');
