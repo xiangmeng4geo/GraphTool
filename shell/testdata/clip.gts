@@ -19,9 +19,12 @@ var GeoClipper = require(path.join(dir_core, 'node_modules/micaps_parser/utils/g
 
 var dir_data = path.join(dir_current, './data');
 var dir_data_clip = path.join(dir_current, './data_clip');
+var dir_data_clip_list = path.join(dir_current, './data_clip_list');
 
 util.rmfileSync(dir_data_clip, true);
 util.mkdirSync(dir_data_clip);
+util.rmfileSync(dir_data_clip_list, true);
+util.mkdirSync(dir_data_clip_list);
 
 function _doclip14(data, fn_getColor){
 	var time_start = new Date();
@@ -97,6 +100,17 @@ function _doclipInterpolate(areas){
 		console.log(new Date() - time_start);
 	});
 }
+function creatList(){
+	fs.readdir(dir_data_clip, function(err, files){
+		if(err){
+			console.log(err);
+		}else{
+			var save_path = path.join(dir_data_clip_list, 'list.json');
+			fs.writeFileSync(save_path, JSON.stringify(files));
+			console.log('save listfile: ', save_path);
+		}
+	});
+}
 fs.readdir(dir_data, function(err, dirs){
 	if(err){
 		console.log(err);
@@ -115,19 +129,29 @@ fs.readdir(dir_data, function(err, dirs){
 				});
 				if(data_file_name.length > 0){
 					var data_file = path.join(product_dir, data_file_name[0]);
-
-					parse_micaps(data_file, null, function(err, data){
+					var conf_file_name = files.filter(function(v){
+						if(path.extname(v) == '.json'){
+							return v;
+						}
+					});
+					var conf = require(path.join(product_dir, conf_file_name[0]));
+					var conf_file = conf.file;
+					var conf_in_out = conf.in_out;
+					var conf_file_rule = conf_in_out.file_rule;
+					var conf_other = conf.other;
+					var conf_interpolation = conf_other.interpolation;
+					parse_micaps(data_file, {
+						val_col: conf_file_rule.col,
+						grid_space: 0.2,
+						interpolation_all: conf_interpolation && conf_interpolation.flag, //传入micaps解析需要参数
+						arithmetic: conf_file_rule.arithmetic
+					}, function(err, data){
 						if(err){
 							console.log(err);
 						}else if(data){
 							err = null;
 							data.path = data_file;
-							var conf_file_name = files.filter(function(v){
-								if(path.extname(v) == '.json'){
-									return v;
-								}
-							});
-							var conf = require(path.join(product_dir, conf_file_name[0]));
+							
 							var blendent = conf.legend.blendent;
 							var len_blendent = blendent.length;
 							var isHaveManyBlendent = len_blendent > 1;
@@ -192,5 +216,6 @@ fs.readdir(dir_data, function(err, dirs){
 				}
 			});
 		}
+		creatList();
 	}
 });
