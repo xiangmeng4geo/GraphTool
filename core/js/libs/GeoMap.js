@@ -260,15 +260,15 @@ define('GeoMap',['zrender',
 		// _this.conf = conf = $.extend({}, default_conf, _this.conf, conf);
 		var new_projector = Albers;
 		var conf_map = conf.map;
-		var is_new_zone = true;
+		var is_new_zone = false;
 		if(conf_map){
 			if(conf_map.projector == 'mercator'){
 				new_projector = Mercator;
 			}
 			if(_data){
 				var _conf_map = _data.map;
-				if(_conf_map && _conf_map.zone == conf_map.zone){
-					is_new_zone = false;
+				if(_conf_map && _conf_map.zone != conf_map.zone){
+					is_new_zone = true;
 				}
 			}
 		}
@@ -279,6 +279,7 @@ define('GeoMap',['zrender',
 		if(_data && w_conf && h_conf){
 			var w = _data.width,
 				h = _data.height;
+
 			if(w != w_conf || h != h_conf){
 				_this.canvas.resize();
 				is_resized = true;

@@ -1234,7 +1234,6 @@ Core.safe(function(){
 								if(file_newest){
 									Timer.start('read micaps');
 									var conf_interpolation = conf_other.interpolation;
-									console.log(conf_interpolation);
 									file_util.micaps.getData(file_newest, {
 										val_col: conf_file_rule.col,
 										grid_space: conf_interpolation.option || 0.2,
