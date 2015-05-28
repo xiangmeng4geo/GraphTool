@@ -1116,7 +1116,7 @@ Core.safe(function(){
 										height: height,
 										src: img_src
 									},function($html, param){
-										$geomap_layer.append($html);
+										$html && $geomap_layer.append($html);
 										callback && callback($html, param);
 									});
 								}
@@ -1163,16 +1163,25 @@ Core.safe(function(){
 											top: 'auto',
 											bottom: 0
 										},toWidth, toHeight,function($html, param){
-											var pos = $html.position();
-											_add_title3({
-												left: 10, 
-												top: pos.top
-											});
+											if($html){
+												var pos = $html.position();
+												_add_title3({
+													left: 10, 
+													top: pos.top
+												});
+											}else{
+												_add_title3({
+													left: 10,
+													top: 'auto',
+													bottom: 10
+												});
+											}
+
 											_add_southsealogo({
 												left: 'auto',
 												right: 10,
 												top: 'auto',
-												bottom: param.height_show + 10
+												bottom: (param?param.height_show:0) + 10
 											});
 										});
 									}
