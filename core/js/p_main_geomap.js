@@ -47,10 +47,12 @@ Core.safe(function(){
 	var conf_export; //保存导出图片设置
 
 	var $body = $('body'),
-		$doc = $(document);
+		$doc = $(document),
+		$win = $(window);
 	var COLOR_TRANSPANT = 'rgba(0,0,0,0)';
 	var $geomap = $('#geomap');
 	var $geomap_container = $('#geomap_container');
+	var $work_container = $('#work_container');
 	var $geomap_layer = $geomap_container;//$('#geomap_layer');
 	$geomap_container.css({
 		width: ConstTemplate[0],
@@ -626,26 +628,6 @@ Core.safe(function(){
 				},
 				onafteraddoverlays: function(){
 					gm.refresh();
-					// if(!this.flag){
-					// 	this.flag = true;
-					// 	$.getJSON('../shell/geo/data-source/chian_river_Merge.jsontest1.json', function(data){
-					// 		$.each(data, function(i, v){
-					// 			var point_arr = [];
-					// 			$.each(v, function(v_i,v_v){
-					// 				var point = new GeoMap.Point(v_v[0], v_v[1]);
-					// 				point_arr.push(point);
-					// 			});
-					// 			var polyline = new GeoMap.Polyline(point_arr, {
-					// 				style: {
-					// 					strokeColor : '#353FC3',
-					// 					lineWidth : 1,
-					// 				},
-					// 				zlevel: GeoMap.ZLEVEL.ZINDEX_MAP
-					// 			});
-					// 			gm.addOverlay(polyline);   //增加折线
-		   //          		});
-					// 	});
-					// }
 				},
 				jsonLoader: file_util.getJson
 			});
@@ -1010,6 +992,34 @@ Core.safe(function(){
 				gm.refresh();
 				callback && callback();
 			}
+			// 当要编辑的图片尺寸过大时进行缩放提示
+			var $zoom_notice = $('#zoom_notice'),
+				top_margin_geomap_container = parseFloat($geomap_container.css('margin-top')),
+				left_margin_geomap_container = parseFloat($geomap_container.css('margin-left'));
+			function _zoomNotice(){
+				var width_max = $work_container.width() - 60,
+					height_max = $work_container.height() -60;
+				var w = $geomap_container.width(),
+					h = $geomap_container.height();
+
+				var zoom = 1;
+				if(w > width_max || h > height_max){
+					zoom = (w/h > width_max/height_max)? width_max/w: height_max/h;
+					
+					$zoom_notice.html(w+'X'+h+'('+(zoom*100).toFixed(1)+'%)').fadeIn();
+				}else{
+					$zoom_notice.hide();
+				}
+				$geomap_container.css({
+					'zoom': zoom,
+					'margin-top': top_margin_geomap_container/zoom,
+					'margin-left': left_margin_geomap_container/zoom
+				});
+				/*这里没有transform:scale()的方式，是因为这种方式会影响子元素的位置*/
+				// $geomap_container.css('transform', 'scale('+(zoom||1)+')');
+			}
+			_zoomNotice();
+			$win.on('resized', _zoomNotice);
 			// 当产品更换时触发
 			function _fn_callback_event(e, data){
 				Timer.start('render product');
@@ -1315,6 +1325,7 @@ Core.safe(function(){
 								});
 							}
 						}catch(e){}
+						_zoomNotice(width_geomap, height_geomap);
 						gm.config({
 							map: _getConfMap(),
 							w: width_geomap,
@@ -1534,7 +1545,7 @@ Core.safe(function(){
 				if(!files_loaded || isReload){
 					files_loaded = file_util.readdir(icon_path);
 					if(!$tool_image){
-						$tool_image = $('<div class="tool_image"><div class="btn_close_tool_image"></div><div class="tool_image_main"></div></div>').appendTo('#work_container');
+						$tool_image = $('<div class="tool_image"><div class="btn_close_tool_image"></div><div class="tool_image_main"></div></div>').appendTo($work_container);
 						$tool_image.delegate('select','change',function(){
 							showFiles($tool_image.find('ul'), $(this).val());
 						});
@@ -1547,7 +1558,7 @@ Core.safe(function(){
 					function _getHeight(){
 						return $tool_image.height() - 80;
 					}
-					$(window).on('resized', function(){
+					$win.on('resized', function(){
 						$('.list_container').css({
 							height: _getHeight()
 						});

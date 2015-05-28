@@ -311,11 +311,11 @@
 		_init_size_TT = setTimeout(function(){
 			var height_c_right = $win.height() - height_top_container;
 			$c_right.css({
-				width: $win.width()+ 10,
+				width: $win.width() - $('#c_left').width(),
 				height: height_c_right
 			});
 			$work_container.css({
-				height: height_c_right - $('#c_top').height() - 2
+				height: height_c_right - $('#c_top').height() - 10
 			});
 			$win.trigger('resized');
 		}, 10);

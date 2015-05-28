@@ -500,3 +500,12 @@
 .off .ui-rotatable-handle{
 	display: none;
 }
+
+#zoom_notice{
+	position: absolute;
+	left: 30px;
+	top: 0;
+	height: 30px;
+	line-height: 30px;
+	display: none;
+}
