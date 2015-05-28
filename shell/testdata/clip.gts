@@ -11,7 +11,7 @@ var dir_core = '../../core';
 if(!fs.existsSync(dir_core)){
 	dir_core = '../../';
 }
-
+require.extensions['.gts'] = require.extensions['.js'];
 
 var parse_micaps = require(path.join(dir_core, 'node_modules/micaps_parser/parser')).parse;
 var raster2vector = require(path.join(dir_core, 'node_modules/micaps_parser/utils/raster2vector')).raster2vector;

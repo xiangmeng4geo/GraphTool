@@ -12,7 +12,7 @@ if(!fs.existsSync(dir_core)){
 }
 var dir_config = path.join(dir_core, 'config');
 var dir_data = path.join(dir_current, 'data');
-var dir_tmp = path.join(os.tmpdir() || os.tmpDir, 'gt_testdata');
+var dir_tmp = path.join(os.tmpdir() || os.tmpDir(), 'gt_testdata');
 
 util.mkdirSync(dir_config);
 util.mkdirSync(dir_tmp);
@@ -81,7 +81,7 @@ fs.readdir(dir_data, function(err, dirs){
 				});
 			});
 
-			console.log('导出数据完成！');
+			console.log('导入数据完成！');
 		}else{
 			console.log('没有要处理的配置文件！');
 		}
