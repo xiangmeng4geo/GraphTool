@@ -166,6 +166,7 @@ define('GeoMap',['zrender',
 		_data_reset = $.extend(_data_reset, _getDefaultData(width_container, height_container));
 		_this._data_o = $.extend(true,{}, _data_reset);
 		if(_data){
+			_data_reset.map = _data.map;
 			var _data_o = _this._data_o;
 			var is_new = false;
 			if(_data_o){
@@ -259,15 +260,15 @@ define('GeoMap',['zrender',
 		// _this.conf = conf = $.extend({}, default_conf, _this.conf, conf);
 		var new_projector = Albers;
 		var conf_map = conf.map;
-		var is_new_zone = true;
+		var is_new_zone = false;
 		if(conf_map){
 			if(conf_map.projector == 'mercator'){
 				new_projector = Mercator;
 			}
 			if(_data){
 				var _conf_map = _data.map;
-				if(_conf_map && _conf_map.zone == conf_map.zone){
-					is_new_zone = false;
+				if(_conf_map && _conf_map.zone != conf_map.zone){
+					is_new_zone = true;
 				}
 			}
 		}
@@ -278,6 +279,7 @@ define('GeoMap',['zrender',
 		if(_data && w_conf && h_conf){
 			var w = _data.width,
 				h = _data.height;
+
 			if(w != w_conf || h != h_conf){
 				_this.canvas.resize();
 				is_resized = true;
@@ -319,11 +321,11 @@ define('GeoMap',['zrender',
 			_this.loadGeo(arr_json, {
 				provinces: conf_map && conf_map.provinces
 			}, function(){
+				_changeCnameColor.call(_this);
+				_addRiver.call(_this);
 				$.each(overlays_weather, function(i, v){
 					_this.addOverlay(v);
 				});
-				_changeCnameColor.call(_this);
-				_addRiver.call(_this);
 				_init_mirror.call(_this);
 				_this.reset();
 				callback && callback();

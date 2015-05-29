@@ -5,7 +5,11 @@ var fs = require('fs'),
 
 var dir_current = __dirname;
 
+//目录可以放在core的同级（开发环境），也可以放在主程序安装目录下（生产环境）
 var dir_core = path.join(dir_current, '../../core');
+if(!fs.existsSync(dir_core)){
+	dir_core = path.join(dir_current, '../../');
+}
 var dir_config = path.join(dir_core, 'config');
 var dir_data = path.join(dir_current, 'data');
 var dir_tmp = os.tmpdir() || os.tmpDir;
@@ -89,6 +93,7 @@ function dealConfigFile(file_name){
 				util.copySync(path.join(dir_config, file_name), path.join(path_to_save, file_name));
 			}
 		}
+		console.log(file_name);
 	}
 }
 
@@ -103,9 +108,9 @@ fs.readdir(dir_config, function(err, files){
 			files.forEach(function(file){
 				dealConfigFile(file);
 			});
-			console.log('导出数据完成！');
+			console.log('\n导出数据完成！');
 		}else{
-			console.log('没有要处理的配置文件！');
+			console.log('\n没有要处理的配置文件！');
 		}
 	}
 });

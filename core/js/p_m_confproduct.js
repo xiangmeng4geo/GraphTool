@@ -14,7 +14,8 @@ Core.safe(function(){
 	var CoreWindow = Core.Window;
 	var _const = Core.Const;
 	var const_msgtype = _const.msgType,
-		_template = _const.template;
+		_template = _const.template,
+		const_interpolate = _const.interpolate;
 	
 	$('.file_dir').click(function(){
 		$(this).parent().prev().click();
@@ -141,11 +142,13 @@ Core.safe(function(){
 		$cb_use_mapbgcolor = $('#cb_use_mapbgcolor'),
 		$color_mapbg = $('#color_mapbg'),
 		$select_value_arithmetic = $('#select_value_arithmetic'),
-		$num_value_arithmetic = $('#num_value_arithmetic');
+		$num_value_arithmetic = $('#num_value_arithmetic'),
+		$select_interpolate = $('#select_interpolate');
+
 	/*初始化文件选定*/
 	!function(){
 		var const_file_rule = Core.Const.fileRule,
-			col_index = const_file_rule.col_index,
+			column = const_file_rule.column,
 			file_rule_time = const_file_rule.time_rule,
 			file_rule_file_postfix = const_file_rule.file_postfix,
 			file_type = const_file_rule.file_type,
@@ -178,9 +181,9 @@ Core.safe(function(){
 		$select_file_hour.html(html_file_hour);
 
 		var html_value_col = '';
-		for(var i = col_index[0], j = col_index[1]; i<=j; i++){
-			html_value_col += '<option value="'+i+'">'+i+'</option>';
-		}
+		$.each(column, function(i, v){
+			html_value_col += '<option value="'+v.v+'">'+v.v+'. '+v.n+'</option>';
+		});
 		$select_value_col.html(html_value_col);
 
 		var html_template = '';
@@ -192,6 +195,11 @@ Core.safe(function(){
 		});
 		$select_template.html(html_template);
 
+		var html_interpolate = '';
+		$.each(const_interpolate.l, function(i, v){
+			html_interpolate += '<option value="'+v.v+'">'+(v.n)+'</option>';
+		});
+		$select_interpolate.html(html_interpolate);
 
 		var $text_file_dir_in = $('#text_file_dir_in');
 		/*显示选定的文件规则*/
@@ -476,7 +484,8 @@ Core.safe(function(){
 					'flag': $cb_use_bgcolor.prop('checked')
 				},
 				'interpolation': {
-					'flag': $cb_interpolation_all.prop('checked')
+					'flag': $cb_interpolation_all.prop('checked'),
+					'option': parseFloat($select_interpolate.val())
 				},
 				'template': parseInt($select_template.val()),
 				'mapbg_color': {
@@ -539,6 +548,8 @@ Core.safe(function(){
 				}
 			});
 		}
+		selected_option($select_interpolate, const_interpolate.d); //选中默认值
+
 		if(conf_product){
 			var conf_file = conf_product.file;
 			if(conf_file){
@@ -649,6 +660,8 @@ Core.safe(function(){
 				var conf_interpolation = conf_other.interpolation;
 				if(conf_interpolation){
 					$cb_interpolation_all.prop('checked', conf_interpolation.flag);
+					
+					selected_option($select_interpolate, conf_interpolation.option);
 				}
 
 				var template_index = parseInt(conf_other.template) || 0;

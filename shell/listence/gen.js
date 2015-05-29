@@ -21,8 +21,8 @@ function gen(time_start, time_end, is_from_command){
 var args = [].slice.call(process.argv);
 //命令行进行指定文件压缩
 if(args.length >= 2){
-	var time_start = args[2] || '2015-04-01',
-		time_end = args[3] || '2017-05-01';
+	var time_start = args[2] || '2015-05-29',
+		time_end = args[3] || '2015-07-01';
 	fs.appendFileSync(path.join(__dirname, './listence.txt'), gen(time_start, time_end, true));
 }
 
