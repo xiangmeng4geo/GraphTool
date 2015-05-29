@@ -7,6 +7,9 @@
 	var Core = {};
 	Core.require = nwrequire;
 	var CoreLib = Core.Lib = nwrequire('core');
+	if(typeof raster2vector != 'undefined'){
+		CoreLib.raster2vector_test(raster2vector);
+	}
 	var CoreLibUtil = CoreLib.util,
 		util_path = CoreLibUtil.path,
 		util_file = CoreLibUtil.file;

@@ -19,12 +19,10 @@ var GeoClipper = require(path.join(dir_core, 'node_modules/micaps_parser/utils/g
 
 var dir_data = path.join(dir_current, './data');
 var dir_data_clip = path.join(dir_current, './data_clip');
-var dir_data_clip_list = path.join(dir_current, './data_clip_list');
 
 util.rmfileSync(dir_data_clip, true);
 util.mkdirSync(dir_data_clip);
-util.rmfileSync(dir_data_clip_list, true);
-util.mkdirSync(dir_data_clip_list);
+
 
 function _doclip14(data, fn_getColor){
 	var time_start = new Date();
@@ -38,7 +36,6 @@ function _doclip14(data, fn_getColor){
 			area.c = color;
 			area.is_stripe = area.code == 24;
 			var result = geoClipper.doClip(area.items);
-			// console.log(result);
 			var scale = result.scale || 1;
 			var paths = result.paths;
 			for(var i = 0, j = paths.length; i<j; i++){
@@ -61,7 +58,7 @@ function _doclip14(data, fn_getColor){
 		});
 		data.areas = areas_new;
 	});
-	console.log(new Date() - time_start);
+	console.log(new Date() - time_start + 'ms!');
 }
 function _doclipInterpolate(areas){
 	var areas_old = areas.splice(0);
@@ -97,20 +94,10 @@ function _doclipInterpolate(areas){
 				areas.push(area_new);
 			}
 		});
-		console.log(new Date() - time_start);
+		console.log(new Date() - time_start + 'ms!');
 	});
 }
-function creatList(){
-	fs.readdir(dir_data_clip, function(err, files){
-		if(err){
-			console.log(err);
-		}else{
-			var save_path = path.join(dir_data_clip_list, 'list.json');
-			fs.writeFileSync(save_path, JSON.stringify(files));
-			console.log('save listfile: ', save_path);
-		}
-	});
-}
+
 fs.readdir(dir_data, function(err, dirs){
 	if(err){
 		console.log(err);
@@ -142,7 +129,7 @@ fs.readdir(dir_data, function(err, dirs){
 					var conf_interpolation = conf_other.interpolation;
 					parse_micaps(data_file, {
 						val_col: conf_file_rule.col,
-						grid_space: 0.2,
+						grid_space: conf_interpolation && conf_interpolation.option || 0.2,
 						interpolation_all: conf_interpolation && conf_interpolation.flag, //传入micaps解析需要参数
 						arithmetic: conf_file_rule.arithmetic
 					}, function(err, data){
@@ -210,12 +197,11 @@ fs.readdir(dir_data, function(err, dirs){
 							var data_json = JSON.stringify(data);
 							var save_path = path.join(dir_data_clip, dir+'.json');
 							fs.writeFileSync(save_path, data_json); //异步保存数据
-							console.log(save_path);
+							console.log(dir);
 						}
 					});
 				}
 			});
 		}
-		creatList();
 	}
 });
