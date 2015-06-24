@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<style type="text/css">
+body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;}
+
+</style>
+<title>micas14类数据展示</title>
+</head>
+<body>
+    <div id="allmap">
+    </div>
+    <script type="text/javascript" src="http://tonny-zhang.github.io/source/js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=E8MDMS4BVFEMeAxVP3YddQ6X"></script>
+    <script type="text/javascript">
+    map = new BMap.Map("allmap");
+    map.centerAndZoom(new BMap.Point(116.404, 39.915), 5);
+    map.enableScrollWheelZoom();
+    // $.getJSON('../data-source/china_province.json.endpoint.json', function(data){
+    //     $.each(data, function(i, v){
+    //         var marker = new BMap.Marker(new BMap.Point(v.lng, v.lat));
+    //         marker.len = v.len;
+    //         marker.addEventListener("click",function(){
+    //          var p = marker.getPosition();  //获取marker的位置
+    //          console.log(v);    
+    //         });
+    //         map.addOverlay(marker);
+    //     });
+    // });
+
+    // var url_river = '../data-source/river.result.json';
+    var url_river = '../data-source/chian_river_Merge.json';
+    // var url_river = './1.result.json';
+    // var url_river = './RIVER22.result.json';
+    // var url_river = './3.result.json';
+    $.getJSON(url_river, function(data){
+        // data.sort(function(a, b){
+        //     return b.length - a.length;
+        // });
+        for(var i = 0, j = data.length; i<j; i++){
+            var val = data[i];
+            (function(v, delay){
+                setTimeout(function(){
+                    if(v[0].join() == v[v.length-1]){
+                        console.log('remove area');
+                        return;
+                    }
+                    // if(v.length < 30){
+                    //     console.log('remove small line');
+                    //     return;
+                    // }
+                    // if(Math.pow(v[0][0] - v[v.length-1][0], 2) + Math.pow(v[0][1] - v[v.length-1][1], 2) < 0.1){
+                    //     console.log('remove area');
+                    //     return;
+                    // }
+                    var point_arr = [];
+                    $.each(v, function(p_i, p_v){
+                        var point = new BMap.Point(parseFloat(p_v[0]), parseFloat(p_v[1]));
+                        point_arr.push(point);
+                        // if(i == 0)
+                        // setTimeout(function(){
+                        //  var marker = new BMap.Marker(point);
+                        //  marker.addEventListener("click",function(){
+                        //      var p = marker.getPosition();  //获取marker的位置
+                        //      alert(" marker的位置是" + p.lng + "," + p.lat);    
+                        //  });
+                        //  map.addOverlay(marker);
+                        // },p_i*200);
+                    });
+                    var polyline = new BMap.Polyline(point_arr, {strokeColor:"#1010FF", strokeWeight: v.weight||1, strokeOpacity:1});
+                    map.addOverlay(polyline);   //增加折线
+                }, delay);
+            })(val, i);
+            
+        }
+    });
+    </script>
+</body>
+</html>

@@ -194,5 +194,9 @@
 	"map1": {
 		"name": ["hebei"],
 		"river": null
+	},
+	"map1": {
+		"name": ["hainan"],
+		"river": null
 	}
 }

@@ -37,8 +37,10 @@ function _format(province_name){
 		var cache_names = {};
 		data_names.features.forEach(function(v){
 			var p = v.properties;
-			cache_names[p['NAME']] = [p['POINT_X'], p['POINT_Y']];
+			var coor = v.geometry.coordinates;
+			cache_names[p['NAME']] = coor;
 		});
+		console.log(JSON.stringify(cache_names));
 		var data_new = {
 			type: "FeatureCollection"
 		};
@@ -100,6 +102,6 @@ function _format(province_name){
 	}
 }
 
-['hebei'].forEach(function(v){
+['hainan'].forEach(function(v){
 	_format(v);
 });

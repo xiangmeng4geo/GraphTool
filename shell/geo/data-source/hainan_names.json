@@ -1,0 +1,26 @@
+﻿{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "Shape_Leng": 1.198726, "Shape_Area": 0.058362, "NAME": "通什市", "ORIG_FID": 0 }, "geometry": { "type": "Point", "coordinates": [ 109.510072228389802, 18.761572602967522 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 2.985061, "Shape_Area": 0.169595, "NAME": "琼山市", "ORIG_FID": 1 }, "geometry": { "type": "Point", "coordinates": [ 110.43847447677993, 19.807648784142728 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 2.477890, "Shape_Area": 0.143853, "NAME": "琼海市", "ORIG_FID": 2 }, "geometry": { "type": "Point", "coordinates": [ 110.398738330304255, 19.209552833090481 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 3.966930, "Shape_Area": 0.278909, "NAME": "儋州市", "ORIG_FID": 3 }, "geometry": { "type": "Point", "coordinates": [ 109.401829411544639, 19.565340181951107 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 3.745594, "Shape_Area": 0.205184, "NAME": "文昌市", "ORIG_FID": 4 }, "geometry": { "type": "Point", "coordinates": [ 110.770882320244993, 19.745985518908718 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 2.797552, "Shape_Area": 0.160461, "NAME": "万宁市", "ORIG_FID": 5 }, "geometry": { "type": "Point", "coordinates": [ 110.278283948712286, 18.833775125699876 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 2.220594, "Shape_Area": 0.195121, "NAME": "东方市", "ORIG_FID": 6 }, "geometry": { "type": "Point", "coordinates": [ 108.839446394540317, 18.990738179830412 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 2.181663, "Shape_Area": 0.102542, "NAME": "定安县", "ORIG_FID": 7 }, "geometry": { "type": "Point", "coordinates": [ 110.308141147978503, 19.485385648736127 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 1.864105, "Shape_Area": 0.105951, "NAME": "屯昌县", "ORIG_FID": 8 }, "geometry": { "type": "Point", "coordinates": [ 110.050445128064794, 19.343326242598021 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 3.093396, "Shape_Area": 0.177328, "NAME": "澄迈县", "ORIG_FID": 9 }, "geometry": { "type": "Point", "coordinates": [ 109.984118766340075, 19.687870626593426 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 1.817270, "Shape_Area": 0.110588, "NAME": "临高县", "ORIG_FID": 10 }, "geometry": { "type": "Point", "coordinates": [ 109.711889127662531, 19.801538407343163 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 2.375839, "Shape_Area": 0.182487, "NAME": "白沙黎族自", "ORIG_FID": 11 }, "geometry": { "type": "Point", "coordinates": [ 109.34602120274765, 19.20864562897766 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 2.361606, "Shape_Area": 0.137997, "NAME": "昌江黎族自", "ORIG_FID": 12 }, "geometry": { "type": "Point", "coordinates": [ 109.000272771993025, 19.21366744981324 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 2.655789, "Shape_Area": 0.244348, "NAME": "乐东黎族自", "ORIG_FID": 13 }, "geometry": { "type": "Point", "coordinates": [ 109.065708492733791, 18.659320008787788 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 2.174952, "Shape_Area": 0.092307, "NAME": "陵水黎族自", "ORIG_FID": 14 }, "geometry": { "type": "Point", "coordinates": [ 109.936557890786645, 18.568209812210558 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 1.806672, "Shape_Area": 0.099352, "NAME": "保亭黎族苗", "ORIG_FID": 15 }, "geometry": { "type": "Point", "coordinates": [ 109.64018819207449, 18.582535418778626 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 3.008031, "Shape_Area": 0.265357, "NAME": "琼中黎族苗", "ORIG_FID": 16 }, "geometry": { "type": "Point", "coordinates": [ 109.81335737676298, 19.019323888309398 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 0.875436, "Shape_Area": 0.017718, "NAME": "海口市", "ORIG_FID": 17 }, "geometry": { "type": "Point", "coordinates": [ 110.254072932553683, 20.00876361696638 ] } },
+{ "type": "Feature", "properties": { "Shape_Leng": 3.239063, "Shape_Area": 0.157007, "NAME": "三亚市市辖", "ORIG_FID": 18 }, "geometry": { "type": "Point", "coordinates": [ 109.419333825663699, 18.388636250465918 ] } }
+]
+}
