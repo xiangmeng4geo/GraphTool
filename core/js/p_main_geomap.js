@@ -741,6 +741,7 @@ Core.safe(function(){
                             arr.push({
                             	x: v.x,
                             	y: v.y,
+                            	v: v.v,
                             	c: color || COLOR_TRANSPANT
                             });
                         }
