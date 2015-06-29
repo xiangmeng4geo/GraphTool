@@ -12,7 +12,7 @@
     "height": 310,
     "toolbar": true,
     "as_desktop": true,
-    "show": false,
+    "show": true,
     "resizable": false
   },
   "single-instance": false
