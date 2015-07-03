@@ -748,6 +748,7 @@ Core.safe(function(){
                         _new_interpolate_data.push(arr);  
                     }
                     Timer.start('raster2vector');
+                    params.is_grid = data.type == 4;
                     var polygons = file_util.micaps.raster2vector(_new_interpolate_data, COLOR_TRANSPANT, params, blendent);
 					// var polygons = raster2vector(_new_interpolate_data, COLOR_TRANSPANT);
                     Timer.end('raster2vector', 1);
