@@ -697,28 +697,27 @@ Core.safe(function(){
 				Timer.start('render micaps');
 				
 				var isHaveManyBlendent = len_blendent > 1;
-				function getColorByCondition(val, range){
+				function getColorByCondition(val, range, is_return_index){
 					for(var i = 0,j=range.length;i<j;i++){
 						var case_range = range[i];
-						if(case_range.is_checked){
-							var val_range = case_range.val;
-							if(val >= val_range[0] && val < val_range[1]){
-								return case_range.color;
-							}
+						var val_range = case_range.val;
+						if(val > val_range[0] && val <= val_range[1]){
+							var c = case_range.is_checked? case_range.color: COLOR_TRANSPANT;
+							return is_return_index? [c, i]: c;
 						}
 					}
-					return COLOR_TRANSPANT;
+					return is_return_index? [COLOR_TRANSPANT, j]: COLOR_TRANSPANT;
 				}
-				function getColor(val, code){
+				function getColor(val, code, is_return_index){
 					if(isHaveManyBlendent){
 						for(var i = 0;i<len_blendent;i++){
 							var v = blendent[i];
 							if(code == v.val.v){
-								return getColorByCondition(val, v.colors);
+								return getColorByCondition(val, v.colors, is_return_index);
 							}
 						}
 					}
-					return getColorByCondition(val, blendent[0].colors);
+					return getColorByCondition(val, blendent[0].colors, is_return_index);
 				}
 		        // 3类里的插值结果
 				var interpolate = data.interpolate;
@@ -737,38 +736,76 @@ Core.safe(function(){
                         var arr = [];
                         for(var j = 0; j< _interpolate_height; j++){
                             var v = interpolate[i][j];
-                            var color = getColor(v.v);
+                            var color_info = getColor(v.v, null, true);
+                            var color = color_info[0],
+                            	color_level = color_info[1];
                             arr.push({
                             	x: v.x,
                             	y: v.y,
                             	v: v.v,
+                            	level: color_level,
                             	c: color || COLOR_TRANSPANT
                             });
                         }
                         _new_interpolate_data.push(arr);  
                     }
                     Timer.start('raster2vector');
-                    params.is_grid = data.type == 4;
-                    var polygons = file_util.micaps.raster2vector(_new_interpolate_data, COLOR_TRANSPANT, params, blendent);
-					// var polygons = raster2vector(_new_interpolate_data, COLOR_TRANSPANT);
-                    Timer.end('raster2vector', 1);
-					for(var i = 0, j = polygons.length; i<j; i++){
-						var point_arr = [];
-						var polygon = polygons[i];
-						var color = polygon.color;
-						for(var i_p = 0, items = polygon.items, j_p = items.length; i_p<j_p; i_p++){
-							var v = items[i_p];
-							var point = new GeoMap.Point(v.lng, v.lat);
+                    var data_polygons = file_util.micaps.getPolygons(_new_interpolate_data, COLOR_TRANSPANT, params, blendent);
+                    var relation = data_polygons.r;
+                    var polygons_itemlist = data_polygons.list;
+                    $.each(relation, function(i, v){
+                    	var index = v[0],
+                    		color = v[1],
+                    		indexs_clips = v[2];
+                    	var items = polygons_itemlist[index];
+                    	var point_arr = [];
+                    	$.each(items, function(item_i, item){
+							var point = new GeoMap.Point(item.x, item.y);
 							point_arr.push(point);
-						}
-						var polygonShape = new GeoMap.Polygon(point_arr, {
+                    	});
+                    	var clips = null;
+                    	if(indexs_clips && indexs_clips.length > 0){
+                    		clips = [];
+                    		$.each(indexs_clips, function(ii, index_c){
+                    			var items_clip = polygons_itemlist[index_c];
+                    			var point_arr_clip = [];
+		                    	$.each(items_clip, function(item_i, item){
+									var point = new GeoMap.Point(item.x, item.y);
+									point_arr_clip.push(point);
+		                    	});
+		                    	clips.push(point_arr_clip);
+                    		});
+                    	}
+                    	var polygonShape = new GeoMap.Polygon(point_arr, {
 							style: {
 								strokeColor: COLOR_TRANSPANT, 
 								color: color,
 							}
-						});
+						}, clips);
 						gm.addOverlay(polygonShape);   //增加面
-					}
+                    });
+					Timer.end('raster2vector', 1);
+     //                params.is_grid = data.type == 4;
+     //                var polygons = file_util.micaps.raster2vector(_new_interpolate_data, COLOR_TRANSPANT, params, blendent);
+					// // var polygons = raster2vector(_new_interpolate_data, COLOR_TRANSPANT);
+     //                Timer.end('raster2vector', 1);
+					// for(var i = 0, j = polygons.length; i<j; i++){
+					// 	var point_arr = [];
+					// 	var polygon = polygons[i];
+					// 	var color = polygon.color;
+					// 	for(var i_p = 0, items = polygon.items, j_p = items.length; i_p<j_p; i_p++){
+					// 		var v = items[i_p];
+					// 		var point = new GeoMap.Point(v.lng, v.lat);
+					// 		point_arr.push(point);
+					// 	}
+					// 	var polygonShape = new GeoMap.Polygon(point_arr, {
+					// 		style: {
+					// 			strokeColor: COLOR_TRANSPANT, 
+					// 			color: color,
+					// 		}
+					// 	});
+					// 	gm.addOverlay(polygonShape);   //增加面
+					// }
 					// gm.addOverlay(interpolation_overlay);   //渲染插值结果
 				}
 				// 14类中的面

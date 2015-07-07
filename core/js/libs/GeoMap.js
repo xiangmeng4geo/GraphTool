@@ -1091,7 +1091,6 @@ define('GeoMap',['zrender',
 		style.x = pixel.x;
 		style.y = pixel.y;
 		style.r = 4;
-		// console.log(123, pixel);
 		return this.shape;
 	}
 	var GeoMapPolyline = function(options, special_options){
@@ -1257,9 +1256,41 @@ define('GeoMap',['zrender',
 		this.lng = lng;
 		this.lat = lat;
 	}
-	GeoMap.Polygon = function(Points,options){
-		this.points = Points;
-		this.shape = new Polygon($.extend(true,{
+
+	var GeoMapPolygon = function(options){
+		Polygon.call(this, options);
+	}
+	var GeoMapPolygonProp = GeoMapPolygon.prototype;
+	GeoMapPolygonProp.type = 'gmpolygon';
+	GeoMapPolygonProp.afterBrush = function(ctx){
+		var _this = this;
+		Polygon.prototype.afterBrush.call(this, ctx);
+
+		ctx.save();
+		var clips = _this.style.clips;
+		if(clips && clips.length > 0){
+			ctx.beginPath();
+			$.each(clips, function(i, v){
+				ctx.moveTo(v[0][0], v[0][1]);
+                for (var i = 1, l = v.length; i < l; i++) {
+                    ctx.lineTo(v[i][0], v[i][1]);
+                }
+                ctx.lineTo(v[0][0], v[0][1]);
+			});
+			ctx.clip();
+			var canvas = ctx.canvas;
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+		}
+		ctx.restore();
+	}
+	util.inherits(GeoMapPolygon, Polygon);
+
+	// 为兼容之前写法，clips参数放在options后
+	GeoMap.Polygon = function(Points, options, clips){
+		var _this = this;
+		_this.points = Points;
+		_this.clips = clips;
+		_this.shape = new GeoMapPolygon($.extend(true,{
 			style: {
 				brushType : 'both',
 		        lineWidth : 1,
@@ -1276,13 +1307,33 @@ define('GeoMap',['zrender',
 		},options));
 	}
 	function _drawPointList(map){
-		var points = this.points;
+		var _this = this;
+		var points = _this.points;
 		var pointList = [];
-		$.each(points,function(i, v){
+		$.each(points, function(i, v){
 			var val = pointToOverlayPixel.call(map, v);
-			pointList.push([val.x,val.y]);
+			pointList.push([val.x, val.y]);
 		});
-		this.shape.style.pointList = pointList;
+		var style = _this.shape.style;
+		style.pointList = pointList;
+
+		var clips = _this.clips;
+		var clips_items = null;
+		if(clips && clips.length > 0){
+			clips_items = [];
+			$.each(clips, function(i, v){
+				var items_arr = [];
+				if(v.length < 2){
+					return;
+				}
+				$.each(v, function(i_v, v_v){
+					var val = pointToOverlayPixel.call(map, v_v);
+					items_arr.push([val.x, val.y]);
+				});
+				clips_items.push(items_arr);
+			});
+		}
+		style.clips = clips_items;
 	}
 	GeoMap.Polygon.prototype.draw = function(map){
 		_drawPointList.call(this,map);
