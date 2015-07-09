@@ -138,6 +138,7 @@ Core.safe(function(){
 		$cb_use_bgcolor = $('#cb_use_bgcolor'),
 		$cb_use_bgimg = $('#cb_use_bgimg'),
 		$cb_interpolation_all = $('#cb_interpolation_all'),
+		$cb_show_not_in_zone = $('#cb_show_not_in_zone'),
 		$select_template = $('#select_template'),
 		$cb_use_mapbgcolor = $('#cb_use_mapbgcolor'),
 		$color_mapbg = $('#color_mapbg'),
@@ -491,7 +492,8 @@ Core.safe(function(){
 				'mapbg_color': {
 					'val': $color_mapbg.val(),
 					'flag': $cb_use_mapbgcolor.prop('checked')
-				}
+				},
+				'show_not_in_zone': $cb_show_not_in_zone.prop('checked')
 			}
 		};
 		
@@ -612,6 +614,7 @@ Core.safe(function(){
 				$cb_is_updown.prop('checked',conf_legend.is_updown);
 
 				var blendent = conf_legend.blendent;
+				console.log(blendent);
 				$.each(blendent,function(i,v){
 					var val = v.val;
 					init_legend_product.add(val);
@@ -663,6 +666,7 @@ Core.safe(function(){
 					
 					selected_option($select_interpolate, conf_interpolation.option);
 				}
+				$cb_show_not_in_zone.prop('checked', !!conf_other.show_not_in_zone);
 
 				var template_index = parseInt(conf_other.template) || 0;
 				selected_option($select_template, template_index);

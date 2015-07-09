@@ -10,7 +10,8 @@ Core.safe(function(){
 	// CoreWindow.get().showDevTools();	
 	var color_toRGB = Core.Color.toRGB
 
-	var Logger = Core.util.Logger,
+	var util_core = Core.util;
+	var Logger = util_core.Logger,
 		Timer = Logger.Timer,
 		Page = Core.Page;
 		
@@ -49,7 +50,7 @@ Core.safe(function(){
 	var $body = $('body'),
 		$doc = $(document),
 		$win = $(window);
-	var COLOR_TRANSPANT = 'rgba(0,0,0,0)';
+	// var COLOR_TRANSPANT = 'rgba(0,0,0,0)';
 	var $geomap = $('#geomap');
 	var $geomap_container = $('#geomap_container');
 	var $work_container = $('#work_container');
@@ -785,28 +786,6 @@ Core.safe(function(){
 						gm.addOverlay(polygonShape);   //增加面
                     });
 					Timer.end('raster2vector', 1);
-     //                params.is_grid = data.type == 4;
-     //                var polygons = file_util.micaps.raster2vector(_new_interpolate_data, COLOR_TRANSPANT, params, blendent);
-					// // var polygons = raster2vector(_new_interpolate_data, COLOR_TRANSPANT);
-     //                Timer.end('raster2vector', 1);
-					// for(var i = 0, j = polygons.length; i<j; i++){
-					// 	var point_arr = [];
-					// 	var polygon = polygons[i];
-					// 	var color = polygon.color;
-					// 	for(var i_p = 0, items = polygon.items, j_p = items.length; i_p<j_p; i_p++){
-					// 		var v = items[i_p];
-					// 		var point = new GeoMap.Point(v.lng, v.lat);
-					// 		point_arr.push(point);
-					// 	}
-					// 	var polygonShape = new GeoMap.Polygon(point_arr, {
-					// 		style: {
-					// 			strokeColor: COLOR_TRANSPANT, 
-					// 			color: color,
-					// 		}
-					// 	});
-					// 	gm.addOverlay(polygonShape);   //增加面
-					// }
-					// gm.addOverlay(interpolation_overlay);   //渲染插值结果
 				}
 				// 14类中的面
 				var areas = data.areas;
@@ -1316,7 +1295,7 @@ Core.safe(function(){
 											$html_title3 && $html_title3.find('span').text(function(){
 												return _replace_date($(this).text(), true);
 											});
-											err_obj = render_conf(data_of_micaps, conf_of_product.legend.blendent, params);
+											err_obj = render_conf(data_of_micaps, util_core.dealBlendent(conf_of_product.legend.blendent), params);
 											var used_time = Timer.end('render product');
 										}
 
@@ -1368,7 +1347,8 @@ Core.safe(function(){
 						gm.config({
 							map: _getConfMap(),
 							w: width_geomap,
-							h: height_geomap
+							h: height_geomap,
+							noclip: !!conf_other.show_not_in_zone
 						}, _afterConfig);
 					});
 				}
