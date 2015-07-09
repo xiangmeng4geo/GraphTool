@@ -699,11 +699,9 @@ Core.safe(function(){
 				
 				var isHaveManyBlendent = len_blendent > 1;
 				function getColorByCondition(val, range, is_return_index){
-					console.log(val, range);
 					for(var i = 0,j=range.length;i<j;i++){
 						var case_range = range[i];
 						var val_range = case_range.val;
-						console.log(val, case_range);
 						if(val > val_range[0] && val <= val_range[1]){
 							var c = case_range.is_checked? case_range.color: COLOR_TRANSPANT;
 							return is_return_index? [c, i]: c;
@@ -837,7 +835,6 @@ Core.safe(function(){
 								}
 							}
 							color = getColor(val_area, v.code);
-							console.log(val_area, v.code, color);
 							if(color){
 								if(v.code == 24){
 									// strokeColor = 'red';

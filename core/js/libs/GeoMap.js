@@ -541,7 +541,6 @@ define('GeoMap',['zrender',
 				shapes_weather.push(shape);
 			}	
 		});
-		console.log(_this._data);
 		_this.addMask(points_mask);
 		$.each(shapes_weather, function(i, v){
 			canvas.addElement(v);
