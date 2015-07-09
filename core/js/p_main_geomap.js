@@ -699,9 +699,11 @@ Core.safe(function(){
 				
 				var isHaveManyBlendent = len_blendent > 1;
 				function getColorByCondition(val, range, is_return_index){
+					console.log(val, range);
 					for(var i = 0,j=range.length;i<j;i++){
 						var case_range = range[i];
 						var val_range = case_range.val;
+						console.log(val, case_range);
 						if(val > val_range[0] && val <= val_range[1]){
 							var c = case_range.is_checked? case_range.color: COLOR_TRANSPANT;
 							return is_return_index? [c, i]: c;
@@ -835,6 +837,7 @@ Core.safe(function(){
 								}
 							}
 							color = getColor(val_area, v.code);
+							console.log(val_area, v.code, color);
 							if(color){
 								if(v.code == 24){
 									// strokeColor = 'red';
@@ -1295,6 +1298,11 @@ Core.safe(function(){
 											$html_title3 && $html_title3.find('span').text(function(){
 												return _replace_date($(this).text(), true);
 											});
+
+											// 只针对14类数据进行显示中国区域以外处理
+											gm.config({
+												noclip: data_of_micaps.type == 14 && !!conf_other.show_not_in_zone
+											});
 											err_obj = render_conf(data_of_micaps, util_core.dealBlendent(conf_of_product.legend.blendent), params);
 											var used_time = Timer.end('render product');
 										}
@@ -1347,8 +1355,7 @@ Core.safe(function(){
 						gm.config({
 							map: _getConfMap(),
 							w: width_geomap,
-							h: height_geomap,
-							noclip: !!conf_other.show_not_in_zone
+							h: height_geomap
 						}, _afterConfig);
 					});
 				}

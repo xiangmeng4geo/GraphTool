@@ -167,6 +167,7 @@ define('GeoMap',['zrender',
 		_this._data_o = $.extend(true,{}, _data_reset);
 		if(_data){
 			_data_reset.map = _data.map;
+			_data_reset.noclip = _data.noclip;
 			var _data_o = _this._data_o;
 			var is_new = false;
 			if(_data_o){
@@ -243,12 +244,13 @@ define('GeoMap',['zrender',
 	GeoMapProp.config = function(conf, callback){
 		var _this = this;
 		var _data = _this._data;
-		if(conf.noclip){
+		var noclip = conf.noclip;
+		_data.noclip = noclip;
+		if(noclip){
 			_this.canvas.painter.delLayer(ZINDEX_LAYER);
 		}else{
 			_this.addMask();
 		}
-		// _this.conf = conf = $.extend({}, default_conf, _this.conf, conf);
 		var new_projector = Albers;
 		var conf_map = conf.map;
 		var is_new_zone = false;
@@ -281,6 +283,7 @@ define('GeoMap',['zrender',
 		//对数据进行缓存
 		_this._data.map = conf_map;
 		_this._data_o.map = conf_map;
+		_this._data_o.noclip = noclip;
 		var geo = _this.conf.geo;
 		if((is_new_zone || is_resized || (!old_projector || old_projector.name != new_projector.name)) && geo){
 			var src = geo.src,
@@ -538,6 +541,7 @@ define('GeoMap',['zrender',
 				shapes_weather.push(shape);
 			}	
 		});
+		console.log(_this._data);
 		_this.addMask(points_mask);
 		$.each(shapes_weather, function(i, v){
 			canvas.addElement(v);
@@ -875,6 +879,11 @@ define('GeoMap',['zrender',
 		}
 	}
     function _doclip(ctx){
+    	var _this = this;
+    	var _data = _this._data;
+    	if(_data && _data.noclip){
+    		return;
+    	}
 		var polygons = this.polygons;
 		if($.isArray(polygons)){
 			ctx.beginPath();

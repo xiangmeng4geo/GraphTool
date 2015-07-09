@@ -561,6 +561,7 @@
 						});
 					}
 				}
+				colors_new.push(colors[j]);
 				blendent_val.colors = colors_new;
 				blendent_new.push(blendent_val);
 			});
