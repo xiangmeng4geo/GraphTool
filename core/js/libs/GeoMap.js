@@ -183,20 +183,6 @@ define('GeoMap',['zrender',
 			}
 		}
 
-		// _this._data = {
-		// 	scale: Math.min(scale_x,scale_y),
-		// 	zoom: 1,
-		// 	center: {
-		// 		lng: center.x,
-		// 		lat: center.y,
-		// 		x: center_xy.x,
-		// 		y: center_xy.y
-		// 	},
-		// 	translat: [width_container/2, height_container/2],
-		// 	width: width_container,
-		// 	height: height_container,
-		// 	overlays: []
-		// }
 		_this._data = _data_reset;
 		
 		_this.MAX_ZOOM = 3*_scale_size*_factor;
@@ -257,6 +243,11 @@ define('GeoMap',['zrender',
 	GeoMapProp.config = function(conf, callback){
 		var _this = this;
 		var _data = _this._data;
+		if(conf.noclip){
+			_this.canvas.painter.delLayer(ZINDEX_LAYER);
+		}else{
+			_this.addMask();
+		}
 		// _this.conf = conf = $.extend({}, default_conf, _this.conf, conf);
 		var new_projector = Albers;
 		var conf_map = conf.map;
@@ -886,7 +877,6 @@ define('GeoMap',['zrender',
     function _doclip(ctx){
 		var polygons = this.polygons;
 		if($.isArray(polygons)){
-			ctx.save();
 			ctx.beginPath();
 			$.each(polygons, function(i_polygon, pointList){
 				if (pointList.length < 2) {
@@ -916,16 +906,8 @@ define('GeoMap',['zrender',
 		var ctx = this.canvas.painter.getLayer(ZINDEX_LAYER).ctx;
 		ctx.save();
 		_doclip.call(this,ctx);
-
 		// Timer.end('addMask');
 	}
-	// function _cancelClip(){
-	// 	var ctx = this.canvas.painter.getLayer(ZINDEX_LAYER).ctx;
-	// 	var canvas = ctx.canvas;
-	// 	ctx.save();
-	// 	ctx.clearRect(0, 0, canvas.w, canvas.h);
-	// 	ctx.restore();
-	// }
 	
 	function _createDom(id, type, painter) {
         var newDom = document.createElement(type);

@@ -1,4 +1,5 @@
 !function(global){
+	global.COLOR_TRANSPANT = 'rgba(0,0,0,0)';
 	var debug = this.debug = true;
 	var nwrequire = global.require;
 	var ext = this.global.require.extensions;
@@ -531,9 +532,39 @@
 			toHTML: color_rgb2normal
 		}
 	}();
-	Core.util = {
+	var util_core = Core.util = {
 		isImg: function is_img(file_path){
 			return /\.(jpg|bmp|gif|png)$/i.test(file_path)
+		},
+		// 处理图例中不连续的数值
+		dealBlendent: function(blendent){
+			var blendent_new = [];
+			
+			$.each(blendent, function(i, v){
+				var blendent_val = {};
+				for(var i in v){
+					blendent_val[i] = v[i];
+				}
+				var colors_new = [];
+				var colors = v.colors;
+				for(var i = 0, j = colors.length-1; i<j; i++){
+					var c_color = colors[i],
+						next_color = colors[i+1];
+					var n_current = c_color.val[1],
+						n_next = next_color.val[0];
+					colors_new.push(c_color);
+					if(n_current != n_next){
+						colors_new.push({
+							"is_add": true,
+							"color": COLOR_TRANSPANT,
+							"val": [n_current, n_next]
+						});
+					}
+				}
+				blendent_val.colors = colors_new;
+				blendent_new.push(blendent_val);
+			});
+			return blendent_new;
 		}
 	}
 	!function(){
@@ -566,7 +597,7 @@
 				return 0;
 			}
 		};
-		Core.util.Logger = Logger;
+		util_core.Logger = Logger;
 	}();
 	global.Core = Core;
 }(this);

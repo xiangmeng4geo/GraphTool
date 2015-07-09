@@ -24,7 +24,7 @@ define('LegendImage',['zrender',
 			html_color += '<ul>';
 			var colors = v.colors;
 			colors = colors.filter(function(v, i){
-				if(v.is_checked){
+				if(v.is_checked && !v.is_add){
 					v._i = i;
 					return v;
 				}
