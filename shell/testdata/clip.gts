@@ -15,6 +15,7 @@ require.extensions['.gts'] = require.extensions['.js'];
 
 var parse_micaps = require(path.join(dir_core, 'node_modules/micaps_parser/parser')).parse;
 var raster2vector = require(path.join(dir_core, 'node_modules/micaps_parser/utils/raster2vector')).raster2vector;
+var conrec = require(path.join(dir_core, 'node_modules/micaps_parser/utils/conrec')).conrec;
 var GeoClipper = require(path.join(dir_core, 'node_modules/micaps_parser/utils/geoclipper'));
 
 var dir_data = path.join(dir_current, './data');
@@ -24,7 +25,7 @@ util.rmfileSync(dir_data_clip, true);
 util.mkdirSync(dir_data_clip);
 
 
-function _doclip14(data, fn_getColor){
+function _doclip14(data, fn_getColor, productname){
 	var time_start = new Date();
 	new GeoClipper(null, null, function(){
 		var geoClipper = this;
@@ -58,43 +59,43 @@ function _doclip14(data, fn_getColor){
 		});
 		data.areas = areas_new;
 	});
-	console.log(new Date() - time_start + 'ms!');
+	console.log(new Date() - time_start + 'ms!', productname);
 }
-function _doclipInterpolate(areas){
+function _doclipInterpolate(areas, productname){
 	var areas_old = areas.splice(0);
 	var time_start = new Date();
 	new GeoClipper(null, null, function(){
 		var geoClipper = this;
 		areas_old.forEach(function(area){
 			var items_xy = [];
-			area.items.forEach(function(item){
+			area.forEach(function(item){
 				items_xy.push({
-					x: parseFloat(item.lng),
-					y: parseFloat(item.lat)
+					x: parseFloat(item.x),
+					y: parseFloat(item.y)
 				});
 			});
 			var result = geoClipper.doClip(items_xy);
 			var scale = result.scale || 1;
 			var paths = result.paths;
 			for(var i = 0, j = paths.length; i<j; i++){
-				var area_new = {};
-				for(var attr in area){
-					area_new[attr] = area[attr];
-				}
+				// var area_new = {};
+				// for(var attr in area){
+				// 	area_new[attr] = area[attr];
+				// }
 				var path = paths[i];
 				var items_new = [];
 				for(var i_p = 0, j_p = path.length; i_p < j_p; i_p++){
 					var item = path[i_p];
 					items_new.push({
-						lng: item.X / scale,
-						lat: item.Y /scale
+						x: item.X / scale,
+						y: item.Y /scale
 					});
 				}
-				area_new.items = items_new;
-				areas.push(area_new);
+				// area_new.items = items_new;
+				areas.push(items_new);
 			}
 		});
-		console.log(new Date() - time_start + 'ms!');
+		console.log(new Date() - time_start + 'ms!', productname);
 	});
 }
 
@@ -142,28 +143,27 @@ fs.readdir(dir_data, function(err, dirs){
 							var blendent = conf.legend.blendent;
 							var len_blendent = blendent.length;
 							var isHaveManyBlendent = len_blendent > 1;
-							function getColorByCondition(val, range){
+							function getColorByCondition(val, range, is_return_index){
 								for(var i = 0,j=range.length;i<j;i++){
 									var case_range = range[i];
-									if(case_range.is_checked){
-										var val_range = case_range.val;
-										if(val >= val_range[0] && val < val_range[1]){
-											return case_range.color;
-										}
+									var val_range = case_range.val;
+									if(val > val_range[0] && val <= val_range[1]){
+										var c = case_range.is_checked? case_range.color: COLOR_TRANSPANT;
+										return is_return_index? [c, i]: c;
 									}
 								}
-								return COLOR_TRANSPANT;
+								return is_return_index? [COLOR_TRANSPANT, j]: COLOR_TRANSPANT;
 							}
-							function getColor(val, code){
+							function getColor(val, code, is_return_index){
 								if(isHaveManyBlendent){
 									for(var i = 0;i<len_blendent;i++){
 										var v = blendent[i];
 										if(code == v.val.v){
-											return getColorByCondition(val, v.colors);
+											return getColorByCondition(val, v.colors, is_return_index);
 										}
 									}
 								}
-								return getColorByCondition(val, blendent[0].colors);
+								return getColorByCondition(val, blendent[0].colors, is_return_index);
 							}
 							var interpolate = data.interpolate;
 							if(interpolate){
@@ -178,20 +178,26 @@ fs.readdir(dir_data, function(err, dirs){
 			                        var arr = [];
 			                        for(var j = 0; j< _interpolate_height; j++){
 			                            var v = interpolate[i][j];
-			                            var color = getColor(v.v);
+			                            var color_info = getColor(v.v, null, true);
+			                            var color = color_info[0],
+			                            	color_level = color_info[1];
 			                            arr.push({
 			                            	x: v.x,
 			                            	y: v.y,
-			                            	c: color || COLOR_TRANSPANT
+			                            	v: v.v,
+			                            	level: color_level,
+                            				c: color || COLOR_TRANSPANT
 			                            });
 			                        }
 			                        _new_interpolate_data.push(arr);  
 			                    }
-			                    data = raster2vector(_new_interpolate_data, COLOR_TRANSPANT);
-			                    _doclipInterpolate(data);
+			                    var polygons = conrec(_new_interpolate_data, blendent, COLOR_TRANSPANT);
+			                    // data = raster2vector(_new_interpolate_data, COLOR_TRANSPANT);
+			                    _doclipInterpolate(polygons.list, dir);
+			                    data = polygons;
 							}else{
 								if(data.type == 14){
-									_doclip14(data, getColor);
+									_doclip14(data, getColor, dir);
 								}
 							}
 							var data_json = JSON.stringify(data);
