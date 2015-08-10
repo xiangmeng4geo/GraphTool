@@ -9,7 +9,7 @@ var info = {
 	pwd: '123'
 }
 info.pwd = util.encrypt(info.pwd,info.key);
-info.l = genListence('2015-07-20', '2100-07-01');
+info.l = genListence('2015-07-20', '2015-09-01');
 console.log(info);
 var content = JSON.stringify(info);
 content = core.util.encrypt.encode(content);

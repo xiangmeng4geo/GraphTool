@@ -1,7 +1,7 @@
 var fs = require('fs'),
 	path = require('path'),
 	os = require('os'),
-	util = require('./util');
+	util = require('./util.gts');
 
 var dir_current = __dirname;
 

@@ -260,7 +260,7 @@ define('GeoMap',['zrender',
 			}
 			if(_data){
 				var _conf_map = _data.map;
-				if(_conf_map && _conf_map.zone != conf_map.zone){
+				if(!_conf_map || _conf_map.zone != conf_map.zone){
 					is_new_zone = true;
 				}
 			}
