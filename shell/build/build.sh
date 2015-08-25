@@ -19,3 +19,11 @@ cp -R /d/soft/node-webkit-v0.11.2-win-x64/* $target_dir/bin
 #4. remove files
 rm -rf $target_dir/config
 rm -rf $target_dir/image
+
+#5. create 32
+target_dir_32=${target_dir}_32
+rm -rf $target_dir_32
+mkdir -p $target_dir_32
+cp -R $target_dir/* $target_dir_32
+rm -rf $target_dir_32/bin/*
+cp -R /d/soft/node-webkit-v0.12.0-win-x32/* $target_dir_32/bin
