@@ -240,6 +240,12 @@ define('GeoMap',['zrender',
 		NOCLIP: ZINDEX_NO_CLIP
 	};
 	var GeoMapProp = GeoMap.prototype;
+	var ZONE_STATE_NOTINIT = 1,
+		ZONE_STATE_NEW = 2,
+		ZONE_STATE_OLD = 3;
+	function _getProjector(name){
+		return ({'mercator': Mercator, 'albers': Albers})[name];
+	}
 	// 对配置进行更改，主要用于投影及尺寸
 	GeoMapProp.config = function(conf, callback){
 		var _this = this;
@@ -251,21 +257,30 @@ define('GeoMap',['zrender',
 		}else{
 			_this.addMask();
 		}
-		var new_projector = Albers;
+		var old_projector = _this.projector;
+		var new_projector = old_projector || Albers;
 		var conf_map = conf.map;
-		var is_new_zone = false;
+		var is_new_zone = ZONE_STATE_NOTINIT;
 		if(conf_map){
-			if(conf_map.projector == 'mercator'){
-				new_projector = Mercator;
+			var p_n = conf_map.projector;
+			if(p_n){
+				new_projector = _getProjector(p_n);
 			}
+			
 			if(_data){
 				var _conf_map = _data.map;
 				if(!_conf_map || _conf_map.zone != conf_map.zone){
-					is_new_zone = true;
+					is_new_zone = ZONE_STATE_NEW;
+				}else{
+					is_new_zone = ZONE_STATE_OLD;
 				}
 			}
+			//对数据进行缓存
+			_this._data.map = conf_map;
+			_this._data_o.map = conf_map;
+		}else{
+			is_new_zone = ZONE_STATE_OLD;
 		}
-		var old_projector = _this.projector;
 		var w_conf = conf.w,
 			h_conf = conf.h;
 		var is_resized = false;
@@ -278,14 +293,12 @@ define('GeoMap',['zrender',
 				is_resized = true;
 			}
 		}
+
 		_this.projector = new_projector;
 		// _init_geomap.call(_this);
-		//对数据进行缓存
-		_this._data.map = conf_map;
-		_this._data_o.map = conf_map;
 		_this._data_o.noclip = noclip;
 		var geo = _this.conf.geo;
-		if((is_new_zone || is_resized || (!old_projector || old_projector.name != new_projector.name)) && geo){
+		if((is_new_zone === ZONE_STATE_NEW || is_resized || (!old_projector || old_projector.name != new_projector.name)) && geo){
 			var src = geo.src,
 				name = geo.name;
 			var arr_json = [];
