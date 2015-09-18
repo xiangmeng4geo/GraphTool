@@ -1,3 +1,4 @@
+.DS_Store
 shell/build/target/
 shell/testdata/data/
 shell/testdata/data_clip/
