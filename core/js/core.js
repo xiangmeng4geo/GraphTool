@@ -261,7 +261,7 @@
 	var util_file_path = util_file.path;
 	/*按指定文件加载页面*/
 	function _open(page_name, options){
-		var win = Window.open('./'+page_name+'.html',$.extend({}, conf_gui_window, conf.get('view_'+page_name), options, {
+		var win = Window.open('./'+page_name+'.html',$.extend({}, conf_gui_window, conf.get('view_'+page_name.replace(/\//g, '_')), options, {
 			icon: util_path.join(util_file_path.core, 'img/icon.png')
 		}));
 		win.on('close',function(){
@@ -354,6 +354,9 @@
 		},
 		aw_edit: function(callback){
 			return _open_only_win('m_aw_edit', callback);
+		},
+		update: function(callback){
+			return _open_only_win('updater/index', callback);
 		}
 	}
 	var message_listeners = [];
@@ -436,6 +439,9 @@
 	function _isAWList(url){
 		return /m_aw_list\.\w+$/.test(url);
 	}
+	function _isUpdater(url){
+		return /updater/.test(url);	
+	}
 	/*窗体关闭的时候清空相关数据及事件*/
 	win_current.on('close',function(){
 		if(!_isLogin(href)){
@@ -456,7 +462,7 @@
 	!function(){
 		// 对入口做验证，防止直接改配置文件进行子模块
 		var tt_check;
-		if(!debug && !(_isLogin(href) || _isAutoWork(href))){
+		if(!debug && !(_isLogin(href) || _isAutoWork(href) || _isUpdater(href))){
 			var _from;
 			function _check(type){
 				if(_isMain(href)){

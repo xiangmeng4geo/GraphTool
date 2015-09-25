@@ -343,5 +343,6 @@
 		Core.Lib.util.file.tmp.clear();
 		alert('缓存清除成功！');
 	});
+	$('#btn_update').click(Page.update);
 	// Page.inited();
 }();

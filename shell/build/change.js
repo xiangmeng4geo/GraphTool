@@ -79,6 +79,12 @@ function _repalce_content(dir){
 	_replace(path.join(dir, 'j/core.gts'), function(content){
 		return content.replace(/\.debug=([^,;]+)/, '.debug=false').replace(/\js\//g, '/j/');
 	});
+	_replace(path.join(dir, 'updater/package.json'), function(content){
+		return content.replace('index.html', 'index.gt');
+	});
+	_replace(path.join(dir, 'updater/index.gts'), function(content){
+		return content.replace(/\.js(?!on)/g, '.gts');
+	});
 }
 
 var args = [].slice.call(process.argv);
