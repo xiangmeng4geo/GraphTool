@@ -7,12 +7,12 @@
 
 	var dir_tmp_os = os.tmpdir();
 	var mainexe = _format_path(process.execPath);
-	var App;
-
+	var GUI,App;
 	function Updater(){
 
 	}
 	Updater.init = function(gui){
+		GUI = gui;
 		App = gui.App;
 	}
 	var prop = Updater.prototype;
@@ -24,7 +24,7 @@
 			res.on('data', function(d){
 				content += d;
 			}).on('end', function(){
-				var result = JSON.parse(content);console.log(result);
+				var result = JSON.parse(content);
 				var v_old = data.version,
 					v_new = result.version;
 
@@ -32,10 +32,14 @@
 				_this._v_new = v_new;
 				_this._info = result;
 
-				cb && cb({
+				cb && cb(null, {
+					v_old: v_old,
+					v_new: v_new,
 					flag_new: v_old && v_new && v_old !== v_new
 				});
 			});
+		}).on('error', function(e){
+			cb && cb(e);
 		});
 	}
 	prop.download = function(ondownloadprogress, onunrar, onfinish){
@@ -47,6 +51,7 @@
 
 		var filename_new = path.join(dir_tmp_os, _this._v_new+path.extname(_url));
 		var ws_download = fs.createWriteStream(filename_new);
+		var _win_current = GUI.Window.get().window;
 		http.get(_url, function(res){
 			var downloaded_size = 0;
 			res.on('data', function(d){
@@ -59,10 +64,27 @@
 				require('./unrar')(filename_new, onunrar, function(data){
 					var _dir = data.path;
 					_this._download_dir = _dir;
-					onfinish && onfinish(null, {
-						path: _dir
-					});
+					onfinish && onfinish(_dir);
 				});
+				// _win_current.onmessage = function(e){
+				// 	var data = e.data;
+				// 	if(data.isfinish){
+				// 		win.close(true);
+				// 		onfinish && onfinish(data.path);
+				// 	}else{
+				// 		onunrar && onunrar(data.filename);
+				// 	}
+				// }
+				// var win = GUI.Window.open('./unrar_worker.html', {
+				// 	show: false
+				// });
+				// win.on('loaded', function(){
+				// 	try{
+				// 		win.window.postMessage(filename_new, _win_current.location.origin);
+				// 	}catch(e){
+				// 		console.log(e);
+				// 	}
+				// });
 			});
 			res.pipe(ws_download);
 		}).on('error', function(e){
@@ -75,35 +97,37 @@
 		return arr.join(path.sep);
 	}
 	prop.install = function(){
-		var _this = this;
+		var _this = this;console.log(_this);
 		var dir_project = _format_path(_this.data.basepath), 
 			dir_download = _format_path(_this._download_dir);
 
 		var command = mainexe.replace(dir_project, dir_download)+' '+path.join(dir_download, 'updater/')+' '+dir_download+' '+dir_project;
+		command = 'start '+ command;
 		console.log(command);
-		exec(command);
-		setTimeout(function(){
+		exec(command).on('exit', function(){
+			console.log('exit');
 			App.quit();
-		}, 1000);
+		});
 	}
-	Updater.restart = function(cb){
+	Updater.restart = function(cb_install, cb_check){
 		var argv = App.argv;
 		if (argv.length) {
+			cb_install && cb_install();
 			var path_tmp = argv[0];
 			var path_project = argv[1];
-			exec('copy /y '+path_tmp+' '+path_project, function(){
+			exec('xcopy /e/i/y/c '+path_tmp+' '+path_project, function(){
 				exec('rmdir /s/q '+path_tmp, function(){
 					console.log('end rmdir');
 				});
 				var command = mainexe.replace(path_tmp, path_project)+' '+path_project;
-				exec(command, function(){
-					console.log('end copy');
+				command = 'start '+ command;
+				exec(command).on('exit', function(){
 					App.quit()	
 				});				
 			})
-			
 		}else{
-			cb && cb();
+			GUI.Window.get().show();
+			cb_check && cb_check();
 		}
 	}
 	module.exports = Updater;

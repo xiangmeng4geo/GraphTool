@@ -1,6 +1,7 @@
 {
 	"width": 600,
-    "height": 500,
-    "resizable": true,
-    "frame": true
+    "height": 280,
+    "resizable": false,
+    "frame": true,
+    "show": false
 }

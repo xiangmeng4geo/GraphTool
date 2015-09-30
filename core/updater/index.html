@@ -5,11 +5,94 @@
     	<meta name="format-detection" content="telephone=no" />
     	<link rel="stylesheet" type="text/css" href="../css/reset.css">
     	<title></title>
+    	<style>
+    	.meter{
+    		width: 100%;
+    		height: 20px;  /* Can be anything */
+			position: relative;
+			margin: 10px auto; /* Just for demo spacing */
+    	}
+    	.meter > span {
+    		text-align: center;
+			display: block;
+			height: 100%;
+			width: 0;
+			border-radius: 5px;
+			background-color: rgb(43,194,83);
+			background-image: -webkit-gradient(
+			  linear,
+			  left bottom,
+			  left top,
+			  color-stop(0, rgb(43,194,83)),
+			  color-stop(1, rgb(84,240,84))
+			 );
+			background-image: -moz-linear-gradient(
+			  center bottom,
+			  rgb(43,194,83) 37%,
+			  rgb(84,240,84) 69%
+			 );
+			-webkit-box-shadow:
+			  inset 0 2px 9px  rgba(255,255,255,0.3),
+			  inset 0 -2px 6px rgba(0,0,0,0.4);
+			box-shadow:
+			  inset 0 2px 9px  rgba(255,255,255,0.3),
+			  inset 0 -2px 6px rgba(0,0,0,0.4);
+			position: relative;
+			overflow: hidden;
+		}
+		.meter > span:after{
+			content: "";
+			position: absolute;
+			top: 0; left: 0; bottom: 0; right: 0;
+			background-image:
+			   -webkit-gradient(linear, 0 0, 100% 100%,
+			      color-stop(.25, rgba(255, 255, 255, .2)),
+			      color-stop(.25, transparent), color-stop(.5, transparent),
+			      color-stop(.5, rgba(255, 255, 255, .2)),
+			      color-stop(.75, rgba(255, 255, 255, .2)),
+			      color-stop(.75, transparent), to(transparent)
+			   );
+			z-index: 1;
+			-webkit-background-size: 50px 50px;
+			background-size: 50px 50px;
+			-webkit-animation: move 2s linear infinite;
+			overflow: hidden;
+		}
+		@-webkit-keyframes move {
+		    0% {
+		       background-position: 0 0;
+		    }
+		    100% {
+		       background-position: 50px 50px;
+		    }
+		}
+		.main{
+			width: 90%;
+			margin: 10px auto;
+		}
+		#result_file_list{
+			height: 150px;
+			overflow: auto;
+			border: 1px solid #ccc;
+		}
+		.btns{
+			text-align: center;
+			margin-top: 10px;
+		}
+    	</style>
 	</head>
 	<body>
-		<div id="result"></div>
-		<div id="progress_download"></div>
-		<input type="button" id="btn_install" value="install"/><input type="button" id="btn_cancel" value="cancel"/>
+		<div class="main">
+			<div id="result"></div>
+			<div id="progress_download" class="meter">
+				<span></span>
+			</div>
+			<div id="result_file_list"></div>
+			<div class="btns">
+				<input type="button" id="btn_install" value="安装"/>
+				<input type="button" id="btn_cancel" value="取消"/>
+			</div>
+		</div>
 		<script type="text/javascript" src="../js/libs/j.js"></script>
 		<script src="../js/core.js"></script>
 		<script src="./index.js"></script>

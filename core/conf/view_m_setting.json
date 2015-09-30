@@ -3,5 +3,5 @@
 	"height": 520,
 	"show": true,
     "frame": true,
-    "toolbar": true
+    "toolbar": false
 }

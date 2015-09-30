@@ -1,11 +1,11 @@
 {
   "name": "Blue π Ants",
-  "main": "../autowork.html",
+  "main": "../autowork.gt",
   "window": {
   	"title": "蓝π蚂蚁制图",
     "icon": "./img/icon.png",
     "show": false,
-    "toolbar": true
+    "toolbar": false
   },
   "single-instance": false
 }

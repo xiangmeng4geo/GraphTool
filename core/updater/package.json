@@ -1,16 +1,13 @@
 {
   "name": "Blue π Ants",
-  "description": "蓝π蚂蚁制图",
-  "main": "index.html",
+  "main": "index.gt",
   "window": {
-    "title": "蓝π蚂蚁制图",
-    "icon": "../img/icon.png",
     "position": "center",
     "width": 600,
     "height": 500,
-    "toolbar": true,
+    "toolbar": false,
     "as_desktop": true,
-    "show": true,
+    "show": false,
     "resizable": false
   },
   "single-instance": false

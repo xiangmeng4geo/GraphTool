@@ -27,3 +27,6 @@ mkdir -p $target_dir_32
 cp -R $target_dir/* $target_dir_32
 rm -rf $target_dir_32/bin/*
 cp -R /d/soft/node-webkit-v0.12.0-win-x32/* $target_dir_32/bin
+
+#6. create udpate resource
+# Rar.exe a -r -s -m1 test.rar C:\Users\Administrator\AppData\Local\*

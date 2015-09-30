@@ -122,7 +122,8 @@ Core.safe(function(){
 		var cmd = process.platform == 'win32'?'tasklist':'ps aux';
 		var pid_current = process.pid;
 		var pid_store = util_main.get();
-		if(pid_store){
+		var App = Core.Window.getGui().App;
+		if(pid_store || App.argv[0] !== 'updater'){
 			C.require('child_process').exec(cmd, function(err, stdout, stderr) {
 			    if(!err){
 			    	var arr = stdout.split('\n');
@@ -133,7 +134,7 @@ Core.safe(function(){
 				        	pid = p[1];
 				        if(pid_store == pid){
 				        	alert('您只能打开一个实例！');
-				            process.exit();
+				            App.quit();
 				            break;
 				        }
 			    	}

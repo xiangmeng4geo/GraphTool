@@ -22,15 +22,23 @@ module.exports = function(path_rar, path_save, onunrar, onfinish){
 	fs.readFile(path_rar, function(err, data){
 		var rarContent = readRARContent([{name: path.basename(path_rar), content: new Uint8Array(data)}], '', function(){
 			// console.log(arguments);
-			onunrar && onunrar.apply(null, arguments);
+			// onunrar && onunrar.apply(null, arguments);
 		});
+		var dealingNum = 0;
 		var rec = function(entry, path_check) {
 			var dealPath = path_check.replace(path_save, '');
-			// if(dealPath){
-			// 	onunrar && onunrar(dealPath);
-			// }
+			if(dealPath){
+				onunrar && onunrar(dealPath);
+			}
 			if(entry.type === 'file') {
-				fs.writeFileSync(path_check, toBuffer(entry.fileContent.buffer));
+				dealingNum++;
+				fs.writeFile(path_check, toBuffer(entry.fileContent.buffer), function(){
+					if(--dealingNum <= 0){
+						onfinish && onfinish({
+							path: path_save
+						});
+					}
+				});
 			} else if(entry.type === 'dir') {
 				var ls = entry.ls;
 				Object.keys(ls).forEach(function(k){
@@ -46,8 +54,5 @@ module.exports = function(path_rar, path_save, onunrar, onfinish){
 			}
 		}
 		rec(rarContent, path_save);
-		onfinish && onfinish({
-			path: path_save
-		});
 	})
 }

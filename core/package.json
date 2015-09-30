@@ -1,5 +1,5 @@
 {
-  "name": "Blue π Ants",
+  "name": "Blue  Ants",
   "version": "v0.7.3",
   "description": "蓝π蚂蚁制图",
   "main": "login.html",
@@ -10,10 +10,10 @@
     "position": "center",
     "width": 400,
     "height": 310,
-    "toolbar": true,
+    "toolbar": false,
     "as_desktop": true,
     "show": true,
     "resizable": false
   },
-  "single-instance": false
+  "single-instance": true
 }
