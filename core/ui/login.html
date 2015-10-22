@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>用户身份验证</title>
+	</head>
+	<body css="reset p_login">
+		<tmpl hidden>
+			<div class="btn_close"></div>
+			<div class="initializing"><span>系统正在初始化。。。</span></div>
+			<div class="top logo_normal titlebar"></div>
+			<div class="row username">
+				<input type="text" id="username" placeholder="用户名"/>
+			</div>
+			<div class="row userpwd">
+				<input type="password" id="userpwd" placeholder="密码"/>
+			</div>
+			<div class="row">
+				<input type="checkbox" id="cb_remember"/><label for="cb_remember">记住密码</label>
+				<input type="checkbox" id="cb_autologin"/><label for="cb_autologin">自动登录</label>
+			</div>
+			<div class="row">
+				<input type="button" value="登录" id="btn_login"/>
+				<!-- <input type="button" value="取消" id="btn_cancel"/> -->
+			</div>
+		</tmpl>
+	</body>
+</html>

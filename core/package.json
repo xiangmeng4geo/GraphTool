@@ -1,0 +1,5 @@
+{
+  "name"    : "BPA GraphTool",
+  "version" : "1.0.0",
+  "main"    : "workbench/bootstrap"
+}
