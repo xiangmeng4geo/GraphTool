@@ -60,5 +60,6 @@
 		// show content
 		// http://www.w3schools.com/tags/att_global_hidden.asp
 		$('tmpl').removeAttr('hidden');
+		win_instance.show();
 	});
 }()

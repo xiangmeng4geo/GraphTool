@@ -10,6 +10,7 @@
 	let PATH = CONST.PATH;
 	let BrowserWindow = require('browser-window');
 	
+	let win_last;
 	/**
 	 * 得到一个`browser-window`实例
 	 */
@@ -23,8 +24,10 @@
 				height: 600
 			}
 		}
+		conf.transparent = true;
 		let win = new BrowserWindow(conf);
 		
+		win_last = win;
 		win.CONST = CONST;	
 		return win;
 	}
@@ -47,6 +50,9 @@
 	
 	module.exports = {
 		getInstance: get_win,
-		load: win_load
+		load: win_load,
+		getLast: function(){
+			return win_last;
+		}
 	}
 }()

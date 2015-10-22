@@ -6,7 +6,6 @@
 	let path = require('path');
 	let window = require('./window');
 	let app = require('app');
-	let BrowserWindow = require('browser-window');
 	
 	global.gtStart = (new Date).getTime();
 		
@@ -29,7 +28,7 @@
 			}
 			onSingle();
 			net.createServer(function(){
-				let win = BrowserWindow.getCurrentWindow();
+				let win = window.getLast();
 				if(win){
 					win.restore();
 					win.focus();
@@ -44,7 +43,6 @@
 		
 		ensure_single(() => {
 			window.load(loginWin, 'login');
-			loginWin.show();
 		});
 	});
 }();

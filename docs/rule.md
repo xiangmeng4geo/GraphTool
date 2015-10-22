@@ -21,8 +21,7 @@
 ```
 
 ### 页面
-所有`body`元素都要用`<tmpl hidden></tmpl>`包裹，`core.js`会自动在时机成熟时让其显示，
-防止页面在初始化还没有加载完样式前的闪动，如：
+所有`body`元素都要用`<tmpl hidden></tmpl>`包裹，`core.js`会自动在时机成熟时让其显示，如：
 ``` html
 <html>
   <head>
@@ -35,6 +34,10 @@
   </body>
 </html>
 ```
+* 防止页面在初始化还没有加载完样式前的闪动
+  1. 在新建窗口时强制设置透明`conf.transparent = true`
+  2. 设置`body`的样式`background-color: white;`
+  3. 在`core.js`里添加样式和脚本完成后，让窗口显示`win.show()`
 
 ### 脚本
 在`main process`里的`browser-window`对象的`webContents`的`did-finish-load`事件
