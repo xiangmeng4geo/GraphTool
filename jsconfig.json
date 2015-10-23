@@ -1,0 +1,6 @@
+
+		var  logger = require('./logger');
+		logger.info('this is a info');
+		setTimeout(function(){
+			logger.error('this is a error');
+		}, 3000);

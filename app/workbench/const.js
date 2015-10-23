@@ -19,6 +19,11 @@
 			BASE: path_base,
 			UI_CONF: path_ui_conf,
 			UI: path_ui
+		},
+		LOG: {
+			PATH: format(path.join(path_base, 'logs')),
+			DELAY: 10, 	// 异步写日志间隔(s)
+			DAYS: 3		// 日志保留天数
 		}
 	}
 }();

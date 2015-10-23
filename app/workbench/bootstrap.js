@@ -1,3 +1,4 @@
+/* global process */
 /* global global */
 /* global __dirname */
 !function(){
@@ -8,7 +9,10 @@
 	let app = require('app');
 	
 	global.gtStart = (new Date).getTime();
-		
+	
+	// process.on('uncaughtException', function(err){
+	// 	console.error(err);
+	// });	
 	app.on('window-all-closed', function () {
 		app.quit();
 	});
@@ -44,5 +48,11 @@
 		ensure_single(() => {
 			window.load(loginWin, 'login');
 		});
+		
 	});
+		var  logger = require('./logger');
+		logger.info('this is a info');
+		setTimeout(function(){
+			logger.error('this is a error');
+		}, 3000);
 }();

@@ -1,1 +1,4 @@
 .DS_Store
+core/logs
+node_modules/
+.vscode/
