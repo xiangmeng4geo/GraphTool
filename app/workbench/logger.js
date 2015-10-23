@@ -54,7 +54,7 @@
 			return;
 		}
 		msgs = msgs.map(v => {
-			return [`[${v[1]}]`, format_date(v[0]), v[2]].join('\t');
+			return [`[${v[1]}]`, format_date(v[0], '<yyyy-MM-dd hh:mm:ss>'), v[2]].join('\t');
 		});
 		
 		let log_file_path = path.join(PATH_LOG, format_date(new Date(), 'yyyy-MM-dd'));
