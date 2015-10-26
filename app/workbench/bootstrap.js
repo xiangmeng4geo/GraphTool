@@ -34,6 +34,7 @@
 			net.createServer(function(){
 				let win = window.getLast();
 				if(win){
+					win.setAlwaysOnTop(true);
 					win.restore();
 					win.focus();
 				}

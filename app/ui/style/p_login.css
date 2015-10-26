@@ -82,3 +82,11 @@ input[type=checkbox]{
 .btn_close:hover{
 	background-position: center -20px;
 }
+
+.logo_normal .titlebar{
+	position: absolute;
+	width: 360px;
+	height: 80px;
+	left: 0;
+	top: 0;
+}
