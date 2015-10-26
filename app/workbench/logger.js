@@ -37,6 +37,16 @@
 	if(!fs.existsSync(PATH_LOG)){
 		fs.mkdirSync(PATH_LOG);
 	}
+	let fn_show = (function(){
+		const IS_DEBUG = true; // 是否是debug模式
+		return IS_DEBUG? function(msg, cb){
+			console.log(msg);
+			cb();
+		}: function(msg, cb){
+			let log_file_path = path.join(PATH_LOG, format_date(new Date(), 'yyyy-MM-dd'));
+			fs.appendFile(log_file_path, msg, cb);
+		}
+	})();
 	let msg_stack = [];
 	let dealTime = 0;
 	function log(msg, type){
@@ -46,6 +56,7 @@
 			dealTime = setTimeout(deal, LOG_DELAY);
 		}
 	}
+	
 	function deal(){
 		let msgs = msg_stack.splice(0);
 		
@@ -57,9 +68,8 @@
 			return [`[${v[1]}]`, format_date(v[0], '<yyyy-MM-dd hh:mm:ss>'), v[2]].join('\t');
 		});
 		
-		let log_file_path = path.join(PATH_LOG, format_date(new Date(), 'yyyy-MM-dd'));
-		fs.appendFile(log_file_path, msgs.join(EOL)+EOL, () => {
-			setTimeout(deal, LOG_DELAY);
+		fn_show(msgs.join(EOL)+EOL, () => {
+			dealTime = setTimeout(deal, LOG_DELAY);
 		});
 	}
 	
