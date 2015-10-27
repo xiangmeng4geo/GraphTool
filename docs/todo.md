@@ -1,7 +1,12 @@
 - [x] 架构窗口打开方式脚本及css加载方式,并写相关文档
 - [x] 架构日志输出模块
-- [ ] 架构`main process`和`render process`通讯机制
-- [ ] 移植登录页面逻辑
+- [ ] 重写原`core.js`里的工具类
+  - [x] 重写file
+  - [x] 重写encrypt
+  - [x] 重写verification
+- [ ] 寻找支持`es6`的压缩工具
+- [x] 架构`main process`和`render process`通讯机制
+- [x] 移植登录页面逻辑
 - [ ] 移植主界面框架
 - [ ] 重写树形菜单
 - [ ] 重写地图模块

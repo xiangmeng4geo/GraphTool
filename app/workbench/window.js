@@ -4,13 +4,13 @@
 	/**
 	 * 这里主要操作窗口
 	 */
-	
+	const IS_PROCESS_MAIN =  process.type == 'browser';
 	let path = require('path');
 	let fs = require('fs');
 	let CONST = require('./const');
 	let PATH = CONST.PATH;
-	let BrowserWindow = process.type == 'browser'? require('browser-window'): require('remote').require('browser-window');
-	
+	let BrowserWindow = IS_PROCESS_MAIN? require('browser-window'): require('remote').require('browser-window');
+
 	let win_stack = [];
 	/**
 	 * 得到一个`browser-window`实例
@@ -26,8 +26,9 @@
 			}
 		}
 		conf.transparent = true;
+		conf.show = false;
 		let win = new BrowserWindow(conf);
-		
+		win.openDevTools();
 		// 当窗口关闭时清除`win_stack`中的标识
 		win.on('close', function(){
 			let id = this.id;
@@ -39,10 +40,10 @@
 			}
 		});
 		win_stack.push(win.id);
-		win.CONST = CONST;	
+		win.CONST = CONST;
 		return win;
 	}
-	
+
 	/**
 	 * 加载页面
 	 */
@@ -54,10 +55,9 @@
 				fs.readFile(path.join(PATH.UI, 'action/core.js'), function(e, str_js){
 					content.executeJavaScript(str_js.toString());
 				});
-			});			
+			});
 		}
 	}
-	
 	/**
 	 * 打开一个窗口，是getInstance和load的结合
 	 */
@@ -65,17 +65,11 @@
 		let win = get_win(name);
 		win_load(win, name);
 	}
-	
+
 	module.exports = {
 		getInstance: get_win,
 		load: win_load,
 		open: open,
-		/**
-		 * 得到当前的窗口实例
-		 */
-		getCurrent: function(){
-			return BrowserWindow.getFocusedWindow();
-		},
 		/**
 		 * 得到最后一个打开的窗口
 		 */

@@ -1,29 +1,32 @@
 /* global Core */
-Core.safe(function(){
+Core.init(function(){
 	'use strict'
-	
+
 	let C = Core;
 	let $ = C.$;
 	let remote = C.remote;
-	
+
 	let Store = C.load('store');
 	let Dialog = C.load('dialog');
 	let dialog_alert = Dialog.alert;
-	
+	let util = remote('util');
+	let util_verification = util.verification;
 	let win = remote('window');
-	
+
 	function close(){
-		win.getCurrent().close();
+		window.close();
 	}
+
+	C.emit('ready');
 	$('.btn_close').on('click', close);
-	
+
 	let $username = $('#username'),
 		$userpwd = $('#userpwd');
 	let $cb_remember = $('#cb_remember'),
 		$cb_autologin = $('#cb_autologin');
 	let is_remember = Store.get('user_is_remember', false);
 	$cb_remember.prop('checked', is_remember);
-	
+
 	var is_encrypt = false;
 	if(is_remember){
 		var pwd = Store.get('user_pwd');
@@ -35,20 +38,25 @@ Core.safe(function(){
 		}
 		$userpwd.val(pwd);
 	}
-	
+
 	var is_autologin = Store.get('user_is_autologin', false);
 	$cb_autologin.prop('checked', is_autologin);
-	
-	let verification = {};
+
+	let verification = util_verification.get();
 	function afterLogin(login_flag, true_fn, false_fn){
 		if(login_flag){
 			var $initializing = $('.initializing').show();
 			var start_time = new Date();
 			var min_init_time = 2000;
 			(true_fn || function(){})();
-			
+
+			C.on('main.loaded', function(){
+				setTimeout(function(){
+					C.emit('login.closed');
+					close();
+				}, min_init_time);
+			});
 			win.open('main');
-			close();
 		}else{
 			(false_fn || function(){
 				dialog_alert('您输入的用户和密码错误，请重新输入！');
@@ -56,7 +64,7 @@ Core.safe(function(){
 		}
 	}
 	function wrapPwd(pwd){
-		// return util.encrypt(pwd,verification.key);
+		return util.encrypt(pwd, verification.key);
 	}
 	function login(name, pwd, is_autologin){
 		if(!is_autologin){
@@ -64,6 +72,7 @@ Core.safe(function(){
 		}
 		return (name == verification.name && pwd == verification.pwd)
 	}
+	$username.val(Store.get('user_name'));
 	if(is_autologin){
 		var name = Store.get('user_name');
 		var pwd = Store.get('user_pwd');
@@ -71,10 +80,11 @@ Core.safe(function(){
 			return afterLogin(login(name, pwd, true));
 		}
 	}
-	$username.val(Store.get('user_name'));
-	// Core.Window.onKeyEnter(function(){
-	// 	$btn_login.click();
-	// });
+	$(document).off('keypress').on('keypress',function(e){
+		if(e.which == 13){
+			$btn_login.click();
+		}
+	});
 	var $btn_login = $('#btn_login').click(function(){
 		var username = $username.val();
 		if(!username){

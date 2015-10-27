@@ -40,13 +40,17 @@
   3. 在`core.js`里添加样式和脚本完成后，让窗口显示`win.show()`
 
 ### 脚本
-在`main process`里的`browser-window`对象的`webContents`的`did-finish-load`事件
+* 在`main process`里的`browser-window`对象的`webContents`的`did-finish-load`事件
 里用`executeJavascript`执行`ui/action/core.js`，在`core.js`里根据页面地址加载默
 认脚本（启动脚本），规则如下：
 > `***/login.html` => `p_login.js`
 >
 > `***/user/center.html` => `p_user/login.js`
 
+* 关于不同页面这间通信问题
+  > `Core.on('eventName', callback)` //可以订阅事件
+  
+  > `Core.emit('eventName', data)`   //触发已经订阅的事件（通过main process 触发所有子窗口已订阅事件）
 
 ### 样式
 在`core.js`会自动加载在body上定义了`css`的列表，如： `<body css="reset p_main">`会

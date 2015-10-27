@@ -4,9 +4,11 @@
 !function(){
 	"use strict";
 	
+	let app = require('app');
+	let ipc = require('ipc');
+	let BrowserWindow = require('browser-window');
 	let path = require('path');
 	let window = require('./window');
-	let app = require('app');
 	let logger = require('./logger');
 	
 	global.gtStart = (new Date).getTime();
@@ -20,6 +22,29 @@
 		app.quit();
 	});
 	
+	let subscibe_list = {};
+	ipc.on('subscibe', function(e, type){
+		let sender = e.sender;
+		let id = BrowserWindow.fromWebContents(sender).id;
+
+		let list = subscibe_list[type] || (subscibe_list[type] = []);
+		if(list.indexOf(id) == -1){
+			list.push(id);
+		}
+	});
+	ipc.on('emit', function(e, data){
+		let type = data.type;
+		let msg = data.msg;
+		let list = subscibe_list[type];
+		if(list && list.length > 0){
+			list.forEach(id => {
+				let win = BrowserWindow.fromId(id);
+				if(win){
+					win.send(type, msg);
+				}
+			});
+		}
+	});
 	/**
 	 * 确保主程序是单例模式
 	 */
@@ -52,7 +77,9 @@
 	}
 	app.on('ready', function () {
 		let loginWin = window.getInstance('login');
-		
+		ipc.on('wait.main', function(e, data){
+			loginWin.send('wait.login', true);
+		});
 		ensure_single(() => {
 			window.load(loginWin, 'login');
 		});
