@@ -71,6 +71,9 @@
 	 */
 	var DEFAULT_PRIVATE_KEY = '20150529';
 	var METHOD_ALGORITHM = 'aes-256-cbc';
+	/**
+	 * 对字符串进行不可逆加密
+	 */
 	var encrypt = function(str, key){
 		if(str && str.toString){
 			return crypto.createHash('sha1').update(str.toString() + (key||DEFAULT_PRIVATE_KEY)).digest('hex');
@@ -79,10 +82,16 @@
 	}
 
 	var DEFAULT_KEY = 'GraphTool'+DEFAULT_PRIVATE_KEY;
+	/**
+	 * 对字符串进行可逆加密
+	 */
 	encrypt.encode = function(str){
 		var cip = crypto.createCipher(METHOD_ALGORITHM, DEFAULT_KEY);
 		return cip.update(str, 'binary', 'hex') + cip.final('hex');
 	}
+	/**
+	 * 解密字符串
+	 */
 	encrypt.decode = function(str){
 		var decipher = crypto.createDecipher(METHOD_ALGORITHM, DEFAULT_KEY);
 		try{
