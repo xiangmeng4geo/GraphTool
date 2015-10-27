@@ -3,7 +3,7 @@
 	
 	var store = localStorage;
 	
-	const prefix = 'gt.';
+	var prefix = 'gt.';
 	function _getName(name){
 		return prefix+name;
 	}

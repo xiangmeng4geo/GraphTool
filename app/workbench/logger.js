@@ -1,14 +1,14 @@
 !function(){
 	'use strict'
 	
-	let fs = require('fs');
-	let path = require('path');
+	var fs = require('fs');
+	var path = require('path');
 	
-	const CONST_LOG = require('./const').LOG;
-	const PATH_LOG = CONST_LOG.PATH;
-	const LOG_DELAY = CONST_LOG.DELAY || 10;
+	var CONST_LOG = require('./const').LOG;
+	var PATH_LOG = CONST_LOG.PATH;
+	var LOG_DELAY = CONST_LOG.DELAY || 10;
 	
-	const EOL = require('os').EOL;
+	var EOL = require('os').EOL;
 	
 	
 	function format_date(date, format){
@@ -37,18 +37,18 @@
 	if(!fs.existsSync(PATH_LOG)){
 		fs.mkdirSync(PATH_LOG);
 	}
-	let fn_show = (function(){
-		const IS_DEBUG = true; // 是否是debug模式
+	var fn_show = (function(){
+		var IS_DEBUG = true; // 是否是debug模式
 		return IS_DEBUG? function(msg, cb){
 			console.log(msg);
 			cb();
 		}: function(msg, cb){
-			let log_file_path = path.join(PATH_LOG, format_date(new Date(), 'yyyy-MM-dd'));
+			var log_file_path = path.join(PATH_LOG, format_date(new Date(), 'yyyy-MM-dd'));
 			fs.appendFile(log_file_path, msg, cb);
 		}
 	})();
-	let msg_stack = [];
-	let dealTime = 0;
+	var msg_stack = [];
+	var dealTime = 0;
 	function log(msg, type){
 		msg_stack.push([new Date(), type, msg]);
 		
@@ -58,23 +58,23 @@
 	}
 	
 	function deal(){
-		let msgs = msg_stack.splice(0);
+		var msgs = msg_stack.splice(0);
 		
 		if(msgs.length == 0){
 			dealTime = 0;
 			return;
 		}
-		msgs = msgs.map(v => {
+		msgs = msgs.map(function(v){
 			return [`[${v[1]}]`, format_date(v[0], '<yyyy-MM-dd hh:mm:ss>'), v[2]].join('\t');
 		});
 		
-		fn_show(msgs.join(EOL)+EOL, () => {
+		fn_show(msgs.join(EOL)+EOL, function(){
 			dealTime = setTimeout(deal, LOG_DELAY);
 		});
 	}
 	
-	let fns = {};
-	['info', 'error'].map(v => {
+	var fns = {};
+	['info', 'error'].map(function(v){
 		fns[v] = function(msg){
 			log(msg, v);
 		}

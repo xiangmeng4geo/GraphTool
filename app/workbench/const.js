@@ -5,17 +5,17 @@
 !function(){
 	'use strict'
 	
-	let path = require('path');
+	var path = require('path');
 	
 	function format(url){
-		let arr = url.replace(/\\/g, '/').split(':');
+		var arr = url.replace(/\\/g, '/').split(':');
 		return [arr[0].toUpperCase(), arr[1]].join(':');
 	}
-	let path_base = format(path.join(__dirname, '..'));
-	let path_ui_conf = format(path.join(path_base, 'conf/ui'));
-	let path_ui = format(path.join(path_base, 'ui'));
-	let path_workbench = format(path.join(path_base, 'workbench'));
-	let path_conf = format(path.join(path_base, 'conf'));
+	var path_base = format(path.join(__dirname, '..'));
+	var path_ui_conf = format(path.join(path_base, 'conf/ui'));
+	var path_ui = format(path.join(path_base, 'ui'));
+	var path_workbench = format(path.join(path_base, 'workbench'));
+	var path_conf = format(path.join(path_base, 'conf'));
 	
 	module.exports = {
 		PATH: {

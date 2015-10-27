@@ -2,16 +2,16 @@
 Core.init(function(){
 	'use strict'
 
-	let C = Core;
-	let $ = C.$;
-	let remote = C.remote;
+	var C = Core;
+	var $ = C.$;
+	var remote = C.remote;
 
-	let Store = C.load('store');
-	let Dialog = C.load('dialog');
-	let dialog_alert = Dialog.alert;
-	let util = remote('util');
-	let util_verification = util.verification;
-	let win = remote('window');
+	var Store = C.load('store');
+	var Dialog = C.load('dialog');
+	var dialog_alert = Dialog.alert;
+	var util = remote('util');
+	var util_verification = util.verification;
+	var win = remote('window');
 
 	function close(){
 		window.close();
@@ -20,11 +20,11 @@ Core.init(function(){
 	C.emit('ready');
 	$('.btn_close').on('click', close);
 
-	let $username = $('#username'),
+	var $username = $('#username'),
 		$userpwd = $('#userpwd');
-	let $cb_remember = $('#cb_remember'),
+	var $cb_remember = $('#cb_remember'),
 		$cb_autologin = $('#cb_autologin');
-	let is_remember = Store.get('user_is_remember', false);
+	var is_remember = Store.get('user_is_remember', false);
 	$cb_remember.prop('checked', is_remember);
 
 	var is_encrypt = false;
@@ -42,7 +42,7 @@ Core.init(function(){
 	var is_autologin = Store.get('user_is_autologin', false);
 	$cb_autologin.prop('checked', is_autologin);
 
-	let verification = util_verification.get();
+	var verification = util_verification.get();
 	function afterLogin(login_flag, true_fn, false_fn){
 		if(login_flag){
 			var $initializing = $('.initializing').show();

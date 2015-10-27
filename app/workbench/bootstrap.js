@@ -4,12 +4,12 @@
 !function(){
 	"use strict";
 	
-	let app = require('app');
-	let ipc = require('ipc');
-	let BrowserWindow = require('browser-window');
-	let path = require('path');
-	let window = require('./window');
-	let logger = require('./logger');
+	var app = require('app');
+	var ipc = require('ipc');
+	var BrowserWindow = require('browser-window');
+	var path = require('path');
+	var _window = require('./window');
+	var logger = require('./logger');
 	
 	global.gtStart = (new Date).getTime();
 	
@@ -22,23 +22,23 @@
 		app.quit();
 	});
 	
-	let subscibe_list = {};
+	var subscibe_list = {};
 	ipc.on('subscibe', function(e, type){
-		let sender = e.sender;
-		let id = BrowserWindow.fromWebContents(sender).id;
+		var sender = e.sender;
+		var id = BrowserWindow.fromWebContents(sender).id;
 
-		let list = subscibe_list[type] || (subscibe_list[type] = []);
+		var list = subscibe_list[type] || (subscibe_list[type] = []);
 		if(list.indexOf(id) == -1){
 			list.push(id);
 		}
 	});
 	ipc.on('emit', function(e, data){
-		let type = data.type;
-		let msg = data.msg;
-		let list = subscibe_list[type];
+		var type = data.type;
+		var msg = data.msg;
+		var list = subscibe_list[type];
 		if(list && list.length > 0){
-			list.forEach(id => {
-				let win = BrowserWindow.fromId(id);
+			list.forEach(function(id){
+				var win = BrowserWindow.fromId(id);
 				if(win){
 					win.send(type, msg);
 				}
@@ -49,8 +49,8 @@
 	 * 确保主程序是单例模式
 	 */
 	function ensure_single(onSingle){
-		let net = require('net');
-		let socket = path.join('\\\\?\\pipe', app.getName());
+		var net = require('net');
+		var socket = path.join('\\\\?\\pipe', app.getName());
 		net.connect({path: socket}, function(){
 			app.terminate();
 		}).on('error', function(err){
@@ -63,7 +63,7 @@
 			}
 			onSingle();
 			net.createServer(function(){
-				let win = window.getLast();
+				var win = _window.getLast();
 				if(win){
 					win.setAlwaysOnTop(true);
 					win.restore();
@@ -76,12 +76,12 @@
 		});
 	}
 	app.on('ready', function () {
-		let loginWin = window.getInstance('login');
+		var loginWin = _window.getInstance('login');
 		ipc.on('wait.main', function(e, data){
 			loginWin.send('wait.login', true);
 		});
-		ensure_single(() => {
-			window.load(loginWin, 'login');
+		ensure_single(function() {
+			_window.load(loginWin, 'login');
 		});
 	});
 }();

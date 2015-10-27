@@ -1,12 +1,12 @@
 !function(){
 	'use strict'
 	
-	let remote = require('remote');
+	var remote = require('remote');
 	
-	let dialog = remote.require('dialog');
-	let win_instance = remote.getCurrentWindow();
+	var dialog = remote.require('dialog');
+	var win_instance = remote.getCurrentWindow();
 	
-	let Dialog = {
+	var Dialog = {
 		alert: function(msg){
 			dialog.showMessageBox(win_instance, {
 				type: 'info',
