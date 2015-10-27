@@ -7,16 +7,22 @@
 	let path = require('path');
 	let window = require('./window');
 	let app = require('app');
+	let logger = require('./logger');
 	
 	global.gtStart = (new Date).getTime();
 	
-	// process.on('uncaughtException', function(err){
-	// 	console.error(err);
-	// });	
+	// 捕获系统级错误，方便调试
+	process.on('uncaughtException', function(err){
+		logger.error(err.stack);
+	});
+	
 	app.on('window-all-closed', function () {
 		app.quit();
 	});
 	
+	/**
+	 * 确保主程序是单例模式
+	 */
 	function ensure_single(onSingle){
 		let net = require('net');
 		let socket = path.join('\\\\?\\pipe', app.getName());
@@ -37,6 +43,7 @@
 					win.setAlwaysOnTop(true);
 					win.restore();
 					win.focus();
+					win.setAlwaysOnTop(false);
 				}
 			}).listen(socket);
 		}).on('data', function(){
@@ -49,11 +56,5 @@
 		ensure_single(() => {
 			window.load(loginWin, 'login');
 		});
-		
 	});
-		var  logger = require('./logger');
-		logger.info('this is a info');
-		setTimeout(function(){
-			logger.error('this is a error');
-		}, 3000);
 }();

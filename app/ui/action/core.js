@@ -4,10 +4,12 @@
 !function(){
 	'use strict'
 	
-	var path = require('path');
-	var win_instance = require('remote').getCurrentWindow();
+	let path = require('path');
+	let _remote = require('remote');
+	let win_instance = _remote.getCurrentWindow();
 	const CONST = win_instance.CONST;
-	const CONST_PATH_UI = CONST.PATH.UI;
+	const CONST_PATH = CONST.PATH;
+	const CONST_PATH_UI = CONST_PATH.UI;
 	const CONST_PATH_UI_ACTION = path.join(CONST_PATH_UI, 'action');
 	const CONST_PATH_UI_STYLE = path.join(CONST_PATH_UI, 'style');
 	
@@ -30,11 +32,18 @@
 	function load(url){
 		return require(path.resolve(CONST_PATH_UI_ACTION, url));
 	}
+	/**
+	 * load module in workbench
+	 */
+	function remote(url){
+		return _remote.require(path.resolve(CONST_PATH.WORKBENCH, url));
+	}
 	
 	let $ = load('lib/j');
 	Core.CONST = CONST;
 	Core.$ = $;
 	Core.load = load;
+	Core.remote = remote;
 	Core.safe = safe;
 	window.Core = Core;
 	
