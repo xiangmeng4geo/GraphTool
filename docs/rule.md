@@ -35,7 +35,8 @@
 </html>
 ```
 * 防止页面在初始化还没有加载完样式前的闪动
-  1. 在新建窗口时强制设置透明`conf.transparent = true`
+  1. *在新建窗口时强制设置透明`conf.transparent = true`*
+    > *官方说明里对这个属性的使用有很多限制，[请参考](https://github.com/atom/electron/blob/master/docs/api/frameless-window.md#limitations)*
   2. 设置`body`的样式`background-color: white;`
   3. 在`core.js`里添加样式和脚本完成后，让窗口显示`win.show()`
 
@@ -49,7 +50,7 @@
 
 * 关于不同页面这间通信问题
   > `Core.on('eventName', callback)` //可以订阅事件
-  
+
   > `Core.emit('eventName', data)`   //触发已经订阅的事件（通过main process 触发所有子窗口已订阅事件）
 
 ### 样式

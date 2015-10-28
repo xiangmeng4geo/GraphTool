@@ -69,20 +69,6 @@ input[type=checkbox]{
 	margin-left: 80px;
 }
 
-.btn_close{
-	-webkit-app-region: no-drag;
-	position: absolute;
-	right: 10px;
-	top: 10px;
-	width: 10px;
-	height: 10px;
-	background: url(../img/btn_close.png) no-repeat center 0;
-	cursor: pointer;
-}
-.btn_close:hover{
-	background-position: center -20px;
-}
-
 .logo_normal .titlebar{
 	position: absolute;
 	width: 360px;

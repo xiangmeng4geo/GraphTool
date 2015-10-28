@@ -16,11 +16,13 @@
 	var path_ui = format(path.join(path_base, 'ui'));
 	var path_workbench = format(path.join(path_base, 'workbench'));
 	var path_conf = format(path.join(path_base, 'conf'));
-	
+	var path_config = format(path.join(path_base, 'config'));
+
 	module.exports = {
 		PATH: {
 			BASE: path_base,
 			CONF: path_conf,
+			CONFIG: path_config,
 			UI: path_ui,
 			UI_CONF: path_ui_conf,
 			WORKBENCH: path_workbench

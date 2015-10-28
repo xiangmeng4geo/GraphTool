@@ -15,7 +15,7 @@
 	
 	// 捕获系统级错误，方便调试
 	process.on('uncaughtException', function(err){
-		logger.error(err.stack);
+		logger.error(err);
 	});
 	
 	app.on('window-all-closed', function () {

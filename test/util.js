@@ -85,4 +85,11 @@ describe('Util', function() {
 			equal(context, result_decode);
 		});
 	});
+	describe('path', function(){
+		var util_path = Util.path;
+		it('path join, should replace "\\" to "/"', function(){
+			var result = util_path.join('a', 'b', 'c');
+			equal('a/b/c', result);
+		});
+	});
 });

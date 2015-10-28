@@ -17,7 +17,6 @@ Core.init(function(){
 		window.close();
 	}
 
-	C.emit('ready');
 	$('.btn_close').on('click', close);
 
 	var $username = $('#username'),

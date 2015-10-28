@@ -10,14 +10,14 @@
 	-webkit-app-region: drag;
 	-webkit-user-select: none;
 }
-/*html,body{
-	height: 100%
-}*/
+html,body{
+	height: 100%;
+	width: 100%;
+}
 body {
 	padding: 0px;
 	margin: 0px;
 	border: 0;
-	background-color: #fff;
 	color: #252525;
 	-webkit-font-smoothing: antialiased;
 	/*background: -webkit-gradient(linear,0 0, 0 100%, color-stop(0,black), color-stop(0.8, rgb(150,150,150)), color-stop(1, rgb(200,200,200)));*/
@@ -296,4 +296,28 @@ td{
 	background-image: url(../img/logo_black.png);
 	background-repeat: no-repeat;
 	background-position: center center;
+}
+
+.btn_close{
+	-webkit-app-region: no-drag;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	width: 10px;
+	height: 10px;
+	background: url(../img/btn_close.png) no-repeat center 0;
+	cursor: pointer;
+}
+.btn_close:hover{
+	background-position: center -20px;
+}
+.main{
+	height: 100%;
+	background-color: white;
+}
+.br3{
+	border-radius: 3px;
+}
+.br5{
+	border-radius: 5px;
 }

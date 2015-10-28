@@ -25,7 +25,12 @@
 				height: 600
 			}
 		}
-		conf.transparent = true;
+		/**
+		 * 考虑到transparent对窗体的很多限制，暂时取消
+		 * 
+		 * https://github.com/atom/electron/blob/master/docs/api/frameless-window.md#limitations
+		 */
+		// conf.transparent = true;
 		conf.show = false;
 		var win = new BrowserWindow(conf);
 		// win.openDevTools();
@@ -52,9 +57,14 @@
 			win.loadUrl(path.join('file://' , PATH.UI, name+ '.html'));
 			var content = win.webContents;
 			content.on('did-finish-load', function(){
-				fs.readFile(path.join(PATH.UI, 'action/core.js'), function(e, str_js){
-					content.executeJavaScript(str_js.toString());
-				});
+				var path_core = path.join(PATH.UI, 'action/core').replace(/\\/g, '/');
+				var js = 'require("'+path_core+'")';
+				// var js = 'var __src=document.createElement("script");__src.src="'+path_core+'.js";document.body.appendChild(__src)';
+				// console.log(js);
+				content.executeJavaScript(js);
+				// fs.readFile(, function(e, str_js){
+				// 	content.executeJavaScript(str_js.toString());
+				// });
 			});
 		}
 	}

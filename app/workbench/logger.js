@@ -4,6 +4,7 @@
 	var fs = require('fs');
 	var path = require('path');
 	
+	var IS_DEBUG = true; // 是否是debug模式
 	var CONST_LOG = require('./const').LOG;
 	var PATH_LOG = CONST_LOG.PATH;
 	var LOG_DELAY = CONST_LOG.DELAY || 10;
@@ -38,7 +39,6 @@
 		fs.mkdirSync(PATH_LOG);
 	}
 	var fn_show = (function(){
-		var IS_DEBUG = true; // 是否是debug模式
 		return IS_DEBUG? function(msg, cb){
 			console.log(msg);
 			cb();
@@ -50,6 +50,9 @@
 	var msg_stack = [];
 	var dealTime = 0;
 	function log(msg, type){
+		if(msg instanceof Error){
+			msg = msg.stack;
+		}
 		msg_stack.push([new Date(), type, msg]);
 		
 		if(!dealTime){
@@ -73,11 +76,13 @@
 		});
 	}
 	
-	var fns = {};
+	var Logger = {};
 	['info', 'error'].map(function(v){
-		fns[v] = function(msg){
+		Logger[v] = function(msg){
 			log(msg, v);
 		}
 	});
-	module.exports = fns
+
+	Logger.DEBUG = IS_DEBUG;
+	module.exports = Logger
 }();

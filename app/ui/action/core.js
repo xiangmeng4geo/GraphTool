@@ -1,10 +1,11 @@
 /**
  * exec after webContents trigger 'did-finish-load'
  */
-!function(){
+!function(window_global){
 	'use strict'
 
 	var path = require('path');
+	var fs = require('fs');
 	var _remote = require('remote');
 	var ipc = require('ipc');
 
@@ -14,23 +15,48 @@
 	var CONST_PATH_UI = CONST_PATH.UI;
 	var CONST_PATH_UI_ACTION = path.join(CONST_PATH_UI, 'action');
 	var CONST_PATH_UI_STYLE = path.join(CONST_PATH_UI, 'style');
+	var CONST_PATH_WORKBENCH = CONST_PATH.WORKBENCH;
+
+	var logger = require(path.join(CONST_PATH_WORKBENCH, 'logger'));
 
 	var Core = {};
-	
+	var EXT_ARR = ['.js', '.json'];
+	function is_exists_module(url){
+		for(var i = 0, j = EXT_ARR.length; i<j; i++){
+			var _url_new = url+EXT_ARR[i];
+			if(fs.existsSync(_url_new)){
+				return true;
+			}
+		}
+		return false;
+	}
+	function require_safe(req, url){
+		if(is_exists_module(url)){
+			try{
+				return req(url);
+			}catch(e){
+				e.stack = '[module error]'+url+'\n' + e.stack;
+				logger.error(e);
+			}
+		}else{
+			var err_msg = '[not exists]' + url;
+			logger.error(new Error(err_msg));
+		}
+	}
 	/**
 	 * load jascript in core/ui/action/
 	 */
 	function load(url){
-		return require(path.resolve(CONST_PATH_UI_ACTION, url));
+		var _p = path.resolve(CONST_PATH_UI_ACTION, url);
+		return require_safe(require, _p);
 	}
 	/**
 	 * load module in workbench
 	 */
 	function remote(url){
-		return _remote.require(path.resolve(CONST_PATH.WORKBENCH, url));
+		var _p = path.resolve(CONST_PATH_WORKBENCH, url);
+		return require_safe(_remote.require, _p);
 	}
-
-	var logger = remote('logger');
 
 	/**
 	 * catch error
@@ -89,7 +115,8 @@
 	Core.load = load;
 	Core.remote = remote;
 	Core.init = safe;
-	window.Core = Core;
+	Core.WIN = win_instance;
+	window_global.Core = Core;
 
 	safe(function(){
 		var EXT_CSS = '.css';
@@ -108,13 +135,15 @@
 
 			// eg: 	"login.html" => "p_login"
 			// 		"user/login.html" => "p_user_login"
-			try{
-				load('p_'+m[2].replace(/\//, '_'));
-			}catch(e){}
+			// load('p_'+m[2].replace(/\//, '_'));
+			load('p_'+m[2].replace(/\//, '_'));
 		}
 
 		// show content
 		// http://www.w3schools.com/tags/att_global_hidden.asp
 		$('tmpl').removeAttr('hidden');
+		if($body.attr('waiting') === undefined){
+			emit('ready');
+		}
 	});
-}()
+}(window)

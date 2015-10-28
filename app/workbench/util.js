@@ -67,6 +67,15 @@
 	}
 
 	/**
+	 * path 工具类
+	 */
+	var path_util = {
+		join: function(){
+			var result = path.join.apply(path, arguments);
+			return result.replace(/\\/g, '/');
+		}
+	}
+	/**
 	 * 加密与解密
 	 */
 	var DEFAULT_PRIVATE_KEY = '20150529';
@@ -117,6 +126,7 @@
 
 	Util.verification = verification;
 	Util.file = file;
+	Util.path = path_util;
 	Util.encrypt = encrypt;
 	module.exports = Util;
 }();

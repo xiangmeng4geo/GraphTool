@@ -1,0 +1,529 @@
+#main{
+	height: 100%;
+}
+.top_container .titlebar{
+	position: absolute;
+	width: auto;
+	left: 10px;
+	right: 350px;
+	height: 90%;
+	top: 5%;
+}
+/*#btn_quite{
+	position: absolute;
+	right: 20px;
+	bottom: 20px;
+	background: url(../img/icon_logout.png) no-repeat;
+	width: 44px;
+	height: 24px;
+	border: none;
+	box-shadow: none;
+}*/
+.c_bottom{
+	position: absolute;
+	height: auto;
+	left: 0;
+	top: 50px;
+	bottom: 0;
+	width: 100%;
+}
+#c_left{
+	position: absolute;
+	z-index: 999;
+	left: 0;
+	top: 0;
+	width: 300px;
+	height: 100%;
+	overflow: auto;
+	background-color: #3d424e;
+	box-shadow: 1px 0 1px rgba(0,0,0,0.38)
+}
+#c_right{
+	position: absolute;
+	top: 0;
+	left: 300px;
+	overflow: auto;
+	background-color: #e5e6e7;
+	width: auto;
+	height: 100%;
+	right: 0;
+}
+#c_top{
+	background-color: #2e3035;
+	overflow: hidden;
+	height: 40px;
+	width: 100%;
+	box-shadow: 0 3px 3px #ccc;
+	position: relative;
+	font-size: 12px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
+	position: absolute;
+	left: 0; 
+	top: 0;
+}
+#c_top:before{
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 1px;
+	height: 100%;
+	background-color: #25262a;
+}
+#c_top:after{
+	content: '';
+	position: absolute;
+	left: 1px;
+	top: 0;
+	width: 1px;
+	height: 100%;
+	background-color: #37383c;
+}
+.btns_top{
+	padding-left: 25px;
+	height: 40px;
+	line-height: 40px;
+	background-position: center left;
+	background-repeat: no-repeat;
+	margin: 0 20px;
+	color: rgba(255, 255, 255, 0.7);
+	cursor: pointer;
+}
+.btns_top span{
+	text-align: center;
+	display: inline-block;
+}
+#btn_add_text{
+	background-image: url(../img/icon_text.png);
+}
+#btn_add_img,
+#btn_add_img_external{
+	background-image: url(../img/icon_img.png);
+}
+#btn_export{
+	background-image: url(../img/icon_export.png);
+}
+#tree{
+	margin: 10px 0;
+}
+#geomap_container{
+	width: 800px;
+	height: 800px;
+	/*border: 1px solid #333;*/
+	/*background-color: #71B7FD;*/
+	/*background-image: url(http://10.14.85.116/android/ChinaWeatherDecision_assets/assets/img/geomap/map.png);*/
+	/*background-image: url(../img/world.jpg);*/
+	/*background-position: -1076px -612px;*/
+	/*background-size: 2540px 2141px;*/
+	background-repeat: no-repeat;
+	float: left;
+	position: relative;
+	overflow: hidden;
+	margin: 30px 0 0 30px;
+	box-shadow: 0 0 5px #bbc2c9;
+	background-color: white;
+}
+#geomap_container .loading{
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 90;
+	width: 100%;
+	height: 100%;
+}
+#geomap_container .loading div{
+	width: 120px;
+	height: 30px;
+	line-height: 30px;
+	position: absolute;
+	left: 50%;
+	margin-left: -60px;
+	top: 50%;
+	margin-top: -15px;
+	border: 1px solid #ccc;
+	background-color: white;
+	text-align: center;
+}
+.geomap_mirror{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	/*opacity: 0.5;*/
+}
+#geomap{
+	width: 100%;
+	height: 100%;
+	position: relative;
+	left: 0;
+	top: 0;
+}
+#geomap.mirror{
+	opacity: 0;
+}
+
+.geomap_mirror.ui-draggable-handle{
+	cursor: url(../img/openhand.cur) 8 8, default !important;
+}
+.geomap_mirror.ui-draggable-dragging{
+	cursor: url(../img/closedhand.cur) 8 8, move !important;
+}
+.geomap_mirror.ui-draggable-disabled{
+	cursor: default !important;
+}
+#geomap_container:hover .map_tool{
+	display: block;
+}
+.map_tool{
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 201;
+	background-color: #494949;
+	padding: 10px;
+	display: none;
+}
+#map_tool_reset{
+	background: url(../img/icon_reset.png) no-repeat center center;
+	width: 25px;
+	height: 25px;
+	cursor: pointer;
+}
+/*#geomap,
+#geomap_layer{
+	width: 100%;
+	height: 100%;
+}
+#geomap_layer{
+	position: absolute;
+	left: 0;
+	top: 0;
+}*/
+
+
+
+#work_container{
+	position: absolute;
+	top: 40px;
+	left: 0;
+	width: 100%;
+}
+/* 添加图片用和图片工具 ｛ */
+.tool_image{
+	position: absolute;
+	right: 310px;
+	top: 1px;
+	width: 300px;
+	height: 100%;
+	background: #3d424e;
+	/*border: 1px solid rgba(185,193,200,0.6);*/
+	display: none;
+	overflow-y: auto;
+	/*box-shadow: -2px 0 2px rgba(185,193,200,0.1);*/
+}
+.tool_image select{
+	border: 1px solid rgba(185,193,200,0.6);
+	width: 270px;
+	border-radius: 8px 8px 0 0;
+	height: 30px;
+	display: block;
+}
+.btn_close_tool_image{
+	width: 100%;
+	height: 40px;
+	background: url(../img/arrow_top.png) no-repeat center center;
+}
+
+.tool_image li{
+	float: left;
+	width: 50%;
+	margin: 0px auto;
+	text-align: center;
+}
+.tool_image li img{
+	display: block;
+	width: 70px;
+	height: 70px;
+	margin: 0 auto;
+}
+.tool_image li span{
+	height: 40px;
+	line-height: 20px;
+	display: inline-block;
+	word-break: break-all;
+}
+.tool_image_main{
+	background-color: rgba(255,255,255,0.2);
+	width: 270px;
+	margin: 0 auto;
+	border-radius: 8px;
+	color: white;
+}
+.tool_image_main ul{
+	margin-top: 10px;
+}
+.list_container{
+	overflow-y: auto;
+}
+/* ｝ 添加图片用和图片工具 */
+
+.map_layer_text span{
+	display: inline-block;
+	width: 100%;
+}
+.map_layer{
+	cursor: move;
+}
+.map_layer{
+	position: absolute;
+	left: 0;
+	top: 0;
+	cursor: move;
+}
+.map_layer:after{
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	border: 2px dashed #ccc;
+	left: -2px;
+	top: -2px;
+}
+.map_layer.off:after{
+	display: none;
+}
+.map_layer.off .ui-resizable-handle{
+	border: none;
+	background: none;
+}
+.map_layer .ui-resizable-handle{
+	width: 6px;
+	height: 6px;
+	border: 1px solid #ccc;
+	background-color: white;
+}
+.map_layer .ui-resizable-n,
+.map_layer .ui-resizable-s{
+	left: 50%;
+	margin-left: -3px;
+}
+.map_layer .ui-resizable-e,
+.map_layer .ui-resizable-w{
+	top: 50%;
+	margin-top: -3px;
+}
+.map_layer .ui-resizable-se{
+	right: -5px;
+	bottom: -5px;
+}
+
+.map_layer_image img{
+	width: 100%;
+	height: 100%;
+}
+
+#tree .bbit-tree-arrows .bbit-tree-elbow-end-minus,
+#tree .bbit-tree-arrows .bbit-tree-elbow-plus,
+#tree .bbit-tree-arrows .bbit-tree-elbow-minus,
+#tree .bbit-tree-arrows .bbit-tree-elbow-end-plus,
+#tree .bbit-tree-arrows .bbit-tree-elbow-end-minus{
+	background-image: url(../img/jquery.tree/arrows_main.gif);
+}
+#tree .bbit-tree-node a span{
+	color: white;
+	line-height: 25px;
+}
+#tree>.bbit-tree-bwrap> .bbit-tree-body>ul>li>div a span{
+	font-size: 16px;
+}
+#tree .bbit-tree-node .bbit-tree-selected{
+	background-color: #32689c;
+}
+#tree .bbit-tree-node-el{
+	padding-left: 40px;
+}
+#tree .bbit-tree-node .bbit-tree-node-over{
+	background-color: rgba(40, 40, 40, 0.3);
+}
+/*#tree .bbit-tree-arrows .bbit-tree-elbow-end-minus,*/
+#tree .bbit-tree-arrows .bbit-tree-elbow-end-minus{
+	background-position: -16px 3px;
+}
+#tree .bbit-tree-arrows .bbit-tree-elbow-plus,
+#tree .bbit-tree-arrows .bbit-tree-elbow-end-plus{
+	background-position: 0 3px;
+}
+
+.top_container{
+	height: 50px;
+	width: 100%;
+	color: #aeaeae;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.user_info{
+	border-left: 1px solid #eeefef;
+	border-right: 1px solid #eeefef;
+	padding: 0 15px;
+	position: relative;
+	z-index: 100;
+	cursor: pointer;
+}
+
+.logo{
+	width: 110px;
+	height: 100%;
+	
+	margin-left: 30px;
+}
+.user_icon{
+	height: 30px;
+}
+.user_icon img{
+	width: 30px;
+	height: 30px;
+	border-radius: 30px;
+}
+.top_right{
+	margin-right: 20px;
+	padding-top: 10px;
+}
+#user_name{
+	margin-left: 10px;
+	line-height: 30px;
+}
+#btn_setting{
+	background: url(../img/bg_setting.png) no-repeat center left;
+	padding-left: 20px;
+	height: 30px;
+	line-height: 30px;
+	margin-left: 15px;
+	cursor: pointer;
+}
+#btn_slide{
+	width: 11px;
+	height: 7px;
+	background: url(../img/arrow.png) no-repeat center center;
+	transform: rotate(180deg);
+	margin-top: 11px;
+	margin-left: 10px;
+	transition: all 0.5s;
+}
+#btn_slide.open{
+	transform: rotate(0deg);
+}
+#slide_down{
+	display: none;
+	position: absolute;
+	width: 100%;
+	padding: 1px;
+	left: 0px;
+	top: 25px;
+}
+#slide_down div{
+	height: 14px;
+}
+#slide_down ul{
+	background-color: white;
+	border-radius: 0 0 8px 8px;
+	border: 1px solid #d5d6d7;
+}
+#slide_down li{
+	color: #aeaeae;
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+	text-align: center;
+	cursor: pointer;
+	border-bottom: 1px solid #d5d6d7;
+}
+#slide_down li:last-child{
+	border: none;
+}
+#slide_down li:hover{
+	color: #16a8de;
+}
+
+.btn_max,
+.btn_min{
+	width: 10px;
+	height: 10px;
+	background-position: center center;
+	margin-right: 10px;
+	cursor: pointer;
+}
+.btn_max{
+	background-image: url(../img/btn_max.png);
+}
+.btn_min{
+	background-image: url(../img/btn_min.png);
+}
+.no_frame{
+	margin-left: 60px;
+}
+
+.map_layer_box_c{
+	position: absolute;
+	left: -9999px;
+	top: -9999px;
+	width: 100%;
+	height: 100%;
+	/*opacity: 0;*/
+}
+.cover .map_layer_box_c{
+	left: 0;
+	top: 0;
+}
+
+.mirror_layer_box{
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.map_layer .handle{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 19;
+}
+/*.cover .mirror_layer_box{
+	display: none;
+}*/
+.map_layer .text{
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	overflow: hidden;
+	z-index: 2;
+}
+.drag_handle{
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    margin-top: -4px;
+    margin-left: -5px;
+    background-color: yellow;
+    border: 1px solid #ccc;
+    -webkit-transform: rotate(45deg);
+    cursor: default;
+    z-index: 2;
+}
+.off .ui-rotatable-handle{
+	display: none;
+}
+
+#zoom_notice{
+	position: absolute;
+	left: 30px;
+	top: 0;
+	height: 30px;
+	line-height: 30px;
+	display: none;
+}
+#tree{
+	color: white;
+}
