@@ -30,11 +30,33 @@ Core.init(function(){
 			WIN.maximize();
 		}
 	});
-	$('.titlebar').on('dblclick', function(){alert(1);
-		$btn_max.click();
-	}).on('contextmenu', function(){
-		alert(2);
-	});
+	// 对左右布局进行拖拽调整宽度
+	{
+		$doc.on('mouseup.resize', function(){
+			$doc.off('mousemove.resize');
+		});
+		var $c_left = $('#c_left'),
+			$c_right = $('#c_right');
+		var $resize_horizontal = $('resize-horizontal').on('mousedown.resize', function(e_down){
+			var x_old = e_down.pageX;
+			$doc.off('mousemove.resize').on('mousemove.resize', function(e_move){
+				var w_old = $c_left.width();
+				var x_new = e_move.pageX;
+				var x = x_new - x_old;
+				var w_new = w_old + x;
+				if(w_new >= 200 && w_new <= 500){
+					$c_left.width(w_new);
+					$resize_horizontal.css({
+						left: '+='+x
+					});
+					$c_right.css({
+						left: '+='+x
+					});
+					x_old = x_new;
+				}
+			});
+		});
+	}
 	$('#btn_quite').click(function(){
 		window.close();
 	});
