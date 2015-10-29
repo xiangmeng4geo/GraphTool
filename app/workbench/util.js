@@ -124,9 +124,36 @@
 		}
 	}
 
+	/**
+	 * 得到经纬度格点网络
+	 */
+	function grid(lng0, lat0, lng1, lat1, GRID_SPACE){
+		GRID_SPACE || (GRID_SPACE = 0.5);
+		var arr = [];
+		var x_num = Math.ceil((lng1 - lng0)/GRID_SPACE),
+			y_num = Math.ceil((lat1 - lat0)/GRID_SPACE);
+
+		for(var i = 0; i < x_num; i++){
+			var x = lng0 + GRID_SPACE * i;
+			var val = [];
+			for(var j = 0; j < y_num; j++){
+				var y = lat0 + GRID_SPACE*j;
+				val.push({
+					x: x,
+					y: y
+				});
+			}
+			arr.push(val);
+		}
+
+		return arr;
+	}
+
 	Util.verification = verification;
 	Util.file = file;
 	Util.path = path_util;
 	Util.encrypt = encrypt;
+	Util.grid = grid;
+
 	module.exports = Util;
 }();
