@@ -4,7 +4,7 @@
   - [x] 重写file
   - [x] 重写encrypt
   - [x] 重写verification
-  - [ ] 重写读取、解析micaps数据方式为异步
+  - [ ] 重写读取、解析micaps数据方式为异步,请[参考](./thread.md)
 - [x] *寻找支持`es6`的压缩工具 [#minify.md](./minify.md)*
 - [x] 架构`main process`和`render process`通讯机制
 - [x] 移植登录页面逻辑

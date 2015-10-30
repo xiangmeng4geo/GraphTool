@@ -109,33 +109,6 @@ Core.init(function(){
 	});
 
 	Core.WIN.openDevTools();
-	// var addon = require('f:/source/node_projects/node_modules/webworker-threads');
-	// console.log(addon);
-	// function fibo(n) {
-	// 	return n > 1 ? fibo(n - 1) + fibo(n - 2) : 1;
-	// }
-	// // require('path').join(__dirname, '../../webworker-threads');
-	// /// Then, we create a worker thread with the `Threads.create` call:
-	// // var Threads = require(require('path').join(__dirname, '../../webworker-threads'));
-	// var Threads = require('webworker-threads');
-	// var t = Threads.create();
-	// /// In the next step, we load the function into the worker thead.
-	// /// We get the function's source with `fibo.toString()` and we 
-	// /// call `t.eval(source)` to evalutate it into the worker thread's context:
-	// t.eval(fibo);
-	// /// Now, we are ready to call this function.
-	// /// We use the `t.eval` function again, with two arguments this time.  
-	// /// The first argument is the expression to evaluate.  
-	// /// The second one is a callback that receives the result (or an error if there was one).
-	// t.eval('fibo(10)', function(err, result) {
-	// 	if (err) throw err; // something abnormal
-	// 	// print the result
-	// 	console.log('fibo(10)=' + result);
-	// 	// chain with next step
-	// 	step2();
-	// });
-
-	// var Threads = require('webworker-threads');
 	var Threads = require('f:/source/node_projects/WebWorkerThreads');
 	var t = Threads.create();
 
@@ -151,49 +124,27 @@ Core.init(function(){
 	t.emit('init', require('util'));
 	t.emit('next', 1);
 
+	function work(a, b){
+		var time_start = new Date();
+		while(1){
+			if(new Date() - time_start >= 3*1000){
+				console.log('work after 3s');
+				break;
+			}
+		}	
+	}
+	run();
+	// work();
+	function run(){
+		console.log(new Date());
+		setTimeout(run, 500);
+	}
 
-	// t.on('data', function(){
-	// 	console.log('main', arguments);
-	// });
-	// var js = require('path').join(__dirname, '../1.js');
-	// console.log(js);
-	// t.load(js);
-	// t.emit('data');
-	// t.on('data', function(n, result){
-	// 	console.log(arguments);
-	// });
-	// function work(a, b){
-	// 	thread.emit('data', JSON.stringify([a, b]));
-	// 	var time_start = new Date();
-	// 	while(1){
-	// 		if(new Date() - time_start >= 10*1000){
-	// 			break;
-	// 		}
-	// 	}	
-	// 	thread.emit('data', 'after 10s');
-	// }
-	// t.eval(work);
-	// t.eval('work(1, {name:"tonny"})');
-	// var worker = new Threads.Worker(function(){
-	// 	this.onmessage = function(e){
-	// 		console.log('from main', e.data);
-	// 		var time_start = new Date();
-	// 		while(1){
-	// 			if(new Date() - time_start >= 10*1000){
-	// 				postMessage('after 10s');
-	// 				break;
-	// 			}
-	// 		}	
-	// 	}
-	// });
-	// worker.onmessage = function(e){
-	// 	console.log('got msg: ', e.data);
-	// };
-	// worker.postMessage('begin');
-
-	// function run(){
-	// 	console.log(new Date());
-	// 	setTimeout(run, 500);
-	// }
-	// run();
+	var sub_process = require('child_process').fork(require('path').join(__dirname, '../2.js'));
+	sub_process.on('message', function(a, b){
+		console.log('sub_process', a, b);
+	});
+	sub_process.send({
+		name: 'tonny'
+	});
 });
