@@ -108,43 +108,6 @@ Core.init(function(){
 		});
 	});
 
-	Core.WIN.openDevTools();
-	var Threads = require('f:/source/node_projects/WebWorkerThreads');
-	var t = Threads.create();
-
-	// Listening to 'data' events from the worker thread
-	t.on('data', function(n, result) {
-		console.log(arguments);
-	});
-	var js = require('path').join(__dirname, '../1.js');
-	console.log(js);
-	/// At this point we load the worker code:
-	t.load(js);
-	/// And we start the game by emitting the first `next` event:
-	t.emit('init', require('util'));
-	t.emit('next', 1);
-
-	function work(a, b){
-		var time_start = new Date();
-		while(1){
-			if(new Date() - time_start >= 3*1000){
-				console.log('work after 3s');
-				break;
-			}
-		}	
-	}
-	run();
-	// work();
-	function run(){
-		console.log(new Date());
-		setTimeout(run, 500);
-	}
-
-	var sub_process = require('child_process').fork(require('path').join(__dirname, '../2.js'));
-	sub_process.on('message', function(a, b){
-		console.log('sub_process', a, b);
-	});
-	sub_process.send({
-		name: 'tonny'
-	});
+	// Core.WIN.openDevTools();
+	
 });

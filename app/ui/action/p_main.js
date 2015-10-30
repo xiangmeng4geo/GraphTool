@@ -17,8 +17,9 @@ Core.init(function(){
 	var win = C.remote('window');
 
 	var $doc = $(document);
-	$doc.on('product.change', function(){
-		console.log(arguments);
+	$doc.on('product.change', function(e, productName){
+		// console.log(arguments);
+		C.load('dialog').alert(productName);
 	});
 	$('.btn_min').click(function(){
 		WIN.minimize();

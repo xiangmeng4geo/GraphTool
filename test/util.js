@@ -104,3 +104,5 @@ describe('Util', function() {
 		});
 	});
 });
+
+require('./async/main-test.js');

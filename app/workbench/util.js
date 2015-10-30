@@ -149,11 +149,46 @@
 		return arr;
 	}
 
+	/**
+	 * 封闭异步
+	 * 
+	 * 基于webworker-thread, 每个异步的模块里只可以是相应的多计算不可以使用外部API(包插require等)
+	 * @param path_js 可以是路径（必须是绝对路径）或函数本身（但不能引用函数外的任务变量）
+	 * eg: 
+	 * init('/a/b/worker.js')(param, cb)
+	 *
+	 * init(function(){
+	 * 		// do something
+	 * })(param, cb)
+	 */
+	var async = {};
+	var Thread = process.type? require('./libs/threads.node'): require('webworker-threads');
+	function init(path_js){
+		var t = Thread.create();
+		t.on('end', function(){
+			t.destroy();
+		});
+		if(typeof path_js === 'function'){
+			t.eval('!'+path_js+'()');
+		}else{
+			t.load(path_js);
+		}
+		return function(param, cb){
+			if(cb === undefined){
+				cb = param;
+				param = null;
+			}
+			t.emit('init', param);
+			t.on('data', cb);
+		}
+	}
+	async.init = init;
 	Util.verification = verification;
 	Util.file = file;
 	Util.path = path_util;
 	Util.encrypt = encrypt;
 	Util.grid = grid;
+	Util.Async = async;
 
 	module.exports = Util;
 }();
