@@ -45,13 +45,58 @@ describe('datareader.micaps', function(){
             }
         });
     });
-    it('[type 1]', function(done){
+    it('[type 1] only get real values', function(done){
         read_micaps({
-            file: _getDataPath('1.1')
+            file: _getDataPath('1.1'),
+            interpolate: false,
+            val_col: 4
         }, function(err, data){
-            console.log(data[0][0]);
+            try{
+                var d = data.data;
+                if(d.length > 0){
+                    var v = d[0];
+                    // 尝试读取第一行数据
+                    if(v.x == 11.92 && v.y == 78.92 && v.v == 7){
+                        return done();
+                    }
+                }
+            }catch(e){}
 
-            done();
+            done(new Error('read data error'));
+        });
+    });
+    it('[type 1] only get interpolate values', function(done){
+        var default_val = 999999;
+        read_micaps({
+            file: _getDataPath('1.1'),
+            val_col: 4,
+            default_val: default_val
+        }, function(err, data){
+            try{
+                var d = data.data;
+                if(d.length > 0){
+                    var v = d[0];
+                    // 尝试读取第一行数据
+                    if(v.x == 11.92 && v.y == 78.92 && v.v == 7){
+                        var data_interpolate = data.interpolate;
+                        var num_total = 0,
+                            num_default = 0;
+                        for(var i = 0, j = data_interpolate.length; i<j; i++){
+                            for(var ii = 0, item = data_interpolate[i], jj = item.length; ii<jj; ii++){
+                                if(data_interpolate[i][ii].v == default_val){
+                                    num_default++;
+                                }
+                                num_total++;
+                            }
+                        }
+                        if(num_default > 0 && num_default != num_total){
+                            return done();
+                        }
+                    }
+                }
+            }catch(e){}
+
+            done(new Error('interpolate data error'));
         });
     });
 });

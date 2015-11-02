@@ -20,8 +20,8 @@
 			default_val: DEFAULT_VALUE,
 			interpolation_all: false,
             interpolate: 'idw', //当interpolate == false时不进行插值
-			num_of_cols: 5,
-			val_col: 5,
+			num_of_cols: 5, //数据列数
+			val_col: 5,      //读取第N列值
 			arithmetic: null
 		}
 		var REG_DEFAULT_VAL = /9{4,}/;
@@ -76,7 +76,9 @@
 
         // 当interpolate选项设置为false时不进行插值，直接把文件里的数据返回
         if(!!interpolate_method === false){
-            return cb(null, data);
+            return cb(null, {
+                data: data
+            });
         }
         interpolate_method = require(path.join(PATH_WORKBENCH, 'interpolate/'+interpolate_method));
         interpolate_method(data, lnglat_arr, option, function(err, new_data){
