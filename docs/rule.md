@@ -16,7 +16,7 @@
     |- workbench (主进程)
     |- worker (多线程时用到资源)
 |- docs （文档）
-|- tests （测试）
+|- test （测试）
 
 ```
 
@@ -56,6 +56,13 @@
 ### 样式
 在`core.js`会自动加载在body上定义了`css`的列表，如： `<body css="reset p_main">`会
 按顺序自动加载`reset.css`和`p_main.css`
+
+### 测试
+用`mocha`进行测试，`test/all.js`为测试入口，在这里包含测试子模块，子模块命名规则为`test-文件名.js`
+测试命令如下：
+
+* `mocha test/all.js` //测试全部
+* `mocha test/test-util.js` //测试某一个子模块
 
 ### 扩展及插件相关说明
 * [extension](./extension.md)
