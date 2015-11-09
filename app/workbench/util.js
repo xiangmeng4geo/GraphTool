@@ -164,7 +164,7 @@
 	var Async = {};
 	var Thread = process.type? require('./libs/threads.node'): require('webworker-threads');
 
-	function init(path_js, cb_info){
+	Async.init = function init(path_js, cb_info){
 		var t = Thread.create();
 		t.on('end', function(){
 			t.destroy();
@@ -291,7 +291,45 @@
 		isLineIn: _isLineIn
 	};
 
-	Async.init = init;
+	/**
+	 * 对象序列化，得到一个字符串
+	 *
+	 * (把键和值都放入数据，最后数据合并得到一个字符串)
+	 */
+	var _fn_serialize = function(obj){
+		if(null == obj){
+			return '_';
+		}
+
+		function _sort(a, b) {
+			return a.localeCompare(b);
+		}
+		switch (obj.constructor) {
+			case String:
+				return obj;
+			case Number:
+				return ''+obj;
+			case Array:
+				var arr = [];
+				for(var i = 0, j = obj.length; i<j; i++){
+					arr.push(_fn_serialize(obj[i]));
+				}
+				arr.sort(_sort);
+				return arr.join('_');
+			case Object:
+				var arr = [];
+				for(var i in obj){
+					arr.push(i);
+					arr.push(_fn_serialize(obj[i]));
+				}
+				arr.sort(_sort);
+				return arr.join('_');
+			default:
+				return ''+obj;
+		}
+	}
+
+	/*对外提供API*/
 	Util.verification = verification;
 	Util.file = file;
 	Util.path = path_util;
@@ -300,6 +338,7 @@
 	Util.Async = Async;
 	Util.Digit = Digit;
 	Util.Polygon = Polygon;
+	Util.serialize = _fn_serialize;
 
 	module.exports = Util;
 }();

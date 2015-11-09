@@ -6,7 +6,6 @@ var equal = assert.equal;
 // idw插值为异步，要充分测试其异步性
 
 describe('interpolate.idw', function(){
-    this.timeout(20000);
     var idw = util.load('workbench/interpolate/idw');
     var Util = util.load('workbench/util');
     var Logger = util.load('workbench/logger');

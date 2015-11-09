@@ -6,7 +6,6 @@ var path = require('path');
 var util = require('../../util');
 
 describe('Util.async', function() {
-	this.timeout(10000);
 	var equal = assert.equal;
 	var Async = util.load('workbench/util').Async;
 

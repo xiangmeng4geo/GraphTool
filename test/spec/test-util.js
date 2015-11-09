@@ -161,4 +161,34 @@ describe('Util', function() {
 			equal(false, result);
 		});
 	});
+
+	describe('serialize', function(){
+		var serialize = Util.serialize;
+		it('serialize value', function(){
+			var result;
+			result = serialize(1);
+			result.should.be.a('string');
+			result.should.equal('1');
+
+			result = serialize('test');
+			result.should.be.a('string');
+			result.should.equal('test');
+
+			result = serialize([1, 2, 3]);
+			result.should.be.a('string');
+			result.should.equal('1_2_3');
+
+			result = serialize({name: 'test', age: 10});
+			result.should.be.a('string');
+			result.should.equal('10_age_name_test');
+
+			result = serialize({name: 'test', v: [1, 2, 3]});
+			result.should.be.a('string');
+			result.should.equal('1_2_3_name_test_v');
+
+			result = serialize();
+			result.should.be.a('string');
+			result.should.equal('_');
+		});
+	});
 });
