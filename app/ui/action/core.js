@@ -19,13 +19,20 @@
 
 	var logger = require(path.join(CONST_PATH_WORKBENCH, 'logger'));
 
+	// 方便各子模块部通信
+	function Model() {}
+	require('util').inherits(Model, require("events").EventEmitter);
+
+	var model = new Model();
+
 	var Core = {};
-	var EXT_ARR = ['.js', '.json'];
+	var EXT_JS = '.js';
+	var EXT_ARR = ['', EXT_JS, '.json', '.node'];
 	function is_exists_module(url){
 		for(var i = 0, j = EXT_ARR.length; i<j; i++){
 			var _url_new = url+EXT_ARR[i];
 			if(fs.existsSync(_url_new)){
-				return true;
+				return _url_new;
 			}
 		}
 		return false;
@@ -46,8 +53,8 @@
 	/**
 	 * load jascript in core/ui/action/
 	 */
-	function load(url){
-		var _p = path.resolve(CONST_PATH_UI_ACTION, url);
+	function load(url, subpath){
+		var _p = path.resolve(CONST_PATH_UI_ACTION, subpath||'', url);
 		return require_safe(require, _p);
 	}
 	/**
@@ -56,6 +63,14 @@
 	function remote(url){
 		var _p = path.resolve(CONST_PATH_WORKBENCH, url);
 		return require_safe(_remote.require, _p);
+	}
+	/**
+	 * load javascript file in action/lib
+	 */
+	function script(url, cb) {
+		var _p = path.resolve(CONST_PATH_UI_ACTION + '/lib', url);
+		var js_path = is_exists_module(_p);
+		return $.getScript(js_path, cb);
 	}
 
 	/**
@@ -69,7 +84,7 @@
 			fn_subscibe();
 		}
 		try{
-			cb();
+			cb(model);
 		}catch(e){
 			logger.error(e.stack);
 		}
@@ -113,6 +128,10 @@
 	Core.CONST = CONST;
 	Core.$ = $;
 	Core.load = load;
+	Core.loadLib = function(url) {
+		return load(url, 'lib');
+	}
+	Core.script = script;
 	Core.remote = remote;
 	Core.init = safe;
 	Core.WIN = win_instance;

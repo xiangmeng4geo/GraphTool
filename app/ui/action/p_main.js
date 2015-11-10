@@ -6,7 +6,7 @@ Core.init(function(){
 	C.on('login.closed', function(){
 		C.emit('ready');
 	});
-}, function(){
+}, function(model){
 	'use strict'
 
 	var C = Core;
@@ -17,10 +17,7 @@ Core.init(function(){
 	var win = C.remote('window');
 
 	var $doc = $(document);
-	$doc.on('product.change', function(e, productName){
-		// console.log(arguments);
-		C.load('dialog').alert(productName);
-	});
+
 	$('.btn_min').click(function(){
 		WIN.minimize();
 	});
@@ -65,7 +62,11 @@ Core.init(function(){
 		win.open('setting');
 	});
 
-	['tree'].forEach(function(v){
+	model.on('product.change', function(productName){
+		// console.log(arguments);
+		C.load('dialog').alert(productName);
+	});
+	['tree', 'map'].forEach(function(v){
 		C.load('p_main_'+v);
 	});
 });
