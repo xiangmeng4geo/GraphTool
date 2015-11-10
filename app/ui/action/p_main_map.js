@@ -8,6 +8,10 @@ Core.init(function(model) {
     var util_loadLib = C.loadLib;
     var util_path = util_remote('util').path;
 
+    //统一处理其它库里的错误信息
+    model.on('error', function(err) {
+
+    });
     var CONST_PATH_ZR = './action/lib/zr';
     var GeoMap = util_loadLib('map');
     var d3 = util_loadLib('d3');
@@ -28,74 +32,49 @@ Core.init(function(model) {
     //   .rotate([-60, 30])
     //   .center([107, 31])
     //   .parallels([27, 45]);
-    // var ctx = $canvas.get(0).getContext('2d');
-    function ready() {
-        requireweb.config({
-            paths:{
-                'zrender': CONST_PATH_ZR,
-                'zrender/shape/Base': CONST_PATH_ZR,
-                'zrender/shape/Polyline': CONST_PATH_ZR,
-                'zrender/shape/Polygon': CONST_PATH_ZR,
-            }
-        });
-
-        GeoMap.init(function() {
-            // var geomap = new GeoMap();
-            // geomap.init({
-            //     container: $('#geomap').get(0)
-            // });
-
-            map_ready();
-        })
-    }
-    var ctx;
-    function map_ready() {
-        model.emit('map.ready');
-
-        var $canvas = $('<canvas>').appendTo($('#geomap')).css({
-            width: 800,
-            height: 800
-        }).attr('width', 800).attr('height', 800);
-        // var $canvas = $('canvas');
-        ctx = $canvas.get(0).getContext('2d');
-        var file_test = 'E:/source/tonny-zhang.github.com/d3/data/border-china.json';
-        var file_test1 = 'E:/source/tonny-zhang.github.com/d3/data/china.topojson.json';
-        Geo.importFile(file_test1, function(err, dataset) {
-            ctx.strokeStyle = 'red';
-            var t_start = new Date();
-            for(var i = 0, j = dataset.arcs.size(); i<j; i++) {
-                drawArc(dataset.arcs.getArcIter(i));
-            }
-            console.log('end', new Date() - t_start);
-        })
-        Geo.importFile(file_test, function(err, dataset) {
-            ctx.strokeStyle = 'blue';
-            var t_start = new Date();
-            for(var i = 0, j = dataset.arcs.size(); i<j; i++) {
-                drawArc(dataset.arcs.getArcIter(i));
-            }
-            console.log('end', new Date() - t_start);
-        })
-    }
-    function drawArc(iter) {
-        if (!iter.hasNext()){
-            return;
-        }
-        var _n = 1;
-        ctx.beginPath();
-        var val = projection([iter.x, iter.y]);
-        ctx.moveTo(val[0], val[1]);
-        while (iter.hasNext()) {
-            var val = projection([iter.x, iter.y]);
-            ctx.lineTo(val[0], val[1]);
-            _n++;
-        }
-        ctx.stroke();
-        return _n;
-    }
+    var geomap;
     C.script('geo', function() {
-        C.script('esl', function() {
-            ready();
+        GeoMap.setImportor(Geo.importFile);
+        GeoMap.setProjection(projection);
+
+        var $div = $('<div>').css({
+            position: 'absolute',
+            left: 1,
+            top: 1
+        }).appendTo('body');
+        function run() {
+            $div.html(new Date().getTime());
+            setTimeout(run, 50);
+        }
+        setTimeout(run, 50);
+        setTimeout(function() {
+        var t_start = new Date();
+        new GeoMap().init({
+            container: $('#geomap')
+        }).setGeo([ {
+            file: 'E:/source/tonny-zhang.github.com/d3/data/border-china.json',
+            style: {
+                strokeStyle: 'red',
+                lineWidth: 3
+            }
+        }, {
+            file: 'E:/source/tonny-zhang.github.com/d3/data/china.topojson.json',
+            style: {
+                strokeStyle: 'blue'
+            }
+        }, {
+            file: 'H:/docs/2015/蓝PI相关/地理信息/陕西/市界+县界/新建文件夹/市界+所有县界/地市县界/地市界.shp',
+            style: {
+                strokeStyle: 'yellow'
+            }
+        }, {
+            file: 'E:/source/tonny-zhang.github.com/d3/data/world-50m.json',
+            style: {
+                strokeStyle: 'orange'
+            }
+        }], function() {
+            console.log('after setgeo', 'takes', new Date() - t_start);
         });
+    }, 51);
     });
 });
