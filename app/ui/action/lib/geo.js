@@ -9280,7 +9280,8 @@ function importFile(filepath, cb){
 }
 if (process.type == 'renderer') {
     window.Geo = {
-        importFile: importFile
+        importFile: importFile,
+        ShapeIter: ShapeIter
     }
 } else {
     exports.importFile = importFile;
