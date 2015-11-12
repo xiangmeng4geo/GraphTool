@@ -1,6 +1,10 @@
 !function() {
-    var _zrender,
-        _Polyline;
+    var LAYER_NAME_GEO = 'geo';
+    var LAYER_NAME_WEATHER = 'weather';
+
+    var CACHE_NAME_GEO = 'geo';
+    var CACHE_NAME_CLIP = 'clip';
+    var CACHE_NAME_SHAPES = 'shapes';
 
     var _fileImportor;
     var _ShapeIter;
@@ -42,7 +46,7 @@
     function _getCtxByPrefix(geomap, prefix) {
         var id = _getCanvasId(geomap, prefix);
         var canvas = $('#'+id).get(0);
-        return canvas.getContext('2d');
+        return canvas && canvas.getContext('2d');
     }
     // 是否是一个数组
     function _isArray(obj) {
@@ -76,6 +80,9 @@
                 xp = x;
                 yp = y;
             }
+        }
+        if (x != xp || y != yp) {
+            ctx.lineTo(x, y);
         }
     }
     // 画arcs.layer.shape数据
@@ -114,13 +121,13 @@
     }
 
     function _getPathStart(ctx, style) {
-        var stroked = style.strokeStyle && style.strokeWidth !== 0,
+        var stroked = style.strokeStyle && style.lineWidth !== 0,
             lineWidth, strokeStyle
             fillStyle = style.fillStyle,
             filled = !!fillStyle;
 
         if (stroked) {
-            lineWidth = style.strokeWidth || 1;
+            lineWidth = style.lineWidth || 1;
             strokeStyle = style.strokeStyle;
         }
         return function() {
@@ -132,6 +139,7 @@
                 ctx.lineWidth = lineWidth;
                 ctx.strokeStyle = strokeStyle;
             }
+            //只添加指定属性
             ['shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY'].forEach(function(key) {
                 var val = style[key];
                 if(val !== undefined) {
@@ -144,9 +152,10 @@
         }
     }
     function _getPathEnd(ctx, style) {
-        var stroked = style.strokeStyle && style.strokeWidth !== 0,
+        var stroked = style.strokeStyle && style.lineWidth !== 0,
             filled = !!style.fillStyle;
         return function() {
+            // ctx.closePath();
             if (stroked) {
                 ctx.stroke();
             }
@@ -162,7 +171,8 @@
         var _this = this;
         _this._id = uid++;
 
-        _set(_this, 'geo', []);
+        _set(_this, CACHE_NAME_GEO, []);
+        _set(_this, CACHE_NAME_SHAPES, []);
     }
 
     // TODO: change to asynchronous
@@ -188,7 +198,8 @@
         function _importNext() {
             var geo_file = geo_files.shift();
             if (!geo_file) {
-                _this.refresh('geo');
+                _this.getBondBorder();
+                _this.refresh();
                 return cb();
             }
             var file_path = geo_file.file;
@@ -203,7 +214,7 @@
                 // if(dataset.layers[0].data){
                 //     console.log(dataset.layers[0].data.getRecords());
                 // }
-                _get(_this, 'geo').push(geo_file);
+                _get(_this, CACHE_NAME_GEO).push(geo_file);
                 _importNext();
             })
         }
@@ -215,35 +226,170 @@
      * 得到地理信息的最外层边界
      */
     prop.getBondBorder = function() {
+        var _this = this;
+        var _data = _get(_this, CACHE_NAME_GEO);
+        var _item_deal;
+        for (var i = 0, j = _data.length; i<j; i++) {
+            var item = _data[i];
+            if (item.clip) {
+                _item_deal = item;
+                break;
+            }
+        }
+        if (!_item_deal) {
+            return;
+        }
+        window._test = _item_deal;
+        var dataset = _item_deal.dataset;
+        var arcs = dataset.arcs;
+        var layers = dataset.layers;
+        if (layers.length > 0) {
+            var shapes = layers[0].shapes;
 
+            var flags_counter = new Uint8Array(arcs.size());
+            shapes.forEach(function(shape, shp_index) {
+                shape.forEach(function(shp) {
+                    shp.forEach(function(arc_index) {
+                        if (arc_index < 0) {
+                            arc_index = ~arc_index;
+                        }
+                        flags_counter[arc_index]++;
+                    });
+                });
+            });
+            var flags = [];
+            flags_counter.map(function(c, i) {
+                if (c == 1) {
+                    var p_start = arcs.getVertex(i, 0),
+                        p_end = arcs.getVertex(i, -1);
+                    flags.push({
+                        start: [p_start.x, p_start.y].join(','),
+                        end: [p_end.x, p_end.y].join(','),
+                        i: i
+                    })
+                }
+            });
+
+            // 重组
+            function findNext(flag) {
+                var start = flag.start,
+                    end = flag.end;
+                for (var i = 0, j = flags.length; i<j; i++) {
+                    var item = flags[i],
+                        start_test = item.start,
+                        end_test = item.end,
+                        i_test = item.i;
+                    var i_new = null;
+                    if (end == start_test) {
+                        i_new = i_test;
+                    } else if (end == end_test) {
+                        i_new = ~i_test;
+                    }
+
+                    if (i_new !== null) {
+                        item.i = i_new;
+                        flags.splice(i, 1);
+                        return item;
+                    }
+                }
+            }
+
+            function findNextShape() {
+                var tmp = flags.shift();
+
+                if (!tmp) {
+                    return;
+                }
+                var _arr = [tmp.i];
+
+                var _arc;
+                while ((_arc = findNext(tmp))) {
+                    _arr.push(_arc.i);
+                    tmp = _arc;
+                }
+
+                return _arr;
+            }
+            var shapes_new = [];
+            while (flags.length > 0) {
+                shapes_new.push(findNextShape());
+            }
+
+            var data = {
+                shapes: shapes_new,
+                arcs: arcs,
+                style: _item_deal.clip
+            }
+            _set(_this, CACHE_NAME_CLIP, data);
+            return data;
+        }
     }
     /**
      * 对要显示天气要素的图层进行clip处理
      */
     prop.setClip = function() {
+        var _this = this;
+        var data = _get(_this, CACHE_NAME_CLIP);
+        if (!data) {
+            return;
+        }
+        var shapes = data.shapes,
+            arcs = data.arcs;
 
+        if (!shapes || shapes.length == 0) {
+            return;
+        }
+        var ctx = _getCtxByPrefix(_this, LAYER_NAME_WEATHER);
+
+        ctx.restore();
+        ctx.save();
+
+        // TIP: this is important
+        ctx.beginPath();
+        for (var i = 0, j = 1; i<j; i++) {
+            _drawShape(ctx, [shapes[i]], arcs);
+        }
+        ctx.closePath();
+
+        // ctx.strokeStyle = 'red';
+        // ctx.stroke();
+        // ctx.fill();
+        ctx.clip();
     }
     /**
      * 添加覆盖物
      */
-    prop.addOverlay = function() {
+    prop.addOverlay = function(shape) {
+        var _this = this;
 
+        var shapes = _get(_this, CACHE_NAME_SHAPES);
+
+        var ctx = _getCtxByPrefix(_this, LAYER_NAME_WEATHER);
+
+        var style = shape.style;
+
+        _getPathStart(ctx, style)();
+        shape.drawPath(ctx, _projection);
+        _getPathEnd(ctx, style)();
+
+        shapes.push(shape);
     }
+
     /**
      * 刷新图层
      */
     prop.refresh = function(layer_name) {
         var _this = this;
         if (!layer_name) {
-            layer_name = ['geo', 'weather'];
+            layer_name = [LAYER_NAME_GEO, LAYER_NAME_WEATHER];
         }else if (!_isArray(layer_name)) {
             layer_name = [layer_name];
         }
-        layer_name.forEach(function(v) {
-            var ctx = _getCtxByPrefix(_this, v);
+        if (layer_name.indexOf(LAYER_NAME_GEO) > -1) {
+            var ctx = _getCtxByPrefix(_this, LAYER_NAME_GEO);
             var _canvas = ctx.canvas;
             ctx.clearRect(0, 0, _canvas.width, _canvas.height);
-            var data_list = _get(_this, v);
+            var data_list = _get(_this, LAYER_NAME_GEO);
             _isArray(data_list) && data_list.forEach(function(data) {
                 var dataset = data.dataset;
                 var style = data.style;
@@ -255,7 +401,21 @@
                     }
                 }
             });
-        });
+        }
+
+        var ctx = _getCtxByPrefix(_this, LAYER_NAME_WEATHER);
+        var _canvas = ctx.canvas;
+        ctx.clearRect(0, 0, _canvas.width, _canvas.height);
+        if (layer_name.indexOf(LAYER_NAME_WEATHER) > -1) {
+            _this.setClip();
+            var shapes = _get(_this, CACHE_NAME_SHAPES);
+            for (var i = 0, j = shapes.length; i<j; i++) {
+                var shp = shapes[i];
+                _getPathStart(ctx, shp.style)();
+                shp.drawPath(ctx, _projection);
+                _getPathEnd(ctx, shp.style)();
+            }
+        }
     }
     /**
      * 重置尺寸
@@ -297,9 +457,10 @@
             'background-color': '#BFEAFB'
         }).appendTo($container);
         // 添加显示geo和weather信息的两个canvas
-        var $canvas_weather = _getCanvas(width, height, _getCanvasId(_this, 'weather')).appendTo($div);
-        var $canvas_geo = _getCanvas(width, height, _getCanvasId(_this, 'geo')).appendTo($div);
+        var $canvas_geo = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_GEO)).appendTo($div);
+        var $canvas_weather = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_WEATHER)).appendTo($div);
 
+        $canvas_weather.get(0).getContext('2d').save();
         _set(_this, 'options', options);
 
         // _this.config();

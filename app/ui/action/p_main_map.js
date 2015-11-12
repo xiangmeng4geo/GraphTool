@@ -14,6 +14,7 @@ Core.init(function(model) {
     });
     var CONST_PATH_ZR = './action/lib/zr';
     var GeoMap = util_loadLib('map');
+    var Shape = util_loadLib('shape');
     var d3 = util_loadLib('d3');
     var projection = d3.geo.mercator()
                             .center([107, 31])
@@ -53,18 +54,23 @@ Core.init(function(model) {
         var zoom = d3.behavior.zoom()
                             .translate(projection.translate())
                             .scale(projection.scale())
-                            .scaleExtent([projection.scale() /4 , projection.scale()*8])
+                            // .scaleExtent([projection.scale() /4 , projection.scale()*8])
                             .on('zoom', function() {
                                 var e = d3.event;
                                 projection.scale(e.scale);
                                 projection.translate(e.translate);
                                 // console.log(e.scale, e.translate, projection.scale(), projection.translate());
+                                // geomap.refresh('geo');
                                 geomap.refresh();
                             })
+                            // .on('zoomend', function() {
+                            //     console.log('end');
+                            //     geomap.refresh('weather');
+                            // });
         d3.select('#geomap').call(zoom);
         var geo_files = [];
         geo_files.push({
-            file: 'E:/source/tonny-zhang.github.com/d3/data/world-50m.json',
+            file: 'E:/source/tonny-zhang.github.com/d3/data/world-110m.json',
             style: {
                 strokeStyle: 'rgba(200, 200, 200, 0.7)',
                 // lineWidth: 0.5,
@@ -84,15 +90,42 @@ Core.init(function(model) {
             }
         });
         geo_files.push({
-            file: 'E:/source/tonny-zhang.github.com/d3/data/china.topojson.json',
+            file: 'E:/source/nodejs_project/GraphTool/shell/geo/data-source/china_province.json',
+            // clip: {
+            //     strokeStyle: 'rgba(255, 255, 255, 1)',
+            //     lineWidth: 0.8,
+            //     fillStyle: 'rgba(255, 255, 255, 1)',
+            // },
             style: {
                 strokeStyle: 'rgba(200, 200, 200, 0.9)',
-                lineWidth: 0.1,
+                lineWidth: 0.8,
                 // fillStyle: 'rgba(0, 200, 0, 0.5)'
             }
         });
         // geo_files.push({
+        //     file: 'E:/source/tonny-zhang.github.com/d3/data/china.topojson.json',
+        //     clip: {
+        //
+        //     },
+        //     style: {
+        //         strokeStyle: 'rgba(200, 200, 200, 0.9)',
+        //         lineWidth: 0.1,
+        //         // fillStyle: 'rgba(0, 200, 0, 0.5)'
+        //     }
+        // });
+        // geo_files.push({
         //     file: 'E:/source/nodejs_project/GraphTool/core/data/china.json',
+        //     clip: {
+        //
+        //     },
+        //     style: {
+        //         strokeStyle: 'red',
+        //         lineWidth: 1,
+        //         fillStyle: 'rgba(200, 200, 0, 0.5)'
+        //     }
+        // });
+        // geo_files.push({
+        //     file: 'C:/Users/Administrator/Desktop/天津数据/天津政区.SHP',
         //     style: {
         //         strokeStyle: 'red',
         //         lineWidth: 1,
@@ -101,10 +134,13 @@ Core.init(function(model) {
         // });
         geo_files.push({
             file: 'H:/docs/2015/蓝PI相关/地理信息/陕西/市界+县界/新建文件夹/市界+所有县界/地市县界/地市界.shp',
+            // clip: {
+            //
+            // },
             style: {
                 strokeStyle: 'rgab(0, 255, 0, 1)',
-                lineWidth: 1.5,
-                fillStyle: 'rgba(0, 0 , 200, 0.5)'
+                lineWidth: 2,
+                // fillStyle: 'rgba(0, 0 , 200, 0.5)'
             }
         });
         // geo_files.push({
@@ -118,6 +154,24 @@ Core.init(function(model) {
             container: $geomap
         }).setGeo(geo_files, function() {
             console.log('after setgeo', 'takes', new Date() - t_start);
+
+
+            geomap.addOverlay(new Shape.Polygon([
+                [107, 31],
+                [115, 31],
+                [100, 50]
+            ], {
+                fillStyle: 'rgba(0, 0, 255, 0.5)'
+            }));
+
+            geomap.addOverlay(new Shape.Polyline([
+                [107, 31],
+                [102, 20],
+                [110, 50]
+            ], {
+                strokeStyle: 'orange',
+                lineWidth: 3
+            }));
         });
     }, 200);
     });
