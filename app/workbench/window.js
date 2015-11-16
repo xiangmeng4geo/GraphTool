@@ -11,7 +11,7 @@
 	var PATH = CONST.PATH;
 	var BrowserWindow = IS_PROCESS_MAIN? require('browser-window'): require('remote').require('browser-window');
 
-	var win_stack = [];
+	var win_stack = global.win_stack || (global.win_stack = []);
 	/**
 	 * 得到一个`browser-window`实例
 	 */
@@ -27,7 +27,7 @@
 		}
 		/**
 		 * 考虑到transparent对窗体的很多限制，暂时取消
-		 * 
+		 *
 		 * https://github.com/atom/electron/blob/master/docs/api/frameless-window.md#limitations
 		 */
 		// conf.transparent = true;
@@ -39,12 +39,13 @@
 			var id = this.id;
 			for(var i = 0, j = win_stack.length; i<j; i++){
 				if(id === win_stack[i]){
-					win_stack.splice(i, 1);
+					// console.log('splice', win_stack.splice(i, 1));
 					break;
 				}
 			}
 		});
 		win_stack.push(win.id);
+		// console.log('push', win.id)
 		win.CONST = CONST;
 		return win;
 	}

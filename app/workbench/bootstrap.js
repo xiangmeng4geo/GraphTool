@@ -3,25 +3,26 @@
 /* global __dirname */
 !function(){
 	"use strict";
-	
+
 	var app = require('app');
 	var ipc = require('ipc');
 	var BrowserWindow = require('browser-window');
 	var path = require('path');
 	var _window = require('./window');
 	var logger = require('./logger');
-	
+	var command = require('./command');
+
 	global.gtStart = (new Date).getTime();
-	
+
 	// 捕获系统级错误，方便调试
 	process.on('uncaughtException', function(err){
 		logger.error(err);
 	});
-	
+
 	app.on('window-all-closed', function () {
 		app.quit();
 	});
-	
+
 	var subscibe_list = {};
 	ipc.on('subscibe', function(e, type){
 		var sender = e.sender;
@@ -62,7 +63,24 @@
 				}
 			}
 			onSingle();
-			net.createServer(function(){
+			net.createServer(function(c){
+				var tt_data;
+				var str = '';
+				c.on('data', function(d){
+					str += d;
+					clearTimeout(tt_data);
+					tt_data = setTimeout(function() {
+						command(str, function(msg) {
+							msg && c.write(msg);
+							c.end('\n');
+						});
+
+					}, 100);
+				}).on('end', function(){
+					/**
+					 * 直接写在end事件里的回调一直不会触发！！
+					 */
+				});
 				var win = _window.getLast();
 				if(win){
 					win.setAlwaysOnTop(true);
