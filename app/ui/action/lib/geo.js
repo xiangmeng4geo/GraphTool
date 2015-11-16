@@ -9259,6 +9259,12 @@ function readFile(filepath, cb) {
         isBinary = ext == '.shp'; // only support shp file
 
     fs.readFile(filepath, function(err, buf) {
+        if (err) {
+            for(var i in err){
+                console.log(i, err[i]);
+            }
+            return cb(new Error('"'+err.path+'"不存在!'));
+        }
         if (isBinary) {
             buf = toArrayBuffer(buf);
         } else {

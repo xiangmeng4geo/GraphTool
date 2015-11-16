@@ -10,16 +10,23 @@ Core.init(function(model) {
 
     //统一处理其它库里的错误信息
     model.on('error', function(err) {
-
+        console.log(err.message);
     });
+    var $geomap_container = $('#geomap_container');
+    var width_map, height_map;
+    function initSize() {
+        width_map = $geomap_container.width(),
+        height_map = $geomap_container.height();
+    }
+    initSize();
+
+
     var CONST_PATH_ZR = './action/lib/zr';
     var GeoMap = util_loadLib('map');
     var Shape = util_loadLib('shape');
+    var Pattern = util_loadLib('pattern');
     var d3 = util_loadLib('d3');
-    var projection = d3.geo.mercator()
-                            .center([107, 31])
-                            .scale(600)
-                            .translate([800/2, 800/2]);
+
 
     // var projection = d3.geo.conicEqualArea()
     //   .parallels([29.5, 45.5])
@@ -34,7 +41,21 @@ Core.init(function(model) {
     //   .center([107, 31])
     //   .parallels([27, 45]);
     var geomap;
+    // 得到一个投影并设置相关参数，让地图居中
+    function _getProjection(leftup, rightdown) {
+        var center = [leftup[0] + (rightdown[0] - leftup[0])/2, leftup[1] + (rightdown[1] - leftup[1])/2];
+        var p = d3.geo.mercator().center(center).translate([width_map/2, height_map/2]);
+        var p_a = p(leftup),
+            p_b = p(rightdown);
+        var scale_old = p.scale();
+        var scale = Math.min(width_map/(p_b[0] - p_a[0]) * scale_old, height_map/(p_b[1] - p_a[1]) * scale_old);
+        return p.scale(scale);
+    }
     C.script('geo', function() {
+        initSize();
+        var leftup = [72.57, 58],
+           rightdown = [136.60, 14.33];
+        var projection = _getProjection(leftup, rightdown);
         GeoMap.setGeo(Geo);
         GeoMap.setProjection(projection);
 
@@ -47,6 +68,7 @@ Core.init(function(model) {
             $div.html(new Date().getTime());
             setTimeout(run, 50);
         }
+
         setTimeout(run, 50);
         setTimeout(function() {
         var t_start = new Date();
@@ -59,7 +81,6 @@ Core.init(function(model) {
                                 var e = d3.event;
                                 projection.scale(e.scale);
                                 projection.translate(e.translate);
-                                // console.log(e.scale, e.translate, projection.scale(), projection.translate());
                                 // geomap.refresh('geo');
                                 geomap.refresh();
                             })
@@ -87,15 +108,16 @@ Core.init(function(model) {
                 shadowColor: 'rgba(0, 0, 0, 0.5)',
                 shadowOffsetX: 10,
                 shadowOffsetY: 10
-            }
+            },
+            // clip:{}
         });
         geo_files.push({
             file: 'E:/source/nodejs_project/GraphTool/shell/geo/data-source/china_province.json',
-            // clip: {
-            //     strokeStyle: 'rgba(255, 255, 255, 1)',
-            //     lineWidth: 0.8,
-            //     fillStyle: 'rgba(255, 255, 255, 1)',
-            // },
+            clip: {
+                strokeStyle: 'rgba(255, 255, 255, 1)',
+                lineWidth: 0.8,
+                fillStyle: 'rgba(255, 255, 255, 1)',
+            },
             style: {
                 strokeStyle: 'rgba(200, 200, 200, 0.9)',
                 lineWidth: 0.8,
@@ -153,15 +175,17 @@ Core.init(function(model) {
         var geomap = new GeoMap(model).init({
             container: $geomap
         }).setGeo(geo_files, function() {
+            model.emit('map.aftersetgeo');
             console.log('after setgeo', 'takes', new Date() - t_start);
-
 
             geomap.addOverlay(new Shape.Polygon([
                 [107, 31],
                 [115, 31],
                 [100, 50]
             ], {
-                fillStyle: 'rgba(0, 0, 255, 0.5)'
+                // fillStyle: 'rgba(0, 0, 255, 0.5)'
+                fillStyle: new Pattern.Streak(),
+                strokeStyle: 'rgba(0, 0, 0, 0.6)'
             }));
 
             geomap.addOverlay(new Shape.Polyline([
@@ -171,6 +195,15 @@ Core.init(function(model) {
             ], {
                 strokeStyle: 'orange',
                 lineWidth: 3
+            }));
+
+            geomap.addOverlay(new Shape.Text('我们是中国人\n你们好', {
+                x: 107,
+                y: 31,
+                fontSize: 30,
+                color: 'red',
+                fontStyle: 'italic',
+                fontWeight: 'bold'
             }));
         });
     }, 200);

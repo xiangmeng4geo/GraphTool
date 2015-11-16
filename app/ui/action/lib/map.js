@@ -140,7 +140,8 @@
                 ctx.strokeStyle = strokeStyle;
             }
             //只添加指定属性
-            ['shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY'].forEach(function(key) {
+            ['shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY',
+            'font', 'textAlign', 'textBaseline'].forEach(function(key) {
                 var val = style[key];
                 if(val !== undefined) {
                     ctx[key] = val;
@@ -205,16 +206,17 @@
             var file_path = geo_file.file;
             _fileImportor(file_path, function(err, dataset) {
                 if (err) {
-                    model.emit('error');
+                    _model.emit('error', err);
                 } else {
                     // dataset.layers[0].shapes.splice(1);
                     geo_file.dataset = dataset;
+                    // console.log(geo_file);
+                    // if(dataset.layers[0].data){
+                    //     console.log(dataset.layers[0].data.getRecords());
+                    // }
+                    _get(_this, CACHE_NAME_GEO).push(geo_file);
                 }
-                // console.log(geo_file);
-                // if(dataset.layers[0].data){
-                //     console.log(dataset.layers[0].data.getRecords());
-                // }
-                _get(_this, CACHE_NAME_GEO).push(geo_file);
+
                 _importNext();
             })
         }
