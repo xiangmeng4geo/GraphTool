@@ -1,5 +1,5 @@
 !function() {
-    function parse(command, cb) {
+    function _parse(command, cb) {
         var arr = command.split(/\s+/);
         var params = [];
         var tmp;
@@ -27,6 +27,6 @@
             cb && cb('正在处理。。。');
         }, 5000)
     }
-    parse('-f e:/test/1.txt -c -d abc');
-    module.exports = parse;
+    _parse('-f e:/test/1.txt -c -d abc');
+    module.exports = _parse;
 }()

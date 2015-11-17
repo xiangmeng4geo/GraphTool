@@ -241,7 +241,7 @@
         if (!_item_deal) {
             return;
         }
-        window._test = _item_deal;
+        // window._test = _item_deal;
         var dataset = _item_deal.dataset;
         var arcs = dataset.arcs;
         var layers = dataset.layers;
@@ -368,12 +368,13 @@
 
         var ctx = _getCtxByPrefix(_this, LAYER_NAME_WEATHER);
 
-        var style = shape.style;
+        var style = shape.style || {};
 
         _getPathStart(ctx, style)();
-        shape.drawPath(ctx, _projection);
+        shape.draw(ctx, _projection);
         _getPathEnd(ctx, style)();
 
+        shape.style = style;
         shapes.push(shape);
     }
 
@@ -414,7 +415,7 @@
             for (var i = 0, j = shapes.length; i<j; i++) {
                 var shp = shapes[i];
                 _getPathStart(ctx, shp.style)();
-                shp.drawPath(ctx, _projection);
+                shp.draw(ctx, _projection);
                 _getPathEnd(ctx, shp.style)();
             }
         }
