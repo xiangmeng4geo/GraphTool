@@ -6,7 +6,8 @@
     - [x] 重写verification
     - [x] 重写读取、解析micaps数据方式为异步,请[参考](./thread.md)
     - [ ] 重写缓存机制
-    - [ ] 定义读取数据接口，`datareader.js`
+    - [x] 定义读取数据接口，`datareader.js`
+        - [ ]  根据配色方案生成等值面图
 - [x] _寻找支持`es6`的压缩工具 [#minify.md](./minify.md)_
 - [x] 架构`main process`和`render process`通讯机制
 - [x] 移植登录页面逻辑
@@ -19,7 +20,7 @@
     - [x] 研究mapshper填多边形效率
         - [x] 分离源码
         - [x] 增加从arc及shape里生成最外层（国界）【只被使用一次的arc,并按一定顺序重组】及各省界
-        - [ ] 增加对分离出边界填色处理
+        - [x] 增加对分离出边界填色处理
     - [x] 把mapshper改造
     - [x] shp文件加载
     - [x] 地图在拖动及缩放动画时只重绘边界数据（国界省界）
