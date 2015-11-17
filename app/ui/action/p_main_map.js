@@ -57,27 +57,39 @@ Core.init(function(model) {
         var leftup = [72.57, 58],
            rightdown = [136.60, 14.33];
         var projection = _getProjection(leftup, rightdown);
+        // $geomap_container.on('click', function(e) {
+        //     var x = e.offsetX,
+        //         y = e.offsetY;
+        //     console.log(x, y, projection.invert([x, y]));
+        // });
+        var zoom = d3.behavior.zoom()
+            .translate(projection.translate())
+            .scale(projection.scale())
+            // .scaleExtent([projection.scale() /4 , projection.scale()*8])
+            .on('zoom', function() {
+                var e = d3.event;
+                projection.scale(e.scale);
+                projection.translate(e.translate);
+                // geomap.refresh('geo');
+                // geomap.refresh();
+                model.emit('refresh');
+            })
+            // .on('zoomend', function() {
+            //     console.log('end');
+            //     geomap.refresh('weather');
+            // });
+        model.on('projection.changeview', function(a, b) {
+            projection = _getProjection(a, b);
+            GeoMap.setProjection(projection);
+            zoom.translate(projection.translate()).scale(projection.scale());
+            // model.emit('refresh');
+        });
         GeoMap.setGeo(Geo);
         GeoMap.setProjection(projection);
 
         setTimeout(function() {
             var $geomap = $('#geomap');
-            var zoom = d3.behavior.zoom()
-                .translate(projection.translate())
-                .scale(projection.scale())
-                // .scaleExtent([projection.scale() /4 , projection.scale()*8])
-                .on('zoom', function() {
-                    var e = d3.event;
-                    projection.scale(e.scale);
-                    projection.translate(e.translate);
-                    // geomap.refresh('geo');
-                    // geomap.refresh();
-                    model.emit('refresh');
-                })
-                // .on('zoomend', function() {
-                //     console.log('end');
-                //     geomap.refresh('weather');
-                // });
+
             d3.select('#geomap').call(zoom);
 
             var _options = {
@@ -88,7 +100,8 @@ Core.init(function(model) {
                 Pattern: Pattern
             }
             require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
-            require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/map-china'))(_options);
+            // require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/map-china'))(_options);
+            require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
         }, 200);
     });
 

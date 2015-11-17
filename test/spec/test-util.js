@@ -191,4 +191,49 @@ describe('Util', function() {
 			result.should.equal('_');
 		});
 	});
+
+	describe('isfunction', function() {
+		var isFunction = Util.isFunction;
+		it('should be function', function() {
+			isFunction(function(){}).should.equal(true);
+			isFunction(new Function()).should.equal(true);
+		})
+		it('should not be function', function() {
+			isFunction(1).should.equal(false);
+			isFunction({}).should.equal(false);
+		})
+	});
+	describe('isArray', function() {
+		var isArray = Util.isArray;
+		it('should be Array', function() {
+			isArray([]).should.equal(true);
+			isArray(new Array()).should.equal(true);
+		})
+		it('should not be Array', function() {
+			isArray(1).should.equal(false);
+			isArray({}).should.equal(false);
+		})
+	});
+	describe('isPlainObject', function() {
+		var isPlainObject = Util.isPlainObject;
+		it('should be PlainObject', function() {
+			isPlainObject({}).should.equal(true);
+		})
+		it('should not be PlainObject', function() {
+			isPlainObject(1).should.equal(false);
+			isPlainObject([]).should.equal(false);
+
+			function Person() {
+				this.name = 'Person';
+			}
+			isPlainObject(new Person()).should.equal(false);
+		})
+	});
+	describe('extend', function() {
+		var extend = Util.extend;
+		it('should get extend object', function() {
+			extend({age: 10}, {name: 'test'}).should.deep.equal({age: 10, name: 'test'});
+			extend({age: 10}, {name: 'test'}, {man: [1, 2, 3]}).should.deep.equal({age: 10, name: 'test', man: [1, 2, 3]});
+		})
+	});
 });

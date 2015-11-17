@@ -126,9 +126,14 @@
 }()
 
 !function(){
-	var Async = require('../util').Async;
+	var util = require('../util');
+	var Async = util.Async;
 	var cb_info;
 	var interpolate = function(data, lnglat_arr, option, cb){
+		if (util.isFunction(option)) {
+			cb = option;
+			option = null;
+		}
 		Async.init(function(){
 			var T = thread;
 			var emit = T.emit;
@@ -258,7 +263,11 @@
 		}, cb_info)({
 			data: data,
 			arr: lnglat_arr,
-			option: option
+			option: util.extend({
+				numOfNearest: 4,
+				default_val: 999999,
+				interpolation_all: true
+			}, option)
 		}, cb);
 	}
 

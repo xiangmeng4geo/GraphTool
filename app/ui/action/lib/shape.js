@@ -128,13 +128,14 @@
 
         _this.style = {
             textAlign: text_align,
-            textBaseline: text_baseline
+            textBaseline: text_baseline,
+            normal: _style.normal
         };
 
 
         var lineheight = _getTextHeight(TEXT_TEST, font);
 
-        text = text.split('\n');
+        text = (''+text).split('\n');
         var x = _style.x,
             y = _style.y,
             lng = _style.lng,

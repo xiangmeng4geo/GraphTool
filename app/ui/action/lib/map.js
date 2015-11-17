@@ -1,6 +1,7 @@
 !function() {
     var LAYER_NAME_GEO = 'geo';
     var LAYER_NAME_WEATHER = 'weather';
+    var LAYER_NAME_NORMAL = 'normal';
 
     var CACHE_NAME_GEO = 'geo';
     var CACHE_NAME_CLIP = 'clip';
@@ -233,7 +234,7 @@
         var _item_deal;
         for (var i = 0, j = _data.length; i<j; i++) {
             var item = _data[i];
-            if (item.clip) {
+            if (item.clip || item.borderStyle) {
                 _item_deal = item;
                 break;
             }
@@ -320,7 +321,8 @@
             var data = {
                 shapes: shapes_new,
                 arcs: arcs,
-                style: _item_deal.clip
+                clip: _item_deal.clip,
+                style: _item_deal.borderStyle
             }
             _set(_this, CACHE_NAME_CLIP, data);
             return data;
@@ -332,7 +334,7 @@
     prop.setClip = function() {
         var _this = this;
         var data = _get(_this, CACHE_NAME_CLIP);
-        if (!data) {
+        if (!data || !data.clip) {
             return;
         }
         var shapes = data.shapes,
@@ -358,6 +360,40 @@
         // ctx.fill();
         ctx.clip();
     }
+    prop.border = function() {
+        var _this = this;
+        var data = _get(_this, CACHE_NAME_CLIP);
+        if (!data) {
+            return;
+        }
+        var shapes = data.shapes,
+            arcs = data.arcs;
+
+        if (!shapes || shapes.length == 0) {
+            return;
+        }
+        var style = data.style;
+        if (style) {
+            var isStroked = false;
+            var arr_test = ['strokeStyle', 'lineWidth'];
+            for (var i = 0, j = arr_test.length; i<j; i++) {
+                if (arr_test[i]) {
+                    isStroked = true;
+                    break;
+                }
+            }
+            if (isStroked) {
+                var ctx = _getCtxByPrefix(_this, LAYER_NAME_GEO);
+                var start = _getPathStart(ctx, style);
+                var end = _getPathEnd(ctx, style);
+                for (var i = 0, j = 1; i<j; i++) {
+                    start();
+                    _drawShape(ctx, [shapes[i]], arcs);
+                    end();
+                }
+            }
+        }
+    }
     /**
      * 添加覆盖物
      */
@@ -366,9 +402,9 @@
 
         var shapes = _get(_this, CACHE_NAME_SHAPES);
 
-        var ctx = _getCtxByPrefix(_this, LAYER_NAME_WEATHER);
-
         var style = shape.style || {};
+
+        var ctx = _getCtxByPrefix(_this, style.normal?LAYER_NAME_NORMAL: LAYER_NAME_WEATHER);
 
         _getPathStart(ctx, style)();
         shape.draw(ctx, _projection);
@@ -384,7 +420,7 @@
     prop.refresh = function(layer_name) {
         var _this = this;
         if (!layer_name) {
-            layer_name = [LAYER_NAME_GEO, LAYER_NAME_WEATHER];
+            layer_name = [LAYER_NAME_GEO, LAYER_NAME_WEATHER, LAYER_NAME_NORMAL];
         }else if (!_isArray(layer_name)) {
             layer_name = [layer_name];
         }
@@ -392,6 +428,9 @@
             var ctx = _getCtxByPrefix(_this, LAYER_NAME_GEO);
             var _canvas = ctx.canvas;
             ctx.clearRect(0, 0, _canvas.width, _canvas.height);
+
+            _this.border();
+
             var data_list = _get(_this, LAYER_NAME_GEO);
             _isArray(data_list) && data_list.forEach(function(data) {
                 var dataset = data.dataset;
@@ -407,16 +446,30 @@
         }
 
         var ctx = _getCtxByPrefix(_this, LAYER_NAME_WEATHER);
+        var ctx_normal = _getCtxByPrefix(_this, LAYER_NAME_NORMAL);
         var _canvas = ctx.canvas;
         ctx.clearRect(0, 0, _canvas.width, _canvas.height);
-        if (layer_name.indexOf(LAYER_NAME_WEATHER) > -1) {
+        ctx_normal.clearRect(0, 0, _canvas.width, _canvas.height);
+
+        var is_refresh_weather = layer_name.indexOf(LAYER_NAME_WEATHER) > -1,
+            is_refresh_normal = layer_name.indexOf(LAYER_NAME_NORMAL) > -1;
+
+        if (is_refresh_weather) {
             _this.setClip();
+        }
+
+        if (is_refresh_normal || is_refresh_weather) {
             var shapes = _get(_this, CACHE_NAME_SHAPES);
             for (var i = 0, j = shapes.length; i<j; i++) {
                 var shp = shapes[i];
-                _getPathStart(ctx, shp.style)();
-                shp.draw(ctx, _projection);
-                _getPathEnd(ctx, shp.style)();
+                var _style = shp.style;
+                var _ctx = is_refresh_normal && _style.normal ? ctx_normal: is_refresh_weather && !_style.normal? ctx: null;
+
+                if (_ctx) {
+                    _getPathStart(_ctx, _style)();
+                    shp.draw(_ctx, _projection);
+                    _getPathEnd(_ctx, _style)();
+                }
             }
         }
     }
@@ -457,11 +510,12 @@
             top: 0,
             width: '100%',
             height: '100%',
-            'background-color': '#BFEAFB'
+            // 'background-color': '#BFEAFB'
         }).appendTo($container);
         // 添加显示geo和weather信息的两个canvas
         var $canvas_geo = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_GEO)).appendTo($div);
         var $canvas_weather = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_WEATHER)).appendTo($div);
+        var $canvas_normal = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_NORMAL)).appendTo($div);
 
         $canvas_weather.get(0).getContext('2d').save();
         _set(_this, 'options', options);

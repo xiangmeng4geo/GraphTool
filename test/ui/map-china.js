@@ -64,12 +64,13 @@
     // });
     geo_files.push({
         file: 'H:/docs/2015/蓝PI相关/地理信息/陕西/市界+县界/新建文件夹/市界+所有县界/地市县界/地市界.shp',
-        // clip: {
-        //
-        // },
+        clip: {
+            strokeStyle: 'rgab(255, 0, 0, 1)',
+            lineWidth: 3
+        },
         style: {
             strokeStyle: 'rgab(0, 255, 0, 1)',
-            lineWidth: 2,
+            lineWidth: 1,
             // fillStyle: 'rgba(0, 0 , 200, 0.5)'
         }
     });

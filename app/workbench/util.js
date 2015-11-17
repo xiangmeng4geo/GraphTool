@@ -129,6 +129,10 @@
 	 */
 	function grid(lng0, lat0, lng1, lat1, GRID_SPACE){
 		GRID_SPACE || (GRID_SPACE = 0.5);
+		lng0 = parseFloat(lng0);
+		lat0 = parseFloat(lat0);
+		lng1 = parseFloat(lng1);
+		lat1 = parseFloat(lat1);
 		var arr = [];
 		var x_num = Math.ceil((lng1 - lng0)/GRID_SPACE),
 			y_num = Math.ceil((lat1 - lat0)/GRID_SPACE);
@@ -329,6 +333,96 @@
 		}
 	}
 
+	var class2type = {};
+	"Boolean Number String Function Array Date RegExp Object Error".split(" ").forEach(function(v) {
+		class2type['[object '+v+']'] = v.toLowerCase();
+	});
+	var _type = function(obj) {
+		if (obj == null) {
+			return obj + '';
+		}
+
+		var _typeof = typeof obj;
+		return _typeof === 'object' || _typeof === 'function' ? class2type[({}).toString.call(obj)] || 'object': _typeof;
+	}
+
+	function _isFunction(obj) {
+		return _type(obj) === 'function';
+	}
+	function _isPlainObject(obj) {
+		if (_type(obj) != 'object') {
+			return false;
+		}
+		if (obj.constructor && !obj.constructor.prototype.hasOwnProperty('isPrototypeOf')) {
+			return false;
+		}
+		return true;
+	}
+	var _isArray = Array.isArray;
+
+	function _extend() {
+		var options, name, src, copy, copyIsArray, clone,
+			target = arguments[0] || {},
+			i = 1,
+			length = arguments.length,
+			deep = false;
+			// Handle a deep copy situation
+		if ( typeof target === "boolean" ) {
+			deep = target;
+
+			// skip the boolean and the target
+			target = arguments[ i ] || {};
+			i++;
+		}
+		// Handle case when target is a string or something (possible in deep copy)
+		if ( typeof target !== "object" && _isFunction(target) ) {
+			target = {};
+		}
+
+		// extend jQuery itself if only one argument is passed
+		if ( i === length ) {
+			target = this;
+			i--;
+		}
+
+		for ( ; i < length; i++ ) {
+			// Only deal with non-null/undefined values
+			if ( (options = arguments[ i ]) != null ) {
+				// Extend the base object
+				for ( name in options ) {
+					src = target[ name ];
+					copy = options[ name ];
+
+					// Prevent never-ending loop
+					if ( target === copy ) {
+						continue;
+					}
+
+					// Recurse if we're merging plain objects or arrays
+					if ( deep && copy && ( _isPlainObject(copy) || (copyIsArray = _isArray(copy)) ) ) {
+						if ( copyIsArray ) {
+							copyIsArray = false;
+							clone = src && _isArray(src) ? src : [];
+
+						} else {
+							clone = src && _isPlainObject(src) ? src : {};
+						}
+
+						// Never move original objects, clone them
+						target[ name ] = jQuery.extend( deep, clone, copy );
+
+					// Don't bring in undefined values
+					} else if ( copy !== undefined ) {
+						target[ name ] = copy;
+					}
+				}
+			}
+		}
+
+		// Return the modified object
+		return target;
+	}
+
 	/*对外提供API*/
 	Util.verification = verification;
 	Util.file = file;
@@ -339,6 +433,11 @@
 	Util.Digit = Digit;
 	Util.Polygon = Polygon;
 	Util.serialize = _fn_serialize;
+
+	Util.isArray = _isArray;
+	Util.isPlainObject = _isPlainObject;
+	Util.isFunction = _isFunction;
+	Util.extend = _extend;
 
 	module.exports = Util;
 }();
