@@ -4,9 +4,9 @@
  */
 !function(){
 	'use strict'
-	
+
 	var path = require('path');
-	
+
 	function format(url){
 		var arr = url.replace(/\\/g, '/').split(':');
 		return [arr[0].toUpperCase(), arr[1]].join(':');
@@ -19,6 +19,9 @@
 	var path_config = format(path.join(path_base, 'config'));
 
 	module.exports = {
+		COLOR: {
+			TRANSPANT: 'rgba(0,0,0,0)'
+		},
 		PATH: {
 			BASE: path_base,
 			CONF: path_conf,

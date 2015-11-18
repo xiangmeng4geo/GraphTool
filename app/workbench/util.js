@@ -422,6 +422,44 @@
 		// Return the modified object
 		return target;
 	}
+	var COLOR_TRANSPANT = CONST.COLOR.TRANSPANT;
+	function color(blendent, use_check) {
+		var len_blendent = 0;
+		if (!blendent || (len_blendent = blendent.length) == 0) {
+			return false;
+		}
+		// 对图例进行验证
+		for (var i = 0; i<len_blendent; i++) {
+			var v = blendent[i];
+			if(!v || !v.colors){
+				return false;
+			}
+		}
+		var isHaveMany = len_blendent > 1;
+		function _get(val, range, is_return_index) {
+			for (var i = 0, j = range.length; i<j; i++) {
+				var case_range = range[i];
+				var val_range = case_range.val;
+				if(val > val_range[0] && val <= val_range[1]){
+					var c = !use_check || case_range.is_checked? case_range.color: COLOR_TRANSPANT;
+					return is_return_index? [c, i]: c;
+				}
+			}
+			return is_return_index? [COLOR_TRANSPANT, j]: COLOR_TRANSPANT;
+		}
+		return function (val, code, is_return_index) {
+			if (isHaveMany) {
+				for (var i = 0; i<len_blendent; i++){
+					var v = blendent[i];
+					if(code == v.val.v){
+						return _get(val, v.colors, is_return_index);
+					}
+				}
+			} else {
+				return _get(val, blendent[0].colors, is_return_index);
+			}
+		}
+	}
 
 	/*对外提供API*/
 	Util.verification = verification;
@@ -438,6 +476,8 @@
 	Util.isPlainObject = _isPlainObject;
 	Util.isFunction = _isFunction;
 	Util.extend = _extend;
+
+	Util.color = color;
 
 	module.exports = Util;
 }();
