@@ -21,8 +21,6 @@
         }
     });
 
-
-
     module.exports = function init(options) {
         var GeoMap = options.GeoMap,
             Shape = options.Shape,
@@ -80,7 +78,7 @@
                 type: 'shanxi',
                 file: 'H:/docs/2015/蓝PI相关/各方需求/陕西/数据/降水.txt'
             }, function(err, data) {
-                console.log(err, data);
+                // console.log(err, data);
                 var data_origin = data.data;
                 for (var i = 0, j = data_origin.length; i<j; i++) {
                     var item = data_origin[i];
@@ -97,22 +95,6 @@
                     }
                 }
             });
-            // getData('H:/docs/2015/蓝PI相关/各方需求/陕西/数据/降水.txt', function(err, data) {
-            //     for (var i = 0, j = data.length; i<j; i++) {
-            //         var item = data[i];
-            //         var item_show = names[item.name];
-            //         if (item_show) {
-            //             geomap.addOverlay(new Shape.Text(item.v, {
-            //                 lng: item_show.lng,
-            //                 lat: item_show.lat,
-            //                 fontSize: 12,
-            //                 color: 'rgba(0, 0, 0, 0.8)',
-            //                 offsetY: -10,
-            //                 offsetX: 6
-            //             }));
-            //         }
-            //     }
-            // });
         });
     }
 }()
