@@ -513,6 +513,7 @@
     return Conrec;
   })();
 
+  var MIN_POINT_NUM = 30;
   function sortEsc(arr){
     arr.sort(function(a, b){
       return a - b;
@@ -536,7 +537,6 @@
     S += p_a.x * p_b.y - p_b.x*p_a.y;
     return S/2;
   }
-
   // B样条插值平滑算法
   var smoothBSpline = (function(){
     // https://github.com/Tagussan/BSpline
@@ -664,7 +664,7 @@
       degree = degree || 4;
       var len = points.length;
       var num = len * (factor || 5);
-      num < 20 && (num = 20);
+      num < MIN_POINT_NUM && (num = Math.max(num*5, MIN_POINT_NUM));
       // console.log('factor = '+factor+', len = '+len +', num = '+num+', degree = '+degree);
       var spline = new BSpline(points, degree, true);
       var points_return = [];
@@ -676,24 +676,55 @@
       return points_return;
     }
   })();
+
+  var MIN_DIS = Math.pow(0.2, 2);
   var dealItems = (function(){
-    var MIN_DIS = Math.pow(0.2, 2);
 
     return function(items){
-      // 不对面积特别小且点比较少的数据进行处理
-      // if(items.length < 20 ){
-      //   return items;
-      // }
+      var len = items.length;
+      var is_small = len < MIN_POINT_NUM;
       var startPoint = items[0];
       var items_new = [startPoint];
-      for(var i = 1, j = items.length; i<j; i++){
+      for(var i = 1, j = len-1; i<j; i++){
         var item = items[i];
-        if(Math.pow(startPoint.x - item.x, 2) + Math.pow(startPoint.y - item.y, 2) > MIN_DIS){
+        if(is_small || Math.pow(startPoint.x - item.x, 2) + Math.pow(startPoint.y - item.y, 2) > MIN_DIS){
           items_new.push(item);
           startPoint = item;
         }
       }
-      return smoothBSpline(items_new, 5);
+      items_new.push(items[len-1]);
+
+      // 找到三个点间角度最小的点做项
+      var min_index = 0;
+      var min_radiu = Math.PI*2;
+      for (var i = 0, j = items_new.length; i<j; i++) {
+        var p = items_new[i],
+            p_prev = items_new[i == 0? j-1: i - 1],
+            p_next = items_new[i+1 == j? 0: i+1];
+        var x_p = p.x,
+            x_prev = p_prev.x,
+            x_next = p_next.x,
+            y_p = p.y,
+            y_prev = p_prev.y,
+            y_next = p_next.y;
+        if (x_p == x_prev && x_p == x_next || (y_p == y_prev && y_p == y_next)) {
+            min_index = i;
+            break;
+        } else {
+            var ab = Math.sqrt(Math.pow(x_p - x_prev, 2) + Math.pow(y_p - y_prev, 2));
+            var ac = Math.sqrt(Math.pow(x_p - x_next, 2) + Math.pow(y_p - y_next, 2));
+            var v = Math.abs(((x_prev - x_p) * (x_next - x_p) + (y_prev - y_p) * (y_next - y_p))/ab*ac);
+            if (min_radiu > v) {
+                min_radiu = v;
+                min_index = i;
+            }
+        }
+      }
+      if (min_index > 0) {
+          items_new = items_new.slice(min_index).concat(items_new.slice(0, min_index));
+      }
+
+      return smoothBSpline(items_new, 4);
     }
   })();
   var util = require('./util');
@@ -715,6 +746,10 @@
    * 6. 生成返回数据
   */
   function conrec(rasterData, blendent, cb){
+    var space = rasterData[1][0].x - rasterData[0][0].x;
+    if (space < 0.5) {
+        MIN_DIS = Math.pow(Math.max(0.1, space*2), 2)
+    }
     SHOW_CONSOLE && console.time('conrec');
     var color_method = util_color(blendent);
     if (!color_method) {

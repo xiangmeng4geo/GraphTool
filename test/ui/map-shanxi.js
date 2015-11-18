@@ -15,7 +15,7 @@
         clip: true,
         borderStyle: {
             strokeStyle: 'rgba(0, 0, 0, 0.8)',
-            lineWidth: 2,
+            lineWidth: 3,
             shadowBlur: 10,
             shadowColor: 'rgba(0, 0, 0, 0.5)',
             shadowOffsetX: 5,
@@ -36,7 +36,7 @@
             geomap.refresh();
         });
         model.on('render', function(shapes) {
-            console.log(shapes);
+            console.log('render');
             shapes.forEach(function(shape) {
                 geomap.addOverlay(shape);
             });
@@ -165,7 +165,8 @@
                     // }
                 }
                 console.log('after idw');
-                C.remote('conrec')(data.interpolate, blendent, function(err, data_conrec) {
+                // C.remote('conrec')
+                require('../../app/workbench/conrec')(data.interpolate, blendent, function(err, data_conrec) {
                     if (err) {
                         return model.emit('error', err);
                     }
