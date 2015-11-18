@@ -86,7 +86,7 @@
     module.exports = function init(options) {
         var GeoMap = options.GeoMap,
             Shape = options.Shape,
-            $geomap = options.$geomap,
+            $geomap = options.$geomap.css('background-color', '#71B7fd'),
             model = options.model,
             Pattern = options.Pattern;
         model.on('refresh', function() {

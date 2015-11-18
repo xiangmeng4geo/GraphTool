@@ -54,7 +54,9 @@
                     }
 
                     var num = 50;
-                    var lnglat_arr = util.grid(lng0, lat0, lng1, lat1, Math.min((lng1 - lng0)/num, (lat1 - lat0)/num));
+                    var space = Math.abs(Math.min((lng1 - lng0)/num, (lat1 - lat0)/num));
+                    var space_add = space * 5;
+                    var lnglat_arr = util.grid(lng0 - space_add, lat0 - space_add, lng1 + space_add, lat1 + space_add, space);
 
                     idw(data, lnglat_arr, function(err_idw, data_idw) {
                         if (err_idw) {

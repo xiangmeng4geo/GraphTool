@@ -129,7 +129,7 @@
         _this.style = {
             textAlign: text_align,
             textBaseline: text_baseline,
-            normal: _style.normal
+            normal: _style.normal === false || true
         };
 
 

@@ -264,7 +264,7 @@
 			data: data,
 			arr: lnglat_arr,
 			option: util.extend({
-				numOfNearest: 4,
+				numOfNearest: 3,
 				default_val: 999999,
 				interpolation_all: true
 			}, option)

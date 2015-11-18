@@ -513,8 +513,8 @@
             // 'background-color': '#BFEAFB'
         }).appendTo($container);
         // 添加显示geo和weather信息的两个canvas
-        var $canvas_geo = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_GEO)).appendTo($div);
         var $canvas_weather = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_WEATHER)).appendTo($div);
+        var $canvas_geo = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_GEO)).appendTo($div);
         var $canvas_normal = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_NORMAL)).appendTo($div);
 
         $canvas_weather.get(0).getContext('2d').save();

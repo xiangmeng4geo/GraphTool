@@ -1,19 +1,21 @@
 !function() {
+    var C = Core;
     var fs = require('fs');
-    var datareader = require('../../app/workbench/datareader');
+    var datareader = C.remote('datareader');
+    var Render = C.load('render');
 
     var geo_files = [];
     geo_files.push({
         file: 'H:/docs/2015/蓝PI相关/地理信息/陕西/市界+县界/新建文件夹/市界+所有县界/地市县界/地市界.shp',
         style: {
             strokeStyle: 'rgba(200, 200, 200, 1)',
-            lineWidth: 2,
-            fillStyle: 'rgba(255, 255, 255, 1)'
+            lineWidth: 0.5,
+            // fillStyle: 'rgba(255, 255, 255, 1)'
         },
         clip: true,
         borderStyle: {
             strokeStyle: 'rgba(0, 0, 0, 0.8)',
-            lineWidth: 6,
+            lineWidth: 2,
             shadowBlur: 10,
             shadowColor: 'rgba(0, 0, 0, 0.5)',
             shadowOffsetX: 5,
@@ -27,10 +29,73 @@
             $geomap = options.$geomap,
             model = options.model,
             Pattern = options.Pattern;
+
+        Render.setModel(model);
         model.emit('projection.changeview', [104.72582600905484, 40.29761417442774], [113.21011197110165, 31.080076687873927]);
         model.on('refresh', function() {
             geomap.refresh();
         });
+        model.on('render', function(shapes) {
+            console.log(shapes);
+            shapes.forEach(function(shape) {
+                geomap.addOverlay(shape);
+            });
+        });
+        var blendent = [{
+			"val": {
+				"n": "温度",
+				"v": "102"
+			},
+			"color_start": "#0000ff",
+			"color_end": "#ff0000",
+			"is_stripe": false,
+			"number_min": "-30",
+			"number_max": "40",
+			"number_level": "8",
+			"colors": [{
+				"is_checked": true,
+				"color": "#1f1885",
+				"color_text": "#ffffff",
+				"val": [0, 0.2],
+				"text": "1, 10",
+				"order": 0
+			}, {
+				"is_checked": true,
+				"color": "#1149d8",
+				"color_text": "#ffffff",
+				"val": [0.2, 0.6],
+				"text": "10, 15",
+				"order": 0
+			}, {
+				"is_checked": true,
+				"color": "#4db4f5",
+				"color_text": "#000000",
+				"val": [0.6, 1],
+				"text": "15,20",
+				"order": 0
+			}, {
+				"is_checked": true,
+				"color": "#f9de46",
+				"color_text": "#000000",
+				"val": [1, 1.5],
+				"text": "20, 25",
+				"order": 0
+			}, {
+				"is_checked": true,
+				"color": "#f9f2bb",
+				"color_text": "#000000",
+				"val": [1.5, 2],
+				"text": "25, 30",
+				"order": 0
+			}, {
+				"is_checked": true,
+				"color": "#f9de46",
+				"color_text": "#000000",
+				"val": [2, 99999],
+				"text": "30以上",
+				"order": 0
+			}]
+		}];
         var t_start = new Date();
         var geomap = new GeoMap(model).init({
             container: $geomap
@@ -78,22 +143,36 @@
                 type: 'shanxi',
                 file: 'H:/docs/2015/蓝PI相关/各方需求/陕西/数据/降水.txt'
             }, function(err, data) {
+                if (err) {
+                    return model.emit('error', err);
+                }
                 // console.log(err, data);
                 var data_origin = data.data;
                 for (var i = 0, j = data_origin.length; i<j; i++) {
                     var item = data_origin[i];
                     var item_show = names[item.name];
-                    if (item_show) {
+                    // if (item_show) {
                         geomap.addOverlay(new Shape.Text(item.v, {
-                            lng: item_show.lng,
-                            lat: item_show.lat,
+                            // lng: item_show.lng,
+                            // lat: item_show.lat,
+                            lng: item.x,
+                            lat: item.y,
                             fontSize: 12,
-                            color: 'rgba(0, 0, 0, 0.8)',
+                            color: item_show?'rgba(255, 0, 0, 0.8)': 'rgba(0, 0, 0, 0.8)',
                             offsetY: -10,
                             offsetX: 6
                         }));
-                    }
+                    // }
                 }
+                console.log('after idw');
+                C.remote('conrec')(data.interpolate, blendent, function(err, data_conrec) {
+                    if (err) {
+                        return model.emit('error', err);
+                    }
+                    console.log('after conrec');
+                    // console.log(data_conrec);
+                    Render.render(data_conrec);
+                });
             });
         });
     }
