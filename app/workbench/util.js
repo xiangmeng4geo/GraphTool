@@ -4,7 +4,11 @@
 	var fs = require('fs'),
 		path = require('path'),
 		crypto = require('crypto'),
-		ipc = require('ipc');
+		ipc;
+
+	try {
+		ipc = require('ipc');// 防止测试框架报错
+	} catch(e){}
 
 	var file_verification = 'verification';
 	var CONST = require('./const');
@@ -60,11 +64,25 @@
 	function exists(_p){
 		return fs.existsSync(_p);
 	}
+	// 同步新建目录
+	function mkdirSync(mkPath) {
+		try{
+			var parentPath = path.dirname(mkPath);
+			if(!exists(parentPath)){
+				mkdirSync(parentPath);
+			}
+			if(!exists(mkPath)){
+				fs.mkdirSync(mkPath);
+			}
+			return true;
+		}catch(e){}
+	}
 	var file = {
 		read: read,
 		write: write,
 		exists: exists,
-		rm: rmfileSync
+		rm: rmfileSync,
+		mkdir: mkdirSync
 	}
 
 	/**
@@ -337,6 +355,12 @@
 		}
 	}
 
+	/**
+	 * 对象序列化并得到一个md5字符串
+	 */
+	_fn_serialize.md5 = function(obj) {
+		return encrypt(_fn_serialize(obj));
+	}
 	var class2type = {};
 	"Boolean Number String Function Array Date RegExp Object Error".split(" ").forEach(function(v) {
 		class2type['[object '+v+']'] = v.toLowerCase();
@@ -467,7 +491,8 @@
 
 	// 触发UI线程里model绑定的事件
 	function model_emit(name, data) {
-		ipc.emit('ui', {
+		// 测试框架中没有ipc模块
+		ipc && ipc.emit('ui', {
 			name: 'ui',
 			type: name,
 			msg: data

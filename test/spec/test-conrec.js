@@ -84,7 +84,7 @@ describe('conrec', function() {
 		}]
     it('should get error', function(done) {
         idw(data, arr, function(e, data){
-            conrec(data, null, function(err, data) {
+            conrec(data, null, false, function(err, data) {
                 err.should.is.a('error');
                 done();
             })
@@ -92,7 +92,7 @@ describe('conrec', function() {
     })
     it('should get result', function(done) {
         idw(data, arr, function(err, data){
-            conrec(data, blendent, function(err, data) {
+            conrec(data, blendent, false, function(err, data) {
                 expect(err).to.be.a('null');
                 data.should.have.property('r');
                 data.should.have.property('list');

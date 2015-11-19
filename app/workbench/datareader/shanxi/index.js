@@ -11,13 +11,18 @@
             var arr = [];
             var lines = data.toString().split(/[\r\n]+/);
             lines.forEach(function(line) {
-                var a = line.split('|');
-                arr.push({
-                    name: a[0],
-                    x: parseFloat(a[1]),
-                    y: parseFloat(a[2]),
-                    v: parseFloat(a[3])
-                });
+                if ((line = line.trim())) {
+                    var a = line.split('|');
+                    if (isNaN(a[1]) || isNaN(a[2]) || isNaN(a[3])) {
+                        return;
+                    }
+                    arr.push({
+                        name: a[0],
+                        x: parseFloat(a[1]),
+                        y: parseFloat(a[2]),
+                        v: parseFloat(a[3])
+                    });
+                }
             });
 
             cb && cb(null, arr);

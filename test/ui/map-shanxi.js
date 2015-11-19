@@ -36,7 +36,6 @@
             geomap.refresh();
         });
         model.on('render', function(shapes) {
-            console.log('render');
             var t_start = new Date();
             shapes.forEach(function(shape) {
                 geomap.addOverlay(shape);

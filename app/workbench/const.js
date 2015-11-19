@@ -17,6 +17,7 @@
 	var path_workbench = format(path.join(path_base, 'workbench'));
 	var path_conf = format(path.join(path_base, 'conf'));
 	var path_config = format(path.join(path_base, 'config'));
+	var path_cache = format(path.join(path_base, 'cache'));
 
 	module.exports = {
 		COLOR: {
@@ -28,7 +29,8 @@
 			CONFIG: path_config,
 			UI: path_ui,
 			UI_CONF: path_ui_conf,
-			WORKBENCH: path_workbench
+			WORKBENCH: path_workbench,
+			CACHE: path_cache
 		},
 		LOG: {
 			PATH: format(path.join(path_base, 'logs')),

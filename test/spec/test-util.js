@@ -164,6 +164,7 @@ describe('Util', function() {
 
 	describe('serialize', function(){
 		var serialize = Util.serialize;
+		var md5 = serialize.md5;
 		it('serialize value', function(){
 			var result;
 			result = serialize(1);
@@ -189,6 +190,12 @@ describe('Util', function() {
 			result = serialize();
 			result.should.be.a('string');
 			result.should.equal('_');
+		});
+
+		it('serialize.md5, should get a string with length of 40', function() {
+			var result = md5('test');
+			result.should.be.a('string');
+			result.should.have.length.within(40, 40)
 		});
 	});
 
