@@ -69,3 +69,5 @@
     > 找到点中和前后三个点角度最小的点做项点
 
     * http://resources.arcgis.com/en/help/main/10.1/index.html#//007000000013000000
+- [x] 优化polygon解析速度
+    * https://github.com/tonny-zhang/docs/issues/1#user-content-1
