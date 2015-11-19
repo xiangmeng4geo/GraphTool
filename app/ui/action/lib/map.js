@@ -549,5 +549,32 @@
     prop.config = function(options) {
 
     }
+    prop.export = function(conf) {
+        var _this = this;
+
+        var canvas_geo = _getCtxByPrefix(_this, LAYER_NAME_GEO).canvas;
+        var canvas_weather = _getCtxByPrefix(_this, LAYER_NAME_WEATHER).canvas;
+        var canvas_normal = _getCtxByPrefix(_this, LAYER_NAME_NORMAL).canvas;
+
+        var width = canvas_geo.width,
+            height = canvas_geo.height;
+
+        var canvas_tmp = _getCanvas(width, height).get(0);
+        var ctx = canvas_tmp.getContext('2d');
+
+        if (conf) {
+            var bgcolor = conf.bgcolor || 'rgba(255, 255, 255, 1)';
+            ctx.fillStyle = bgcolor;
+            ctx.fillRect(0, 0, width, height);
+        }
+
+        ctx.drawImage(canvas_weather, 0, 0, width, height);
+        ctx.drawImage(canvas_geo, 0, 0, width, height);
+        ctx.drawImage(canvas_normal, 0, 0, width, height);
+
+        var result = canvas_tmp.toDataURL();
+        console.log(result);
+        return result;
+    }
     module.exports = GeoMap;
 }()

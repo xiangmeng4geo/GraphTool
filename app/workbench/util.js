@@ -56,7 +56,7 @@
 		return null;
 	}
 	function write(_p, content){
-		if(typeof content === 'object'){
+		if (typeof content === 'object' && !(content instanceof Buffer)) {
 			content = JSON.stringify(content);
 		}
 		fs.writeFileSync(_p, content);
@@ -77,12 +77,20 @@
 			return true;
 		}catch(e){}
 	}
+	function saveBase64(save_file_name, img_data){
+		img_data = img_data.substring(img_data.indexOf('base64,') + 7);
+		img_data = new Buffer(img_data, 'base64');
+		write(save_file_name, img_data);
+	}
 	var file = {
 		read: read,
 		write: write,
 		exists: exists,
 		rm: rmfileSync,
-		mkdir: mkdirSync
+		mkdir: mkdirSync,
+		Image: {
+			save: saveBase64
+		}
 	}
 
 	/**

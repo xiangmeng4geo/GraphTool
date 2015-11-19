@@ -41,6 +41,9 @@
                 geomap.addOverlay(shape);
             });
             model.emit('log', 'render data takes '+(new Date() - t_start)+' ms!');
+
+            var util = C.remote('util');
+            util.file.Image.save(util.path.join(C.remote('const').PATH.CACHE, '1.png'), geomap.export());
         });
         var blendent = [{
 			"val": {
