@@ -3,7 +3,8 @@
 
 	var fs = require('fs'),
 		path = require('path'),
-		crypto = require('crypto');
+		crypto = require('crypto'),
+		ipc = require('ipc');
 
 	var file_verification = 'verification';
 	var CONST = require('./const');
@@ -174,6 +175,9 @@
 			t.destroy();
 		});
 		t.on('info', cb_info); // 对thread原生函数注册调试
+		t.on('model.log', function(msg) {
+			model_emit_log(msg);
+		});
 		if(typeof path_js === 'function'){
 			var js = '!'+path_js+'()';
 			t.eval(js);
@@ -461,6 +465,22 @@
 		}
 	}
 
+	// 触发UI线程里model绑定的事件
+	function model_emit(name, data) {
+		ipc.emit('ui', {
+			name: 'ui',
+			type: name,
+			msg: data
+		});
+	}
+	function model_emit_log(msg) {
+		model_emit('log', msg);
+	}
+	var Model = {
+		emit: model_emit,
+		log: model_emit_log
+	}
+
 	/*对外提供API*/
 	Util.verification = verification;
 	Util.file = file;
@@ -478,6 +498,8 @@
 	Util.extend = _extend;
 
 	Util.color = color;
+
+	Util.Model = Model;
 
 	module.exports = Util;
 }();

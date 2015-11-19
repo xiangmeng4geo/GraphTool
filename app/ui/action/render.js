@@ -2,6 +2,7 @@
     var Shape = Core.loadLib('shape');
     var _model;
     function _render(data) {
+        var t_start = new Date();
         var shapes = [];
         if (data) {
             var relation = data.r,
@@ -12,17 +13,14 @@
                     var index = v[0],
                         color = v[1],
                         indexs_clip = v[2];
-                    var items = data_list[index];
-                    var points = [];
-                    items.forEach(function(item) {
-                        points.push([item.x, item.y]);
-                    });
-                    shapes.push(new Shape.Polygon(points, {
+                        
+                    shapes.push(new Shape.Polygon(data_list[index], {
                         fillStyle: color
                     }));
                 });
             }
         }
+        _model.emit('log', 'render deal data takes '+(new Date() - t_start)+' ms!');
         if (shapes && shapes.length > 0) {
             _model.emit('render', shapes);
         }

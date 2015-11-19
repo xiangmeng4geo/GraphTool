@@ -11,8 +11,9 @@
     var MIN_LEN = _getPixelRatio() > 1 ? 1 : 0.6;
 
     function _drawPath(ctx, points, projection, needClose) {
+        var isObj = points.isObj;
         var first = points[0];
-        var pixel_first = projection(first);
+        var pixel_first = projection(isObj? [first.x, first.y]: first);
         var x = xp = pixel_first[0],
             y = yp = pixel_first[1];
 
@@ -20,7 +21,7 @@
 
         for (var i = 1, j = points.length; i<j; i++) {
             var p = points[i];
-            var pixel = projection(p);
+            var pixel = projection(isObj?[p.x, p.y]: p);
             x = pixel[0];
             y = pixel[1];
             if (Math.abs(x - xp) > MIN_LEN || Math.abs(y - yp) > MIN_LEN) {
@@ -34,9 +35,9 @@
             ctx.lineTo(x, y);
         }
 
-        if (needClose) {
-            ctx.lineTo(pixel_first[0], pixel_first[1]);
-        }
+        // if (needClose) {
+        //     ctx.lineTo(pixel_first[0], pixel_first[1]);
+        // }
     }
 
     function Polygon(points, style) {

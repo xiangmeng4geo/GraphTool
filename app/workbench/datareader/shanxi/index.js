@@ -26,9 +26,12 @@
     function _parse(options, callback) {
         callback || (callback = function() {});
         var file_path = options.file;
+        var error_msg = '['+file_path+']'
         _getData(file_path, function(err, data) {
             if (err) {
-                callback(new Error('no file'));
+                callback({
+                    msg: error_msg + '[no exists!]'
+                });
             } else {
                 if (data && data.length > 0) {
                     var first = data[0];
@@ -60,7 +63,9 @@
 
                     idw(data, lnglat_arr, function(err_idw, data_idw) {
                         if (err_idw) {
-                            callback(new Error('idw interpolate error'));
+                            callback({
+                                msg: error_msg + '[idw interpolate error!]'
+                            });
                         } else {
                             callback(null, {
                                 data: data,
@@ -69,7 +74,9 @@
                         }
                     });
                 } else {
-                    callback(new Error('no data'));
+                    callback({
+                        msg: error_msg + '[no data!]'
+                    });
                 }
             }
         });

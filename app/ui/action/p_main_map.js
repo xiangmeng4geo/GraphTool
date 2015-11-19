@@ -10,7 +10,7 @@ Core.init(function(model) {
 
     //统一处理其它库里的错误信息
     model.on('error', function(err) {
-        console.log(err.message);
+        console.log(err.msg||err.message||err);
     });
     var $geomap_container = $('#geomap_container');
     var width_map, height_map;

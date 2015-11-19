@@ -1,7 +1,7 @@
 !function() {
     var C = Core;
     var fs = require('fs');
-    var datareader = C.remote('datareader');
+    var Reader = C.remote('datareader');
     var Render = C.load('render');
 
     var geo_files = [];
@@ -37,9 +37,11 @@
         });
         model.on('render', function(shapes) {
             console.log('render');
+            var t_start = new Date();
             shapes.forEach(function(shape) {
                 geomap.addOverlay(shape);
             });
+            model.emit('log', 'render data takes '+(new Date() - t_start)+' ms!');
         });
         var blendent = [{
 			"val": {
@@ -139,7 +141,7 @@
                 normal: true
             }));
 
-            datareader.read({
+            Reader.read({
                 type: 'shanxi',
                 file: 'H:/docs/2015/蓝PI相关/各方需求/陕西/数据/降水.txt'
             }, function(err, data) {
@@ -164,13 +166,13 @@
                         }));
                     // }
                 }
-                console.log('after idw');
-                // C.remote('conrec')
-                require('../../app/workbench/conrec')(data.interpolate, blendent, function(err, data_conrec) {
+                var conrec = C.remote('conrec');
+                // var conrec = require('../../app/workbench/conrec');
+                conrec(data.interpolate, blendent, true, function(err, data_conrec) {
                     if (err) {
                         return model.emit('error', err);
                     }
-                    console.log('after conrec');
+                    // console.log('after conrec');
                     // console.log(data_conrec);
                     Render.render(data_conrec);
                 });

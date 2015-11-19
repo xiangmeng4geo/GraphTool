@@ -25,7 +25,13 @@
 
 	var model = new Model();
 
-	var Core = {};
+	model.on('log', function(msg) {
+		console.log(msg);
+	});
+
+	var Core = {
+		model: model
+	};
 	var EXT_JS = '.js';
 	var EXT_ARR = ['', EXT_JS, '.json', '.node'];
 	function is_exists_module(url){
@@ -121,6 +127,11 @@
 			'msg': data
 		});
 	}
+
+	// 处理main进程发过来的事件
+	subscibe('ui', function(data) {
+		model.emit(data.type, data.msg);
+	});
 	Core.on = subscibe;
 	Core.emit = emit;
 

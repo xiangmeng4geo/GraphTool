@@ -654,10 +654,12 @@
 
     BSpline.prototype.calcAt = function(t){
         t = t*((this.degree+1)*2+this.points.length);//t must be in [0,1]
-        return {
-          x: this.getInterpol(this.seqAt('x'),t).toFixed(4),
-          y: this.getInterpol(this.seqAt('y'),t).toFixed(4)
-        };
+        var x = this.getInterpol(this.seqAt('x'),t).toFixed(4),
+            y = this.getInterpol(this.seqAt('y'),t).toFixed(4)
+
+        // 数组形式访问较快
+        // https://github.com/tonny-zhang/docs/issues/1#user-content-1
+        return IS_POINTS_ARRAY? [x, y]: {x: x, y: y};
     };
     // degree = [2, 5]; factor = [2, 10]
     return function(points, degree, factor){
@@ -678,8 +680,8 @@
   })();
 
   var MIN_DIS = Math.pow(0.2, 2);
+  var PI = Math.PI;
   var dealItems = (function(){
-
     return function(items){
       var len = items.length;
       var is_small = len < MIN_POINT_NUM;
@@ -693,11 +695,12 @@
         }
       }
       items_new.push(items[len-1]);
+      // !!可对点少的多边形，进行变形处理
 
       // 找到三个点间角度最小的点做项
-      var min_index = 0;
-      var min_radiu = Math.PI*2;
-      for (var i = 0, j = items_new.length; i<j; i++) {
+      var max_index = 0;
+      var max_angle = 0;
+      for (var i = 1, j = items_new.length-1; i<j; i++) {
         var p = items_new[i],
             p_prev = items_new[i == 0? j-1: i - 1],
             p_next = items_new[i+1 == j? 0: i+1];
@@ -708,27 +711,35 @@
             y_prev = p_prev.y,
             y_next = p_next.y;
         if (x_p == x_prev && x_p == x_next || (y_p == y_prev && y_p == y_next)) {
-            min_index = i;
+            max_index = i;
+            // max_angle = Math.PI;
             break;
         } else {
-            var ab = Math.sqrt(Math.pow(x_p - x_prev, 2) + Math.pow(y_p - y_prev, 2));
-            var ac = Math.sqrt(Math.pow(x_p - x_next, 2) + Math.pow(y_p - y_next, 2));
-            var v = Math.abs(((x_prev - x_p) * (x_next - x_p) + (y_prev - y_p) * (y_next - y_p))/ab*ac);
-            if (min_radiu > v) {
-                min_radiu = v;
-                min_index = i;
+            // 向量运算，得到向量夹角
+            var vector_a_x = x_p - x_prev,
+                vector_a_y = y_p - y_prev,
+                vector_b_x = x_next - x_p,
+                vector_b_y = y_next - y_p;
+            var cos_angle = (vector_a_x * vector_b_x + vector_a_y * vector_b_y)/
+            (Math.sqrt(vector_a_x*vector_a_x + vector_a_y*vector_a_y) + Math.sqrt(vector_b_x*vector_b_x + vector_b_y*vector_b_y))
+
+            var angle = PI - Math.acos(cos_angle);
+            if (max_angle < angle) {
+                max_angle = angle;
+                max_index = i;
             }
         }
       }
-      if (min_index > 0) {
-          items_new = items_new.slice(min_index).concat(items_new.slice(0, min_index));
+      if (max_index > 0) {
+          items_new = items_new.slice(max_index).concat(items_new.slice(0, max_index));
       }
-
+    //   console.log('j='+j, max_index, max_angle/ Math.PI*180, arr);
       return smoothBSpline(items_new, 4);
     }
   })();
   var util = require('./util');
   var util_color = util.color;
+  var util_log = util.Model.log;
   var utils_polygon = util.Polygon;
   var isPointIn = utils_polygon.isPointIn,
     isPolygonIn = utils_polygon.isPolygonIn;
@@ -736,6 +747,7 @@
   var SHOW_CONSOLE = false;
   var DEFAULT_VALUE = 999999;
   var COLOR_TRANSPANT = require('./const').COLOR.TRANSPANT;
+  var IS_POINTS_ARRAY = false;
   /*
    * 解决的问题如下：
    * 1. 找到离默认值最近且个数最多的颜色或等级
@@ -745,7 +757,9 @@
    * 5. 找到孤岛面的父级面，建立索引包含关系
    * 6. 生成返回数据
   */
-  function conrec(rasterData, blendent, cb){
+  function conrec(rasterData, blendent, is_points_array/*返回的点是否为数组*/, cb){
+    IS_POINTS_ARRAY = is_points_array;
+    var t_start = new Date();
     var space = rasterData[1][0].x - rasterData[0][0].x;
     if (space < 0.5) {
         MIN_DIS = Math.pow(Math.max(0.1, space*2), 2)
@@ -1011,7 +1025,9 @@
       colors.reverse();
     }
     list.map(function(v){
-        v.area = Math.abs(getArea(v));
+        var _area = getArea(v);
+        v._area = _area;
+        v.area = Math.abs(_area);
         list_new.push(v);
         // var color_conf =  colors[Number(v.k)+1];
         // if(color_conf && color_conf.is_checked){
@@ -1129,6 +1145,7 @@
       if(!cache_index[i]){
         relation.push(val);
       }
+    //   console.log(polygon.area, polygon._area);
       list_return[i] = dealItems(polygon);
     }
     SHOW_CONSOLE && console.timeEnd('conrec.afterConrec_new.relation');
@@ -1138,6 +1155,7 @@
     };
     SHOW_CONSOLE && console.timeEnd('conrec.afterConrec_new');
     SHOW_CONSOLE && console.timeEnd('conrec');
+    util_log('conrec takes '+(new Date() - t_start)+' ms!');
     cb(null, val_return);
   }
 

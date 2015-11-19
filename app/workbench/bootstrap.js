@@ -22,7 +22,6 @@
 	app.on('window-all-closed', function () {
 		app.quit();
 	});
-
 	var subscibe_list = {};
 	ipc.on('subscibe', function(e, type){
 		var sender = e.sender;
@@ -33,7 +32,7 @@
 			list.push(id);
 		}
 	});
-	ipc.on('emit', function(e, data){
+	function _emit(data){
 		var type = data.type;
 		var msg = data.msg;
 		var list = subscibe_list[type];
@@ -45,7 +44,22 @@
 				}
 			});
 		}
+	}
+	ipc.on('emit', function(e, data){
+		_emit(data);
 	});
+
+	// 把ipc当成一个EventEmitter处理,Util.Model.[emit|log]触发
+	ipc.on('ui', function(data) {
+		_emit({
+			type: data.name,
+			msg: {
+				type: data.type,
+				msg: data.msg
+			}
+		});
+	});
+
 	/**
 	 * 确保主程序是单例模式
 	 */

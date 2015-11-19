@@ -179,7 +179,23 @@
 
     // TODO: change to asynchronous
     GeoMap.setGeo = function(Geo) {
-        _fileImportor = Geo.importFile;
+        var cache_key_obj = {_id: 100};
+        var fn_import = Geo.importFile;
+        _fileImportor = function(file_path, cb) {
+            // 对加载并解析完成的数据进行缓存
+            var cache_val = _get(cache_key_obj, file_path);
+            if (cache_val) {
+                cb(null, cache_val);
+            } else {
+                fn_import(file_path, function(err, d) {
+                    if (!err) {
+                        _set(cache_key_obj, file_path);
+                    }
+
+                    cb(err, d);
+                });
+            }
+        }
         _ShapeIter = Geo.ShapeIter;
     }
     GeoMap.setProjection = function(projection) {
@@ -190,6 +206,7 @@
      * 设置地理信息
      */
     prop.setGeo = function(geo_files, cb) {
+        var t_start = new Date();
         var _this = this;
         if (!_isArray(geo_files)) {
             geo_files = [geo_files];
@@ -202,6 +219,7 @@
             if (!geo_file) {
                 _this.getBondBorder();
                 _this.refresh();
+                _model.emit('log', 'import and render geo files takes '+(new Date() - t_start)+' ms!');
                 return cb();
             }
             var file_path = geo_file.file;
