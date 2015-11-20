@@ -535,3 +535,12 @@ resize-horizontal{
 	cursor: ew-resize;
 	z-index: 10;
 }
+#geomap{
+	cursor: url(../img/openhand.cur) 8 8, default !important;
+}
+#geomap.dragging{
+	cursor: url(../img/closedhand.cur) 8 8, move !important;
+}
+#geomap.nodrag{
+	cursor: default !important;
+}

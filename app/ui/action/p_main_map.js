@@ -13,13 +13,13 @@ Core.init(function(model) {
         console.log(err.msg||err.message||err);
     });
     var $geomap_container = $('#geomap_container');
+    var $geomap = $('#geomap');
     var width_map, height_map;
     function initSize() {
         width_map = $geomap_container.width(),
         height_map = $geomap_container.height();
     }
     initSize();
-
 
     var CONST_PATH_ZR = './action/lib/zr';
     var GeoMap = util_loadLib('map');
@@ -79,6 +79,11 @@ Core.init(function(model) {
             //     console.log('end');
             //     geomap.refresh('weather');
             // });
+        var drag = d3.behavior.drag().on('dragstart', function() {
+            $geomap.addClass('dragging');
+        }).on('dragend', function() {
+            $geomap.removeClass('dragging');
+        });
         model.on('projection.changeview', function(a, b) {
             projection = _getProjection(a, b);
             GeoMap.setProjection(projection);
@@ -89,9 +94,7 @@ Core.init(function(model) {
         GeoMap.setProjection(projection);
 
         setTimeout(function() {
-            var $geomap = $('#geomap');
-
-            d3.select('#geomap').call(zoom);
+            d3.select('#geomap').call(zoom).call(drag);
 
             var _options = {
                 GeoMap: GeoMap,
@@ -105,5 +108,4 @@ Core.init(function(model) {
             require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
         }, 200);
     });
-
 });

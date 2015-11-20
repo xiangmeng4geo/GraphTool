@@ -58,44 +58,51 @@
 			"number_level": "8",
 			"colors": [{
 				"is_checked": true,
-				"color": "#1f1885",
+				"color": "#ffffff",
 				"color_text": "#ffffff",
-				"val": [0, 0.2],
+				"val": [0, 1],
 				"text": "1, 10",
 				"order": 0
 			}, {
 				"is_checked": true,
-				"color": "#1149d8",
+				"color": "#9DF085",
 				"color_text": "#ffffff",
-				"val": [0.2, 0.6],
+				"val": [1, 1.5],
 				"text": "10, 15",
 				"order": 0
 			}, {
 				"is_checked": true,
-				"color": "#4db4f5",
+				"color": "#33B333",
 				"color_text": "#000000",
-				"val": [0.6, 1],
+				"val": [1.5, 7],
 				"text": "15,20",
 				"order": 0
 			}, {
 				"is_checked": true,
-				"color": "#f9de46",
+				"color": "#56B1FF",
 				"color_text": "#000000",
-				"val": [1, 1.5],
+				"val": [7, 15],
 				"text": "20, 25",
 				"order": 0
 			}, {
 				"is_checked": true,
-				"color": "#f9f2bb",
+				"color": "#0000DE",
 				"color_text": "#000000",
-				"val": [1.5, 2],
+				"val": [15, 40],
 				"text": "25, 30",
 				"order": 0
 			}, {
 				"is_checked": true,
-				"color": "#f9de46",
+				"color": "#F900F9",
 				"color_text": "#000000",
-				"val": [2, 99999],
+				"val": [40, 50],
+				"text": "30以上",
+				"order": 0
+			}, {
+				"is_checked": true,
+				"color": "#750036",
+				"color_text": "#000000",
+				"val": [50, 9999],
 				"text": "30以上",
 				"order": 0
 			}]
