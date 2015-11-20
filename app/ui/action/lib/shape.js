@@ -185,7 +185,7 @@
     }
     var _cache_img = {};
     function _getImg(src) {
-        if (typeof src === 'string' || src.indexOf('data:image') !== 0) {
+        if (typeof src === 'string' && src.indexOf('data:image') !== 0) {
             if (_cache_img[src]) {
                 return _cache_img[src];
             } else {
@@ -228,7 +228,10 @@
         width = width || img.width;
         height = height || img.height;
 
-        this.draw = function(ctx, projection) {
+        _this.style = {
+            normal: style.normal
+        }
+        _this.draw = function(ctx, projection) {
             var pixel = isNaN(lng) && isNaN(lat)? [x, y]: projection([lng, lat]);
 
             // 图片居中显示在点上

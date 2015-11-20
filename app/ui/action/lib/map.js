@@ -478,6 +478,7 @@
 
         if (is_refresh_normal || is_refresh_weather) {
             var shapes = _get(_this, CACHE_NAME_SHAPES);
+            
             for (var i = 0, j = shapes.length; i<j; i++) {
                 var shp = shapes[i];
                 var _style = shp.style;
@@ -562,8 +563,14 @@
         var canvas_tmp = _getCanvas(width, height).get(0);
         var ctx = canvas_tmp.getContext('2d');
 
+        var bgcolor = 'rgba(255, 255, 255, 1)';
         if (conf) {
-            var bgcolor = conf.bgcolor || 'rgba(255, 255, 255, 1)';
+            var _bgColor = conf.bgcolor;
+            if (_bgColor) {
+                bgcolor = _bgColor;
+            }
+        }
+        if (bgcolor) {
             ctx.fillStyle = bgcolor;
             ctx.fillRect(0, 0, width, height);
         }
@@ -572,8 +579,7 @@
         ctx.drawImage(canvas_geo, 0, 0, width, height);
         ctx.drawImage(canvas_normal, 0, 0, width, height);
 
-        var result = canvas_tmp.toDataURL();
-        console.log(result);
+        var result = canvas_tmp.toDataURL(null, bgcolor);
         return result;
     }
     module.exports = GeoMap;

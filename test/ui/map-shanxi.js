@@ -100,10 +100,30 @@
 				"order": 0
 			}]
 		}];
+        
+        
+         
         var t_start = new Date();
         var geomap = new GeoMap(model).init({
             container: $geomap
-        }).setGeo(geo_files, function() {
+        });
+        var canvas_legend = C.loadLib('legend')({
+            blendent: blendent
+        }, {
+            height: $geomap.height()/2
+        });
+        // $canvas_legend.css({
+        //     position: 'absolute',
+        //     right: 0,
+        //     top: $geomap.height()/4
+        // }).appendTo($geomap);
+        
+        geomap.addOverlay(new Shape.Image(canvas_legend, {
+            x: $geomap.width() - canvas_legend.width,
+            y: $geomap.height()/4,
+            normal: true
+        }));
+        geomap.setGeo(geo_files, function() {
             model.emit('map.aftersetgeo');
 
             var place_arr = require('H:/docs/2015/蓝PI相关/各方需求/陕西/地名+经纬度.json');
