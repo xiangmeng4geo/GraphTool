@@ -1,3 +1,4 @@
+/* global Geo */
 /**
  * 管理主页上的地图模块
  */
@@ -28,19 +29,6 @@ Core.init(function(model) {
     var d3 = util_loadLib('d3');
     var d3 = util_loadLib('d3');
 
-
-    // var projection = d3.geo.conicEqualArea()
-    //   .parallels([29.5, 45.5])
-    //   .rotate([-80, 0])
-    //   .center([107, 31])
-    //   .scale(300);
-    //
-    //   var projection = d3.geo.albers()
-    //   .scale(300)
-    //   .translate([800 / 2, 800 / 2])
-    //   .rotate([-60, 30])
-    //   .center([107, 31])
-    //   .parallels([27, 45]);
     var geomap;
     // 得到一个投影并设置相关参数，让地图居中
     function _getProjection(leftup, rightdown) {
