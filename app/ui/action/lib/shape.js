@@ -127,10 +127,11 @@
 
         var text_color = _style['color'];
 
+        var _normal = _style.normal;
         _this.style = {
             textAlign: text_align,
             textBaseline: text_baseline,
-            normal: _style.normal === false || true
+            normal: undefined === _normal? true: !!_normal
         };
 
 
@@ -228,8 +229,9 @@
         width = width || img.width;
         height = height || img.height;
 
+        var _normal = style.normal;
         _this.style = {
-            normal: style.normal
+            normal: undefined === _normal? true: !!_normal
         }
         _this.draw = function(ctx, projection) {
             var pixel = isNaN(lng) && isNaN(lat)? [x, y]: projection([lng, lat]);

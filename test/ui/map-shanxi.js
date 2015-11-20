@@ -120,8 +120,7 @@
         
         geomap.addOverlay(new Shape.Image(canvas_legend, {
             x: $geomap.width() - canvas_legend.width,
-            y: $geomap.height()/4,
-            normal: true
+            y: $geomap.height()/4
         }));
         geomap.setGeo(geo_files, function() {
             model.emit('map.aftersetgeo');
@@ -151,16 +150,14 @@
                 x: 10,
                 y: 10,
                 fontSize: 20,
-                color: 'rgba(0, 0, 0, 0.8)',
-                normal: true
+                color: 'rgba(0, 0, 0, 0.8)'
             }));
 
             geomap.addOverlay(new Shape.Text('最大：泾河 4.5mm', {
                 x: 10,
                 y: 40,
                 fontSize: 18,
-                color: 'rgba(255, 0, 0, 0.8)',
-                normal: true
+                color: 'rgba(255, 0, 0, 0.8)'
             }));
 
             Reader.read({
