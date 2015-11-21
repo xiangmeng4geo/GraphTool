@@ -20,10 +20,29 @@
 	function _rmConfig(name){
 		return util_file.rm(_getPathByName(name));
 	}
+	
+	var CONST_SYSCONF_NAME = 'sys';
+	var CONST_SYS_PRODUCT_TREE_NAME = 'sys_product_tree';
+	function _getSysConf() {
+		return _readConfig(CONST_SYSCONF_NAME);
+	}
+	function _saveSysConf(json) {
+		return _saveConfig(CONST_SYSCONF_NAME, json);
+	}
+	function _getTree() {
+		return _readConfig(CONST_SYS_PRODUCT_TREE_NAME);
+	}
+	function _saveTree(json) {
+		return _saveConfig(CONST_SYS_PRODUCT_TREE_NAME, json);
+	}
 	var config = {
 		read: _readConfig,
 		save: _saveConfig,
-		rm: _rmConfig
+		rm: _rmConfig,
+		getSys: _getSysConf,
+		setSys: _saveSysConf,
+		getTree: _getTree,
+		setTree: _saveTree
 	};
 
 	module.exports = config;

@@ -2,10 +2,103 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<link rel="stylesheet" type="text/css" href="css/reset.css">
-		<link rel="stylesheet" type="text/css" href="css/p_m_setting.css">
+		<link rel="stylesheet" type="text/css" href="style/reset.css">
+		<link rel="stylesheet" type="text/css" href="style/p_setting.css">
 		<title>设置</title>
 	</head>
 	<body>
+		<div class="main">
+			<script type="tmpl" id="tmpl_map_item">
+				<div class="map_item">
+					<div class="btns">
+						<input type="button" value="上移" class="btn_up"/>
+						<input type="button" value="下移" class="btn_down"/>
+						<input type="button" value="删除" class="btn_dele"/>
+					</div>
+					<div class="row">
+						<label>文件</label>
+						<input type="file" class="f_map_item"/>
+					</div>
+					<div class="row">
+						<label>线宽度</label>
+						<input type="number" class="n_map_item"/>
+					</div>
+					<div class="row">
+						<label>线颜色</label>
+						<input type="color" class="c_map_item"/>
+					</div>
+					<div class="row">
+						<input type="checkbox" class="cb_map_item"/>
+						<label>是否只显示本区域</label>
+					</div>
+					<div class="row">
+						<input type="checkbox" class="cb_map_item_border"/>
+						<label>对边界进行处理</label>
+						<div class="row">
+							<label>线宽度</label>
+							<input type="number" class="n_map_item_line"/>
+						</div>
+						<div class="row">
+							<label>线颜色</label>
+							<input type="color" class="c_map_item_line"/>
+						</div>
+						<!--<div class="row">
+							<label>填充色</label>
+							<input type="color" class="c_map_item_fill"/>
+						</div>-->
+					</div>
+				</div>
+			</script>
+			<tab>
+				<item class="on">地图</item>
+				<item>图例</item>
+			</tab>
+			<tab-content>
+				<item class="on">
+					<div class="list">
+						<input type="button" value="添加" id="btn_add_map_conf"/>
+						<input type="button" value="删除" id="btn_dele_map_conf"/>
+						<ul id="map_conf_list">				
+						</ul>
+					</div>
+					<resize-horizontal></resize-horizontal>
+					<div class="content">
+						<div class="map_left" id="map_conf">
+							<input type="text" value="" placeholder="自定义地图模块名" id="txt_map_name">
+							<input type="button" value="添加或修改" id="btn_save_map"/>
+							<input type="button" value="添加地图文件" id="btn_add_map"/>
+						</div>
+						<div class="map_right">
+							<div class="row">
+								<input type="checkbox" id="cb_prov"/>省名<br/>
+								<input type="checkbox" id="cb_city"/>市名<br/>
+								<input type="checkbox" id="cb_county"/>县名<br/>
+								<div class="row">
+									颜色<input type="color" id="c_map_text"/><br/>
+									大小<input type="number" style="width: 30px" id="n_map_text"/><br/>
+									标识<select id="s_map_text">
+										<option value="1">1</option>
+										<option value="2">2</option>
+									</select>
+								</div>
+							</div>
+						</div>	
+					</div>
+				</item>
+				<item>
+					<ul class="list">
+						<li>test</li>
+						<li class="on">abc</li>
+					</ul>
+					<resize-horizontal></resize-horizontal>
+					<div class="content">
+						<div class="row">
+							<label>填充色</label>
+							<input type="radio"/>
+						</div>
+					</div>
+				</item>
+			</tab-content>
+		</div>
 	</body>
 </html>

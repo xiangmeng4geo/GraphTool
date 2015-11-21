@@ -63,10 +63,18 @@
 		var _p = path.resolve(CONST_PATH_UI_ACTION, subpath||'', url);
 		return require_safe(require, _p);
 	}
+	
+	/**
+	 * 直接加载workbench下的后端模块
+	 */
+	function loadRemote(url, subpath) {
+		var _p = path.resolve(CONST_PATH_WORKBENCH, subpath||'', url);
+		return require_safe(require, _p);
+	}
 	/**
 	 * load module in workbench
 	 */
-	function remote(url){
+	function _loadRemote(url){
 		var _p = path.resolve(CONST_PATH_WORKBENCH, url);
 		return require_safe(_remote.require, _p);
 	}
@@ -142,8 +150,9 @@
 	Core.loadLib = function(url) {
 		return load(url, 'lib');
 	}
+	Core.loadRemote = loadRemote;
 	Core.script = script;
-	Core.remote = remote;
+	Core.remote = _loadRemote;
 	Core.init = safe;
 	Core.WIN = win_instance;
 	window_global.Core = Core;
