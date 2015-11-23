@@ -1,6 +1,6 @@
 var util = require('../util');
 var equal = util.equal;
-var Util = util.load('workbench/util'),
+var Util = util.load('common/util'),
     Util_file = Util.file,
     Util_path = Util.path;
 
@@ -8,7 +8,7 @@ describe('datareader.micaps', function(){
     function _getDataPath(name){
         return Util_path.join(__dirname, '../data/micaps', name);
     }
-    var read_micaps = util.load('workbench/datareader/micaps');
+    var read_micaps = util.load('common/datareader/micaps');
     it('[type 14] file = 14.1(get no areas)', function(done){
         read_micaps({
             file: _getDataPath('14.1')

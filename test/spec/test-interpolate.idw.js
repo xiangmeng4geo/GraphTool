@@ -6,9 +6,9 @@ var equal = assert.equal;
 // idw插值为异步，要充分测试其异步性
 
 describe('interpolate.idw', function(){
-    var idw = util.load('workbench/interpolate/idw');
-    var Util = util.load('workbench/util');
-    var Logger = util.load('workbench/logger');
+    var idw = util.load('common/interpolate/idw');
+    var Util = util.load('common/util');
+    var Logger = util.load('common/logger');
     // idw.info(function(msg){
     //     Logger.info(msg);
     // });

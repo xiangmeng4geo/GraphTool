@@ -2,8 +2,8 @@ var assert = require('assert');
 var util = require('../util');
 
 describe('Util.color', function() {
-    var CONST = util.load('workbench/const');
-    var Util = util.load('workbench/util');
+    var CONST = util.load('common/const');
+    var Util = util.load('common/util');
     var color = Util.color;
 
     it('should get false', function() {

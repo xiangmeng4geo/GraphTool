@@ -7,7 +7,7 @@ describe('product_conf', function() {
 
 	var name = 'test',
 		json = {name: 'hello'};
-	var Config = require('../util').load('workbench/product_conf');
+	var Config = require('../util').load('common/product_conf');
 	it('[functon read] should not read a not exists conf file', function(){
 		var result = Config.read(name+Math.random());
 		equal(null, result);

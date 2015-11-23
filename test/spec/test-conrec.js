@@ -2,9 +2,9 @@ var assert = require('assert');
 var util = require('../util');
 
 describe('conrec', function() {
-    var idw = util.load('workbench/interpolate/idw');
-    var Util = util.load('workbench/util');
-    var conrec = util.load('workbench/conrec');
+    var idw = util.load('common/interpolate/idw');
+    var Util = util.load('common/util');
+    var conrec = util.load('common/conrec');
     var x0 = 0, y0 = 0, x1 = 10, y1 = 10;
     var v0 = 0, v1 = 30;
     var DEFAULT_VAL = 999999;

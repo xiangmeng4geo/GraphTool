@@ -7,7 +7,7 @@ var util = require('../../util');
 
 describe('Util.async', function() {
 	var equal = assert.equal;
-	var Async = util.load('workbench/util').Async;
+	var Async = util.load('common/util').Async;
 
 	var time_start,
 		time_end;

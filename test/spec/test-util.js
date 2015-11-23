@@ -7,7 +7,7 @@ var util = require('util');
 describe('Util', function() {
 	var util_test = require('../util');
 	var equal = util_test.equal;
-	var Util = util_test.load('workbench/util');
+	var Util = util_test.load('common/util');
 	describe('verification', function () {
 		it('[function get] should get result, and result.name should not be undefined', function () {
 			var result = Util.verification.get();
