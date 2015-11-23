@@ -30,6 +30,9 @@
 					cb_no && cb_no();
 				}
 			});
+		},
+		open: function(options, callback) {
+			return dialog.showOpenDialog(win_instance, options, callback);
 		}
 	};
 	module.exports = Dialog;

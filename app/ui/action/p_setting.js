@@ -5,6 +5,7 @@
 	var _alert = dialog.alert;
 	var _confirm = dialog.confirm;
 	var product_conf = C.loadRemote('product_conf'); //直接把模块加载到UI进程
+	var util_ui = C.load('util').UI;
 	
 	var conf_data_sys = product_conf.getSys() || {};
 	var conf_data_geo = conf_data_sys.geo || (conf_data_sys.geo = []);
@@ -141,7 +142,8 @@
 		$map_conf.find('.map_item').each(function() {
 			var $this = $(this);
 			
-			var file = $this.find('.f_map_item').val();
+			// var file = $this.find('.f_map_item').val();
+			var file = util_ui.file($this.find('.file'))();
 			var lineWidth = $this.find('.n_map_item').val();
 			var strokeStyle = $this.find('.c_map_item').val();
 			var clip = _getChecked($this.find('.cb_map_item'));
@@ -216,7 +218,12 @@
 		if (!is_can_add_map_file) {
 			return _alert('请先配置好当前项目再进行下一个!');
 		}
-		$map_conf.append(tmpl_map_item);
+		var $html = $(tmpl_map_item);
+		util_ui.file($html.find('.file'), {
+			width_minus: 8
+		});
+		$map_conf.append($html);
+		
 		// is_can_add_map_file = false;
 	});
 	
@@ -241,6 +248,10 @@
 				var borderStyle = _map_conf.borderStyle || {};
 				
 				var $html = $(tmpl_map_item);
+				util_ui.file($html.find('.file'), {
+					width_minus: 8,
+					val: file
+				});
 				// $html.find('.f_map_item').val(file);
 				$html.find('.n_map_item').val(style.lineWidth);
 				$html.find('.c_map_item').val(style.strokeStyle);

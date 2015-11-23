@@ -321,3 +321,9 @@ td{
 .br5{
 	border-radius: 5px;
 }
+
+.file{
+	display: inline-block;
+	width: 200px;
+	height: 28px;
+}
