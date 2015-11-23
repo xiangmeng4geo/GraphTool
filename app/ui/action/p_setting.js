@@ -7,6 +7,8 @@
 	var _confirm = dialog.confirm;
 	var product_conf = _require('product_conf'); //直接把模块加载到UI进程
 	var util_ui = _require('component').UI;
+	var CONST = _require('const');
+	var CONST_GEO_FLAGS = CONST.GEO.FLAGS;
 
 	var conf_data_sys = product_conf.getSys() || {};
 	var conf_data_geo = conf_data_sys.geo || (conf_data_sys.geo = []);
@@ -78,21 +80,6 @@
 	function _setChecked($checkbox, checked) {
 		$checkbox.prop('checked', checked);
 	}
-	function _setSelect($select, val, data) {
-		if (data) {
-			var html = '';
-			for (var i = 0, j = data.length; i<j; i++) {
-				var d = data[i];
-				html += '<option value="'+d.v+'">'+d.n+'</option>'
-			}
-			$select.html(html);
-		}
-		if (undefined === val || null === val) {
-			$select.find('option').removeAttr('selected');
-		} else {
-			$select.find('[value='+val+']').attr('selected', 'selected');
-		}
-	}
 
 	var $txt_map_name = $('#txt_map_name');
 	var $map_conf_list = $('#map_conf_list');
@@ -103,7 +90,10 @@
 	var $c_map_text = $('#c_map_text');
 	var $n_map_text = $('#n_map_text');
 	var $s_map_text = $('#s_map_text');
-
+	
+	util_ui.select($s_map_text, {
+		data: CONST_GEO_FLAGS
+	});
 	var tmpl_map_item = $('#tmpl_map_item').text();
 
 	var is_can_add_map_file = true;
@@ -115,7 +105,9 @@
 		_setChecked($cb_city, false);
 		_setChecked($cb_county, false);
 		$n_map_text.val(12);
-		_setSelect($s_map_text);
+		util_ui.select($s_map_text, {
+			val: undefined
+		});
 
 		is_can_add_map_file = true;
 	}
@@ -142,6 +134,7 @@
 			name: map_name
 		};
 		var list = [];
+		var is_not_have_file = false;
 		$map_conf.find('.map_item').each(function() {
 			var $this = $(this);
 
@@ -158,7 +151,11 @@
 			var shadow_size = $this.find('.c_map_item_shadow_size').val();
 			var shadow_x = $this.find('.c_map_item_shadow_x').val();
 			var shadow_y = $this.find('.c_map_item_shadow_y').val();
-
+			
+			// 对地理数据文件加强验证
+			if (!file) {
+				is_not_have_file = true;
+			}
 			list.push({
 				file: file,
 				style: {
@@ -177,7 +174,10 @@
 				}
 			});
 		});
-
+		
+		if (is_not_have_file) {
+			return _alert('请先选择地理数据文件！');
+		}
 		if (list.length > 0) {
 			data.maps = list;
 		} else {
@@ -190,7 +190,7 @@
 			county: _getChecked($cb_county),
 			fontSize: parseInt($n_map_text.val()) || 12,
 			color: $c_map_text.val(),
-			flag: $s_map_text.val()
+			flag: util_ui.select($s_map_text).val()
 		}
 
 		var index = $map_conf_list.find('.on').index();
@@ -291,7 +291,8 @@
 			_setChecked($cb_county, cb_county);
 			$c_map_text.val(color);
 			$n_map_text.val(fontSize);
-			_setSelect($s_map_text, flag);
+			
+			util_ui.select($s_map_text).selected(flag);
 		}
 	}
 	function _changeMapConf(index) {

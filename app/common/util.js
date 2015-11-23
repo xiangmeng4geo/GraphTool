@@ -42,7 +42,7 @@
 			var content = fs.readFileSync(_p, 'utf-8');
 			if(is_return_json){
 				try{
-					return JSON.parse(content);
+					return JSON.parse(content.trim());
 				}catch(e){}
 			}else{
 				return content;

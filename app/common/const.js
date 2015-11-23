@@ -19,8 +19,20 @@
 	var path_conf = format(path.join(path_base, 'conf'));
 	var path_config = format(path.join(path_base, 'config'));
 	var path_cache = format(path.join(path_base, 'cache'));
-
+	
+	var path_img_ball = format(path.join(path_ui, 'img/ball.png'));
 	module.exports = {
+		GEO: {
+			FILE: format(path.join(path_base, 'data', 'sx.json')),
+			FLAGS: [{
+				text: '无',
+				val: ''
+			}, {
+				text: path_img_ball,
+				val: path_img_ball,
+				type: 'img'
+			}]
+		},
 		COLOR: {
 			TRANSPANT: 'rgba(0,0,0,0)'
 		},

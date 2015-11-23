@@ -447,8 +447,6 @@
             var _canvas = ctx.canvas;
             ctx.clearRect(0, 0, _canvas.width, _canvas.height);
 
-            _this.border();
-
             var data_list = _get(_this, LAYER_NAME_GEO);
             _isArray(data_list) && data_list.forEach(function(data) {
                 var dataset = data.dataset;
@@ -461,6 +459,8 @@
                     }
                 }
             });
+            
+            _this.border();
         }
 
         var ctx = _getCtxByPrefix(_this, LAYER_NAME_WEATHER);

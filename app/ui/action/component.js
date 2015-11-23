@@ -60,7 +60,76 @@
 			return $txt_file.val();
 		}
 	}
+	
+	$doc.delegate('.select', 'mouseleave', function() {
+		$(this).find('ul').hide();
+	})
+	$doc.delegate('.select>span', 'click', function() {
+		$(this).next().show();
+	});
+	$doc.delegate('.select ul li', 'click', function(e) {
+		e.stopPropagation();
+		var $this = $(this).addClass('selected');
+		$this.siblings().removeClass('selected');
+		var $select_show_text = $this.parent().prev('span');
+		
+		$select_show_text.data('val', $this.data('val')).html($this.html());
+		$this.parent().hide();
+	})
+	function select($container, options) {
+		options = $.extend({
+			val: null,
+			data: null,
+		}, options);
+		
+		var val_selected = options.val;
+		if (!$container.data('inited')) {
+			var html = '<ul>';
+			var data = options.data || [];
+			for (var i = 0, j = data.length; i<j; i++) {
+				var item = data[i];
+				var text = item.text;
+				var val = item.val;
+				var type = item.type;
+				var classStr = '';
+				if (val_selected === val) {
+					classStr = ' class="selected"';
+				}
+				html += '<li data-val="'+val+'"'+classStr+'>'+(type == 'img'?'<img src="'+text+'"/>': text)+'</li>';
+			}
+			html += '</ul>';
+			var $html = $(html);
+			var $val = $html.find('.selected');
+			if ($val.length == 0) {
+				$val = $html.find('li:first');
+			}
+			var tmpl = '<span>'+$val.html()+'</span>';
+			$container.html(tmpl+html);
+			$container.data('inited', true);
+		}
+		
+		return {
+			val: function() {
+				var $val = $container.find('.selected');
+				if ($val.length == 0) {
+					$val = $container.find('li:first');
+				}
+				return $val.data('val');
+			},
+			selected: function(val) {
+				var $item = $container.find('li')
+						.removeClass('selected')
+						.filter('[data-val="'+val+'"]')
+						.addClass('selected');
+				if ($item.length == 0) {
+					$item = $container.find('li:first');
+				}
+				$container.find('>span').html($item.html());
+			}
+		}
+	}
 	UI.file = file;
+	UI.select = select;
 	
 	module.exports = {
 		UI: UI

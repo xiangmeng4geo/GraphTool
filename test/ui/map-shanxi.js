@@ -4,9 +4,15 @@
     var _require = C.require;
     var Reader = _require('datareader');
     var Render = _require('render');
+    var util = _require('util');
+    var util_file = util.file;
+    var util_path = util.path;
+    var CONST = _require('const');
+    var CONST_PATH_CACHE = CONST.PATH.CACHE;
     var CONF_GEO = _require('product_conf').getSys.getGeo('陕西地图');
 
     var geo_files = CONF_GEO.maps;
+    var textStyle = CONF_GEO.textStyle;
     module.exports = function init(options) {
         var GeoMap = options.GeoMap,
             Shape = options.Shape,
@@ -27,8 +33,8 @@
             });
             model.emit('log', 'render data takes '+(new Date() - t_start)+' ms!');
 
-            var util = _require('util');
-            util.file.Image.save(util.path.join(_require('const').PATH.CACHE, '1.png'), geomap.export());
+            
+            util_file.Image.save(util_path.join(CONST_PATH_CACHE, '1.png'), geomap.export());
         });
         var blendent = [{
 			"val": {
@@ -111,25 +117,47 @@
         geomap.setGeo(geo_files, function() {
             model.emit('map.aftersetgeo');
 
-            var place_arr = require('H:/docs/2015/蓝PI相关/各方需求/陕西/地名+经纬度.json');
-
-            var names = {};
-            for (var i = 0, j = place_arr.length; i<j; i++) {
-                var item = place_arr[i];
-                if (item.name == item.pname) {
-                    names[item.name] = item;
-                    geomap.addOverlay(new Shape.Text(item.name, {
-                        lng: item.lng,
-                        lat: item.lat,
-                        fontSize: 14,
-                        color: 'rgba(0, 0, 0, 0.8)',
-                        flag: {
-                            src: 'H:/docs/2015/蓝PI相关/各方需求/陕西/ball.png',
+            var place_arr = util_file.read(CONST.GEO.FILE, true);
+            // var place_arr = require('H:/docs/2015/蓝PI相关/各方需求/陕西/地名+经纬度.json');
+            
+            var cb_prov = textStyle.prov,
+                cb_city = textStyle.city,
+                cb_county = textStyle.county;
+            
+            var FLAGS = CONST.GEO.FLAGS;
+            var flag = null;
+            for (var i = 0, j = FLAGS.length; i<j; i++) {
+                var f = FLAGS[i];
+                if (f.val === textStyle.flag) {
+                    if (f.type == 'img') {
+                        flag = {
+                            src: f.val,
                             width: 5,
                             height: 5,
                             center: true
                         }
-                    }));
+                    }
+                    break;
+                }
+            }
+            var names = {};
+            if (cb_prov || cb_city || cb_county) {
+                for (var i = 0, j = place_arr.length; i<j; i++) {
+                    var item = place_arr[i];
+                    var name = item.name,
+                        pname = item.pname;
+                    if ((cb_prov && !pname) || 
+                        (cb_city && name == pname) ||
+                        (cb_county && pname && pname !== name)) {
+                        names[item.name] = item;
+                        geomap.addOverlay(new Shape.Text(item.name, {
+                            lng: item.lng,
+                            lat: item.lat,
+                            fontSize: textStyle.fontSize || 14,
+                            color: textStyle.color || 'rgba(0, 0, 0, 0.8)',
+                            flag: flag
+                        }));
+                    }
                 }
             }
             geomap.addOverlay(new Shape.Text('陕西省2015年09月10日08时-自动站雨量分布图', {
