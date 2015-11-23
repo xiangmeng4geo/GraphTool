@@ -4,9 +4,15 @@
     var util_file = util.file;
     var CONST = require('./const');
 
-    var _log = util.Model.log;
+    // var _log = util.Model.log;
+    function _log(msg) {
+        _model && _model.emit('log', msg);
+    }
     var _model;
     var Reader = {};
+    Reader.setModel = function(model) {
+        _model = model;
+    }
     Reader.read = function(opt, cb){
         var s_start = new Date();
         var type = opt.type;
@@ -28,7 +34,7 @@
             } else {
                 _reader(opt, function(err, data) {
                     var msg = 'Reader.read takes '+(new Date()-s_start)+' ms!';
-                    util.Model.log(msg);
+                    _log(msg);
 
                     if (!err && data) {
                         util_file.write(cache_path, data);

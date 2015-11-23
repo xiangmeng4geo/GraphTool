@@ -4,12 +4,14 @@ Core.init(function(){
 
 	var C = Core;
 	var $ = C.$;
+	var _require = C.require;
+	// var _load = C.load;
 	var remote = C.remote;
 
-	var Store = C.load('store');
-	var Dialog = C.load('dialog');
+	var Store = _require('store');
+	var Dialog = _require('dialog');
 	var dialog_alert = Dialog.alert;
-	var util = remote('util');
+	var util = _require('util');
 	var util_verification = util.verification;
 	var win = remote('window');
 
@@ -109,5 +111,5 @@ Core.init(function(){
 	});
 
 	// Core.WIN.openDevTools();
-	
+
 });

@@ -7,7 +7,7 @@
 	var IS_PROCESS_MAIN =  process.type == 'browser';
 	var path = require('path');
 	var fs = require('fs');
-	var CONST = require('./const');
+	var CONST = require('../common/const');
 	var PATH = CONST.PATH;
 	var BrowserWindow = IS_PROCESS_MAIN? require('browser-window'): require('remote').require('browser-window');
 
@@ -55,7 +55,7 @@
 	 */
 	var win_load = function(win, name){
 		if(win){
-			win.loadUrl(path.join('file://' , PATH.UI, name+ '.html'));
+			win.loadURL(path.join('file://' , PATH.UI, name+ '.html'));
 			var content = win.webContents;
 			content.on('did-finish-load', function(){
 				var path_core = path.join(PATH.UI, 'action/core').replace(/\\/g, '/');

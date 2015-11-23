@@ -3,12 +3,7 @@
 
 	var fs = require('fs'),
 		path = require('path'),
-		crypto = require('crypto'),
-		ipc;
-
-	try {
-		ipc = require('ipc');// 防止测试框架报错
-	} catch(e){}
+		crypto = require('crypto');
 
 	var file_verification = 'verification';
 	var CONST = require('./const');
@@ -497,23 +492,6 @@
 		}
 	}
 
-	// 触发UI线程里model绑定的事件
-	function model_emit(name, data) {
-		// 测试框架中没有ipc模块
-		ipc && ipc.emit('ui', {
-			name: 'ui',
-			type: name,
-			msg: data
-		});
-	}
-	function model_emit_log(msg) {
-		model_emit('log', msg);
-	}
-	var Model = {
-		emit: model_emit,
-		log: model_emit_log
-	}
-
 	/*对外提供API*/
 	Util.verification = verification;
 	Util.file = file;
@@ -531,8 +509,6 @@
 	Util.extend = _extend;
 
 	Util.color = color;
-
-	Util.Model = Model;
 
 	module.exports = Util;
 }();

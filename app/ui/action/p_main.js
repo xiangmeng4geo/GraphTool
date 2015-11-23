@@ -11,6 +11,7 @@ Core.init(function(){
 
 	var C = Core;
 	var $ = C.$;
+	var _require = C.require;
 	var WIN = C.WIN;
 
 	C.emit('main.loaded');
@@ -64,9 +65,9 @@ Core.init(function(){
 
 	model.on('product.change', function(productName){
 		// console.log(arguments);
-		C.load('dialog').alert(productName);
+		_require('dialog').alert(productName);
 	});
 	['tree', 'map'].forEach(function(v){
-		C.load('p_main_'+v);
+		_require('p_main_'+v);
 	});
 });

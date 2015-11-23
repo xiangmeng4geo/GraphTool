@@ -5,14 +5,19 @@
 Core.init(function(model) {
     var C = Core;
     var $ = C.$;
-    var util_remote = C.remote;
-    var util_loadLib = C.loadLib;
-    var util_path = util_remote('util').path;
+    var _require = C.require;
+    var util_common = _require('util');
+    var util_path = util_common.path;
+    var GeoMap = _require('map');
+    var Shape = _require('shape');
+    var Pattern = _require('pattern');
+    var d3 = _require('d3');
 
     //统一处理其它库里的错误信息
     model.on('error', function(err) {
         console.log(err.msg||err.message||err);
     });
+    
     var $geomap_container = $('#geomap_container');
     var $geomap = $('#geomap');
     var width_map, height_map;
@@ -21,13 +26,6 @@ Core.init(function(model) {
         height_map = $geomap_container.height();
     }
     initSize();
-
-    var CONST_PATH_ZR = './action/lib/zr';
-    var GeoMap = util_loadLib('map');
-    var Shape = util_loadLib('shape');
-    var Pattern = util_loadLib('pattern');
-    var d3 = util_loadLib('d3');
-    var d3 = util_loadLib('d3');
 
     var geomap;
     // 得到一个投影并设置相关参数，让地图居中
@@ -91,9 +89,9 @@ Core.init(function(model) {
                 Shape: Shape,
                 Pattern: Pattern
             }
-            require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
+            require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
             // require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/map-china'))(_options);
-            require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
+            require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
         }, 200);
     });
 });

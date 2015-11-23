@@ -737,9 +737,13 @@
       return smoothBSpline(items_new, 4);
     }
   })();
+
+  var _model;
   var util = require('./util');
   var util_color = util.color;
-  var util_log = util.Model.log;
+  var util_log = function(msg) {
+      _model && _model.emit('log', msg);
+  }
   var utils_polygon = util.Polygon;
   var isPointIn = utils_polygon.isPointIn,
     isPolygonIn = utils_polygon.isPolygonIn;
@@ -1158,6 +1162,10 @@
     util_log('conrec takes '+(new Date() - t_start)+' ms!');
     cb(null, val_return);
   }
+  conrec.setModel = function(model) {
+      _model = model;
+      return conrec;
+  };
 
   module.exports = conrec;
 }();

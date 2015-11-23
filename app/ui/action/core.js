@@ -7,7 +7,7 @@
 	var path = require('path');
 	var fs = require('fs');
 	var _remote = require('remote');
-	var ipc = require('ipc');
+	var ipc = require('electron').ipcRenderer;
 
 	var win_instance = _remote.getCurrentWindow();
 	var CONST = win_instance.CONST;
@@ -16,8 +16,9 @@
 	var CONST_PATH_UI_ACTION = path.join(CONST_PATH_UI, 'action');
 	var CONST_PATH_UI_STYLE = path.join(CONST_PATH_UI, 'style');
 	var CONST_PATH_WORKBENCH = CONST_PATH.WORKBENCH;
+	var CONST_PATH_COMMON = CONST_PATH.COMMON;
 
-	var logger = require(path.join(CONST_PATH_WORKBENCH, 'logger'));
+	var logger = require(path.join(CONST_PATH_COMMON, 'logger'));
 
 	// 方便各子模块部通信
 	function Model() {}
@@ -43,7 +44,7 @@
 		}
 		return false;
 	}
-	function require_safe(req, url){
+	function require_safe(req, url, showError){
 		if(is_exists_module(url)){
 			try{
 				return req(url);
@@ -52,8 +53,10 @@
 				logger.error(e);
 			}
 		}else{
-			var err_msg = '[not exists]' + url;
-			logger.error(new Error(err_msg));
+			if (showError) {
+				var err_msg = '[not exists]' + url;
+				logger.error(new Error(err_msg));
+			}
 		}
 	}
 	/**
@@ -63,12 +66,12 @@
 		var _p = path.resolve(CONST_PATH_UI_ACTION, subpath||'', url);
 		return require_safe(require, _p);
 	}
-	
+
 	/**
 	 * 直接加载workbench下的后端模块
 	 */
-	function loadRemote(url, subpath) {
-		var _p = path.resolve(CONST_PATH_WORKBENCH, subpath||'', url);
+	function loadCommon(url, subpath) {
+		var _p = path.resolve(CONST_PATH_COMMON, subpath||'', url);
 		return require_safe(require, _p);
 	}
 	/**
@@ -85,6 +88,17 @@
 		var _p = path.resolve(CONST_PATH_UI_ACTION + '/lib', url);
 		var js_path = is_exists_module(_p);
 		return $.getScript(js_path, cb);
+	}
+	var paths_require = [CONST_PATH_COMMON, CONST_PATH_UI_ACTION, CONST_PATH_UI_ACTION + '/lib']
+	function _require(name) {
+		for (var i = 0, j = paths_require.length; i<j; i++) {
+			var result = require_safe(require, path.resolve(paths_require[i], name), false);
+			// console.log(result, path.resolve(paths_require[i], name));
+			if (result) {
+				return result;
+			}
+		}
+		logger.error(new Error('[module error]'+name));
 	}
 
 	/**
@@ -146,11 +160,12 @@
 	var $ = load('lib/j');
 	Core.CONST = CONST;
 	Core.$ = $;
-	Core.load = load;
-	Core.loadLib = function(url) {
-		return load(url, 'lib');
-	}
-	Core.loadRemote = loadRemote;
+	// Core.load = load;
+	// Core.loadLib = function(url) {
+	// 	return load(url, 'lib');
+	// }
+	Core.require = _require;
+	// Core.loadRemote = loadRemote;
 	Core.script = script;
 	Core.remote = _loadRemote;
 	Core.init = safe;

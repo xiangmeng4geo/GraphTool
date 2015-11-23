@@ -1,29 +1,11 @@
 !function() {
     var C = Core;
     var fs = require('fs');
-    var Reader = C.remote('datareader');
-    var Render = C.load('render');
-    var CONF_GEO = C.loadRemote('product_conf').getSys.getGeo('陕西地图');
+    var _require = C.require;
+    var Reader = _require('datareader');
+    var Render = _require('render');
+    var CONF_GEO = _require('product_conf').getSys.getGeo('陕西地图');
 
-    // var geo_files = [];
-    // geo_files.push({
-    //     file: 'H:/docs/2015/蓝PI相关/地理信息/陕西/市界+县界/新建文件夹/市界+所有县界/地市县界/地市界.shp',
-    //     style: {
-    //         strokeStyle: 'rgba(200, 200, 200, 1)',
-    //         lineWidth: 0.5,
-    //         // fillStyle: 'rgba(255, 255, 255, 1)'
-    //     },
-    //     clip: true,
-    //     borderStyle: {
-    //         strokeStyle: 'rgba(0, 0, 0, 0.8)',
-    //         lineWidth: 3,
-    //         shadowBlur: 10,
-    //         shadowColor: 'rgba(0, 0, 0, 0.5)',
-    //         shadowOffsetX: 5,
-    //         shadowOffsetY: 5
-    //     }
-    // });
-    
     var geo_files = CONF_GEO.maps;
     module.exports = function init(options) {
         var GeoMap = options.GeoMap,
@@ -32,6 +14,7 @@
             model = options.model,
             Pattern = options.Pattern;
 
+        Reader.setModel(model);
         Render.setModel(model);
         model.emit('projection.changeview', [104.72582600905484, 40.29761417442774], [113.21011197110165, 31.080076687873927]);
         model.on('refresh', function() {
@@ -44,8 +27,8 @@
             });
             model.emit('log', 'render data takes '+(new Date() - t_start)+' ms!');
 
-            var util = C.remote('util');
-            util.file.Image.save(util.path.join(C.remote('const').PATH.CACHE, '1.png'), geomap.export());
+            var util = _require('util');
+            util.file.Image.save(util.path.join(_require('const').PATH.CACHE, '1.png'), geomap.export());
         });
         var blendent = [{
 			"val": {
@@ -109,24 +92,18 @@
 				"order": 0
 			}]
 		}];
-        
-        
-         
+
+
         var t_start = new Date();
         var geomap = new GeoMap(model).init({
             container: $geomap
         });
-        var canvas_legend = C.loadLib('legend')({
+        var canvas_legend = _require('legend')({
             blendent: blendent
         }, {
             height: $geomap.height()/2
         });
-        // $canvas_legend.css({
-        //     position: 'absolute',
-        //     right: 0,
-        //     top: $geomap.height()/4
-        // }).appendTo($geomap);
-        
+
         geomap.addOverlay(new Shape.Image(canvas_legend, {
             x: $geomap.width() - canvas_legend.width,
             y: $geomap.height()/4
@@ -194,9 +171,7 @@
                         }));
                     // }
                 }
-                var conrec = C.remote('conrec');
-                // var conrec = require('../../app/workbench/conrec');
-                conrec(data.interpolate, blendent, true, function(err, data_conrec) {
+                _require('conrec').setModel(model)(data.interpolate, blendent, true, function(err, data_conrec) {
                     if (err) {
                         return model.emit('error', err);
                     }

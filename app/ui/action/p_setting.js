@@ -1,21 +1,22 @@
 !function() {
 	var C = Core;
 	var $ = C.$;
-	var dialog = C.load('dialog');
+	var _require = C.require;
+	var dialog =_require('dialog');
 	var _alert = dialog.alert;
 	var _confirm = dialog.confirm;
-	var product_conf = C.loadRemote('product_conf'); //直接把模块加载到UI进程
-	var util_ui = C.load('util').UI;
-	
+	var product_conf = _require('product_conf'); //直接把模块加载到UI进程
+	var util_ui = _require('component').UI;
+
 	var conf_data_sys = product_conf.getSys() || {};
 	var conf_data_geo = conf_data_sys.geo || (conf_data_sys.geo = []);
-	
+
 	var $doc = $(document);
 	$doc.delegate('[type=range]', 'input', function() {
 		var $this = $(this);
 		$this.next('span').text($this.val());
 	});
-	
+
 	// 对resize-horizontal组件初始化
 	{
 		$doc.on('mouseup.resize', function(){
@@ -46,7 +47,7 @@
 			});
 		});
 	}
-	
+
 	// tab切换效果
 	{
 		var $tabContentItems = $('tab-content item');
@@ -54,7 +55,7 @@
 			$tabContentItems.removeClass('on').eq($(this).index()).addClass('on');
 		});
 	}
-	
+
 	$doc.delegate('.map_item .btn_up', 'click', function() {
 		var $this = $(this);
 		var $p = $this.closest('.map_item');
@@ -70,7 +71,7 @@
 			$(this).remove();
 		});
 	});
-	
+
 	function _getChecked($checkbox){
 		return $checkbox.prop('checked');
 	}
@@ -92,9 +93,9 @@
 			$select.find('[value='+val+']').attr('selected', 'selected');
 		}
 	}
-	
+
 	var $txt_map_name = $('#txt_map_name');
-	var $map_conf_list = $('#map_conf_list');	
+	var $map_conf_list = $('#map_conf_list');
 	var $map_conf = $('#map_conf');
 	var $cb_prov = $('#cb_prov');
 	var $cb_city = $('#cb_city');
@@ -102,9 +103,9 @@
 	var $c_map_text = $('#c_map_text');
 	var $n_map_text = $('#n_map_text');
 	var $s_map_text = $('#s_map_text');
-	
+
 	var tmpl_map_item = $('#tmpl_map_item').text();
-	
+
 	var is_can_add_map_file = true;
 	var editting = false;
 	function _clearMapConf() {
@@ -115,16 +116,14 @@
 		_setChecked($cb_county, false);
 		$n_map_text.val(12);
 		_setSelect($s_map_text);
-		
+
 		is_can_add_map_file = true;
 	}
 	function _saveConfData() {
-		// console.log(JSON.stringify(conf_data_geo))
 		conf_data_sys.geo = conf_data_geo;
-		console.log(JSON.stringify(conf_data_sys))
 		product_conf.setSys(conf_data_sys);
 	}
-	
+
 	function _saveMapConf(cb) {
 		var map_name = $txt_map_name.val();
 		if (!map_name) {
@@ -134,18 +133,18 @@
 			var $list_check = $map_conf_list.find('li:not(.on)');
 			for (var i = 0, j = $list_check.length; i<j; i++) {
 				if ($list_check.eq(i).text() == map_name) {
-					return _alert('请确保名称不重复');	
+					return _alert('请确保名称不重复');
 				}
 			}
 		}
-		
+
 		var data = {
 			name: map_name
 		};
 		var list = [];
 		$map_conf.find('.map_item').each(function() {
 			var $this = $(this);
-			
+
 			// var file = $this.find('.f_map_item').val();
 			var file = util_ui.file($this.find('.file'))();
 			var lineWidth = $this.find('.n_map_item').val();
@@ -159,7 +158,7 @@
 			var shadow_size = $this.find('.c_map_item_shadow_size').val();
 			var shadow_x = $this.find('.c_map_item_shadow_x').val();
 			var shadow_y = $this.find('.c_map_item_shadow_y').val();
-			
+
 			list.push({
 				file: file,
 				style: {
@@ -178,13 +177,13 @@
 				}
 			});
 		});
-		
+
 		if (list.length > 0) {
 			data.maps = list;
 		} else {
 			return _alert('您还没有添加地图数据文件!');
 		}
-		
+
 		data.textStyle = {
 			prov: _getChecked($cb_prov),
 			city: _getChecked($cb_city),
@@ -193,22 +192,22 @@
 			color: $c_map_text.val(),
 			flag: $s_map_text.val()
 		}
-		
+
 		var index = $map_conf_list.find('.on').index();
-	
+
 		if (index == -1) {
 			conf_data_geo.push(data);
 		} else {
 			conf_data_geo.splice(index, 1, data);
 		}
-		
+
 		conf_data_geo.sort(function(a, b) {
 			return (a.name+'').localeCompare(b.name);
 		});
 		_saveConfData();
-		
+
 		_initMapConfList();
-		
+
 		editting = false;
 		cb && cb();
 	}
@@ -217,13 +216,13 @@
 		for (var i = 0, j = conf_data_geo.length; i<j; i++) {
 			html += '<li>'+conf_data_geo[i].name+'</li>';
 		}
-		
+
 		$map_conf_list.html(html);
 	}
 	_initMapConfList();
 	$('#btn_save_map').click(function() {
 		_saveMapConf(function() {
-			_alert('保存成功！');	
+			_alert('保存成功！');
 		});
 	});
 	$('#btn_add_map').click(function() {
@@ -235,19 +234,19 @@
 			width_minus: 8
 		});
 		$map_conf.append($html);
-		
+
 		// is_can_add_map_file = false;
 	});
-	
+
 	// 切换地图配置
 	function _initMapConf(index) {
 		_clearMapConf();
-		
+
 		var geo = conf_data_geo[index];
 		if (geo) {
 			var name = geo.name;
 			$txt_map_name.val(name);
-			
+
 			var maps = geo.maps;
 			if (!maps) {
 				return;
@@ -258,7 +257,7 @@
 				var style = _map_conf.style || {};
 				var clip = _map_conf.clip;
 				var borderStyle = _map_conf.borderStyle || {};
-				
+
 				var $html = $(tmpl_map_item);
 				util_ui.file($html.find('.file'), {
 					width_minus: 8,
@@ -278,7 +277,7 @@
 				// $html.find('.c_map_item_fill').val(file);
 				$map_conf.append($html);
 			}
-			
+
 			var textStyle = geo.textStyle;
 			var cb_prov = textStyle.prov;
 			var cb_city = textStyle.city;
@@ -286,7 +285,7 @@
 			var fontSize = textStyle.fontSize;
 			var color = textStyle.color;
 			var flag = textStyle.flag;
-			
+
 			_setChecked($cb_prov, cb_prov);
 			_setChecked($cb_city, cb_city);
 			_setChecked($cb_county, cb_county);
@@ -311,24 +310,24 @@
 		$(this).addClass('on').siblings().removeClass('on');
 		_changeMapConf($(this).index());
 	});
-	
+
 	$('#btn_add_map_conf').click(function() {
 		$map_conf_list.find('.on').removeClass('on');
 		_changeMapConf();
 	});
-	
+
 	$('#btn_dele_map_conf').click(function() {
 		var $item = $map_conf_list.find('.on');
 		var index = $item.index();
 		if (index == -1) {
 			return _alert('请选中要删除的项!');
-		}	
+		}
 		_confirm('确定要删除选中项吗？', function() {
 			conf_data_geo.splice(index, 1);
 			_saveConfData();
-			
+
 			$item.remove();
 			_clearMapConf();
-		});		
+		});
 	});
 }()

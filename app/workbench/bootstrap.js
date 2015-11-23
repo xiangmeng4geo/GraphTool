@@ -5,13 +5,13 @@
 	"use strict";
 
 	var app = require('app');
-	var ipc = require('ipc');
+	var ipc = require('electron').ipcMain;
 	var BrowserWindow = require('browser-window');
 	var path = require('path');
 	var _window = require('./window');
-	var logger = require('./logger');
+	var logger = require('../common/logger');
 	var command = require('./command');
-	var CONST = require('./const');
+	var CONST = require('../common/const');
 	// var util = require('./util');
 	// var util_file_mkdir = util.file.mkdir
 	//

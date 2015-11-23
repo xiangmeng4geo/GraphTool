@@ -1,5 +1,5 @@
 !function() {
-    var Shape = Core.loadLib('shape');
+    var Shape = Core.require('shape');
     var _model;
     function _render(data) {
         var t_start = new Date();
@@ -13,7 +13,7 @@
                     var index = v[0],
                         color = v[1],
                         indexs_clip = v[2];
-                        
+
                     shapes.push(new Shape.Polygon(data_list[index], {
                         fillStyle: color
                     }));

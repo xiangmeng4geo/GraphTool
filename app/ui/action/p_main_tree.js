@@ -4,8 +4,10 @@
  Core.init(function(model){
  	var C = Core;
  	var $ = C.$;
- 	C.load('lib/j.tree');
- 	var Config = C.remote('product_conf');
+    var _require = C.require;
+    _require('j.tree');
+
+    var Config = _require('product_conf');
 
  	var $doc = $(document);
  	var TREE_NAME = 'sys_product_tree';
