@@ -21,7 +21,8 @@
 					</div>
 					<div class="row">
 						<label>线宽度</label>
-						<input type="number" class="n_map_item"/>
+						<input type="range" min=0 max=6 step=0.5 class="n_map_item"/>
+						<span></span>
 					</div>
 					<div class="row">
 						<label>线颜色</label>
@@ -36,11 +37,31 @@
 						<label>对边界进行处理</label>
 						<div class="row">
 							<label>线宽度</label>
-							<input type="number" class="n_map_item_line"/>
+							<input type="range" min=0 max=6 step=0.5 class="n_map_item_line"/>
+							<span></span>
 						</div>
 						<div class="row">
 							<label>线颜色</label>
 							<input type="color" class="c_map_item_line"/>
+						</div>
+						<div class="row">
+							<label>投影颜色</label>
+							<input type="color" class="c_map_item_shadow"/>
+						</div>
+						<div class="row">
+							<label>投影大小</label>
+							<input type="range" min=0 max=10 class="c_map_item_shadow_size"/>
+							<span></span>
+						</div>
+						<div class="row">
+							<label>x偏移</label>
+							<input type="range" min=-10 max=10 class="c_map_item_shadow_x"/>
+							<span></span>
+						</div>
+						<div class="row">
+							<label>y偏移</label>
+							<input type="range" min=-10 max=10 class="c_map_item_shadow_y"/>
+							<span></span>
 						</div>
 						<!--<div class="row">
 							<label>填充色</label>

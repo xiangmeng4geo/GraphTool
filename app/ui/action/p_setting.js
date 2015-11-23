@@ -11,6 +11,10 @@
 	var conf_data_geo = conf_data_sys.geo || (conf_data_sys.geo = []);
 	
 	var $doc = $(document);
+	$doc.delegate('[type=range]', 'input', function() {
+		var $this = $(this);
+		$this.next('span').text($this.val());
+	});
 	
 	// 对resize-horizontal组件初始化
 	{
@@ -150,7 +154,11 @@
 			var is_use_border = _getChecked($this.find('.cb_map_item_border'));
 			var b_lineWidth = $this.find('.n_map_item_line').val();
 			var b_strokeStyle = $this.find('.c_map_item_line').val();
-			var b_fillStyle = $this.find('.c_map_item_fill').val(); //暂时不考虑填充色
+			// var b_fillStyle = $this.find('.c_map_item_fill').val(); //暂时不考虑填充色
+			var shadow_color = $this.find('.c_map_item_shadow').val();
+			var shadow_size = $this.find('.c_map_item_shadow_size').val();
+			var shadow_x = $this.find('.c_map_item_shadow_x').val();
+			var shadow_y = $this.find('.c_map_item_shadow_y').val();
 			
 			list.push({
 				file: file,
@@ -162,7 +170,11 @@
 				borderStyle: {
 					flag: is_use_border,
 					strokeStyle: b_strokeStyle,
-					lineWidth: b_lineWidth
+					lineWidth: b_lineWidth,
+					shadowBlur: shadow_size,
+					shadowColor: shadow_color,
+					shadowOffsetX: shadow_x,
+					shadowOffsetY: shadow_y
 				}
 			});
 		});
@@ -253,12 +265,16 @@
 					val: file
 				});
 				// $html.find('.f_map_item').val(file);
-				$html.find('.n_map_item').val(style.lineWidth);
+				$html.find('.n_map_item').val(style.lineWidth).next('span').text(style.lineWidth);
 				$html.find('.c_map_item').val(style.strokeStyle);
 				_setChecked($html.find('.cb_map_item'), clip);
 				_setChecked($html.find('.cb_map_item_border'), borderStyle.flag);
-				$html.find('.n_map_item_line').val(borderStyle.lineWidth);
+				$html.find('.n_map_item_line').val(borderStyle.lineWidth).next('span').text(borderStyle.lineWidth);;
 				$html.find('.c_map_item_line').val(borderStyle.strokeStyle);
+				$html.find('.c_map_item_shadow').val(borderStyle.shadowColor);
+				$html.find('.c_map_item_shadow_size').val(borderStyle.shadowBlur).next('span').text(borderStyle.shadowBlur);
+				$html.find('.c_map_item_shadow_x').val(borderStyle.shadowOffsetX).next('span').text(borderStyle.shadowOffsetX);
+				$html.find('.c_map_item_shadow_y').val(borderStyle.shadowOffsetY).next('span').text(borderStyle.shadowOffsetY);
 				// $html.find('.c_map_item_fill').val(file);
 				$map_conf.append($html);
 			}

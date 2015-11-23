@@ -3,26 +3,28 @@
     var fs = require('fs');
     var Reader = C.remote('datareader');
     var Render = C.load('render');
+    var CONF_GEO = C.loadRemote('product_conf').getSys.getGeo('陕西地图');
 
-    var geo_files = [];
-    geo_files.push({
-        file: 'H:/docs/2015/蓝PI相关/地理信息/陕西/市界+县界/新建文件夹/市界+所有县界/地市县界/地市界.shp',
-        style: {
-            strokeStyle: 'rgba(200, 200, 200, 1)',
-            lineWidth: 0.5,
-            // fillStyle: 'rgba(255, 255, 255, 1)'
-        },
-        clip: true,
-        borderStyle: {
-            strokeStyle: 'rgba(0, 0, 0, 0.8)',
-            lineWidth: 3,
-            shadowBlur: 10,
-            shadowColor: 'rgba(0, 0, 0, 0.5)',
-            shadowOffsetX: 5,
-            shadowOffsetY: 5
-        }
-    });
-
+    // var geo_files = [];
+    // geo_files.push({
+    //     file: 'H:/docs/2015/蓝PI相关/地理信息/陕西/市界+县界/新建文件夹/市界+所有县界/地市县界/地市界.shp',
+    //     style: {
+    //         strokeStyle: 'rgba(200, 200, 200, 1)',
+    //         lineWidth: 0.5,
+    //         // fillStyle: 'rgba(255, 255, 255, 1)'
+    //     },
+    //     clip: true,
+    //     borderStyle: {
+    //         strokeStyle: 'rgba(0, 0, 0, 0.8)',
+    //         lineWidth: 3,
+    //         shadowBlur: 10,
+    //         shadowColor: 'rgba(0, 0, 0, 0.5)',
+    //         shadowOffsetX: 5,
+    //         shadowOffsetY: 5
+    //     }
+    // });
+    
+    var geo_files = CONF_GEO.maps;
     module.exports = function init(options) {
         var GeoMap = options.GeoMap,
             Shape = options.Shape,

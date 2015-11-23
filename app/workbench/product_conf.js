@@ -23,10 +23,23 @@
 	
 	var CONST_SYSCONF_NAME = 'sys';
 	var CONST_SYS_PRODUCT_TREE_NAME = 'sys_product_tree';
-	function _getSysConf() {
+	function _getSys() {
 		return _readConfig(CONST_SYSCONF_NAME);
 	}
-	function _saveSysConf(json) {
+	_getSys.getGeo = function(name) {
+		var conf = _getSys() || {};
+		var geo = conf.geo || [];
+		if (!name) {
+			return geo;
+		} else {
+			for (var i = 0, j = geo.length; i<j; i++) {
+				if (name == geo[i].name) {
+					return geo[i];
+				}
+			}
+		}
+	}
+	function _saveSys(json) {
 		return _saveConfig(CONST_SYSCONF_NAME, json);
 	}
 	function _getTree() {
@@ -39,8 +52,8 @@
 		read: _readConfig,
 		save: _saveConfig,
 		rm: _rmConfig,
-		getSys: _getSysConf,
-		setSys: _saveSysConf,
+		getSys: _getSys,
+		setSys: _saveSys,
 		getTree: _getTree,
 		setTree: _saveTree
 	};
