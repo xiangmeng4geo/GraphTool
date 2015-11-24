@@ -42,7 +42,7 @@
 				return _url_new;
 			}
 		}
-		return false;
+		return '';
 	}
 	function require_safe(req, url, showError){
 		if(is_exists_module(url)){
@@ -157,19 +157,26 @@
 	Core.on = subscibe;
 	Core.emit = emit;
 
+	var Win = {
+		open: function(name, is_subwin) {
+			var win_remote = _loadRemote('window');
+			var win = win_remote.open(name);
+			if (is_subwin) {
+				win_remote.setSub(win_instance.id, win.id);
+			}
+			return win;
+		},
+		WIN: win_instance
+	}
 	var $ = load('lib/j');
 	Core.CONST = CONST;
 	Core.$ = $;
-	// Core.load = load;
-	// Core.loadLib = function(url) {
-	// 	return load(url, 'lib');
-	// }
+
 	Core.require = _require;
-	// Core.loadRemote = loadRemote;
 	Core.script = script;
 	Core.remote = _loadRemote;
 	Core.init = safe;
-	Core.WIN = win_instance;
+	Core.Win = Win;
 	window_global.Core = Core;
 
 	safe(function(){

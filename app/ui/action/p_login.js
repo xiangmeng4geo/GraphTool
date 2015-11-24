@@ -5,15 +5,12 @@ Core.init(function(){
 	var C = Core;
 	var $ = C.$;
 	var _require = C.require;
-	// var _load = C.load;
-	var remote = C.remote;
 
 	var Store = _require('store');
 	var Dialog = _require('dialog');
 	var dialog_alert = Dialog.alert;
 	var util = _require('util');
 	var util_verification = util.verification;
-	var win = remote('window');
 
 	function close(){
 		window.close();
@@ -57,7 +54,7 @@ Core.init(function(){
 					close();
 				}, min_init_time);
 			});
-			win.open('main');
+			C.Win.open('main');
 		}else{
 			(false_fn || function(){
 				dialog_alert('您输入的用户和密码错误，请重新输入！');

@@ -12,10 +12,13 @@ Core.init(function(){
 	var C = Core;
 	var $ = C.$;
 	var _require = C.require;
-	var WIN = C.WIN;
-	
+	var Win = C.Win;
+	var WIN = Win.WIN;
+
+	Win.beforeclose();
+
 	C.emit('main.loaded');
-	var win = C.remote('window');
+	// var win = C.remote('window');
 
 	var $doc = $(document);
 
@@ -65,7 +68,7 @@ Core.init(function(){
 			win_setting.isFocused();
 			win_setting.focus();
 		} catch(e){
-			win_setting = win.open('setting');
+			win_setting = Win.open('setting', true);
 		}
 	});
 

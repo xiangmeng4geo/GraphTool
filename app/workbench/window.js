@@ -5,14 +5,15 @@
 	/**
 	 * 这里主要操作窗口
 	 */
-	var IS_PROCESS_MAIN =  process.type == 'browser';
+	// var IS_PROCESS_MAIN =  process.type == 'browser';
 	var path = require('path');
 	var fs = require('fs');
 	var CONST = require('../common/const');
 	var PATH = CONST.PATH;
-	var BrowserWindow = IS_PROCESS_MAIN? require('browser-window'): require('remote').require('browser-window');
-
+	// var BrowserWindow = IS_PROCESS_MAIN? require('browser-window'): require('remote').require('browser-window');
+	var BrowserWindow = require('browser-window');
 	var win_stack = global.win_stack || (global.win_stack = []);
+	var win_sub = global.win_sub || (global.win_sub = {});
 	/**
 	 * 得到一个`browser-window`实例
 	 */
@@ -33,10 +34,20 @@
 		 */
 		// conf.transparent = true;
 		conf.show = false;
+		conf.titleBarStyle = 'hidden';
 		var win = new BrowserWindow(conf);
 		// win.openDevTools();
 		// 当窗口关闭时清除`win_stack`中的标识
-		win.on('close', function(){
+		win.on('close', function(e){
+			var sub_windows = win_sub[win.id];
+			if (sub_windows && sub_windows.length > 0) {
+				sub_windows.forEach(function(w) {
+					var _sub = BrowserWindow.fromId(w);
+					_sub && _sub.close();
+				});
+			}
+
+			// e.preventDefault();
 			var id = this.id;
 			for(var i = 0, j = win_stack.length; i<j; i++){
 				if(id === win_stack[i]){
@@ -79,6 +90,9 @@
 		win_load(win, name);
 		return win;
 	}
+	function setSub(parentId, subId) {
+		(win_sub[parentId] || (win_sub[parentId] = [])).push(subId);
+	}
 
 	module.exports = {
 		getInstance: get_win,
@@ -92,6 +106,7 @@
 			if(id !== undefined){
 				return BrowserWindow.fromId(id);
 			}
-		}
+		},
+		setSub: setSub
 	}
 }()
