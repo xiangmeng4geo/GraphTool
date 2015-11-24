@@ -13,6 +13,7 @@
 
     var geo_files = CONF_GEO.maps;
     var textStyle = CONF_GEO.textStyle;
+    var bound = CONF_GEO.bound;
     module.exports = function init(options) {
         var GeoMap = options.GeoMap,
             Shape = options.Shape,
@@ -22,7 +23,8 @@
 
         Reader.setModel(model);
         Render.setModel(model);
-        model.emit('projection.changeview', [104.72582600905484, 40.29761417442774], [113.21011197110165, 31.080076687873927]);
+
+        model.emit('projection.changeview', bound.wn, bound.es);
         model.on('refresh', function() {
             geomap.refresh();
         });
@@ -33,7 +35,7 @@
             });
             model.emit('log', 'render data takes '+(new Date() - t_start)+' ms!');
 
-            
+
             util_file.Image.save(util_path.join(CONST_PATH_CACHE, '1.png'), geomap.export());
         });
         var blendent = [{
@@ -119,11 +121,11 @@
 
             var place_arr = util_file.read(CONST.GEO.FILE, true);
             // var place_arr = require('H:/docs/2015/蓝PI相关/各方需求/陕西/地名+经纬度.json');
-            
+
             var cb_prov = textStyle.prov,
                 cb_city = textStyle.city,
                 cb_county = textStyle.county;
-            
+
             var FLAGS = CONST.GEO.FLAGS;
             var flag = null;
             for (var i = 0, j = FLAGS.length; i<j; i++) {
@@ -146,7 +148,7 @@
                     var item = place_arr[i];
                     var name = item.name,
                         pname = item.pname;
-                    if ((cb_prov && !pname) || 
+                    if ((cb_prov && !pname) ||
                         (cb_city && name == pname) ||
                         (cb_county && pname && pname !== name)) {
                         names[item.name] = item;

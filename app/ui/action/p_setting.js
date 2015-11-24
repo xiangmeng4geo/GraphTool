@@ -9,6 +9,7 @@
 	var util_ui = _require('component').UI;
 	var CONST = _require('const');
 	var CONST_GEO_FLAGS = CONST.GEO.FLAGS;
+	var CONST_BOUND = CONST.BOUND;
 
 	var conf_data_sys = product_conf.getSys() || {};
 	var conf_data_geo = conf_data_sys.geo || (conf_data_sys.geo = []);
@@ -92,6 +93,10 @@
 	var $c_map_text = $('#c_map_text');
 	var $n_map_text = $('#n_map_text');
 	var $s_map_text = $('#s_map_text');
+	var $txt_wn_lng = $('#txt_wn_lng');
+	var $txt_wn_lat = $('#txt_wn_lat')
+	var $txt_es_lng = $('#txt_es_lng');
+	var $txt_es_lat = $('#txt_es_lat')
 	
 	util_ui.select($s_map_text, {
 		data: CONST_GEO_FLAGS
@@ -112,6 +117,11 @@
 		});
 
 		is_can_add_map_file = true;
+		
+		$txt_wn_lng.val(CONST_BOUND.WN[0]);
+		$txt_wn_lat.val(CONST_BOUND.WN[1]);
+		$txt_es_lng.val(CONST_BOUND.ES[0]);
+		$txt_es_lat.val(CONST_BOUND.ES[1]);
 	}
 	function _saveConfData() {
 		conf_data_sys.geo = conf_data_geo;
@@ -186,6 +196,26 @@
 			return _alert('您还没有添加地图数据文件!');
 		}
 
+		var es_lng = $txt_es_lng.val();
+		var es_lat = $txt_es_lat.val();
+		var wn_lng = $txt_wn_lng.val();
+		var wn_lat = $txt_wn_lat.val();
+		
+		if (isNaN(es_lng) || isNaN(es_lat) || isNaN(wn_lng) || isNaN(wn_lat)) {
+			return _alert('请输入正确的坐标!');
+		} else {
+			es_lng = parseFloat(es_lng);
+			es_lat = parseFloat(es_lat);
+			wn_lng = parseFloat(wn_lng);
+			wn_lat = parseFloat(wn_lat);
+			if (es_lng < wn_lng || es_lat > wn_lat) {
+				return _alert('请确保西北和东南的数据方向正确！'+(es_lng < wn_lng) +''+ (es_lat > wn_lat));
+			}
+		}
+		data.bound = {
+			wn: [wn_lng, wn_lat],
+			es: [es_lng, es_lat]
+		}
 		data.textStyle = {
 			prov: _getChecked($cb_prov),
 			city: _getChecked($cb_city),
@@ -194,6 +224,7 @@
 			color: $c_map_text.val(),
 			flag: util_ui.select($s_map_text).val()
 		}
+		
 
 		var index = $map_conf_list.find('.on').index();
 
@@ -295,6 +326,15 @@
 			$n_map_text.val(fontSize);
 			
 			util_ui.select($s_map_text).selected(flag);
+			
+			
+			var bound = geo.bound;
+			var wn = bound.wn;
+			var es = bound.es;
+			$txt_wn_lng.val(wn[0]);
+			$txt_wn_lat.val(wn[1]);
+			$txt_es_lng.val(es[0]);
+			$txt_es_lat.val(es[1]);
 		}
 	}
 	function _changeMapConf(index) {
