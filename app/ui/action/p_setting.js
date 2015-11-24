@@ -12,6 +12,7 @@
 
 	var conf_data_sys = product_conf.getSys() || {};
 	var conf_data_geo = conf_data_sys.geo || (conf_data_sys.geo = []);
+	var conf_data_blendent = conf_data_sys.blendent || (conf_data_sys.blendent = []);
 
 	var $doc = $(document);
 	$doc.delegate('[type=range]', 'input', function() {
@@ -53,7 +54,8 @@
 	// tab切换效果
 	{
 		var $tabContentItems = $('tab-content item');
-		$('tab item').click(function() {
+		var $tabItems = $('tab item').click(function() {
+			$(this).addClass('on').siblings().removeClass('on');
 			$tabContentItems.removeClass('on').eq($(this).index()).addClass('on');
 		});
 	}
@@ -331,4 +333,8 @@
 			_clearMapConf();
 		});
 	});
+	
+	
+	// 图例相关
+	require('./p_setting_blendent');			
 }()

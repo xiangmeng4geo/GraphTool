@@ -107,16 +107,30 @@
 					</div>
 				</item>
 				<item>
-					<ul class="list">
-						<li>test</li>
-						<li class="on">abc</li>
-					</ul>
+					<div class="list">
+						<input type="button" value="添加" id="btn_add_blendent_conf"/>
+						<input type="button" value="删除" id="btn_dele_blendent_conf"/>
+						<ul id="blendent_conf_list">				
+						</ul>
+					</div>
 					<resize-horizontal></resize-horizontal>
 					<div class="content">
-						<div class="row">
-							<label>填充色</label>
-							<input type="radio"/>
+						<div class="map_left" id="blendent_conf" style="right: 0">
+							<input type="text" value="" placeholder="自定义配色方案名" id="txt_blendent_name">
+							<input type="button" value="添加或修改" id="btn_save_blendent"/>
+							
+							<div class="row">
+								<h2>添加新的配色方案</h2>
+								<select id="select_legent_product" class="mt10">
+								</select>
+								<input type="button" value="添加" id="btn_add_new_legend"/>
+							</div>
 						</div>
+						<div class="map_right" style="width:0">
+							<div class="row">
+								
+							</div>
+						</div>	
 					</div>
 				</item>
 			</tab-content>

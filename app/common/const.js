@@ -21,7 +21,8 @@
 	var path_cache = format(path.join(path_base, 'cache'));
 	
 	var path_img_ball = format(path.join(path_ui, 'img/ball.png'));
-	module.exports = {
+	
+	var conf = {
 		GEO: {
 			FILE: format(path.join(path_base, 'data', 'sx.json')),
 			FLAGS: [{
@@ -51,5 +52,15 @@
 			DELAY: 10, 	// 异步写日志间隔(s)
 			DAYS: 3		// 日志保留天数
 		}
+	};
+	
+	var conf_const;
+	try{
+		conf_const = require('../conf/const');
+	} catch(e) {}
+	
+	for (var i in conf_const) {
+		conf[i] = conf_const[i];
 	}
+	module.exports = conf;
 }();

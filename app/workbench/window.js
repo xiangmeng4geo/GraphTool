@@ -1,3 +1,4 @@
+/* global global */
 /* global process */
 !function(){
 	'use strict'
@@ -68,6 +69,7 @@
 				// });
 			});
 		}
+		return win;
 	}
 	/**
 	 * 打开一个窗口，是getInstance和load的结合
@@ -75,6 +77,7 @@
 	var open = function(name){
 		var win = get_win(name);
 		win_load(win, name);
+		return win;
 	}
 
 	module.exports = {

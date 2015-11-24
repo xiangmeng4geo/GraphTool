@@ -18,6 +18,7 @@ tab item{
 	min-width: 100px;
 	text-align: center;
 	cursor: pointer;
+	height: 28px;
 }
 tab item.on{
 	border-bottom-color: red;
@@ -130,4 +131,7 @@ tab-content item resize-horizontal:after{
 }
 .row .row{
 	margin-left: 20px;
+}
+.fieldset_color input{
+	width: 80px;
 }

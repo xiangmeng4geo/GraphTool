@@ -1,7 +1,7 @@
 !function() {
 	var $ = Core.$;
 	var Dialog = require('./dialog');
-	
+
 	var FILETER_GEO = [{
 		name: 'GeoJSON',
 		extensions: ['json']
@@ -12,13 +12,13 @@
 		name: 'shp',
 		extensions: ['shp']
 	}];
-	var FILETER_DEFAULT = 
+	var FILETER_DEFAULT =
 	function openGeo() {
 		Dialog.open({
 			filters: FILETER_GEO
 		});
 	}
-	
+
 	var $doc = $(document);
 	var UI = {};
 	var types = {
@@ -44,10 +44,10 @@
 			val: '',
 			placeholder: ''
 		}, options);
-		
+
 		var width_btn = options.width_btn;
 		var width_minus = options.width_minus;
-		
+
 		if (!$container.data('inited')) {
 			var tmpl_file = '<input type="text" value="'+options.val+'" placeholder="'+options.placeholder+'" class="txt_file" style="width: calc(100% - '+(width_btn + width_minus)+'px);"/>'+
 						'<input type="button" data-type="'+options.type+'" class="btn_file_browse" value="浏览" style="width:'+width_btn+'px;"/>';
@@ -55,12 +55,12 @@
 			$container.data('inited', true);
 		}
 		var $txt_file = $container.find('.txt_file');
-		
+
 		return function() {
 			return $txt_file.val();
 		}
 	}
-	
+
 	$doc.delegate('.select', 'mouseleave', function() {
 		$(this).find('ul').hide();
 	})
@@ -72,7 +72,7 @@
 		var $this = $(this).addClass('selected');
 		$this.siblings().removeClass('selected');
 		var $select_show_text = $this.parent().prev('span');
-		
+
 		$select_show_text.data('val', $this.data('val')).html($this.html());
 		$this.parent().hide();
 	})
@@ -81,7 +81,7 @@
 			val: null,
 			data: null,
 		}, options);
-		
+
 		var val_selected = options.val;
 		if (!$container.data('inited')) {
 			var html = '<ul>';
@@ -107,7 +107,7 @@
 			$container.html(tmpl+html);
 			$container.data('inited', true);
 		}
-		
+
 		return {
 			val: function() {
 				var $val = $container.find('.selected');
@@ -130,8 +130,55 @@
 	}
 	UI.file = file;
 	UI.select = select;
-	
-	module.exports = {
+
+	var Util = {
 		UI: UI
-	}
+	};
+	/*颜色转换*/
+	!function(){
+		var REG_RGB = /rgb\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)/;
+		function to16(num){
+			var str16 = Number(num).toString(16);
+			return (str16.length == 1? '0':'')+str16;
+		}
+		function color_rgb2normal(color_rgb){
+			if(color_rgb){
+				var m = REG_RGB.exec(color_rgb);
+				if(m){
+					return '#'+to16(m[1])+to16(m[2])+to16(m[3]);
+				}else if(REG_HTML.test(color_rgb)){
+					return color_rgb;
+				}
+			}
+		}
+		var REG_HTML = /#([\da-f]{2})([\da-f]{2})([\da-f]{2})/
+		function color_normal2rgb(color_html,isReturnArray){
+			if(color_html){
+				var m = REG_HTML.exec(color_html);
+				if(m){
+					var arr = [parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)];
+
+					if(isReturnArray){
+						return arr;
+					}
+					return 'rgb('+(arr.join(','))+')';
+				}else{
+					var m = REG_RGB.exec(color_html);
+					if(m){
+						if(isReturnArray){
+							m.shift();
+							return m;
+						}else{
+							return color_html;
+						}
+					}
+				}
+			}
+		}
+		Util.Color = {
+			toRGB: color_normal2rgb,
+			toHTML: color_rgb2normal
+		}
+	}();
+	module.exports = Util;
 }();

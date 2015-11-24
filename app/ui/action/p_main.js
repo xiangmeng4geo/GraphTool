@@ -13,7 +13,7 @@ Core.init(function(){
 	var $ = C.$;
 	var _require = C.require;
 	var WIN = C.WIN;
-
+	
 	C.emit('main.loaded');
 	var win = C.remote('window');
 
@@ -56,11 +56,17 @@ Core.init(function(){
 			});
 		});
 	}
-	$('#btn_quite').click(function(){
+	$('#btn_quite, .btn_close').click(function(){
 		window.close();
 	});
+	var win_setting;
 	$('#btn_setting').click(function(){
-		win.open('setting');
+		try {
+			win_setting.isFocused();
+			win_setting.focus();
+		} catch(e){
+			win_setting = win.open('setting');
+		}
 	});
 
 	model.on('product.change', function(productName){
