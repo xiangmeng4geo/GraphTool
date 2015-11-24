@@ -32,9 +32,24 @@
 		if (!name) {
 			return geo;
 		} else {
+			name = name.trim();
 			for (var i = 0, j = geo.length; i<j; i++) {
 				if (name == geo[i].name) {
 					return geo[i];
+				}
+			}
+		}
+	}
+	_getSys.getLegend = function(name) {
+		var conf = _getSys() || {};
+		var legend = conf.legend || [];
+		if (!name) {
+			return legend;
+		} else {
+			name = name.trim();
+			for (var i = 0, j = legend.length; i<j; i++) {
+				if (name === legend[i].name) {
+					return legend[i];
 				}
 			}
 		}

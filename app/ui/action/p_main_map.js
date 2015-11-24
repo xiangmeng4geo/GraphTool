@@ -12,12 +12,16 @@ Core.init(function(model) {
     var Shape = _require('shape');
     var Pattern = _require('pattern');
     var d3 = _require('d3');
+    var util = _require('util');
+    var util_file = util.file;
+    var CONST = _require('const');
+    var place_arr = util_file.readJson(CONST.GEO.FILE);
 
     //统一处理其它库里的错误信息
     model.on('error', function(err) {
         console.log(err.msg||err.message||err);
     });
-    
+
     var $geomap_container = $('#geomap_container');
     var $geomap = $('#geomap');
     var width_map, height_map;
@@ -44,11 +48,6 @@ Core.init(function(model) {
         var leftup = [72.57, 58],
            rightdown = [136.60, 14.33];
         var projection = _getProjection(leftup, rightdown);
-        // $geomap_container.on('click', function(e) {
-        //     var x = e.offsetX,
-        //         y = e.offsetY;
-        //     console.log(x, y, projection.invert([x, y]));
-        // });
         var zoom = d3.behavior.zoom()
             .translate(projection.translate())
             .scale(projection.scale())
@@ -57,18 +56,15 @@ Core.init(function(model) {
                 var e = d3.event;
                 projection.scale(e.scale);
                 projection.translate(e.translate);
-                // geomap.refresh('geo');
-                // geomap.refresh();
                 model.emit('refresh');
-            })
-            // .on('zoomend', function() {
-            //     console.log('end');
-            //     geomap.refresh('weather');
-            // });
+            });
         var drag = d3.behavior.drag().on('dragstart', function() {
             $geomap.addClass('dragging');
         }).on('dragend', function() {
             $geomap.removeClass('dragging');
+        });
+        var geomap = new GeoMap(model).init({
+            container: $geomap
         });
         model.on('projection.changeview', function(a, b) {
             projection = _getProjection(a, b);
@@ -76,10 +72,79 @@ Core.init(function(model) {
             zoom.translate(projection.translate()).scale(projection.scale());
             // model.emit('refresh');
         });
+        model.on('refresh', function() {
+            geomap.refresh();
+        });
+        model.on('render', function(shapes) {
+            var t_start = new Date();
+            shapes.forEach(function(shape) {
+                geomap.addOverlay(shape);
+            });
+            model.emit('log', 'render data takes '+(new Date() - t_start)+' ms!');
+        });
+        model.on('export', function() {
+            util_file.Image.save(util_path.join(CONST.PATH.CACHE, '1.png'), geomap.export());
+        });
+        model.on('legend', function(blendent) {
+            var canvas_legend = _require('legend')({
+                blendent: blendent
+            }, {
+                height: height_map/2
+            });
+            geomap.addOverlay(new Shape.Image(canvas_legend, {
+                x: width_map - canvas_legend.width,
+                y: height_map/4
+            }));
+        });
+        model.on('geo', function(geo_files, textStyle, cb_afterGeo) {
+            geomap.setGeo(geo_files, function() {
+                var cb_prov = textStyle.prov,
+                    cb_city = textStyle.city,
+                    cb_county = textStyle.county;
+                var FLAGS = CONST.GEO.FLAGS;
+                var flag = null;
+                for (var i = 0, j = FLAGS.length; i<j; i++) {
+                    var f = FLAGS[i];
+                    if (f.val === textStyle.flag) {
+                        if (f.type == 'img') {
+                            flag = {
+                                src: f.val,
+                                width: 5,
+                                height: 5,
+                                center: true
+                            }
+                        }
+                        break;
+                    }
+                }
+                var names = {};
+                if (cb_prov || cb_city || cb_county) {
+                    for (var i = 0, j = place_arr.length; i<j; i++) {
+                        var item = place_arr[i];
+                        var name = item.name,
+                            pname = item.pname;
+                        if ((cb_prov && !pname) ||
+                            (cb_city && name == pname) ||
+                            (cb_county && pname && pname !== name)) {
+                            names[item.name] = item;
+                            geomap.addOverlay(new Shape.Text(item.name, {
+                                lng: item.lng,
+                                lat: item.lat,
+                                fontSize: textStyle.fontSize || 14,
+                                color: textStyle.color || 'rgba(0, 0, 0, 0.8)',
+                                flag: flag
+                            }));
+                        }
+                    }
+                }
+
+                cb_afterGeo && cb_afterGeo(names);
+            });
+        });
         GeoMap.setGeo(Geo);
         GeoMap.setProjection(projection);
 
-        setTimeout(function() {
+        // setTimeout(function() {
             d3.select('#geomap').call(zoom).call(drag);
 
             var _options = {
@@ -91,7 +156,10 @@ Core.init(function(model) {
             }
             require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
             // require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/map-china'))(_options);
-            require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
-        }, 200);
+            // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
+            require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi-conf'))(_options);
+
+            model.emit('map.changeconfig', 'H:/docs/2015/蓝PI相关/各方需求/陕西/data.json');
+        // }, 200);
     });
 });

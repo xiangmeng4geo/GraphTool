@@ -459,7 +459,7 @@
                     }
                 }
             });
-            
+
             _this.border();
         }
 
@@ -478,7 +478,7 @@
 
         if (is_refresh_normal || is_refresh_weather) {
             var shapes = _get(_this, CACHE_NAME_SHAPES);
-            
+
             for (var i = 0, j = shapes.length; i<j; i++) {
                 var shp = shapes[i];
                 var _style = shp.style;

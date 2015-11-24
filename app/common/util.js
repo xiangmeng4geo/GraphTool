@@ -50,6 +50,9 @@
 		}
 		return null;
 	}
+	function readJson(_p) {
+		return read(_p, true);
+	}
 	function write(_p, content){
 		if (typeof content === 'object' && !(content instanceof Buffer)) {
 			content = JSON.stringify(content);
@@ -79,6 +82,7 @@
 	}
 	var file = {
 		read: read,
+		readJson: readJson,
 		write: write,
 		exists: exists,
 		rm: rmfileSync,

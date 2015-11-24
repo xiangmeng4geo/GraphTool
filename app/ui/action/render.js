@@ -1,7 +1,8 @@
 !function() {
     var Shape = Core.require('shape');
     var _model;
-    function _render(data) {
+    // 处理conrec后的数据
+    function _conrec(data) {
         var t_start = new Date();
         var shapes = [];
         if (data) {
@@ -28,9 +29,27 @@
     function _setModel(model) {
         _model = model;
     }
-
+    // 处理文字
+    // [{
+    //  txt: 'test',
+    //  x: 10,
+    //  y: 10
+    // }]
+    function _text(texts) {
+        if (texts) {
+            var shapes = [];
+            for (var i = 0, j = texts.length; i<j; i++) {
+                var item = texts[i];
+                shapes.push(new Shape.Text(item.txt, item));
+            }
+            if (shapes && shapes.length > 0) {
+                _model.emit('render', shapes);
+            }
+        }
+    }
     module.exports = {
         setModel: _setModel,
-        render: _render
+        conrec: _conrec,
+        text: _text
     };
 }()

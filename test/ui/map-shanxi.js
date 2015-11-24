@@ -1,6 +1,5 @@
 !function() {
     var C = Core;
-    var fs = require('fs');
     var _require = C.require;
     var Reader = _require('datareader');
     var Render = _require('render');
@@ -10,6 +9,7 @@
     var CONST = _require('const');
     var CONST_PATH_CACHE = CONST.PATH.CACHE;
     var CONF_GEO = _require('product_conf').getSys.getGeo('陕西地图');
+    var CONF_LEGEND = _require('product_conf').getSys.getLegend('降水配色');
 
     var geo_files = CONF_GEO.maps;
     var textStyle = CONF_GEO.textStyle;
@@ -19,6 +19,7 @@
             Shape = options.Shape,
             $geomap = options.$geomap,
             model = options.model,
+            geomap = options.geomap,
             Pattern = options.Pattern;
 
         Reader.setModel(model);
@@ -38,74 +39,14 @@
 
             util_file.Image.save(util_path.join(CONST_PATH_CACHE, '1.png'), geomap.export());
         });
-        var blendent = [{
-			"val": {
-				"n": "温度",
-				"v": "102"
-			},
-			"color_start": "#0000ff",
-			"color_end": "#ff0000",
-			"is_stripe": false,
-			"number_min": "-30",
-			"number_max": "40",
-			"number_level": "8",
-			"colors": [{
-				"is_checked": true,
-				"color": "#ffffff",
-				"color_text": "#ffffff",
-				"val": [0, 1],
-				"text": "1, 10",
-				"order": 0
-			}, {
-				"is_checked": true,
-				"color": "#9DF085",
-				"color_text": "#ffffff",
-				"val": [1, 1.5],
-				"text": "10, 15",
-				"order": 0
-			}, {
-				"is_checked": true,
-				"color": "#33B333",
-				"color_text": "#000000",
-				"val": [1.5, 7],
-				"text": "15,20",
-				"order": 0
-			}, {
-				"is_checked": true,
-				"color": "#56B1FF",
-				"color_text": "#000000",
-				"val": [7, 15],
-				"text": "20, 25",
-				"order": 0
-			}, {
-				"is_checked": true,
-				"color": "#0000DE",
-				"color_text": "#000000",
-				"val": [15, 40],
-				"text": "25, 30",
-				"order": 0
-			}, {
-				"is_checked": true,
-				"color": "#F900F9",
-				"color_text": "#000000",
-				"val": [40, 50],
-				"text": "30以上",
-				"order": 0
-			}, {
-				"is_checked": true,
-				"color": "#750036",
-				"color_text": "#000000",
-				"val": [50, 9999],
-				"text": "30以上",
-				"order": 0
-			}]
-		}];
+        
+        var blendent = CONF_LEGEND.blendent;
 
 
         var t_start = new Date();
-        var geomap = new GeoMap(model).init({
-            container: $geomap
-        });
+        // var geomap = new GeoMap(model).init({
+        //     container: $geomap
+        // });
         var canvas_legend = _require('legend')({
             blendent: blendent
         }, {
