@@ -15,8 +15,6 @@ Core.init(function(){
 	var Win = C.Win;
 	var WIN = Win.WIN;
 
-	Win.beforeclose();
-
 	C.emit('main.loaded');
 	// var win = C.remote('window');
 
