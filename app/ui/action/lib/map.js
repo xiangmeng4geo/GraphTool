@@ -189,9 +189,8 @@
             } else {
                 fn_import(file_path, function(err, d) {
                     if (!err) {
-                        _set(cache_key_obj, file_path);
+                        _set(cache_key_obj, file_path, d);
                     }
-
                     cb(err, d);
                 });
             }

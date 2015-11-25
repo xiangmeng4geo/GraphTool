@@ -9285,10 +9285,12 @@ function importFile(filepath, cb){
     });
 }
 if (process.type == 'renderer') {
-    window.Geo = {
+    var result = {
         importFile: importFile,
         ShapeIter: ShapeIter
     }
+    // window.Geo = result;
+    module.exports = result;
 } else {
     exports.importFile = importFile;
 }

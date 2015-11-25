@@ -4096,11 +4096,19 @@
 			}
 			obj = this.get_node(obj);
 			if (!obj || obj.id === $.jstree.root) {
+				this.trigger('rename_node_error', {
+					msg: 1,
+					obj: obj
+				})
 				return false;
 			}
 			old = obj.text;
 			if (!this.check("rename_node", obj, this.get_parent(obj), val)) {
 				this.settings.core.error.call(this, this._data.core.last_error);
+				this.trigger('rename_node_error', {
+					msg: 2,
+					obj: obj
+				})
 				return false;
 			}
 			this.set_text(obj, val); // .apply(this, Array.prototype.slice.call(arguments))

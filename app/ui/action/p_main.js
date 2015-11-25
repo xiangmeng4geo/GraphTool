@@ -74,7 +74,7 @@ Core.init(function(){
 		// console.log(arguments);
 		_require('dialog').alert(productName);
 	});
-	['tree', 'map'].forEach(function(v){
+	['map', 'tree'].forEach(function(v){
 		_require('p_main_'+v);
 	});
 });

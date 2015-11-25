@@ -29,6 +29,10 @@
 	model.on('log', function(msg) {
 		console.log(msg);
 	});
+    //统一处理其它库里的错误信息
+    model.on('error', function(err) {
+        console.log(err.msg||err.message||err);
+    });
 
 	var Core = {
 		model: model

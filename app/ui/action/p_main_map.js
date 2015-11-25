@@ -15,12 +15,9 @@ Core.init(function(model) {
     var util = _require('util');
     var util_file = util.file;
     var CONST = _require('const');
+    var Geo = _require('geo');
+    var CONST_BOUND = CONST.BOUND;
     var place_arr = util_file.readJson(CONST.GEO.FILE);
-
-    //统一处理其它库里的错误信息
-    model.on('error', function(err) {
-        console.log(err.msg||err.message||err);
-    });
 
     var $geomap_container = $('#geomap_container');
     var $geomap = $('#geomap');
@@ -31,7 +28,6 @@ Core.init(function(model) {
     }
     initSize();
 
-    var geomap;
     // 得到一个投影并设置相关参数，让地图居中
     function _getProjection(leftup, rightdown) {
         var center = [leftup[0] + (rightdown[0] - leftup[0])/2, leftup[1] + (rightdown[1] - leftup[1])/2];
@@ -42,13 +38,9 @@ Core.init(function(model) {
         var scale = Math.min(width_map/(p_b[0] - p_a[0]) * scale_old, height_map/(p_b[1] - p_a[1]) * scale_old);
         return p.scale(scale);
     }
-
-    C.script('geo', function() {
-        initSize();
-        var leftup = [72.57, 58],
-           rightdown = [136.60, 14.33];
-        var projection = _getProjection(leftup, rightdown);
-        var zoom = d3.behavior.zoom()
+    var geomap;
+    var projection = _getProjection(CONST_BOUND.WN, CONST_BOUND.ES);
+    var zoom = d3.behavior.zoom()
             .translate(projection.translate())
             .scale(projection.scale())
             // .scaleExtent([projection.scale() /4 , projection.scale()*8])
@@ -58,108 +50,109 @@ Core.init(function(model) {
                 projection.translate(e.translate);
                 model.emit('refresh');
             });
-        var drag = d3.behavior.drag().on('dragstart', function() {
-            $geomap.addClass('dragging');
-        }).on('dragend', function() {
-            $geomap.removeClass('dragging');
+    var drag = d3.behavior.drag().on('dragstart', function() {
+        $geomap.addClass('dragging');
+    }).on('dragend', function() {
+        $geomap.removeClass('dragging');
+    });
+    d3.select('#geomap').call(zoom).call(drag);
+    model.on('projection.changeview', function(a, b) {
+        projection = _getProjection(a, b);
+        GeoMap.setProjection(projection);
+        zoom.translate(projection.translate()).scale(projection.scale());
+        // model.emit('refresh');
+    });
+    model.on('refresh', function() {
+        geomap.refresh();
+    });
+    model.on('render', function(shapes) {
+        var t_start = new Date();
+        shapes.forEach(function(shape) {
+            geomap.addOverlay(shape);
         });
-        var geomap = new GeoMap(model).init({
-            container: $geomap
+        model.emit('log', 'render data takes '+(new Date() - t_start)+' ms!');
+    });
+    model.on('export', function() {
+        util_file.Image.save(util_path.join(CONST.PATH.CACHE, '1.png'), geomap.export());
+    });
+    model.on('legend', function(blendent) {
+        var canvas_legend = _require('legend')({
+            blendent: blendent
+        }, {
+            height: height_map/2
         });
-        model.on('projection.changeview', function(a, b) {
-            projection = _getProjection(a, b);
-            GeoMap.setProjection(projection);
-            zoom.translate(projection.translate()).scale(projection.scale());
-            // model.emit('refresh');
-        });
-        model.on('refresh', function() {
-            geomap.refresh();
-        });
-        model.on('render', function(shapes) {
-            var t_start = new Date();
-            shapes.forEach(function(shape) {
-                geomap.addOverlay(shape);
-            });
-            model.emit('log', 'render data takes '+(new Date() - t_start)+' ms!');
-        });
-        model.on('export', function() {
-            util_file.Image.save(util_path.join(CONST.PATH.CACHE, '1.png'), geomap.export());
-        });
-        model.on('legend', function(blendent) {
-            var canvas_legend = _require('legend')({
-                blendent: blendent
-            }, {
-                height: height_map/2
-            });
-            geomap.addOverlay(new Shape.Image(canvas_legend, {
-                x: width_map - canvas_legend.width,
-                y: height_map/4
-            }));
-        });
-        model.on('geo', function(geo_files, textStyle, cb_afterGeo) {
-            geomap.setGeo(geo_files, function() {
-                var cb_prov = textStyle.prov,
-                    cb_city = textStyle.city,
-                    cb_county = textStyle.county;
-                var FLAGS = CONST.GEO.FLAGS;
-                var flag = null;
-                for (var i = 0, j = FLAGS.length; i<j; i++) {
-                    var f = FLAGS[i];
-                    if (f.val === textStyle.flag) {
-                        if (f.type == 'img') {
-                            flag = {
-                                src: f.val,
-                                width: 5,
-                                height: 5,
-                                center: true
-                            }
-                        }
-                        break;
-                    }
-                }
-                var names = {};
-                if (cb_prov || cb_city || cb_county) {
-                    for (var i = 0, j = place_arr.length; i<j; i++) {
-                        var item = place_arr[i];
-                        var name = item.name,
-                            pname = item.pname;
-                        if ((cb_prov && !pname) ||
-                            (cb_city && name == pname) ||
-                            (cb_county && pname && pname !== name)) {
-                            names[item.name] = item;
-                            geomap.addOverlay(new Shape.Text(item.name, {
-                                lng: item.lng,
-                                lat: item.lat,
-                                fontSize: textStyle.fontSize || 14,
-                                color: textStyle.color || 'rgba(0, 0, 0, 0.8)',
-                                flag: flag
-                            }));
+        geomap.addOverlay(new Shape.Image(canvas_legend, {
+            x: width_map - canvas_legend.width,
+            y: height_map/4
+        }));
+    });
+    model.on('geo', function(geo_files, textStyle, cb_afterGeo) {
+        geomap.setGeo(geo_files, function() {
+            var cb_prov = textStyle.prov,
+                cb_city = textStyle.city,
+                cb_county = textStyle.county;
+            var FLAGS = CONST.GEO.FLAGS;
+            var flag = null;
+            for (var i = 0, j = FLAGS.length; i<j; i++) {
+                var f = FLAGS[i];
+                if (f.val === textStyle.flag) {
+                    if (f.type == 'img') {
+                        flag = {
+                            src: f.val,
+                            width: 5,
+                            height: 5,
+                            center: true
                         }
                     }
+                    break;
                 }
+            }
+            var names = {};
+            if (cb_prov || cb_city || cb_county) {
+                for (var i = 0, j = place_arr.length; i<j; i++) {
+                    var item = place_arr[i];
+                    var name = item.name,
+                        pname = item.pname;
+                    if ((cb_prov && !pname) ||
+                        (cb_city && name == pname) ||
+                        (cb_county && pname && pname !== name)) {
+                        names[item.name] = item;
+                        geomap.addOverlay(new Shape.Text(item.name, {
+                            lng: item.lng,
+                            lat: item.lat,
+                            fontSize: textStyle.fontSize || 14,
+                            color: textStyle.color || 'rgba(0, 0, 0, 0.8)',
+                            flag: flag
+                        }));
+                    }
+                }
+            }
 
-                cb_afterGeo && cb_afterGeo(names);
-            });
+            cb_afterGeo && cb_afterGeo(names);
         });
+    });
+    
+    model.on('ready', function() {
         GeoMap.setGeo(Geo);
         GeoMap.setProjection(projection);
-
-        // setTimeout(function() {
-            d3.select('#geomap').call(zoom).call(drag);
-
-            var _options = {
-                GeoMap: GeoMap,
-                $geomap: $geomap,
-                model: model,
-                Shape: Shape,
-                Pattern: Pattern
-            }
-            require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
-            // require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/map-china'))(_options);
-            // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
-            require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi-conf'))(_options);
-
-            model.emit('map.changeconfig', 'H:/docs/2015/蓝PI相关/各方需求/陕西/data.json');
-        // }, 200);
+        initSize();
+        
+        geomap = new GeoMap(model).init({
+            container: $geomap
+        });
+        
+        var _options = {
+            GeoMap: GeoMap,
+            $geomap: $geomap,
+            model: model,
+            Shape: Shape,
+            Pattern: Pattern
+        }
+        require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
+        // require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/map-china'))(_options);
+        // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
+        require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi-conf'))(_options);
+        
+        model.emit('map.changeconfig', 'H:/docs/2015/蓝PI相关/各方需求/陕西/data.json');
     });
 });

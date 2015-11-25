@@ -544,3 +544,12 @@ resize-horizontal{
 #geomap.nodrag{
 	cursor: default !important;
 }
+.vakata-context{
+	z-index: 1001;
+}
+.jstree-default a.jstree-clicked{
+	color: #000;
+}
+.jstree-default a.jstree-hovered{
+	color: #ccc;
+}

@@ -1,50 +1,153 @@
 /**
  * 管理主界面的树弄菜单
  */
- Core.init(function(model){
- 	var C = Core;
- 	var $ = C.$;
+Core.init(function(model) {
+    var C = Core;
+    var $ = C.$;
     var _require = C.require;
-    _require('j.tree');
-
+    var dialog = _require('dialog');
+    var _confirm = dialog.confirm;
+    var _alert = dialog.alert;
     var Config = _require('product_conf');
 
- 	var $doc = $(document);
- 	var TREE_NAME = 'sys_product_tree';
- 	var treeData = Config.read(TREE_NAME);
- 	if(treeData){
- 		var data = [];
- 		function getNodes(arr){
- 			if(!arr || arr.length == 0){
- 				return false;
- 			}
- 			var d = [];
- 			arr.forEach(function(v){
- 				var name = v.name;
- 				d.push({
- 					icon: false,
- 					text: name,
- 					children: getNodes(v.childNodes)
- 				});
- 			});
- 			return d;
- 		}
- 		treeData = getNodes(treeData);
- 	}
- 	// 相关的事件说明请参考：https://www.jstree.com/api/#/?q=.jstree%20Event
- 	// 自定义了'dblclick_node.jstree'事件
- 	$('#tree').jstree({
- 		'core': {
- 			"themes" : { "stripes" : true, dots: false},
- 			data: treeData
- 		}
- 	}).on('dblclick_node.jstree', function(e, data){
- 		if(data){
- 			var node = data.node;
- 			var children = node.children;
- 			if(!children || children.length == 0){
- 				model.emit('product.change', node.text);
- 			}
- 		}
- 	});
- });
+    _require('j.tree');
+    var $doc = $(document);
+    var treeData = Config.getTree();
+    if (treeData) {
+        var data = [];
+
+        function getNodes(arr) {
+            if (!arr) {
+                return null;
+            }
+            var d = [];
+            arr.forEach(function(v) {
+                var name = v.name;
+                var child = getNodes(v.childNodes);
+                d.push({
+                    icon: false,
+                    text: name,
+                    children: child,
+                    type: child ? 'default' : 'file'
+                });
+            });
+            return d;
+        }
+        treeData = getNodes(treeData);
+    }
+    function refreshData() {
+        var data = this.get_json();
+        function getNodes(arr) {
+            if (!arr) {
+                return null;
+            }
+            var d = [];
+            arr.forEach(function(v) {
+                var obj = {
+                    name: v.text
+                }
+                if (v.type == 'default') {
+                    obj.childNodes = getNodes(v.children)
+                }
+                d.push(obj);
+            });
+            return d;
+        }
+        var data_new = getNodes(data);
+        Config.setTree(data_new);
+    }
+    function _getAction(type, _instance) {
+        return function(data) {console.log(data);
+            var inst = $.jstree.reference(data.reference),
+                obj = inst.get_node(data.reference);
+            inst.create_node(obj, {
+                type: type
+            }, "last", function(new_node) {
+                setTimeout(function() {
+                    inst.edit(new_node, null, function() {
+                        refreshData.call(_instance);
+                    });
+                }, 0);
+            });
+        }
+    }
+    // 相关的事件说明请参考：https://www.jstree.com/api/#/?q=.jstree%20Event
+    // 自定义了'dblclick_node.jstree'事件
+    var $tree = $('#tree').jstree({
+        'core': {
+            "themes": {
+                "stripes": true,
+                dots: false
+            },
+            "strings": {
+                'New node': '请输入名称'
+            },
+            data: treeData,
+            "check_callback": true
+        },
+        "contextmenu": {
+            items: function(node) {
+                var _instance = this;
+                var tmp = $.jstree.defaults.contextmenu.items();
+                delete tmp.create.action;
+                delete tmp.ccp;
+                tmp.create.label = "添加";
+                tmp.rename.label = "修改";
+                tmp.remove.label = "删除";
+                var _action_remove = tmp.remove.action;
+                tmp.remove.action = function(data) {
+                    var _this = this;
+                    _confirm('确定要删除吗？', function() {
+                        _action_remove.call(_this, data);
+                        refreshData.call(_instance);
+                    });
+                }
+                tmp.create.submenu = {
+                    'create_folder': {
+                        separator_after: true,
+                        label: '分类',
+                        action: _getAction('default', _instance)
+                    },
+                    'create_file': {
+                        separator_after: true,
+                        label: '产品',
+                        action: _getAction('file', _instance)
+                    }
+                }
+                if (this.get_type(node) === "file") {
+                    delete tmp.create;
+                }
+
+                return tmp;
+            }
+        },
+        'types': {
+            'default': {
+                'icon': 'jstree-themeicon-hidden'
+            },
+            'file': {
+                'valid_children': [],
+                'icon': 'jstree-themeicon-hidden'
+            }
+        },
+        "plugins": ["contextmenu", "types", "unique"]
+    }).on('dblclick_node.jstree', function(e, data) {
+        if (data) {
+            var node = data.node;
+            var children = node.children;
+            if (!children || children.length == 0) {
+                model.emit('product.change', node.text);
+            }
+        }
+    }).on('rename_node_error.jstree', function(e, data) {
+        _alert('请确保名字不重复！');
+        setTimeout(function() {
+            var _instance = data.instance;
+            _instance.edit(data.obj, null, function() {
+                refreshData.call(_instance);
+            });
+        }, 0)
+    }).on('ready.jstree', function() {
+        model.emit('ready');
+    });
+});
