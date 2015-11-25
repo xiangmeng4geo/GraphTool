@@ -53,7 +53,7 @@
                     for (var i = 0, j = data_origin.length; i<j; i++) {
                         var item = data_origin[i];
                         var item_show = names_show[item.name];
-                        if (item_show) {
+                        // if (item_show) {
                             texts_data.push({
                                 txt: item.v,
                                 lng: item.x,
@@ -63,7 +63,7 @@
                                 offsetY: -10,
                                 offsetX: 6
                             });
-                        }
+                        // }
                     }
                     // 处理源数据
                     Render.text(texts_data);

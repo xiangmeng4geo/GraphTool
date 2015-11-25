@@ -338,13 +338,15 @@ td{
 	background-color: white;
 	min-width: 40px;
 	vertical-align: middle;
+	padding-right: 16px;
 }
 .select span{
 	display: inline-block;
 	width: 100%;
 	height: 100%;
+	cursor: default;
 }
-.select span:after{
+.select:after{
 	content: "";
 	position: absolute;
 	margin: auto;
@@ -352,7 +354,7 @@ td{
 	height: 0;
 	width: 0;
 	border: 1px solid transparent;
-	border-top-color: inherit;
+	border-top-color: #333;
 	border-width: 6px 4px;
 	top: 50%;
 	margin-top: -2px;
@@ -382,4 +384,69 @@ td{
 .select li img{
 	width: 5px;
 	height: 5px;
+}
+
+tab{
+	width: 100%;
+	border-bottom: 1px solid #ccc;
+	overflow: hidden;
+	float: left;
+	height: 30px;
+	line-height: 30px;
+}
+tab item{
+	float: left;
+	border-bottom: 2px solid rgba(0, 0, 0, 0);
+	position: relative;
+	min-width: 100px;
+	text-align: center;
+	cursor: pointer;
+	height: 28px;
+}
+tab item.on{
+	border-bottom-color: red;
+}
+tab item:after {
+	content: '';
+	position: absolute;
+	right: -1px;
+	top: 10%;
+	height: 80%;
+	border-right: 1px solid #ccc;
+}
+
+tab-content{
+	position: absolute;
+	top: 32px;
+	bottom: 0;
+	left: 0;
+	height: auto;
+	width: 100%;
+}
+tab-content item{
+	position: relative;
+	display: none;
+	height: 100%;
+	overflow: auto;
+}
+tab-content item.on{
+	display: block;
+}
+tab-content item resize-horizontal{
+	position: absolute;
+	height: 100%;
+	width: 6px;
+	cursor: ew-resize;
+	z-index: 10;
+	left: 100px;
+	top: 0;
+}
+tab-content item resize-horizontal:after{
+	content: '';
+	position: absolute;
+	border: 1px solid #ccc;
+	left: 2px;
+	top: 10px;
+	bottom: 10px;
+	height: auto;
 }

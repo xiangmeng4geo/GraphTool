@@ -88,6 +88,7 @@ Core.init(function(model) {
         "contextmenu": {
             items: function(node) {
                 var _instance = this;
+                window.test = _instance;
                 var tmp = $.jstree.defaults.contextmenu.items();
                 delete tmp.create.action;
                 delete tmp.ccp;
@@ -116,6 +117,17 @@ Core.init(function(model) {
                 }
                 if (this.get_type(node) === "file") {
                     delete tmp.create;
+                    var editConf = {
+                        "separator_before": true,
+                        "label": "配置",
+                        "action": function(data) {
+                            var node = _instance.get_node(_instance.get_selected());
+                            C.Win.open('pconf', {
+                                param: node.text
+                            });
+                        }
+                    }
+                    tmp.edit = editConf;
                 }
 
                 return tmp;

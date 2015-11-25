@@ -162,7 +162,7 @@
 		var arr = [];
 		var x_num = Math.ceil((lng1 - lng0)/GRID_SPACE),
 			y_num = Math.ceil((lat1 - lat0)/GRID_SPACE);
-
+	
 		for(var i = 0; i < x_num; i++){
 			var x = lng0 + GRID_SPACE * i;
 			var val = [];

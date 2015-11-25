@@ -65,15 +65,20 @@
 	/**
 	 * 加载页面
 	 */
-	var win_load = function(win, name){
+	var win_load = function(win, name, param){
 		if(win){
 			win.loadURL(path.join('file://' , PATH.UI, name+ '.html'));
 			var content = win.webContents;
 			content.on('did-finish-load', function(){
 				var path_core = path.join(PATH.UI, 'action/core').replace(/\\/g, '/');
-				var js = 'require("'+path_core+'")';
+				var js = '';
+				if (param) {
+					js = 'var _PARAM_ = '+JSON.stringify(param)+';';
+				}
+				js += 'require("'+path_core+'")';
 				// var js = 'var __src=document.createElement("script");__src.src="'+path_core+'.js";document.body.appendChild(__src)';
 				// console.log(js);
+				
 				content.executeJavaScript(js);
 				// fs.readFile(, function(e, str_js){
 				// 	content.executeJavaScript(str_js.toString());
@@ -85,11 +90,14 @@
 	/**
 	 * 打开一个窗口，是getInstance和load的结合
 	 */
-	var open = function(name){
+	var open = function(name, param){
 		var win = get_win(name);
-		win_load(win, name);
+		win_load(win, name, param);
 		return win;
 	}
+	/**
+	 * 设置窗口关系
+	 */
 	function setSub(parentId, subId) {
 		(win_sub[parentId] || (win_sub[parentId] = [])).push(subId);
 	}

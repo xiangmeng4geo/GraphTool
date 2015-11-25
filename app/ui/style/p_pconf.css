@@ -1,0 +1,14 @@
+#shanxi_txt_command{
+	width: 500px;
+	height: 200px;
+	line-height: 20px;
+}
+tab-content{
+	bottom: 50px;
+}
+.btns_bottom{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 50px;
+}

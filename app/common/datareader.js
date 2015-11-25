@@ -3,6 +3,7 @@
     var util_path = util.path;
     var util_file = util.file;
     var CONST = require('./const');
+    var product_conf = require('./product_conf');
 
     // var _log = util.Model.log;
     function _log(msg) {
@@ -12,6 +13,7 @@
     var Reader = {};
     Reader.setModel = function(model) {
         _model = model;
+        return Reader;
     }
     Reader.read = function(opt, cb){
         var s_start = new Date();
@@ -43,6 +45,22 @@
                 })
             }
         }
+        return Reader;
+    }
+    // 解析产品的配置文件
+    Reader.parseConf = function(conf) {
+        var s_time = new Date();
+        var _parser;
+        try{
+            _parser = require('./datareader/'+conf.data.type+'/parse');
+        } catch(e) {
+            console.log(e);
+            _model && _model.emit('error', new Error('no support parse method of reader!'));
+        }
+        if (_parser) {
+            _parser(conf, _model);
+        }
+        return Reader;
     }
     Reader.save = function(opt){
     }

@@ -20,7 +20,7 @@
 	function _rmConfig(name){
 		return util_file.rm(_getPathByName(name));
 	}
-	
+
 	var CONST_SYSCONF_NAME = 'sys';
 	var CONST_SYS_PRODUCT_TREE_NAME = 'sys_product_tree';
 	function _getSys() {

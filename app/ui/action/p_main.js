@@ -12,8 +12,10 @@ Core.init(function(){
 	var C = Core;
 	var $ = C.$;
 	var _require = C.require;
+	var product_conf = _require('product_conf');
 	var Win = C.Win;
 	var WIN = Win.WIN;
+	var _alert = _require('dialog').alert;
 
 	C.emit('main.loaded');
 	// var win = C.remote('window');
@@ -66,13 +68,20 @@ Core.init(function(){
 			win_setting.isFocused();
 			win_setting.focus();
 		} catch(e){
-			win_setting = Win.open('setting', true);
+			win_setting = Win.openSub('setting');
 		}
 	});
 
 	model.on('product.change', function(productName){
 		// console.log(arguments);
-		_require('dialog').alert(productName);
+		// _alert(productName);
+		var conf = product_conf.read(productName);
+		if (conf) {
+			_require('datareader').setModel(model).parseConf(conf);
+		} else {
+			_alert('请先对产品进行配置!');
+		}
+
 	});
 	['map', 'tree'].forEach(function(v){
 		_require('p_main_'+v);

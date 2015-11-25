@@ -162,13 +162,21 @@
 	Core.emit = emit;
 
 	var Win = {
-		open: function(name, is_subwin) {
+		open: function(name, option) {
+			option || (option = {});
+			var is_subwin = option.is_sub;
+			
 			var win_remote = _loadRemote('window');
-			var win = win_remote.open(name);
+			var win = win_remote.open(name, option.param);
 			if (is_subwin) {
 				win_remote.setSub(win_instance.id, win.id);
 			}
 			return win;
+		},
+		openSub: function(name) {
+			return this.open(name, {
+				is_sub: true
+			});
 		},
 		WIN: win_instance
 	}

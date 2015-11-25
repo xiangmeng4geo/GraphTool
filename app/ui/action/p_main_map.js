@@ -154,6 +154,6 @@ Core.init(function(model) {
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
         require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi-conf'))(_options);
 
-        model.emit('map.changeconfig', 'H:/docs/2015/蓝PI相关/各方需求/陕西/data.json');
+        // model.emit('map.changeconfig', 'H:/docs/2015/蓝PI相关/各方需求/陕西/data.json');
     });
 });
