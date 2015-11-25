@@ -21,7 +21,9 @@
         var textStyle = conf_geo.textStyle;
         var bound = conf_geo.bound;
         model.emit('projection.changeview', bound.wn, bound.es);
-        model.emit('geo', geo_files, textStyle, function(names_show) {});
+        model.emit('geo', conf_geo, function(names_show) {
+            model.emit('export');
+        });
     }
 
     module.exports = init;

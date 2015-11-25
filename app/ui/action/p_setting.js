@@ -96,7 +96,9 @@
 	var $txt_wn_lng = $('#txt_wn_lng');
 	var $txt_wn_lat = $('#txt_wn_lat')
 	var $txt_es_lng = $('#txt_es_lng');
-	var $txt_es_lat = $('#txt_es_lat')
+	var $txt_es_lat = $('#txt_es_lat');
+	var $c_map_color = $('#c_map_color');
+	var $cb_map_bgcolor = $('#cb_map_bgcolor');
 	
 	util_ui.select($s_map_text, {
 		data: CONST_GEO_FLAGS
@@ -108,9 +110,11 @@
 	function _clearMapConf() {
 		$map_conf.find('.map_item').remove();
 		$txt_map_name.val('');
+		$c_map_color.val('');
 		_setChecked($cb_prov, false);
 		_setChecked($cb_city, false);
 		_setChecked($cb_county, false);
+		_setChecked($cb_map_bgcolor, false);
 		$n_map_text.val(12);
 		util_ui.select($s_map_text, {
 			val: undefined
@@ -154,6 +158,8 @@
 			var file = util_ui.file($this.find('.file'))();
 			var lineWidth = $this.find('.n_map_item').val();
 			var strokeStyle = $this.find('.c_map_item').val();
+			var fillStyle = $this.find('.c_map_item_fill').val();
+			var flag_fillStyle = _getChecked($this.find('.cb_map_item_fill'));
 			var clip = _getChecked($this.find('.cb_map_item'));
 			var is_use_border = _getChecked($this.find('.cb_map_item_border'));
 			var b_lineWidth = $this.find('.n_map_item_line').val();
@@ -163,7 +169,7 @@
 			var shadow_size = $this.find('.c_map_item_shadow_size').val();
 			var shadow_x = $this.find('.c_map_item_shadow_x').val();
 			var shadow_y = $this.find('.c_map_item_shadow_y').val();
-			
+			var cb_map_item_shadow_flag = _getChecked($this.find('.cb_map_item_shadow_flag'));
 			// 对地理数据文件加强验证
 			if (!file) {
 				is_not_have_file = true;
@@ -172,7 +178,9 @@
 				file: file,
 				style: {
 					strokeStyle: strokeStyle,
-					lineWidth: lineWidth
+					lineWidth: lineWidth,
+					fillStyle: fillStyle,
+					flag_fill: flag_fillStyle
 				},
 				clip: clip,
 				borderStyle: {
@@ -182,7 +190,8 @@
 					shadowBlur: shadow_size,
 					shadowColor: shadow_color,
 					shadowOffsetX: shadow_x,
-					shadowOffsetY: shadow_y
+					shadowOffsetY: shadow_y,
+					flag_shadow: cb_map_item_shadow_flag
 				}
 			});
 		});
@@ -224,7 +233,10 @@
 			color: $c_map_text.val(),
 			flag: util_ui.select($s_map_text).val()
 		}
-		
+		data.bg = {
+			flag: _getChecked($cb_map_bgcolor),
+			color: $c_map_color.val()
+		}
 
 		var index = $map_conf_list.find('.on').index();
 
@@ -307,6 +319,9 @@
 				$html.find('.c_map_item_shadow_size').val(borderStyle.shadowBlur).next('span').text(borderStyle.shadowBlur);
 				$html.find('.c_map_item_shadow_x').val(borderStyle.shadowOffsetX).next('span').text(borderStyle.shadowOffsetX);
 				$html.find('.c_map_item_shadow_y').val(borderStyle.shadowOffsetY).next('span').text(borderStyle.shadowOffsetY);
+				$html.find('.c_map_item_fill').val(style.fillStyle);
+				_setChecked($html.find('.cb_map_item_fill'), style.flag_fill);
+				_setChecked($html.find('.cb_map_item_shadow_flag', borderStyle.flag_shadow));
 				// $html.find('.c_map_item_fill').val(file);
 				$map_conf.append($html);
 			}
@@ -324,6 +339,10 @@
 			_setChecked($cb_county, cb_county);
 			$c_map_text.val(color);
 			$n_map_text.val(fontSize);
+			
+			var style_bg = geo.bg;
+			$c_map_color.val(style_bg.color);
+			_setChecked($cb_map_bgcolor, style_bg.flag);
 			
 			util_ui.select($s_map_text).selected(flag);
 			

@@ -86,8 +86,9 @@ Core.init(function(model) {
             y: height_map/4
         }));
     });
-    model.on('geo', function(geo_files, textStyle, cb_afterGeo) {
-        geomap.setGeo(geo_files, function() {
+    model.on('geo', function(options, cb_afterGeo) {
+        var textStyle = options.textStyle;
+        geomap.setGeo(options, function() {
             var cb_prov = textStyle.prov,
                 cb_city = textStyle.city,
                 cb_county = textStyle.county;

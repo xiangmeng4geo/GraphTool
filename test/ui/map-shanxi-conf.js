@@ -43,7 +43,7 @@
             var blendentJson = conf_legend.blendent;
             model.emit('projection.changeview', bound.wn, bound.es);
             model.emit('legend', blendentJson);
-            model.emit('geo', geo_files, textStyle, function(names_show) {
+            model.emit('geo', conf_geo, function(names_show) {
                 Reader.read(data, function(err, dataJson) {
                     if (err) {
                         return model.emit('error', err);

@@ -29,6 +29,11 @@
 						<input type="color" class="c_map_item"/>
 					</div>
 					<div class="row">
+						<label>填充颜色</label>
+						<input type="color" class="c_map_item_fill"/>
+						<input type="checkbox" class="cb_map_item_fill"/>
+					</div>
+					<div class="row">
 						<input type="checkbox" class="cb_map_item"/>
 						<label>是否只显示本区域</label>
 					</div>
@@ -43,6 +48,10 @@
 						<div class="row">
 							<label>线颜色</label>
 							<input type="color" class="c_map_item_line"/>
+						</div>
+						<div class="row">
+							<input type="checkbox" min=0 max=10 class="cb_map_item_shadow_flag"/>
+							<span>是否使用投影</span>
 						</div>
 						<div class="row">
 							<label>投影颜色</label>
@@ -91,6 +100,7 @@
 						</div>
 						<div class="map_right">
 							<div class="row">
+								<input type="checkbox" id="cb_map_bgcolor"/>地图背景色<input type="color" id="c_map_color"/><br/>
 								<input type="checkbox" id="cb_prov"/>省名<br/>
 								<input type="checkbox" id="cb_city"/>市名<br/>
 								<input type="checkbox" id="cb_county"/>县名<br/>

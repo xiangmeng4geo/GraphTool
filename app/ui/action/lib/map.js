@@ -1,11 +1,14 @@
 !function() {
     var LAYER_NAME_GEO = 'geo';
+    var LAYER_NAME_GEO_STROKE = 'geo_stroke';
+    var LAYER_NAME_GEO_FILL = 'geo_fill';
     var LAYER_NAME_WEATHER = 'weather';
     var LAYER_NAME_NORMAL = 'normal';
 
     var CACHE_NAME_GEO = 'geo';
     var CACHE_NAME_CLIP = 'clip';
     var CACHE_NAME_SHAPES = 'shapes';
+    var CACHE_NAME_GEOCONF = 'geoconf';
 
     var _fileImportor;
     var _ShapeIter;
@@ -105,18 +108,56 @@
     // 画arcs.layers数据
     //
     // 暂时考虑到实际的应用场景，只提供stroke即只画线
-    function _drawLayer(ctx, layer, arcs, style) {
-        var start = _getPathStart(ctx, style);
-        var end = _getPathEnd(ctx, style);
+    function _drawLayer(_this, layer, arcs, style, is_clip) {
+        var ctx_stroke = _getCtxByPrefix(_this, LAYER_NAME_GEO_STROKE);
+        var ctx_fill = _getCtxByPrefix(_this, LAYER_NAME_GEO_FILL);
+
         var type = layer.geometry_type;
         if ('polygon' === type) {
+            var is_stroked = style.strokeStyle && style.lineWidth !== 0,
+                is_filled = !!style.fillStyle && style.flag_fill;
+            // 对world topojson进行处理
+            var name_layer = layer.name;
+            if ("land" == name_layer) {
+                is_stroked = false;
+            } else if ('countries' == name_layer) {
+                is_filled = false;
+            }
+            if (is_filled && is_clip) {
+                is_filled = false;
+            }
+            var style_stroke = $.extend({}, style);
+            var style_fill = $.extend({}, style);
+            if (is_filled) {
+                delete style_stroke['fillStyle'];
+            }
+            if (is_stroked) {
+                delete style_fill['lineWidth'];
+                delete style_fill['strokeStyle'];
+            }
+            var start_stroke = _getPathStart(ctx_stroke, style_stroke);
+            var start_fill = _getPathStart(ctx_fill, style_fill);
+
             var shapes = layer.shapes;
             for (var i = 0, j = shapes.length; i<j; i++) {
-                start()
-                _drawShape(ctx, shapes[i], arcs);
-                end();
+                if (is_stroked) {
+                    start_stroke();
+                    _drawShape(ctx_stroke, shapes[i], arcs);
+
+                    ctx_stroke.stroke();
+                    ctx_stroke.restore();
+                }
+                if (is_filled) {
+                    start_fill();
+                    _drawShape(ctx_fill, shapes[i], arcs);
+
+                    ctx_fill.fill();
+                    ctx_fill.restore();
+                }
             }
         } else if ('polyline' === type || 'polygon' === type) {
+            var start = _getPathStart(ctx_stroke, style);
+            var end = _getPathEnd(ctx_stroke, style);
             for (var i = 0, j = arcs.size(); i<j; i++){
                 start();
                 _drawPath(ctx, arcs.getArcIter(i));
@@ -129,13 +170,14 @@
         var stroked = style.strokeStyle && style.lineWidth !== 0,
             lineWidth, strokeStyle,
             fillStyle = style.fillStyle,
-            filled = !!fillStyle;
+            flag_fill = style.flag_fill,
+            filled = !!fillStyle && (undefined !== flag_fill || null !== flag_fill || flag_fill);
 
         if (stroked) {
             lineWidth = style.lineWidth || 1;
             strokeStyle = style.strokeStyle;
         }
-        return function() {
+        function fn() {
             ctx.save();
             ctx.beginPath();
             if (stroked) {
@@ -146,7 +188,7 @@
             }
             //只添加指定属性
             ['shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY',
-            'font', 'textAlign', 'textBaseline'].forEach(function(key) {
+                'font', 'textAlign', 'textBaseline'].forEach(function(key) {
                 var val = style[key];
                 if(val !== undefined) {
                     ctx[key] = val;
@@ -156,10 +198,12 @@
                 ctx.fillStyle = fillStyle;
             }
         }
+        return fn;
     }
     function _getPathEnd(ctx, style) {
         var stroked = style.strokeStyle && style.lineWidth !== 0,
-            filled = !!style.fillStyle;
+            flag_fill = style.flag_fill,
+            filled = !!style.fillStyle && (undefined !== flag_fill || null !== flag_fill || flag_fill);
         return function() {
             // ctx.closePath();
             if (stroked) {
@@ -193,7 +237,7 @@
             } else {
                 fn_import(file_path, function(err, d) {
                     if (!err) {
-                        _set(cache_key_obj, file_path, d);
+                        _set(cache_key_obj, file_path, d); //对数据文件进行缓存
                     }
                     cb(err, d);
                 });
@@ -208,9 +252,11 @@
     /**
      * 设置地理信息
      */
-    prop.setGeo = function(geo_files, cb) {
+    prop.setGeo = function(conf, cb) {
         var t_start = new Date();
         var _this = this;
+        var geo_files = conf.maps;
+        _set(_this, CACHE_NAME_GEOCONF, conf);
         if (!_isArray(geo_files)) {
             geo_files = [geo_files];
         }
@@ -255,7 +301,7 @@
         var _item_deal;
         for (var i = 0, j = _data.length; i<j; i++) {
             var item = _data[i];
-            if (item.clip || item.borderStyle) {
+            if (item.clip || (item.borderStyle && item.borderStyle.flag)) {
                 _item_deal = item;
                 break;
             }
@@ -339,11 +385,23 @@
                 shapes_new.push(findNextShape());
             }
 
+            var _styleBorder = $.extend({}, _item_deal.borderStyle);
+            var _style = _item_deal.style;
+            var _fillStyle = _style.fillStyle;
+            if (_style.flag_fill && _fillStyle) {
+                _styleBorder.fillStyle = _fillStyle;
+            }
+            if (!_styleBorder.flag_shadow) {
+                delete _styleBorder['shadowBlur'];
+                delete _styleBorder['shadowColor'];
+                delete _styleBorder['shadowOffsetX'];
+                delete _styleBorder['shadowOffsetY'];
+            }
             var data = {
                 shapes: shapes_new,
                 arcs: arcs,
                 clip: _item_deal.clip,
-                style: _item_deal.borderStyle
+                style: _styleBorder
             }
             _set(_this, CACHE_NAME_CLIP, data);
             return data;
@@ -398,16 +456,37 @@
             var isStroked = false;
             var arr_test = ['strokeStyle', 'lineWidth'];
             for (var i = 0, j = arr_test.length; i<j; i++) {
-                if (arr_test[i]) {
+                if (style[arr_test[i]]) {
                     isStroked = true;
                     break;
                 }
             }
+            if (style.fillStyle) {
+                var style_fill = $.extend({flag_fill: true}, style);
+                delete style_fill['lineWidth'];
+                delete style_fill['strokeStyle'];
+
+                var ctx = _getCtxByPrefix(_this, LAYER_NAME_GEO_FILL);
+                var start = _getPathStart(ctx, style_fill);
+                var end = _getPathEnd(ctx, style_fill);
+                for (var i = 0, j = shapes.length; i<j; i++) {
+                    start();
+                    _drawShape(ctx, [shapes[i]], arcs);
+                    end();
+                }
+            }
             if (isStroked) {
-                var ctx = _getCtxByPrefix(_this, LAYER_NAME_GEO);
-                var start = _getPathStart(ctx, style);
-                var end = _getPathEnd(ctx, style);
-                for (var i = 0, j = 1; i<j; i++) {
+                var style_stroke = $.extend({}, style);
+                delete style_stroke['fillStyle'];
+                delete style_stroke['shadowBlur'];
+                delete style_stroke['shadowColor'];
+                delete style_stroke['shadowOffsetX'];
+                delete style_stroke['shadowOffsetY'];
+
+                var ctx = _getCtxByPrefix(_this, LAYER_NAME_GEO_STROKE);
+                var start = _getPathStart(ctx, style_stroke);
+                var end = _getPathEnd(ctx, style_stroke);
+                for (var i = 0, j = shapes.length; i<j; i++) {
                     start();
                     _drawShape(ctx, [shapes[i]], arcs);
                     end();
@@ -445,20 +524,32 @@
         }else if (!_isArray(layer_name)) {
             layer_name = [layer_name];
         }
+        var conf_geo = _get(_this, CACHE_NAME_GEOCONF);
         if (layer_name.indexOf(LAYER_NAME_GEO) > -1) {
-            var ctx = _getCtxByPrefix(_this, LAYER_NAME_GEO);
-            var _canvas = ctx.canvas;
-            ctx.clearRect(0, 0, _canvas.width, _canvas.height);
+            var ctx_stroke = _getCtxByPrefix(_this, LAYER_NAME_GEO_STROKE);
+            var ctx_fill = _getCtxByPrefix(_this, LAYER_NAME_GEO_FILL);
+            var _canvas = ctx_stroke.canvas;
+            ctx_stroke.clearRect(0, 0, _canvas.width, _canvas.height);
+            ctx_fill.clearRect(0, 0, _canvas.width, _canvas.height);
+            var conf_bg = conf_geo.bg;
+            if (conf_bg && conf_bg.flag) {
+                var bg_color = conf_bg.color;
+                if (bg_color) {
+                    ctx_fill.fillStyle = '#71B7fd';
+                    ctx_fill.fillRect(0, 0, _canvas.width, _canvas.height);
+                }
+            }
 
-            var data_list = _get(_this, LAYER_NAME_GEO);
+            var data_list = _get(_this, CACHE_NAME_GEO);
+
             _isArray(data_list) && data_list.forEach(function(data) {
                 var dataset = data.dataset;
                 var style = data.style;
-
+                var is_clip = data.clip;
                 if (dataset) {
                     var arcs = dataset.arcs;
                     for (var i = 0, layers = dataset.layers, j = layers.length; i<j; i++) {
-                        _drawLayer(ctx, layers[i], arcs, style);
+                        _drawLayer(_this, layers[i], arcs, style, is_clip);
                     }
                 }
             });
@@ -535,8 +626,9 @@
             // 'background-color': '#BFEAFB'
         }).appendTo($container);
         // 添加显示geo和weather信息的两个canvas
+        var $canvas_geo_fill = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_GEO_FILL)).appendTo($div);
         var $canvas_weather = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_WEATHER)).appendTo($div);
-        var $canvas_geo = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_GEO)).appendTo($div);
+        var $canvas_geo = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_GEO_STROKE)).appendTo($div);
         var $canvas_normal = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_NORMAL)).appendTo($div);
 
         $canvas_weather.get(0).getContext('2d').save();
@@ -556,12 +648,13 @@
     prop.export = function(conf) {
         var _this = this;
 
-        var canvas_geo = _getCtxByPrefix(_this, LAYER_NAME_GEO).canvas;
+        var canvas_geo_fill = _getCtxByPrefix(_this, LAYER_NAME_GEO_FILL).canvas;
+        var canvas_geo_stroke = _getCtxByPrefix(_this, LAYER_NAME_GEO_STROKE).canvas;
         var canvas_weather = _getCtxByPrefix(_this, LAYER_NAME_WEATHER).canvas;
         var canvas_normal = _getCtxByPrefix(_this, LAYER_NAME_NORMAL).canvas;
 
-        var width = canvas_geo.width,
-            height = canvas_geo.height;
+        var width = canvas_geo_fill.width,
+            height = canvas_geo_fill.height;
 
         var canvas_tmp = _getCanvas(width, height).get(0);
         var ctx = canvas_tmp.getContext('2d');
@@ -578,8 +671,9 @@
             ctx.fillRect(0, 0, width, height);
         }
 
+        ctx.drawImage(canvas_geo_fill, 0, 0, width, height);
         ctx.drawImage(canvas_weather, 0, 0, width, height);
-        ctx.drawImage(canvas_geo, 0, 0, width, height);
+        ctx.drawImage(canvas_geo_stroke, 0, 0, width, height);
         ctx.drawImage(canvas_normal, 0, 0, width, height);
 
         var result = canvas_tmp.toDataURL(null, bgcolor);
