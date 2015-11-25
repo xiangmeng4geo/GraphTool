@@ -12,11 +12,11 @@
 	var logger = require('../common/logger');
 	var command = require('./command');
 	var CONST = require('../common/const');
-	// var util = require('./util');
-	// var util_file_mkdir = util.file.mkdir
+	var util = require('../common/util');
+	var util_file_mkdir = util.file.mkdir
 	//
 	// // 创建必要的目录
-	// util_file_mkdir(CONST.PATH.CACHE);
+	util_file_mkdir(CONST.PATH.CACHE);
 
 	global.gtStart = (new Date).getTime();
 
