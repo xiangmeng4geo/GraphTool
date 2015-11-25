@@ -14,8 +14,9 @@
         var isObj = points.isObj;
         var first = points[0];
         var pixel_first = projection(isObj? [first.x, first.y]: first);
-        var x = xp = pixel_first[0],
-            y = yp = pixel_first[1];
+        var x, xp, y, yp;
+        x = xp = pixel_first[0];
+        y = yp = pixel_first[1];
 
         ctx.moveTo(x, y);
 
@@ -35,9 +36,9 @@
             ctx.lineTo(x, y);
         }
 
-        // if (needClose) {
-        //     ctx.lineTo(pixel_first[0], pixel_first[1]);
-        // }
+        if (needClose) {
+            ctx.lineTo(pixel_first[0], pixel_first[1]);
+        }
     }
 
     function Polygon(points, style) {

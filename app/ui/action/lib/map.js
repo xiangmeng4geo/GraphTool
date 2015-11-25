@@ -63,13 +63,14 @@
     }
     var MIN_LEN = _getPixelRatio() > 1 ? 1 : 0.6
     // 画路径
-    function _drawPath(ctx, iter) {
+    function _drawPath(ctx, iter, needClose) {
         if (!iter.hasNext()){
             return;
         }
-        var pixel = _projection([iter.x, iter.y]);
-        var x = xp = pixel[0],
-            y = yp = pixel[1];
+        var pixel_first = _projection([iter.x, iter.y]);
+        var x, xp, y, yp;
+        x = xp = pixel_first[0];
+        y = yp = pixel_first[1];
         ctx.moveTo(x, y);
 
         while (iter.hasNext()) {
@@ -85,6 +86,9 @@
         if (x != xp || y != yp) {
             ctx.lineTo(x, y);
         }
+        if (needClose) {
+            ctx.lineTo(pixel_first[0], pixel_first[1]);
+        }
     }
     // 画arcs.layer.shape数据
     function _drawShape(ctx, shp, arcs) {
@@ -95,7 +99,7 @@
 
         for (var i = 0, j = shp.length; i<j; i++) {
             iter.init(shp[i]);
-            _drawPath(ctx, iter);
+            _drawPath(ctx, iter, true);
         }
     }
     // 画arcs.layers数据
@@ -123,7 +127,7 @@
 
     function _getPathStart(ctx, style) {
         var stroked = style.strokeStyle && style.lineWidth !== 0,
-            lineWidth, strokeStyle
+            lineWidth, strokeStyle,
             fillStyle = style.fillStyle,
             filled = !!fillStyle;
 

@@ -131,16 +131,16 @@ Core.init(function(model) {
             cb_afterGeo && cb_afterGeo(names);
         });
     });
-    
+
     model.on('ready', function() {
         GeoMap.setGeo(Geo);
         GeoMap.setProjection(projection);
         initSize();
-        
+
         geomap = new GeoMap(model).init({
             container: $geomap
         });
-        
+
         var _options = {
             GeoMap: GeoMap,
             $geomap: $geomap,
@@ -149,10 +149,10 @@ Core.init(function(model) {
             Pattern: Pattern
         }
         require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
-        // require(Core.remote('util').path.join(Core.CONST.PATH.BASE, '../test/ui/map-china'))(_options);
+        require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-china-conf'))(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
-        require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi-conf'))(_options);
-        
-        model.emit('map.changeconfig', 'H:/docs/2015/蓝PI相关/各方需求/陕西/data.json');
+        // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi-conf'))(_options);
+
+        // model.emit('map.changeconfig', 'H:/docs/2015/蓝PI相关/各方需求/陕西/data.json');
     });
 });
