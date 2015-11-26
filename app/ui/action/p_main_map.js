@@ -44,8 +44,11 @@ Core.init(function(model) {
         return p.scale(scale);
     }
     var geomap;
-    var projection = _getProjection(CONST_BOUND.WN, CONST_BOUND.ES);
-    var zoom = d3.behavior.zoom()
+    var projection;
+    var zoom;
+    function _init() {
+        projection = _getProjection(CONST_BOUND.WN, CONST_BOUND.ES);
+        zoom = d3.behavior.zoom()
             .translate(projection.translate())
             .scale(projection.scale())
             // .scaleExtent([projection.scale() /4 , projection.scale()*8])
@@ -55,12 +58,14 @@ Core.init(function(model) {
                 projection.translate(e.translate);
                 model.emit('refresh');
             });
-    var drag = d3.behavior.drag().on('dragstart', function() {
-        $geomap.addClass('dragging');
-    }).on('dragend', function() {
-        $geomap.removeClass('dragging');
-    });
-    d3.select('#geomap').call(zoom).call(drag);
+        var drag = d3.behavior.drag().on('dragstart', function() {
+            $geomap.addClass('dragging');
+        }).on('dragend', function() {
+            $geomap.removeClass('dragging');
+        });
+        d3.select('#geomap').call(zoom).call(drag);
+    }
+
     model.on('product.change', function(productName){
         geomap && geomap.clear();
     });
@@ -148,7 +153,7 @@ Core.init(function(model) {
         GeoMap.setGeo(Geo);
         GeoMap.setProjection(projection);
         initSize();
-
+        _init();
         geomap = new GeoMap(model).init({
             container: $geomap
         });

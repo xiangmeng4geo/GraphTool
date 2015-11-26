@@ -168,15 +168,16 @@
     }
 
     function _getPathStart(ctx, style) {
-        var stroked = style.strokeStyle && style.lineWidth !== 0,
-            lineWidth, strokeStyle,
+        var lineWidth = parseFloat(style.lineWidth) || 0,
+            strokeStyle = style.strokeStyle,
             fillStyle = style.fillStyle,
             flag_fill = style.flag_fill,
+            stroked = strokeStyle && lineWidth !== 0,
             filled = !!fillStyle && (undefined !== flag_fill || null !== flag_fill || flag_fill);
 
         if (stroked) {
-            lineWidth = style.lineWidth || 1;
-            strokeStyle = style.strokeStyle;
+            lineWidth = lineWidth || 1;
+            strokeStyle = strokeStyle;
         }
         function fn() {
             ctx.save();
