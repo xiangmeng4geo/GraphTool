@@ -61,12 +61,12 @@
 	function _showDataDetail(val) {
 		$data_detail_list.hide().filter('.'+val).show();
 	}
-	_showDataDetail(_type);
 	var shanxi_s_data_type = UI.select($shanxi_s_data_type, {
 		data: CONST.DATA_TYPE,
 		val: _type,
 		onchange: _showDataDetail
 	});
+	_showDataDetail(_type || shanxi_s_data_type.val());
 	if ('shanxi' == _type) {
 		$shanxi_txt_command.val(conf_data.val.command);
 	}

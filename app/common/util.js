@@ -57,10 +57,21 @@
 		if (typeof content === 'object' && !(content instanceof Buffer)) {
 			content = JSON.stringify(content);
 		}
+		mkdirSync(path.dirname(_p));
 		fs.writeFileSync(_p, content);
 	}
 	function exists(_p){
 		return fs.existsSync(_p);
+	}
+	function rename(oldPath, newPath) {
+		if (exists(oldPath)) {
+			try {
+				return fs.renameSync(oldPath, newPath);
+			}catch(e) {
+				return false;
+			}
+		}
+		return false;
 	}
 	// 同步新建目录
 	function mkdirSync(mkPath) {
@@ -85,6 +96,7 @@
 		readJson: readJson,
 		write: write,
 		exists: exists,
+		rename: rename,
 		rm: rmfileSync,
 		mkdir: mkdirSync,
 		Image: {

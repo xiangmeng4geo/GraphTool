@@ -20,9 +20,12 @@
 	function _rmConfig(name){
 		return util_file.rm(_getPathByName(name));
 	}
+	function _renameConfig(name_old, name_new) {
+		return util_file.rename(_getPathByName(name_old), _getPathByName(name_new));
+	}
 
-	var CONST_SYSCONF_NAME = 'sys';
-	var CONST_SYS_PRODUCT_TREE_NAME = 'sys_product_tree';
+	var CONST_SYSCONF_NAME = '.sys/sys';
+	var CONST_SYS_PRODUCT_TREE_NAME = '.sys/sys_product_tree';
 	function _getSys() {
 		return _readConfig(CONST_SYSCONF_NAME);
 	}
@@ -66,6 +69,7 @@
 	var config = {
 		read: _readConfig,
 		save: _saveConfig,
+		rename: _renameConfig,
 		rm: _rmConfig,
 		getSys: _getSys,
 		setSys: _saveSys,

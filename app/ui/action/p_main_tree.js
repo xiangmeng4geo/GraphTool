@@ -12,7 +12,10 @@ Core.init(function(model) {
 
     _require('j.tree');
     var $doc = $(document);
-    var treeData = Config.getTree();
+    var treeData = Config.getTree() || [{
+        name: '常用图形',
+        childNodes: []
+    }];
     if (treeData) {
         var data = [];
 
@@ -57,7 +60,7 @@ Core.init(function(model) {
         Config.setTree(data_new);
     }
     function _getAction(type, _instance) {
-        return function(data) {console.log(data);
+        return function(data) {
             var inst = $.jstree.reference(data.reference),
                 obj = inst.get_node(data.reference);
             inst.create_node(obj, {
@@ -65,6 +68,7 @@ Core.init(function(model) {
             }, "last", function(new_node) {
                 setTimeout(function() {
                     inst.edit(new_node, null, function() {
+                        console.log('abc');
                         refreshData.call(_instance);
                     });
                 }, 0);
@@ -103,6 +107,7 @@ Core.init(function(model) {
                         refreshData.call(_instance);
                     });
                 }
+                
                 tmp.create.submenu = {
                     'create_folder': {
                         separator_after: true,
@@ -161,5 +166,19 @@ Core.init(function(model) {
         }, 0)
     }).on('ready.jstree', function() {
         model.emit('ready');
+    }).on('rename_node.jstree', function(e, data) {
+        var text = data.text.trim();
+        if (/[\.\/\\\s]/.test(text)) { //防止对.sys文件夹及文件夹里的文件进行操作
+            _alert('名称中不能含有“. / \\”等特殊字符!');
+            setTimeout(function() {
+                var _instance = data.instance;
+                _instance.edit(data.node, data.old);
+            }, 0)
+        } else {
+            Config.rename(data.old, data.text);//对配置文件进行重命名
+            refreshData.call(data.instance);//刷新列表数据
+        }
+    }).on('delete_node.jstree', function(e, data) {
+        Config.rm(data.node.text);
     });
 });
