@@ -29,7 +29,7 @@
 				}
 			}
 			
-			model.emit('map.changeconfig', util.extend({
+			model.emit('map.changeconfig', util.extend(true, {
 				map: conf.other.map,
 				legend: conf.other.legend,
 				data: {

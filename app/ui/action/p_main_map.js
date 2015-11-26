@@ -149,7 +149,7 @@ Core.init(function(model) {
         });
     });
 
-    model.on('ready', function() {
+    model.on('tree.ready', function() {
         GeoMap.setGeo(Geo);
         GeoMap.setProjection(projection);
         initSize();

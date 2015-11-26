@@ -165,7 +165,7 @@ Core.init(function(model) {
             });
         }, 0)
     }).on('ready.jstree', function() {
-        model.emit('ready');
+        model.emit('tree.ready');
     }).on('rename_node.jstree', function(e, data) {
         var text = data.text.trim();
         if (/[\.\/\\\s]/.test(text)) { //防止对.sys文件夹及文件夹里的文件进行操作

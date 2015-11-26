@@ -22,7 +22,7 @@
         try{
             _reader = require('./datareader/'+type);
         } catch(e) {
-            cb(new Error('no support method of reader!'));
+            cb(new Error('no support ['+type+'] method of reader!'));
         }
         if (_reader) {
             var key = util.serialize.md5(opt);
