@@ -15,6 +15,7 @@
     var _projection;
     var C = Core;
     var $ = C.$;
+    var util = C.require('util');
 
     var uid = 0;
     var cache = {};
@@ -596,7 +597,9 @@
      * 清除图层
      */
     prop.clear = function() {
-
+        var _this = this;
+        _set(this, CACHE_NAME_SHAPES, []);
+        _this.refresh([LAYER_NAME_WEATHER, LAYER_NAME_NORMAL]);
     }
     /**
      * 销毁对象

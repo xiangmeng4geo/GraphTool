@@ -73,17 +73,21 @@
 		$this.siblings().removeClass('selected');
 		var $select_show_text = $this.parent().prev('span');
 
-		$select_show_text.data('val', $this.data('val')).html($this.html());
-		$this.parent().hide();
+		var val_new = $this.data('val');
+		$select_show_text.data('val', val_new).html($this.html());
+		$this.parent().hide().parent().trigger('change', val_new);
 	})
 	function select($container, options) {
 		options = $.extend({
 			val: null,
 			data: null,
+			onchange: null
 		}, options);
 
 		var val_selected = options.val;
 		if (!$container.data('inited')) {
+			var onchange = options.onchange || function(){};
+			
 			var html = '<ul>';
 			var data = options.data || [];
 			for (var i = 0, j = data.length; i<j; i++) {
@@ -104,7 +108,7 @@
 				$val = $html.find('li:first');
 			}
 			var tmpl = '<span>'+$val.html()+'</span>';
-			$container.html(tmpl+html);
+			$container.html(tmpl+html).on('change', onchange);
 			$container.data('inited', true);
 		}
 

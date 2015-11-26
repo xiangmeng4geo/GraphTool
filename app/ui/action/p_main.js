@@ -81,7 +81,6 @@ Core.init(function(){
 		} else {
 			_alert('请先对产品进行配置!');
 		}
-
 	});
 	['map', 'tree'].forEach(function(v){
 		_require('p_main_'+v);

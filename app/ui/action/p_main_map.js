@@ -29,7 +29,12 @@ Core.init(function(model) {
     initSize();
 
     // 得到一个投影并设置相关参数，让地图居中
+    var _last_key_project;
+    function _getKeyOfProjection(leftup, rightdown) {
+        return JSON.stringify(leftup) + '_' + JSON.stringify(rightdown);
+    }
     function _getProjection(leftup, rightdown) {
+        _last_key_project = _getKeyOfProjection(leftup, rightdown);
         var center = [leftup[0] + (rightdown[0] - leftup[0])/2, leftup[1] + (rightdown[1] - leftup[1])/2];
         var p = d3.geo.mercator().center(center).translate([width_map/2, height_map/2]);
         var p_a = p(leftup),
@@ -56,11 +61,17 @@ Core.init(function(model) {
         $geomap.removeClass('dragging');
     });
     d3.select('#geomap').call(zoom).call(drag);
+    model.on('product.change', function(productName){
+        geomap && geomap.clear();
+    });
     model.on('projection.changeview', function(a, b) {
-        projection = _getProjection(a, b);
-        GeoMap.setProjection(projection);
-        zoom.translate(projection.translate()).scale(projection.scale());
-        // model.emit('refresh');
+        var key = _getKeyOfProjection(a, b);
+        if (key !== _last_key_project) {
+            projection = _getProjection(a, b);
+            GeoMap.setProjection(projection);
+            zoom.translate(projection.translate()).scale(projection.scale());
+            // model.emit('refresh');
+        }
     });
     model.on('refresh', function() {
         geomap.refresh();

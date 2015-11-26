@@ -20,25 +20,26 @@
         Render.setModel(model);
         var conrec = _require('conrec').setModel(model);
 
+        // 主要监听命令行调用时配置文件更新
         model.on('map.changeconfig', function(file_path) {
-            var conf = util_file.readJson(file_path);
+            var conf = util.isPlainObject(file_path) ? file_path: util_file.readJson(file_path);
 
             _changeConf(conf);
         });
         function _changeConf(conf) {
-            var geo = conf.geo;
-            if (!geo) {
+            var map_name = conf.map;
+            if (!map_name) {
 
             }
-            var legend = conf.legend;
+            var legend_name = conf.legend;
             var data = conf.data;
             var texts = conf.text || [];
 
-            var conf_geo = getSys.getGeo(geo);
+            var conf_geo = getSys.getGeo(map_name);
             var geo_files = conf_geo.maps;
             var textStyle = conf_geo.textStyle;
             var bound = conf_geo.bound;
-            var conf_legend = getSys.getLegend(legend);
+            var conf_legend = getSys.getLegend(legend_name);
 
             var blendentJson = conf_legend.blendent;
             model.emit('projection.changeview', bound.wn, bound.es);
