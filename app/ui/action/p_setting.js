@@ -80,8 +80,8 @@
 	function _getChecked($checkbox){
 		return $checkbox.prop('checked');
 	}
-	function _setChecked($checkbox, checked) {
-		$checkbox.prop('checked', checked);
+	function _setChecked($checkbox, ischecked) {
+		$checkbox.prop('checked', ischecked);
 	}
 
 	var $txt_map_name = $('#txt_map_name');
@@ -304,10 +304,12 @@
 				var borderStyle = _map_conf.borderStyle || {};
 
 				var $html = $(tmpl_map_item);
+				$map_conf.append($html);
 				util_ui.file($html.find('.file'), {
 					width_minus: 8,
 					val: file
 				});
+				
 				// $html.find('.f_map_item').val(file);
 				$html.find('.n_map_item').val(style.lineWidth).next('span').text(style.lineWidth);
 				$html.find('.c_map_item').val(style.strokeStyle);
@@ -320,10 +322,8 @@
 				$html.find('.c_map_item_shadow_x').val(borderStyle.shadowOffsetX).next('span').text(borderStyle.shadowOffsetX);
 				$html.find('.c_map_item_shadow_y').val(borderStyle.shadowOffsetY).next('span').text(borderStyle.shadowOffsetY);
 				$html.find('.c_map_item_fill').val(style.fillStyle);
+				_setChecked($html.find('.cb_map_item_shadow_flag'), borderStyle.flag_shadow);
 				_setChecked($html.find('.cb_map_item_fill'), style.flag_fill);
-				_setChecked($html.find('.cb_map_item_shadow_flag', borderStyle.flag_shadow));
-				// $html.find('.c_map_item_fill').val(file);
-				$map_conf.append($html);
 			}
 
 			var textStyle = geo.textStyle;

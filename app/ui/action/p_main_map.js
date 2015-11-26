@@ -73,10 +73,10 @@ Core.init(function(model) {
         var key = _getKeyOfProjection(a, b);
         if (key !== _last_key_project) {
             projection = _getProjection(a, b);
-            GeoMap.setProjection(projection);
             zoom.translate(projection.translate()).scale(projection.scale());
             // model.emit('refresh');
         }
+        GeoMap.setProjection(projection);
     });
     model.on('refresh', function() {
         geomap.refresh();

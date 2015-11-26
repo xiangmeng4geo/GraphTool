@@ -31,7 +31,13 @@
     function _parse(options, callback) {
         callback || (callback = function() {});
         var file_path = options.file;
-        var error_msg = '['+file_path+']'
+        if (!file_path) {
+            callback({
+                msg: 'no option.file'
+            });
+            return;
+        }
+        var error_msg = '['+file_path+']';
         _getData(file_path, function(err, data) {
             if (err) {
                 callback({
