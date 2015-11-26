@@ -259,6 +259,7 @@
         var _this = this;
         var geo_files = conf.maps;
         _set(_this, CACHE_NAME_GEOCONF, conf);
+        _set(_this, CACHE_NAME_GEO, []);
         if (!_isArray(geo_files)) {
             geo_files = [geo_files];
         }
