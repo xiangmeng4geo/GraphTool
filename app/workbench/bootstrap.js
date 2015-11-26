@@ -55,16 +55,16 @@
 		_emit(data);
 	});
 
-	// 把ipc当成一个EventEmitter处理,Util.Model.[emit|log]触发
-	ipc.on('ui', function(data) {
-		_emit({
-			type: data.name,
-			msg: {
-				type: data.type,
-				msg: data.msg
-			}
-		});
-	});
+	// // 把ipc当成一个EventEmitter处理,Util.Model.[emit|log]触发
+	// ipc.on('ui', function(data) {
+	// 	_emit({
+	// 		type: data.name,
+	// 		msg: {
+	// 			type: data.type,
+	// 			msg: data.msg
+	// 		}
+	// 	});
+	// });
 
 	/**
 	 * 确保主程序是单例模式
@@ -84,30 +84,40 @@
 			}
 			onSingle();
 			net.createServer(function(c){
+				var tt_focus;
 				var tt_data;
 				var str = '';
 				c.on('data', function(d){
 					str += d;
 					clearTimeout(tt_data);
+					clearTimeout(tt_focus);
 					tt_data = setTimeout(function() {
-						command(str, function(msg) {
-							msg && c.write(msg);
+						command(str, function(err, msg) {
+							var info = {};
+							err && (info.err = err);
+							msg && (info.msg = msg);
+							var str = JSON.stringify(info);
+							(err || msg) && c.write(str);
 							c.end('\n');
 						});
-
 					}, 100);
 				}).on('end', function(){
 					/**
 					 * 直接写在end事件里的回调一直不会触发！！
 					 */
 				});
-				var win = _window.getLast();
-				if(win){
-					win.setAlwaysOnTop(true);
-					win.restore();
-					win.focus();
-					win.setAlwaysOnTop(false);
-				}
+				tt_focus = setTimeout(function() {
+					if (str) {//命令行调用
+						return;
+					}
+					var win = _window.getLast();
+					if(win){
+						win.setAlwaysOnTop(true);
+						win.restore();
+						win.focus();
+						win.setAlwaysOnTop(false);
+					}
+				}, 100);
 			}).listen(socket);
 		}).on('data', function(){
 		}).on('close', function(){

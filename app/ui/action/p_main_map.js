@@ -65,7 +65,9 @@ Core.init(function(model) {
         });
         d3.select('#geomap').call(zoom).call(drag);
     }
-
+    model.on('map.changeconfig', function(file_path) {
+        geomap && geomap.clear();
+    });
     model.on('product.change', function(productName){
         geomap && geomap.clear();
     });

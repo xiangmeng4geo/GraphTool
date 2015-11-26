@@ -54,7 +54,6 @@
         try{
             _parser = require('./datareader/'+conf.data.type+'/parse');
         } catch(e) {
-            console.log(e);
             _model && _model.emit('error', new Error('no support parse method of reader!'));
         }
         if (_parser) {

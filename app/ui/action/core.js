@@ -196,27 +196,40 @@
 		var $head = $('head');
 		var $body = $('body');
 		var str_css = $body.attr('css');
+		
+		var len_css = 0;
+		// 保证css优先加载
+		function fn_css() {
+			if (--len_css <= 0) {
+				fn_js();
+			}
+		}
+		function fn_js() {
+			// show content
+			// http://www.w3schools.com/tags/att_global_hidden.asp
+			$('tmpl').removeAttr('hidden');
+			
+			var reg = RegExp('(file:///)?'+CONST_PATH_UI+'/?(.+)\.html');
+			var m = reg.exec(location.href);
+			if(m){
+				// load default javascript for page base on page name
+	
+				// eg: 	"login.html" => "p_login"
+				// 		"user/login.html" => "p_user_login"
+				// load('p_'+m[2].replace(/\//, '_'));
+				load('p_'+m[2].replace(/\//, '_'));
+			}
+	
+			if($body.attr('waiting') === undefined){
+				emit('ready');
+			}
+		}
 		if(str_css){
-			str_css.split(/\s+/).forEach(function(v){
-				$head.append('<link rel="stylesheet" href="'+path.resolve(CONST_PATH_UI_STYLE, v+EXT_CSS)+'" type="text/css" />');
+			var css_arr = str_css.split(/\s+/);
+			len_css = css_arr.length;
+			css_arr.forEach(function(v){
+				$head.append($('<link rel="stylesheet" href="'+path.resolve(CONST_PATH_UI_STYLE, v+EXT_CSS)+'" type="text/css"/>').on('load', fn_css).on('error', fn_css));
 			});
-		}
-		var reg = RegExp('(file:///)?'+CONST_PATH_UI+'/?(.+)\.html');
-		var m = reg.exec(location.href);
-		if(m){
-			// load default javascript for page base on page name
-
-			// eg: 	"login.html" => "p_login"
-			// 		"user/login.html" => "p_user_login"
-			// load('p_'+m[2].replace(/\//, '_'));
-			load('p_'+m[2].replace(/\//, '_'));
-		}
-
-		// show content
-		// http://www.w3schools.com/tags/att_global_hidden.asp
-		$('tmpl').removeAttr('hidden');
-		if($body.attr('waiting') === undefined){
-			emit('ready');
 		}
 	});
 }(window)
