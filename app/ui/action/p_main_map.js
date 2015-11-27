@@ -65,6 +65,9 @@ Core.init(function(model) {
         });
         d3.select('#geomap').call(zoom).call(drag);
     }
+    model.on('map.afterRender', function(err, time_used) {
+        model.emit('log', 'afterRender takes '+time_used+' ms!');
+    });
     model.on('map.changeconfig', function(file_path) {
         geomap && geomap.clear();
     });
@@ -90,8 +93,19 @@ Core.init(function(model) {
         });
         model.emit('log', 'render data takes '+(new Date() - t_start)+' ms!');
     });
-    model.on('export', function() {
-        util_file.Image.save(util_path.join(CONST.PATH.CACHE, '1.png'), geomap.export());
+    var _getUniqueName = (function() {
+        var id = 0;
+        return function() {
+            return new Date().getTime() + '-'+(id++)+'.png';    
+        }
+    })();
+    model.on('export', function(save_path) {
+        var s_time = new Date();
+        save_path || (save_path = util_path.join(CONST.PATH.OUTPUT, _getUniqueName()));
+        util_file.Image.save(save_path, geomap.export());
+        var time_used = new Date() - s_time;
+        model.emit('log', 'save ['+save_path+'] takes '+time_used+' ms! ');
+        model.emit('afterExport', save_path, time_used);
     });
     model.on('legend', function(blendent) {
         var canvas_legend = _require('legend')({

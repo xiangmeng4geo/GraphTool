@@ -19,6 +19,7 @@
 	var path_conf = format(path.join(path_base, 'conf'));
 	var path_config = format(path.join(path_base, 'config'));
 	var path_cache = format(path.join(path_base, 'cache'));
+	var path_output = format(path.join(path_base, 'output'));
 	
 	var path_img_ball = format(path.join(path_ui, 'img/ball.png'));
 	
@@ -45,7 +46,8 @@
 			UI_CONF: path_ui_conf,
 			WORKBENCH: path_workbench,
 			COMMON: path_common,
-			CACHE: path_cache
+			CACHE: path_cache,
+			OUTPUT: path_output
 		},
 		LOG: {
 			PATH: format(path.join(path_base, 'logs')),

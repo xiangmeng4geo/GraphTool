@@ -80,8 +80,6 @@
 				// console.log(js);
 				
 				content.executeJavaScript(js);
-				console.log('after-js');
-				content.emit('after-js');
 				// fs.readFile(, function(e, str_js){
 				// 	content.executeJavaScript(str_js.toString());
 				// });

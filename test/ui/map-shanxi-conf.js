@@ -26,7 +26,12 @@
 
             _changeConf(conf);
         });
+        function _afterChangeConf(err, t_start) {
+            var t_used = new Date() - t_start;
+            model.emit('map.afterRender', err, t_used);
+        }
         function _changeConf(conf) {
+            var s_time = new Date();
             var map_name = conf.map;
             if (!map_name) {
 
@@ -47,6 +52,7 @@
             model.emit('geo', conf_geo, function(names_show) {
                 Reader.read(data, function(err, dataJson) {
                     if (err) {
+                        _afterChangeConf(err, s_time);
                         return model.emit('error', err);
                     }
                     var texts_data = [];
@@ -72,9 +78,11 @@
 
                     conrec(dataJson.interpolate, blendentJson, true, function(err, data_conrec) {
                         if (err) {
-                            return model.emit('error', err);
+                            model.emit('error', err);
+                        } else {
+                            Render.conrec(data_conrec);
                         }
-                        Render.conrec(data_conrec);
+                        _afterChangeConf(err, s_time);;
                     });
                 });
             });

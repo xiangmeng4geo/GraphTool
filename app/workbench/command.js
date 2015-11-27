@@ -1,33 +1,51 @@
 !function() {
+    var ipc = require('electron').ipcMain;
     var window = require('./window');
     var win;
     function _runjs(conf) {
         var js = 'Core.init(function(m){m.emit("command.conf", '+JSON.stringify(conf)+')})';
-        console.log(js);
         win.webContents.executeJavaScript(js);
     }
+    var _cb_cache = {};
+    var id = 0;
+    function _setCache(conf, cb) {
+        if (conf.sync) {
+            var key = id++;
+            conf._id = key;
+            _cb_cache[key] = {
+                time: new Date(),
+                cb: cb
+            };
+        }
+    }
+    ipc.on('cb', function(e, data) {
+        var key = data.key;
+        var cache_val = _cb_cache[key];
+        var cb = cache_val.cb;
+        cb && cb(null, JSON.stringify(data.data));
+    });
     function _openUi(conf, cb) {
+        _setCache(conf, cb);
         if (!conf.sync) {
             cb(null, 'dealing...');
         }
-        // conf = {
-        //     file: 'H:/docs/2015/蓝PI相关/各方需求/陕西/data.json'
-        // }
+        
         try {
             win.isFocused();
             _runjs(conf);
         } catch(e){
             win = window.getInstance('service');
             
-            win.webContents.on('after-js', function() {console.log(123);
-                setTimeout(function() {
-                    _runjs(conf);
-                }, 1000);
+            win.webContents.on('ready', function() {
+                _runjs(conf);
             });
             window.load(win, 'service');
         }
     }
-    
+    /**
+     * cb调用的参数：[err, msg]
+     *     msg: {path: '图片存储路径', time: '所用毫秒数'} 
+     */
     function _parse(command, cb) {
         cb || (cb = function(){});
         var arr = command.split(/\s+/);
@@ -65,7 +83,6 @@
                     conf['sync'] = true;
             }
         }
-        console.log(conf);
         if (!conf.name && !conf.file) {
             cb('command error, use -name or -file'); 
         } else {
@@ -78,8 +95,8 @@
         //     cb(null, '正在处理。。。');
         // }, 5000)
     }
-    _parse('-f e:/test/1.txt -c -d abc', function() {
-        console.log(arguments);
-    });
+    // _parse('-f e:/test/1.txt -c -d abc', function() {
+    //     console.log(arguments);
+    // });
     module.exports = _parse;
 }()

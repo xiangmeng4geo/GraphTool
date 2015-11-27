@@ -1,8 +1,13 @@
 Core.init(function(model) {
+	var ipc = require('electron').ipcRenderer;
+	
 	var C = Core;
 	var _require = C.require;
 	var util = _require('util');
 	var util_file = util.file;
+	var util_path = util.path;
+	var path = require('path');
+	var CONST_PATH_OUTPUT = _require('const').PATH.OUTPUT;
 	
 	_require('p_main_map');
 	
@@ -11,6 +16,7 @@ Core.init(function(model) {
 	model.on('error', function(err) {
 		
 	});
+	var _confCurrent;
 	function _error(msg) {
 		model.emit(new Error('[command error] '+msg));
 	}
@@ -30,10 +36,45 @@ Core.init(function(model) {
 					type: 'shanxi'
 				}
 			}, conf);
+			_confCurrent.__conf = conf;
 			model.emit('map.changeconfig', conf);
 		}
 	}
+	model.on('map.afterRender', function(err, time_used) {
+		if (!err) {
+			var conf = _confCurrent.__conf;
+			var save_path = conf.savepath;
+			var save_dir, filename;
+			if (save_path) {
+				if (!/\.(png|jpg)$/i.test(save_path)) {
+					save_dir = save_path;
+				} else {
+					save_dir = path.dirname(save_path);
+					filename = path.basename(save_path);
+				}
+			}
+			if (!save_dir) {
+				save_dir = CONST_PATH_OUTPUT;
+			}
+			if (!filename) {
+				filename = util.encrypt(util.serialize(conf))+'.png';
+			}
+			
+			save_path = path.join(save_dir, filename);
+			model.emit('export', save_path);
+		}
+    });
+	model.on('afterExport', function(save_path, time_used){
+		ipc.send('cb', {
+			key: _confCurrent._id,
+			data: {
+				path: save_path,
+				time: time_used
+			}
+		});
+	})
 	model.on('command.conf', function(conf) {
+		_confCurrent = conf;
 		var file = conf.file;
 		var name = conf.name;
 		if (file) {
@@ -42,4 +83,5 @@ Core.init(function(model) {
 			_changeProduct(name);
 		}
 	});
+	require('remote').getCurrentWindow().webContents.emit('ready');
 })
