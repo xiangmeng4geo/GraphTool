@@ -181,7 +181,7 @@ Core.init(function(model) {
             Shape: Shape,
             Pattern: Pattern
         }
-        require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
+        // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-china-conf'))(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
         require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi-conf'))(_options);

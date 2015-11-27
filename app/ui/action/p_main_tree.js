@@ -158,6 +158,9 @@ Core.init(function(model) {
             var children = node.children;
             var text = node.text;
             if ((!children || children.length == 0) && (_productNameCurrent !== text)) {
+                if (!_productNameCurrent) {
+                    $('#geomap_container').removeClass('no_inited');
+                }
                 _productNameCurrent = text;
                 _log('['+_productNameCurrent+'] click');
                 model.emit('product.change', text);

@@ -122,6 +122,19 @@
 	box-shadow: 0 0 5px #bbc2c9;
 	background-color: white;
 }
+.no_inited:after {
+	content: '请双击左侧产品';
+	width: 300px;
+	height: 30px;
+	line-height: 30px;
+	position: absolute;
+	left: 50%;
+	margin-left: -150px;
+	top: 50%;
+	margin-top: -15px;
+	font-size: 40px;
+	text-shadow: 3px 2px 2px #ccc;
+}
 #geomap_container .loading{
 	position: absolute;
 	left: 0;
