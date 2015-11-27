@@ -1,7 +1,13 @@
 !function() {
+    var app = require('app');
     var ipc = require('electron').ipcMain;
     var window = require('./window');
     var win;
+    app.on('ready', function() {
+        // 主进程直接打开服务窗口
+        win = window.open('service');
+    });
+    
     function _runjs(conf) {
         var js = 'Core.init(function(m){m.emit("command.conf", '+JSON.stringify(conf)+')})';
         win.webContents.executeJavaScript(js);

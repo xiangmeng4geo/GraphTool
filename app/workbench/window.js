@@ -102,19 +102,46 @@
 		(win_sub[parentId] || (win_sub[parentId] = [])).push(subId);
 	}
 
+	/**
+	 * 让UI进程的最后一个窗口得到焦点
+	 */
+	function _focusLastOfUi() {
+		var wins = BrowserWindow.getAllWindows();
+		for (var i = wins.length - 1; i>=0; i--) {
+			var w = wins[i];
+			if (w) {
+				var url = w.getURL();
+				if (!/service\.\w+$/.test(url)) {
+					w.setAlwaysOnTop(true);
+					w.restore();
+					w.focus();
+					w.setAlwaysOnTop(false);
+					break;
+				}
+			}
+		}
+	}
+	/**
+	 * UI进程是否已经打开（login.html或main.html是否打开）
+	 */
+	function _isOpenedUi() {
+		var wins = BrowserWindow.getAllWindows();
+		for (var i = wins.length - 1; i>=0; i--) {
+			var w = wins[i];
+			if (w) {
+				var url = w.getURL();
+				if (/(login|main)\.\w+$/.test(url)) {
+					return true;
+				}
+			}
+		}
+	}
 	module.exports = {
 		getInstance: get_win,
 		load: win_load,
 		open: open,
-		/**
-		 * 得到最后一个打开的窗口
-		 */
-		getLast: function(){
-			var id = win_stack[win_stack.length-1];
-			if(id !== undefined){
-				return BrowserWindow.fromId(id);
-			}
-		},
+		isOpenedUi: _isOpenedUi,
+		setFocusToLast: _focusLastOfUi,
 		setSub: setSub
 	}
 }()

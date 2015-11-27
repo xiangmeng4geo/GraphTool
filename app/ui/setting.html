@@ -2,150 +2,150 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<link rel="stylesheet" type="text/css" href="style/reset.css">
-		<link rel="stylesheet" type="text/css" href="style/p_setting.css">
 		<title>设置</title>
 	</head>
-	<body>
-		<div class="main">
-			<script type="tmpl" id="tmpl_map_item">
-				<div class="map_item">
-					<div class="btns">
-						<input type="button" value="上移" class="btn_up"/>
-						<input type="button" value="下移" class="btn_down"/>
-						<input type="button" value="删除" class="btn_dele"/>
-					</div>
-					<div class="row">
-						<label>文件</label>
-						<div class="file"></div>
-					</div>
-					<div class="row">
-						<label>线宽度</label>
-						<input type="range" min=0 max=6 step=0.1 class="n_map_item"/>
-						<span></span>
-					</div>
-					<div class="row">
-						<label>线颜色</label>
-						<input type="color" class="c_map_item"/>
-					</div>
-					<div class="row">
-						<label>填充颜色</label>
-						<input type="color" class="c_map_item_fill"/>
-						<input type="checkbox" class="cb_map_item_fill"/>
-					</div>
-					<div class="row">
-						<input type="checkbox" class="cb_map_item"/>
-						<label>是否只显示本区域</label>
-					</div>
-					<div class="row">
-						<input type="checkbox" class="cb_map_item_border"/>
-						<label>对边界进行处理</label>
+	<body css="reset p_setting">
+		<tmpl hidden>
+			<div class="main">
+				<script type="tmpl" id="tmpl_map_item">
+					<div class="map_item">
+						<div class="btns">
+							<input type="button" value="上移" class="btn_up"/>
+							<input type="button" value="下移" class="btn_down"/>
+							<input type="button" value="删除" class="btn_dele"/>
+						</div>
+						<div class="row">
+							<label>文件</label>
+							<div class="file"></div>
+						</div>
 						<div class="row">
 							<label>线宽度</label>
-							<input type="range" min=0 max=6 step=0.1 class="n_map_item_line"/>
+							<input type="range" min=0 max=6 step=0.1 class="n_map_item"/>
 							<span></span>
 						</div>
 						<div class="row">
 							<label>线颜色</label>
-							<input type="color" class="c_map_item_line"/>
+							<input type="color" class="c_map_item"/>
 						</div>
 						<div class="row">
-							<input type="checkbox" class="cb_map_item_shadow_flag"/>
-							<span>是否使用投影</span>
+							<label>填充颜色</label>
+							<input type="color" class="c_map_item_fill"/>
+							<input type="checkbox" class="cb_map_item_fill"/>
 						</div>
 						<div class="row">
-							<label>投影颜色</label>
-							<input type="color" class="c_map_item_shadow"/>
+							<input type="checkbox" class="cb_map_item"/>
+							<label>是否只显示本区域</label>
 						</div>
 						<div class="row">
-							<label>投影大小</label>
-							<input type="range" min=0 max=10 class="c_map_item_shadow_size"/>
-							<span></span>
-						</div>
-						<div class="row">
-							<label>x偏移</label>
-							<input type="range" min=-10 max=10 class="c_map_item_shadow_x"/>
-							<span></span>
-						</div>
-						<div class="row">
-							<label>y偏移</label>
-							<input type="range" min=-10 max=10 class="c_map_item_shadow_y"/>
-							<span></span>
-						</div>
-					</div>
-				</div>
-			</script>
-			<tab>
-				<item class="on">地图</item>
-				<item>图例</item>
-			</tab>
-			<tab-content>
-				<item class="on">
-					<div class="list">
-						<input type="button" value="添加" id="btn_add_map_conf"/>
-						<input type="button" value="删除" id="btn_dele_map_conf"/>
-						<ul id="map_conf_list">				
-						</ul>
-					</div>
-					<resize-horizontal></resize-horizontal>
-					<div class="content">
-						<div class="map_left" id="map_conf">
-							<input type="text" value="" placeholder="自定义地图模块名" id="txt_map_name">
-							<input type="button" value="添加或修改" id="btn_save_map"/>
-							<input type="button" value="添加地图文件" id="btn_add_map"/>
-						</div>
-						<div class="map_right">
+							<input type="checkbox" class="cb_map_item_border"/>
+							<label>对边界进行处理</label>
 							<div class="row">
-								<input type="checkbox" id="cb_map_bgcolor"/>地图背景色<input type="color" id="c_map_color"/><br/>
-								<input type="checkbox" id="cb_prov"/>省名<br/>
-								<input type="checkbox" id="cb_city"/>市名<br/>
-								<input type="checkbox" id="cb_county"/>县名<br/>
-								<div class="row">
-									颜色<input type="color" id="c_map_text"/><br/>
-									大小<input type="number" style="width: 30px" id="n_map_text"/><br/>
-									标识
-									<div class="select" id="s_map_text"></div>
-								</div>
-								<div class="row">
-									<h3>西北坐标</h3>
-									经度：<input type="text" id="txt_wn_lng"/><br/>
-									纬度：<input type="text"  id="txt_wn_lat"/><br/>
-									<h3>东南坐标</h3>
-									经度：<input type="text"  id="txt_es_lng"/><br/>
-									纬度：<input type="text" id="txt_es_lat"/><br/>
-								</div>
+								<label>线宽度</label>
+								<input type="range" min=0 max=6 step=0.1 class="n_map_item_line"/>
+								<span></span>
 							</div>
-						</div>	
-					</div>
-				</item>
-				<item>
-					<div class="list">
-						<input type="button" value="添加" id="btn_add_blendent_conf"/>
-						<input type="button" value="删除" id="btn_dele_blendent_conf"/>
-						<ul id="blendent_conf_list">				
-						</ul>
-					</div>
-					<resize-horizontal></resize-horizontal>
-					<div class="content">
-						<div class="map_left" id="blendent_conf" style="right: 0">
-							<input type="text" value="" placeholder="自定义配色方案名" id="txt_blendent_name">
-							<input type="button" value="添加或修改" id="btn_save_blendent"/>
-							
 							<div class="row">
-								<h2>添加新的配色方案</h2>
-								<select id="select_legent_product" class="mt10">
-								</select>
-								<input type="button" value="添加" id="btn_add_new_legend"/>
+								<label>线颜色</label>
+								<input type="color" class="c_map_item_line"/>
+							</div>
+							<div class="row">
+								<input type="checkbox" class="cb_map_item_shadow_flag"/>
+								<span>是否使用投影</span>
+							</div>
+							<div class="row">
+								<label>投影颜色</label>
+								<input type="color" class="c_map_item_shadow"/>
+							</div>
+							<div class="row">
+								<label>投影大小</label>
+								<input type="range" min=0 max=10 class="c_map_item_shadow_size"/>
+								<span></span>
+							</div>
+							<div class="row">
+								<label>x偏移</label>
+								<input type="range" min=-10 max=10 class="c_map_item_shadow_x"/>
+								<span></span>
+							</div>
+							<div class="row">
+								<label>y偏移</label>
+								<input type="range" min=-10 max=10 class="c_map_item_shadow_y"/>
+								<span></span>
 							</div>
 						</div>
-						<div class="map_right" style="width:0">
-							<div class="row">
+					</div>
+				</script>
+				<tab>
+					<item class="on">地图</item>
+					<item>图例</item>
+				</tab>
+				<tab-content>
+					<item class="on">
+						<div class="list">
+							<input type="button" value="添加" id="btn_add_map_conf"/>
+							<input type="button" value="删除" id="btn_dele_map_conf"/>
+							<ul id="map_conf_list">				
+							</ul>
+						</div>
+						<resize-horizontal></resize-horizontal>
+						<div class="content">
+							<div class="map_left" id="map_conf">
+								<input type="text" value="" placeholder="自定义地图模块名" id="txt_map_name">
+								<input type="button" value="添加或修改" id="btn_save_map"/>
+								<input type="button" value="添加地图文件" id="btn_add_map"/>
+							</div>
+							<div class="map_right">
+								<div class="row">
+									<input type="checkbox" id="cb_map_bgcolor"/>地图背景色<input type="color" id="c_map_color"/><br/>
+									<input type="checkbox" id="cb_prov"/>省名<br/>
+									<input type="checkbox" id="cb_city"/>市名<br/>
+									<input type="checkbox" id="cb_county"/>县名<br/>
+									<div class="row">
+										颜色<input type="color" id="c_map_text"/><br/>
+										大小<input type="number" style="width: 30px" id="n_map_text"/><br/>
+										标识
+										<div class="select" id="s_map_text"></div>
+									</div>
+									<div class="row">
+										<h3>西北坐标</h3>
+										经度：<input type="text" id="txt_wn_lng"/><br/>
+										纬度：<input type="text"  id="txt_wn_lat"/><br/>
+										<h3>东南坐标</h3>
+										经度：<input type="text"  id="txt_es_lng"/><br/>
+										纬度：<input type="text" id="txt_es_lat"/><br/>
+									</div>
+								</div>
+							</div>	
+						</div>
+					</item>
+					<item>
+						<div class="list">
+							<input type="button" value="添加" id="btn_add_blendent_conf"/>
+							<input type="button" value="删除" id="btn_dele_blendent_conf"/>
+							<ul id="blendent_conf_list">				
+							</ul>
+						</div>
+						<resize-horizontal></resize-horizontal>
+						<div class="content">
+							<div class="map_left" id="blendent_conf" style="right: 0">
+								<input type="text" value="" placeholder="自定义配色方案名" id="txt_blendent_name">
+								<input type="button" value="添加或修改" id="btn_save_blendent"/>
 								
+								<div class="row">
+									<h2>添加新的配色方案</h2>
+									<select id="select_legent_product" class="mt10">
+									</select>
+									<input type="button" value="添加" id="btn_add_new_legend"/>
+								</div>
 							</div>
-						</div>	
-					</div>
-				</item>
-			</tab-content>
-		</div>
+							<div class="map_right" style="width:0">
+								<div class="row">
+									
+								</div>
+							</div>	
+						</div>
+					</item>
+				</tab-content>
+			</div>
+		</tmpl>
 	</body>
 </html>

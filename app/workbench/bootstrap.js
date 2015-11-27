@@ -22,6 +22,7 @@
 
 	// 捕获系统级错误，方便调试
 	process.on('uncaughtException', function(err){
+		console.log(err);
 		logger.error(err);
 	});
 
@@ -55,17 +56,6 @@
 		_emit(data);
 	});
 
-	// // 把ipc当成一个EventEmitter处理,Util.Model.[emit|log]触发
-	// ipc.on('ui', function(data) {
-	// 	_emit({
-	// 		type: data.name,
-	// 		msg: {
-	// 			type: data.type,
-	// 			msg: data.msg
-	// 		}
-	// 	});
-	// });
-
 	/**
 	 * 确保主程序是单例模式
 	 */
@@ -73,7 +63,7 @@
 		var net = require('net');
 		var socket = path.join('\\\\?\\pipe', app.getName());
 		net.connect({path: socket}, function(){
-			app.terminate();
+			app.quit();
 		}).on('error', function(err){
 			try{
 				require('fs').unlinkSync(socket);
@@ -92,6 +82,7 @@
 					clearTimeout(tt_data);
 					clearTimeout(tt_focus);
 					tt_data = setTimeout(function() {
+						// 解析命令行参数
 						command(str, function(err, msg) {
 							var info = {};
 							err && (info.err = err);
@@ -110,12 +101,12 @@
 					if (str) {//命令行调用
 						return;
 					}
-					var win = _window.getLast();
-					if(win){
-						win.setAlwaysOnTop(true);
-						win.restore();
-						win.focus();
-						win.setAlwaysOnTop(false);
+					
+					// ui主进程启动时直接得到焦点，否则重新打开
+					if (_window.isOpenedUi()) {
+						_window.setFocusToLast();
+					} else {
+						_getMainWin();
 					}
 				}, 100);
 			}).listen(socket);
@@ -123,13 +114,23 @@
 		}).on('close', function(){
 		});
 	}
-	app.on('ready', function () {
+	function _getMainWin(is_use_single) {
 		var loginWin = _window.getInstance('login');
 		ipc.on('wait.main', function(e, data){
 			loginWin.send('wait.login', true);
 		});
-		ensure_single(function() {
+		function cb() {
 			_window.load(loginWin, 'login');
-		});
+		}
+		if (is_use_single) {
+			ensure_single(cb);
+		} else {
+			cb();
+		}
+		return loginWin;
+	}
+	
+	app.on('ready', function() {
+		_getMainWin(true);
 	});
 }();

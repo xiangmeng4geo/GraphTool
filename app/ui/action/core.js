@@ -232,6 +232,8 @@
 			css_arr.forEach(function(v){
 				$head.append($('<link rel="stylesheet" href="'+path.resolve(CONST_PATH_UI_STYLE, v+EXT_CSS)+'" type="text/css"/>').on('load', fn_css).on('error', fn_css));
 			});
+		} else {
+			fn_js();
 		}
 	});
 }(window)
