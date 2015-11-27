@@ -36,7 +36,7 @@
 		conf.show = false;
 		conf.titleBarStyle = 'hidden';
 		var win = new BrowserWindow(conf);
-		win.openDevTools();
+		// win.openDevTools();
 		// 当窗口关闭时清除`win_stack`中的标识
 		win.on('close', function(e){
 			var sub_windows = win_sub[win.id];

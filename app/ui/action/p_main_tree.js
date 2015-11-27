@@ -75,6 +75,10 @@ Core.init(function(model) {
             });
         }
     }
+    var _productNameCurrent;
+    function _log(msg) {
+        model.emit('log', msg);
+    }
     // 相关的事件说明请参考：https://www.jstree.com/api/#/?q=.jstree%20Event
     // 自定义了'dblclick_node.jstree'事件
     var $tree = $('#tree').jstree({
@@ -127,7 +131,7 @@ Core.init(function(model) {
                         "label": "配置",
                         "action": function(data) {
                             var node = _instance.get_node(_instance.get_selected());
-                            C.Win.open('pconf', {
+                            C.Win.openSub('pconf', {
                                 param: node.text
                             });
                         }
@@ -152,8 +156,11 @@ Core.init(function(model) {
         if (data) {
             var node = data.node;
             var children = node.children;
-            if (!children || children.length == 0) {
-                model.emit('product.change', node.text);
+            var text = node.text;
+            if ((!children || children.length == 0) && (_productNameCurrent !== text)) {
+                _productNameCurrent = text;
+                _log('['+_productNameCurrent+'] click');
+                model.emit('product.change', text);
             }
         }
     }).on('rename_node_error.jstree', function(e, data) {
@@ -175,10 +182,21 @@ Core.init(function(model) {
                 _instance.edit(data.node, data.old);
             }, 0)
         } else {
-            Config.rename(data.old, data.text);//对配置文件进行重命名
+            var nameOld = data.old;
+            var nameNew = data.text;
+            Config.rename(nameOld, nameNew);//对配置文件进行重命名
             refreshData.call(data.instance);//刷新列表数据
+            
+            if ('请输入名称' == nameOld) {
+                _log('new ['+nameNew+']');
+            } else {
+                _log('rename ['+nameOld+'] to ['+nameNew+']');
+            }
         }
     }).on('delete_node.jstree', function(e, data) {
-        Config.rm(data.node.text);
+        var name = data.node.text;
+        Config.rm(name);
+        
+        _log('delete ['+name+']');
     });
 });

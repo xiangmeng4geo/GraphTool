@@ -27,12 +27,14 @@
 	var model = new Model();
 
 	model.on('log', function(msg) {
-		console.log(msg);
+		logger.info(msg);
 	});
+	function _error(err) {
+		var info = err.msg||err.message||err;
+		logger.error(info);
+	}
     //统一处理其它库里的错误信息
-    model.on('error', function(err) {
-        console.log(err.msg||err.message||err);
-    });
+    model.on('error', _error);
 
 	var Core = {
 		model: model
@@ -54,12 +56,12 @@
 				return req(url);
 			}catch(e){
 				e.stack = '[module error]'+url+'\n' + e.stack;
-				logger.error(e);
+				_error(e);
 			}
 		}else{
 			if (showError) {
 				var err_msg = '[not exists]' + url;
-				logger.error(new Error(err_msg));
+				_error(new Error(err_msg));
 			}
 		}
 	}
@@ -102,7 +104,7 @@
 				return result;
 			}
 		}
-		logger.error(new Error('[module error]'+name));
+		model.emit('error', new Error('[module error]'+name));
 	}
 
 	/**
@@ -173,10 +175,10 @@
 			}
 			return win;
 		},
-		openSub: function(name) {
-			return this.open(name, {
+		openSub: function(name, option) {
+			return this.open(name, $.extend({
 				is_sub: true
-			});
+			}, option));
 		},
 		WIN: win_instance
 	}
