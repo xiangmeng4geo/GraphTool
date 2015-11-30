@@ -27,8 +27,10 @@
     ipc.on('cb', function(e, data) {
         var key = data.key;
         var cache_val = _cb_cache[key];
-        var cb = cache_val.cb;
-        cb && cb(null, JSON.stringify(data.data));
+        if (cache_val) {
+            var cb = cache_val.cb;
+            cb && cb(null, JSON.stringify(data.data));
+        }
     });
     function _openUi(conf, cb) {
         _setCache(conf, cb);
