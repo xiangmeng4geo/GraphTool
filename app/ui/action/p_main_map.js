@@ -180,11 +180,13 @@ Core.init(function(model) {
             model: model,
             Shape: Shape,
             Pattern: Pattern
-        }
+        };
+        
+        require('./map_ext/shanxi')(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-china-conf'))(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);
-        require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi-conf'))(_options);
+        // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi-conf'))(_options);
 
         // model.emit('map.changeconfig', 'H:/docs/2015/蓝PI相关/各方需求/陕西/data.json');
     });

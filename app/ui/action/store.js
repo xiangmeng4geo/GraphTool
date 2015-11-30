@@ -17,7 +17,7 @@
 		}catch(e){}
 	}
 	function _get(name, val_default){
-		let val = store.getItem(_getName(name));
+		var val = store.getItem(_getName(name));
 		if(val !== undefined && val !== null){
 			try{
 				return JSON.parse(val);

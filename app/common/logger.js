@@ -68,7 +68,7 @@
 			return;
 		}
 		msgs = msgs.map(function(v){
-			return [`[${v[1]}]`, format_date(v[0], '<yyyy-MM-dd hh:mm:ss>'), v[2]].join('\t');
+			return ['['+v[1]+']', format_date(v[0], '<yyyy-MM-dd hh:mm:ss>'), v[2]].join('\t');
 		});
 
 		fn_show(msgs.join(EOL)+EOL, function(){
