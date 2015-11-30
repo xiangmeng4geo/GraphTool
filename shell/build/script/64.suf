@@ -3099,7 +3099,8 @@ end</Script>
 <Event>
 <Name>On Post Install</Name>
 <Args/>
-<Script/>
+<Script>Shell.CreateShortcut(Shell.GetFolder(SHF_DESKTOP), "蓝PI制图", SessionVar.Expand("%AppFolder%\\BPA.exe"), "", "", SessionVar.Expand("%AppFolder%\\BPA.exe"), 0, SW_SHOWNORMAL, nil, "");
+</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3201,8 +3202,8 @@ g_HandleSystemReboot();
 <PostBuildProg/>
 <PostBuildCmdLine/>
 <PostBuildWait>0</PostBuildWait>
-<Filename>蓝π蚂蚁制图_64_v0.7.3.exe</Filename>
-<OutputFolder>E:\docs\2014工作\SK替代\安装包及打包配置文件\安装包</OutputFolder>
+<Filename>BPA-64-1.0.0.exe</Filename>
+<OutputFolder>C:\Users\Administrator\Desktop</OutputFolder>
 <SegmentSizeMode>0</SegmentSizeMode>
 <CustomSegSize>100</CustomSegSize>
 <CustomSegSizeMode>2</CustomSegSizeMode>

@@ -78,7 +78,7 @@
 				js += 'require("'+path_core+'")';
 				// var js = 'var __src=document.createElement("script");__src.src="'+path_core+'.js";document.body.appendChild(__src)';
 				// console.log(js);
-				
+
 				content.executeJavaScript(js);
 				// fs.readFile(, function(e, str_js){
 				// 	content.executeJavaScript(str_js.toString());

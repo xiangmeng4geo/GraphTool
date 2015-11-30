@@ -211,7 +211,7 @@
 			// http://www.w3schools.com/tags/att_global_hidden.asp
 			$('tmpl').removeAttr('hidden');
 
-			var reg = RegExp("(file:///)?" + (encodeURI(CONST_PATH_UI).replace(/\(/g, '\\(').replace(/\)/g, '\\)')) + "/?([^.]+).(.+)$"),
+			var reg = RegExp("(file:///)?" + (encodeURI(CONST_PATH_UI).replace(/\(/g, '\\(').replace(/\)/g, '\\)')) + "/?([^.]+).(.+)$");
 			var m = reg.exec(location.href);
 			if(m){
 				// load default javascript for page base on page name
