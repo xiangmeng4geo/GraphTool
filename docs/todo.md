@@ -49,6 +49,8 @@
 
 ## 新功能添加
 
+- [ ] 用`Inno Stepup`做安装及程序程序
+- [ ] 用`grunt`做自动打包
 - [ ] 封装时间序列产品生成gif图模块
 - [ ] 配置文件用xml格式（语义化更强方便修改）
     * http://dfsq.github.io/xml2json/#/xml/paste
@@ -71,3 +73,4 @@
     * http://resources.arcgis.com/en/help/main/10.1/index.html#//007000000013000000
 - [x] 优化polygon解析速度
     * https://github.com/tonny-zhang/docs/issues/1#user-content-1
+- [ ] conrec后对等值线进行填色

@@ -167,7 +167,7 @@
 		open: function(name, option) {
 			option || (option = {});
 			var is_subwin = option.is_sub;
-			
+
 			var win_remote = _loadRemote('window');
 			var win = win_remote.open(name, option.param);
 			if (is_subwin) {
@@ -198,7 +198,7 @@
 		var $head = $('head');
 		var $body = $('body');
 		var str_css = $body.attr('css');
-		
+
 		var len_css = 0;
 		// 保证css优先加载
 		function fn_css() {
@@ -210,18 +210,18 @@
 			// show content
 			// http://www.w3schools.com/tags/att_global_hidden.asp
 			$('tmpl').removeAttr('hidden');
-			
-			var reg = RegExp('(file:///)?'+CONST_PATH_UI+'/?(.+)\.html');
+
+			var reg = RegExp("(file:///)?" + (encodeURI(CONST_PATH_UI).replace(/\(/g, '\\(').replace(/\)/g, '\\)')) + "/?([^.]+).(.+)$"),
 			var m = reg.exec(location.href);
 			if(m){
 				// load default javascript for page base on page name
-	
+
 				// eg: 	"login.html" => "p_login"
 				// 		"user/login.html" => "p_user_login"
 				// load('p_'+m[2].replace(/\//, '_'));
 				load('p_'+m[2].replace(/\//, '_'));
 			}
-	
+
 			if($body.attr('waiting') === undefined){
 				emit('ready');
 			}
