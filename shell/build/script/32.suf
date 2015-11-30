@@ -3060,9 +3060,9 @@ g_HandleSystemReboot();
 <Args/>
 <Script>result = System.Is64BitOS();
 -- An if statement that compares two numbers
-if (false == result) then
+if (true == result) then
 	-- Do something here
-	result = Dialog.Message("Notice", "检测到您的系统是不是64位，请使用相应安装包，本次安装将退出！", MB_OK, MB_ICONINFORMATION, MB_DEFBUTTON1);
+	result = Dialog.Message("Notice", "检测到您的系统是不是32位，请使用相应安装包，本次安装将退出！", MB_OK, MB_ICONINFORMATION, MB_DEFBUTTON1);
 	Application.Exit(0);
 end
 </Script>
@@ -3072,19 +3072,14 @@ end
 <Event>
 <Name>On Pre Install</Name>
 <Args/>
-<Script>result = System.GetUserInfo();
-
-if (result.IsAdmin or result.IsVistaAdminLimitedToken) then
-	--Dialog.Message("Notice", "管理员安装！", MB_OK, MB_ICONINFORMATION, MB_DEFBUTTON1);
-else
-	app_drive = SessionVar.Expand("%AppDrive%");
-	--Dialog.Message("Notice", app_drive, MB_OK, MB_ICONINFORMATION, MB_DEFBUTTON1);
-	sys_drive = SessionVar.Expand("%SystemDrive%");
-	if( String.CompareNoCase(app_drive, sys_drive) == 0 ) then
-		Dialog.Message("Notice", "没有安装权限,请与管理员联系开通权限或把程序安装到其它盘符！", MB_OK, MB_ICONINFORMATION, MB_DEFBUTTON1);
-		Application.Exit(0);
-	end
-end</Script>
+<Script>result = System.Is64BitOS();
+-- An if statement that compares two numbers
+if (true == result) then
+	-- Do something here
+	result = Dialog.Message("Notice", "检测到您的系统是不是32位，请使用相应安装包，本次安装将退出！", MB_OK, MB_ICONINFORMATION, MB_DEFBUTTON1);
+	Application.Exit(0);
+end
+</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
