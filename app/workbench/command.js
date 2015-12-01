@@ -79,7 +79,14 @@
         var cache_val = _cb_cache[key];
         if (cache_val) {
             var cb = cache_val.cb;
-            cb && cb(null, JSON.stringify(data.data));
+            var err = data.err;
+            if (cb) {
+                if (err) {
+                    cb(JSON.stringify(err));
+                } else {
+                    cb(null, JSON.stringify(data.data));
+                }
+            }
         }
     });
     function _openUi(conf, cb) {

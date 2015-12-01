@@ -227,6 +227,12 @@
         var is_center = !!style.center;
 
         var img = _getImg(src);
+        if (width && !height) {
+            height = img.height * width/img.width;
+        }
+        if (height && !width) {
+            width = img.width * height/img.height;
+        }
         width = width || img.width;
         height = height || img.height;
 

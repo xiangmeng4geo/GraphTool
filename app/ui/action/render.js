@@ -47,9 +47,22 @@
             }
         }
     }
+    function _img(imgs) {
+        if (imgs) {
+            var shapes = [];
+            for (var i = 0, j = imgs.length; i<j; i++) {
+                var item = imgs[i];
+                shapes.push(new Shape.Image(item.src, item));
+            }
+            if (shapes && shapes.length > 0) {
+                _model.emit('render', shapes);
+            }
+        }
+    }
     module.exports = {
         setModel: _setModel,
         conrec: _conrec,
-        text: _text
+        text: _text,
+        img: _img
     };
 }()

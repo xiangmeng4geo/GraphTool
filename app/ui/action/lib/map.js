@@ -522,12 +522,15 @@
      */
     prop.refresh = function(layer_name) {
         var _this = this;
+        var conf_geo = _get(_this, CACHE_NAME_GEOCONF);
+        if (!conf_geo) {
+            return;
+        }
         if (!layer_name) {
             layer_name = [LAYER_NAME_GEO, LAYER_NAME_WEATHER, LAYER_NAME_NORMAL];
         }else if (!_isArray(layer_name)) {
             layer_name = [layer_name];
         }
-        var conf_geo = _get(_this, CACHE_NAME_GEOCONF);
         if (layer_name.indexOf(LAYER_NAME_GEO) > -1) {
             var ctx_stroke = _getCtxByPrefix(_this, LAYER_NAME_GEO_STROKE);
             var ctx_fill = _getCtxByPrefix(_this, LAYER_NAME_GEO_FILL);

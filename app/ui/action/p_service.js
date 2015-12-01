@@ -1,24 +1,28 @@
 Core.init(function(model) {
 	var ipc = require('electron').ipcRenderer;
-	
-	var C = Core;
+
+	var C = Core;C.Win.WIN.show();
 	var _require = C.require;
 	var util = _require('util');
 	var util_file = util.file;
 	var util_path = util.path;
 	var path = require('path');
 	var CONST_PATH_OUTPUT = _require('const').PATH.OUTPUT;
-	
+
 	_require('p_main_map');
-	
+
 	model.emit('tree.ready');
-	
+
 	model.on('error', function(err) {
-		
+
 	});
 	var _confCurrent;
 	function _error(msg) {
 		model.emit(new Error('[command error] '+msg));
+		ipc.send('cb', {
+			key: _confCurrent._id,
+			err: msg
+		});
 	}
 	function _changeProduct(product_name) {
 		var conf = _require('product_conf').read(product_name);
@@ -29,7 +33,7 @@ Core.init(function(model) {
 	function _changeFile(file_path) {
 		var conf = util_file.readJson(file_path);
 		if (!conf) {
-			_error('file ['+file_path+'] not exists or empty!');
+			_error('file ['+file_path+'] not exists or empty or data error!');
 		} else {
 			conf = util.extend(true, {
 				data: {
@@ -59,7 +63,7 @@ Core.init(function(model) {
 			if (!filename) {
 				filename = util.encrypt(util.serialize(conf))+'.png';
 			}
-			
+
 			save_path = path.join(save_dir, filename);
 			model.emit('export', save_path);
 		}

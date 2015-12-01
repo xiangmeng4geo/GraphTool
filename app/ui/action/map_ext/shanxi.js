@@ -39,6 +39,7 @@
             var legend_name = conf.legend;
             var data = conf.data;
             var texts = conf.text || [];
+            var imgs = conf.imgs || [];
 
             var conf_geo = getSys.getGeo(map_name);
             var geo_files = conf_geo.maps;
@@ -75,6 +76,7 @@
                     // 处理源数据
                     Render.text(texts_data);
                     Render.text(texts);
+                    Render.img(imgs);
 
                     conrec(dataJson.interpolate, blendentJson, true, function(err, data_conrec) {
                         if (err) {
