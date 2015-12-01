@@ -1,13 +1,63 @@
 !function() {
+    var CONST = require('../common/const');
+    var path = require('path');
     var app = require('app');
-    var ipc = require('electron').ipcMain;
+    var electron = require('electron');
+    var ipc = electron.ipcMain;
+    var Menu = electron.Menu;
+    var Tray = electron.Tray;
+    var Shell = electron.shell;
     var window = require('./window');
+    var dialog = require('dialog');
+
+    function showTray() {
+        var appIcon = new Tray(path.join(CONST.PATH.UI, 'img/favicon.ico'));
+        // setTimeout(function() {
+        //     appIcon.displayBalloon({
+        //         title: 'test',
+        //         content: 'content'
+        //     });
+        // }, 2000);
+        var contextMenu = Menu.buildFromTemplate([
+            {
+                label: '日志',
+                click: function() {
+                    Shell.openItem(CONST.LOG.PATH);
+                }
+            },
+            {
+                label: '退出',
+                click: function() {
+                    if (window.isOpenedUi()) {
+                        if (win) {
+                            dialog.showMessageBox(win, {
+                				type: 'info',
+                				buttons: ['yes', 'no'],
+                				title: '系统提示',
+                				message: "主界面还在运行，是否强制退出？",
+                				icon: null
+                			}, function(index){
+                				if (index == 0) {
+                					app.quit();
+                				}
+                			});
+                        }
+                    } else {
+                        app.quit();
+                    }
+                }
+            }
+        ]);
+        appIcon.setToolTip('后台运行');
+        appIcon.setContextMenu(contextMenu);
+    }
     var win;
     app.on('ready', function() {
+        showTray();
         // 主进程直接打开服务窗口
         win = window.open('service');
     });
-    
+
     function _runjs(conf) {
         var js = 'Core.init(function(m){m.emit("command.conf", '+JSON.stringify(conf)+')})';
         win.webContents.executeJavaScript(js);
@@ -37,13 +87,13 @@
         if (!conf.sync) {
             cb(null, 'dealing...');
         }
-        
+
         try {
             win.isFocused();
             _runjs(conf);
         } catch(e){
             win = window.getInstance('service');
-            
+
             win.webContents.on('ready', function() {
                 _runjs(conf);
             });
@@ -52,7 +102,7 @@
     }
     /**
      * cb调用的参数：[err, msg]
-     *     msg: {path: '图片存储路径', time: '所用毫秒数'} 
+     *     msg: {path: '图片存储路径', time: '所用毫秒数'}
      */
     function _parse(command, cb) {
         cb || (cb = function(){});
@@ -92,7 +142,7 @@
             }
         }
         if (!conf.name && !conf.file) {
-            cb('command error, use -name or -file'); 
+            cb('command error, use -name or -file');
         } else {
             _openUi(conf, cb);
         }
