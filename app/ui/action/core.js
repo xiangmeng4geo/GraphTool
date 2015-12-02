@@ -225,6 +225,38 @@
 			if($body.attr('waiting') === undefined){
 				emit('ready');
 			}
+
+			// $(function() {
+			// 	var width_screen = screen.width,
+			// 		height_screen = screen.height;
+			// 	var $titlebar = $('.titlebar').on('dblclick', function() {
+			// 		if (!win_instance.isMaximized()) {
+			// 			win_instance.maximize();
+			// 			win_instance.setPosition(0, 0);
+			// 			win_instance.setSize(width_screen, height_screen);
+			// 		} else {
+			// 			win_instance.restore();
+			// 		}
+			// 	});
+			// 	function _off(){
+			// 		$titlebar.off('mousemove');
+			// 	}
+			// 	$titlebar.on('mousedown', function(e_down) {
+			// 		if (win_instance.isMaximized()) {
+			// 			return;
+			// 		}
+			// 		var x_old = e_down.screenX,
+			// 			y_old = e_down.screenY;
+			// 		var pos = win_instance.getPosition();
+			// 		var pos_x = pos[0],
+			// 			pos_y = pos[1];
+			// 		$titlebar.on('mousemove', function(e_move){
+			// 			var x_new = e_move.screenX,
+			// 				y_new = e_move.screenY;
+			// 			win_instance.setPosition(pos_x+x_new-x_old, pos_y+y_new-y_old);
+			// 		});
+			// 	}).on('mouseup', _off).on('mouseleave', _off);
+			// })
 		}
 		if(str_css){
 			var css_arr = str_css.split(/\s+/);

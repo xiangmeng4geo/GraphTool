@@ -13,13 +13,15 @@
 html,body{
 	height: 100%;
 	width: 100%;
+    padding: 0;
+    margin: 0;
 }
 body {
 	padding: 0px;
 	margin: 0px;
 	border: 0;
 	color: #252525;
-	-webkit-font-smoothing: antialiased;
+	/*-webkit-font-smoothing: antialiased;*/
 	/*background: -webkit-gradient(linear,0 0, 0 100%, color-stop(0,black), color-stop(0.8, rgb(150,150,150)), color-stop(1, rgb(200,200,200)));*/
 }
 
@@ -79,7 +81,8 @@ input[type="color"] {border-radius: 3px; border: 6; padding: 0;}
 input,button,select,textarea,
 [contenteditable=true]{outline:none}
 /*重置按钮样式*/
-input[type=button]{
+input[type=button],
+button{
 	border: 1px solid #e3e7eb;
 	box-shadow: 0 2px 2px #e3e7eb;
 	text-align: center;
@@ -91,7 +94,8 @@ input[type=button]{
 input[disabled]{
 	background-color: #e5eef3;
 }
-input[type=button].big{
+input[type=button].big,
+button.big{
 	font-size: 14px;
 	color: white;
 	background-color: #32689c;
@@ -104,45 +108,27 @@ input[type=checkbox]{
 }
 input[type=checkbox]:before{
 	content: '';
-	width: 11px;
-	height: 11px;
-	background-color: #e5eef3;
+	width: 12px;
+	height: 12px;
+	background-color: #282b2c;
 	display: block;
 	border: 1px solid #d4e3f2;
+    border-radius: 2px;
+    box-shadow: inset 0 0 10px #191b1b ;
 }
 input[type=checkbox]:checked:after{
 	content: '';
 	position: absolute;
-	left: 2px;
-	top: 3px;
-	width: 7px;
-	height: 3px;
-	border: 1px solid #333;
-	border-top: none;
-	border-right: none;
-	-webkit-transform: rotate(-64deg) skewX(-24deg);
+	left: 15%;
+	top: 15%;
+    width: 70%;
+    height: 70%;
+	background: url(../img/cb_flag.png) center center no-repeat;
+    background-size: 100%;
 }
 /*不可放大缩小*/
 textarea{resize:none}
 
-/* 设置滚动条的样式 {*/
-::-webkit-scrollbar {
-	width: 6px;
-	height: 6px;
-}
-/* 滚动槽 */
-::-webkit-scrollbar-track {
-	/*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
-	border-radius: 10px;
-	background-color: #d4e3f2;
-}
-/* 滚动条滑块 */
-::-webkit-scrollbar-thumb {
-	border-radius: 10px;
-	/*background: rgba(0,0,0,0.1);   */
-	background-color: #32689c;
-	/*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);*/
-}
 /*::-webkit-scrollbar-thumb:window-inactive {
 	background: rgba(255,0,0,0.4);
 }*/
@@ -301,15 +287,15 @@ td{
 .btn_close{
 	-webkit-app-region: no-drag;
 	position: absolute;
-	right: 10px;
-	top: 10px;
-	width: 10px;
-	height: 10px;
+	right: 8px;
+	top: 0px;
+	width: 43px;
+	height: 20px;
 	background: url(../img/btn_close.png) no-repeat center 0;
 	cursor: pointer;
 }
 .btn_close:hover{
-	background-position: center -20px;
+	background-position: center -23px;
 }
 .main{
 	height: 100%;
@@ -320,6 +306,9 @@ td{
 }
 .br5{
 	border-radius: 5px;
+}
+.br10{
+    border-radius: 10px;
 }
 
 .file{

@@ -6,24 +6,26 @@
 	</head>
 	<body css="reset p_login">
 		<tmpl hidden>
-			<div class="btn_close"></div>
-			<div class="initializing"><span>系统正在初始化。。。</span></div>
-			<div class="top logo_normal">
-				<div class="titlebar"></div>
-			</div>
-			<div class="row username">
-				<input type="text" id="username" placeholder="用户名"/>
-			</div>
-			<div class="row userpwd">
-				<input type="password" id="userpwd" placeholder="密码"/>
-			</div>
-			<div class="row">
-				<input type="checkbox" id="cb_remember"/><label for="cb_remember">记住密码</label>
-				<input type="checkbox" id="cb_autologin"/><label for="cb_autologin">自动登录</label>
-			</div>
-			<div class="row">
-				<input type="button" value="登录" id="btn_login"/>
-				<!-- <input type="button" value="取消" id="btn_cancel"/> -->
+			<div class="main br10">
+				<div class="btn_close"></div>
+				<div class="initializing"><span>系统正在初始化。。。</span></div>
+				<div class="top logo_normal">
+					<div class="titlebar"></div>
+				</div>
+				<div class="row username">
+					<input type="text" id="username" placeholder="用户名"/>
+				</div>
+				<div class="row userpwd">
+					<input type="password" id="userpwd" placeholder="密码"/>
+				</div>
+				<div class="row clear">
+					<div class="fl"><input type="checkbox" id="cb_remember"/><label for="cb_remember">记住密码</label></div>
+					<div class="fr"><input type="checkbox" id="cb_autologin"/><label for="cb_autologin">自动登录</label></div>
+				</div>
+				<div class="row">
+					<button id="btn_login">登录</button>
+					<!-- <input type="button" value="取消" id="btn_cancel"/> -->
+				</div>
 			</div>
 		</tmpl>
 	</body>

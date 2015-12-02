@@ -1,7 +1,8 @@
 {
-	"width": 400,
-    "height": 310,
+	"width": 460,
+    "height": 300,
 	"show": false,
 	"frame": false,
+	"transparent": true,
 	"resizable": false
 }

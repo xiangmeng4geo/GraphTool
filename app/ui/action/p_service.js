@@ -1,7 +1,7 @@
 Core.init(function(model) {
 	var ipc = require('electron').ipcRenderer;
 
-	var C = Core;C.Win.WIN.show();
+	var C = Core;//C.Win.WIN.show();
 	var _require = C.require;
 	var util = _require('util');
 	var util_file = util.file;

@@ -1,20 +1,32 @@
-body{background-color: #e5e6e7;}
+.main{
+	background-color: #272727;
+	color: white;
+	overflow: hidden;
+	position: relative;
+}
+
 .top{
-	height: 88px;
+	height: 62px;
 	background-color: #333740;
+	margin-bottom: 20px;
 }
 .row{
-	width: 230px;
+	width: 260px;
 	margin: 10px auto;
 }
 #username,
 #userpwd{
 	border: none;
 	border-radius: 0;
-	border-bottom: 1px solid #333740;
-	width: 205px;
+	border-bottom: 1px solid #757575;
+	width: 260px;
 	padding: 7px 0;
-	padding-left: 25px;
+	text-indent: 25px;
+	color: white;
+}
+#username:focus,
+#userpwd:focus{
+	border-bottom: 1px solid #4c9bb6;
 }
 #username{
 	background: url(../img/user.png) no-repeat left center;
@@ -29,14 +41,22 @@ body{background-color: #e5e6e7;}
 	display: inline-block;
 }
 #btn_login{
-	/*float: left;
-	margin-left: 40px;*/
-	width: 240px;
-	background-color: #16a8de;
+	width: 100%;
+	background-color: #464646;
+	background: linear-gradient(to bottom, #494949 0%,#444444 100%);
 	color: white;
 	box-shadow: none;
 	height: 40px;
 	font-size: 18px;
+	border: none;
+	border-top: 1px solid #797979;
+	border-bottom: 1px solid #141414;
+	margin-top: 20px;
+}
+#btn_login:active{
+	background: linear-gradient(to bottom, #242424 0%,#2c2c2c 100%);
+	border-top: 1px solid #191919;
+	border-bottom: 1px solid #5d5d5d;
 }
 #btn_cancel{
 	float: right;
@@ -48,7 +68,7 @@ input[type=checkbox]{
 .initializing{
 	width: 100%;
 	height: 100%;
-	position: fixed;
+	position: absolute;
 	background-color: rgba(0,0,0,.5);
 	color: white;
 	left: 0;
@@ -68,7 +88,9 @@ input[type=checkbox]{
 #cb_autologin{
 	margin-left: 80px;
 }
-
+.logo_normal{
+	background: url(../img/login_logo.png) center center no-repeat, url(../img/bg_top.png) top center no-repeat;
+}
 .logo_normal .titlebar{
 	position: absolute;
 	width: 360px;
