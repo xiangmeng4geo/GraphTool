@@ -65,7 +65,10 @@
 		$(this).find('ul').hide();
 	})
 	$doc.delegate('.select>span', 'click', function() {
-		$(this).next().show();
+		var $this = $(this);
+		if (!$this.parent().hasClass('disable')) {
+			$(this).next().show();
+		}
 	});
 	$doc.delegate('.select ul li', 'click', function(e) {
 		e.stopPropagation();
@@ -84,12 +87,12 @@
 			onchange: null
 		}, options);
 
+		var data = options.data || [];
 		var val_selected = options.val;
-		if (!$container.data('inited')) {
+		if (!$container.data('inited') || data.length > 0) {
 			var onchange = options.onchange || function(){};
-			
+
 			var html = '<ul>';
-			var data = options.data || [];
 			for (var i = 0, j = data.length; i<j; i++) {
 				var item = data[i];
 				var text = item.text;
@@ -120,6 +123,30 @@
 				}
 				return $val.data('val');
 			},
+			text: function() {
+				var $val = $container.find('.selected');
+				if ($val.length == 0) {
+					$val = $container.find('li:first');
+				}
+				return $val.text();
+			},
+			rm: function(val) {
+				var $item = $container.find('[data-val="'+val+'"]');
+				var val_return = {
+					val: val,
+					text: $item.text()
+				};
+
+				var _this = this;
+				if ($item.length > 0) {
+					$item.remove();
+					_this.selected(_this.val());
+					return val_return;
+				}
+			},
+			setDisable: function(is_disable) {
+				$container[is_disable? 'addClass': 'removeClass']('disable');
+			},
 			selected: function(val) {
 				var $item = $container.find('li')
 						.removeClass('selected')
@@ -128,7 +155,10 @@
 				if ($item.length == 0) {
 					$item = $container.find('li:first');
 				}
-				$container.find('>span').html($item.html());
+				$container.find('>span').html($item.html() || '');
+			},
+			getLen: function() {
+				return $container.find('li').length;
 			}
 		}
 	}

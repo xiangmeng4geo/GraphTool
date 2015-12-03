@@ -23,6 +23,7 @@
 	var format_number = function(num){
 		return num.toFixed(num%1>0?1:0);
 	}
+	var ui_select;
 	var html_fieldset_color = '<fieldset class="fieldset_color">'+
 								'<legend>_N_ <input type="button" class="admin btn_dele_lengend" value="删除"/></legend>'+
 								'<div class="legend_value">'+
@@ -41,6 +42,12 @@
 									'</form>'+
 								'</div>'+
 								'</fieldset>';
+	var _getId = (function() {
+		var id = 0;
+		return function() {
+			return 'cb_'+(id++);
+		}
+	})();
 	function getTable(color_arr) {
 		var html_table = '<table cellspacing=1>'+
 								'<tr>'+
@@ -54,7 +61,7 @@
 		$.each(color_arr, function(i,v){
 			var text_color = v.color_text || '#000';
 			html_table += '<tr>'+
-								'<td class="fn_contextmenu"><input type="checkbox" '+(v.is_checked?'checked':'')+'/></td>'+
+								'<td class="fn_contextmenu"><div class="checkbox"><input type="checkbox" '+(v.is_checked?'checked':'')+'/><label></label></div></td>'+
 								'<td><input type="color" value="'+v.color+'"/></td>'+
 								'<td><input type="color" value="'+text_color+'"/></td>'+
 								'<td><input type="number" value="'+v.val[0]+'"/>~<input type="number" value="'+v.val[1]+'"/></td>'+
@@ -63,14 +70,22 @@
 							'</tr>'
 		});
 		html_table += '</table>';
-		return html_table;
+
+		var $html = $(html_table);
+		$html.find('.checkbox').each(function() {
+			var id = _getId();
+			var $this = $(this);
+			$this.find('[type=checkbox]').attr('id', id);
+			$this.find('label').attr('for', id);
+		});
+		return $html;
 	}
 
 	var $legend_left = $('#blendent_conf');
 	var _contextmenu = (function(){
-		const remote = require('electron').remote;
-		const Menu = remote.Menu;
-		const MenuItem = remote.MenuItem;
+		var remote = require('electron').remote;
+		var Menu = remote.Menu;
+		var MenuItem = remote.MenuItem;
 		var $_target;
 		var menu = new Menu();
 		var menu_add_above = new MenuItem({label: '在上方添加', 'click': function() {
@@ -129,7 +144,15 @@
 	// 初始化图例设置
 	var init_legend_product = (function(){
 		var const_legend_product = CONST.LEGEND.PRODUCT;
-		var show_product = const_legend_product.slice(0);
+		var show_product = [];
+		for (var i = 0, j = const_legend_product.length; i<j; i++) {
+			var item = const_legend_product[i];
+			show_product.push({
+				n: item.text,
+				v: item.val
+			});
+		}
+		const_legend_product = show_product.slice(0);
 		var $select_legent_product = $('#select_legent_product');
 		function isInShowProduct(v){
 			for(var i = 0,j=show_product.length;i<j;i++){
@@ -140,39 +163,51 @@
 			}
 		}
 		function initHtml(){
-			var html_legend_product = '';
-			$.each(const_legend_product,function(i,v){
-				if(isInShowProduct(v)){
-					html_legend_product += '<option value="'+v.v+'">'+v.n+'</option>';
+			var data_new = [];
+			const_legend_product.filter(function(v) {
+				if (isInShowProduct(v)) {
+					data_new.push({
+						text: v.n,
+						val: v.v
+					});
 				}
 			});
-
-			$select_legent_product.html(html_legend_product);
+			ui_select = util_ui.select($select_legent_product, {
+				data: data_new
+			});
 		}
 		initHtml();
 		return {
 			add: function(add_val){
-				if(add_val){
-					var selected_option = $select_legent_product.find('option[value='+add_val['v']+']');
-				}else{
-					var selected_option = $($select_legent_product.get(0).selectedOptions);
+				var name = ui_select.text(),
+					val = ui_select.val();
+				if (add_val) {
+					val = add_val.v;
 				}
-				selected_option.remove();
-				if($select_legent_product.find('option').length == 0){
-					$select_legent_product.html('<option>暂无可添加的产品配色</option>');
-					$select_legent_product.attr('disabled','disabled');
+				var result = ui_select.rm(val);
+				if (result) {
+					name = result.text;
+					val = result.val;
+				}
+				if (ui_select.getLen() == 0) {
+					ui_select = util_ui.select($select_legent_product, {
+						data: [{
+							text: '暂无可添加的产品配色',
+							val: 0
+						}]
+					});
+					ui_select.setDisable(true);
 					$btn_add_new_legend.attr('disabled','disabled');
 				}
-				var name = selected_option.text(),
-					val = selected_option.val();
+
 				for(var i = 0,j=show_product.length;i<j;i++){
 					var v = show_product[i];
 					if(v.n == name && v.v == val){
 						return show_product.splice(i,1)[0];
 					}
 				}
-			},rm: function(delete_val){
-				$select_legent_product.removeAttr('disabled');
+			}, rm: function(delete_val){
+				ui_select.setDisable(false);
 				$btn_add_new_legend.removeAttr('disabled');
 				show_product.push(delete_val);
 				initHtml();
@@ -182,13 +217,13 @@
 	var $blendent_conf_list = $('#blendent_conf_list');
 	$blendent_conf_list.delegate('li', 'click', function() {
 		$(this).addClass('on').siblings().removeClass('on');
+		_clearConf();
 		_changeBlendentConf($(this).index());
 	});
 	// 删除某一个配色
 	$legend_left.delegate('.btn_dele_lengend','click',function(){
 		var $this = $(this);
 		var $remote_fieldset = $this.closest('fieldset');
-		// console.log($remote_fieldset,$remote_fieldset.data('val_c'));
 		init_legend_product.rm($remote_fieldset.data('val_c'));
 		$remote_fieldset.remove()
 	});
@@ -367,5 +402,9 @@
 			$item.remove();
 			_clearConf();
 		});
+	});
+	$('#btn_add_blendent_conf').click(function() {
+		_clearConf();
+		$blendent_conf_list.find('.on').removeClass('on');
 	});
 }()

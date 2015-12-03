@@ -1,8 +1,8 @@
 .main{
 	width: 100%;
 	margin: 0 auto;
+	overflow: hidden;
 }
-
 
 .list{
 	width: 100px;
@@ -69,6 +69,13 @@
 .row .row{
 	margin-left: 20px;
 }
-.fieldset_color input{
-	width: 80px;
+#form_legend input[type=number]{
+	width: 40px;
+	margin: 0 3px;
+}
+.legend_value table input[type=number]{
+	width: 50px;
+	background: rgba(0, 0, 0, 0);
+	border: none;
+	text-align: center;
 }
