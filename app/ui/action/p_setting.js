@@ -130,6 +130,7 @@
 	function _saveConfData() {
 		conf_data_sys.geo = conf_data_geo;
 		product_conf.setSys(conf_data_sys);
+		C.emit('sys.change');
 	}
 
 	function _saveMapConf(cb) {
@@ -400,7 +401,7 @@
 		if (index == -1) {
 			return _alert('请选中要设置成默认地图的项!');
 		}
-		_confirm('确定要把选中项设置成默认吗？', function() {
+		_confirm('些操作会影响所有设置成默认地图的产品，确定要把选中项设置成默认吗？', function() {
 			for (var i = 0, j = conf_data_geo.length; i<j; i++) {
 				if (i === index) {
 					conf_data_geo[i].default = true;

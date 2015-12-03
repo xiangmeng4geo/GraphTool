@@ -81,6 +81,9 @@ Core.init(function(model) {
     function _log(msg) {
         model.emit('log', msg);
     }
+    C.on('sys.change', function() {
+        _productNameCurrent = null;
+    });
 
     // 相关的事件说明请参考：https://www.jstree.com/api/#/?q=.jstree%20Event
     // 自定义了'dblclick_node.jstree'事件

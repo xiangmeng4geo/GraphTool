@@ -9,7 +9,7 @@
 	var CONST = _require('const');
 	var UI = _require('component').UI;
 	var getSys = product_conf.getSys;
-	
+
 	var geo = getSys.getGeo() || [];
 	var legend = getSys.getLegend() || [];
 	var is_no_geo = geo.length == 0;
@@ -18,7 +18,7 @@
 		_alert('请先在系统配置里添加“'+([is_no_geo?'地图方案':'', is_no_legend? '配色方案': ''].join())+'”！');
 		return window.close();
 	}
-	
+
 	var s_data_geo = [],
 		s_data_legend = [];
 	geo.forEach(function(v) {
@@ -33,11 +33,15 @@
 			val: v.name
 		});
 	});
-	
+
 	var conf_product = product_conf.read(_PARAM_) || {};
 	var conf_data = conf_product.data || {};
 	var conf_other = conf_product.other || {};
-	
+
+	s_data_geo.unshift({
+		text: '默认地图',
+		val: ''
+	});
 	var s_map = UI.select($('#s_map'), {
 		data: s_data_geo,
 		val: conf_other.map
@@ -46,17 +50,17 @@
 		data: s_data_legend,
 		val: conf_other.legend
 	});
-	
+
 	var $tabContentItems = $('tab-content item');
 	var $tabItems = $('tab item').click(function() {
 		$(this).addClass('on').siblings().removeClass('on');
 		$tabContentItems.removeClass('on').eq($(this).index()).addClass('on');
 	});
-	
+
 	var $shanxi_s_data_type = $('#shanxi_s_data_type');
 	var $shanxi_txt_command = $('#shanxi_txt_command');
 	var $data_detail_list = $('.data_detail_list>div');
-	
+
 	var _type = conf_data.type;
 	function _showDataDetail(val) {
 		$data_detail_list.hide().filter('.'+val).show();
@@ -70,8 +74,8 @@
 	if ('shanxi' == _type) {
 		$shanxi_txt_command.val(conf_data.val.command);
 	}
-	
-	
+
+
 	$('#btn_save').click(function() {
 		var conf = {};
 		var data_type = shanxi_s_data_type.val();
@@ -83,20 +87,20 @@
 			if (!command){
 				return _alert('请输入命令！');
 			}
-			
+
 			command = command.replace(/_PRODUCT_/g, _PARAM_);
 			_conf_data.val = {
 				command: command
 			}
 		}
 		conf.data = _conf_data;
-		
+
 		conf.other = {
 			map: s_map.val(),
 			legend: s_legend.val()
 		};
 		product_conf.save(_PARAM_, conf);
-		
+
 		_alert('保存成功!');
 		window.close();
 	});

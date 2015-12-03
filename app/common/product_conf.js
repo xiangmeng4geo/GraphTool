@@ -33,6 +33,14 @@
 		var conf = _getSys() || {};
 		var geo = conf.geo || [];
 		if (!name) {
+			// name 等于空字符串时加载默认地图
+			if (name === '') {
+				for (var i = 0, j = geo.length; i<j; i++) {
+					if (geo[i].default) {
+						return geo[i];
+					}
+				}
+			}
 			return geo;
 		} else {
 			name = name.trim();

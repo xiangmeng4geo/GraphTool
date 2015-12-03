@@ -351,6 +351,7 @@
 	}
 	function _saveConfData() {
 		product_conf.setSys(conf_data_sys);
+		C.emit('sys.change');
 	}
 	function _clearConf() {
 		$('.btn_dele_lengend').click();
