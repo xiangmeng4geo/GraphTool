@@ -79,3 +79,7 @@
 	border: none;
 	text-align: center;
 }
+
+#map_conf_list .default{
+	color: red;
+}

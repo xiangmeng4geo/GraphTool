@@ -99,7 +99,7 @@
 	var $txt_es_lat = $('#txt_es_lat');
 	var $c_map_color = $('#c_map_color');
 	var $cb_map_bgcolor = $('#cb_map_bgcolor');
-	
+
 	util_ui.select($s_map_text, {
 		data: CONST_GEO_FLAGS
 	});
@@ -121,7 +121,7 @@
 		});
 
 		is_can_add_map_file = true;
-		
+
 		$txt_wn_lng.val(CONST_BOUND.WN[0]);
 		$txt_wn_lat.val(CONST_BOUND.WN[1]);
 		$txt_es_lng.val(CONST_BOUND.ES[0]);
@@ -195,7 +195,7 @@
 				}
 			});
 		});
-		
+
 		if (is_not_have_file) {
 			return _alert('请先选择地理数据文件！');
 		}
@@ -209,7 +209,7 @@
 		var es_lat = $txt_es_lat.val();
 		var wn_lng = $txt_wn_lng.val();
 		var wn_lat = $txt_wn_lat.val();
-		
+
 		if (isNaN(es_lng) || isNaN(es_lat) || isNaN(wn_lng) || isNaN(wn_lat)) {
 			return _alert('请输入正确的坐标!');
 		} else {
@@ -259,7 +259,8 @@
 	function _initMapConfList() {
 		var html = '';
 		for (var i = 0, j = conf_data_geo.length; i<j; i++) {
-			html += '<li>'+conf_data_geo[i].name+'</li>';
+			var item = conf_data_geo[i];
+			html += '<li '+(item.default? 'class="default"':'')+'>'+item.name+'</li>';
 		}
 
 		$map_conf_list.html(html);
@@ -309,7 +310,7 @@
 					width_minus: 8,
 					val: file
 				});
-				
+
 				// $html.find('.f_map_item').val(file);
 				$html.find('.n_map_item').val(style.lineWidth).next('span').text(style.lineWidth);
 				$html.find('.c_map_item').val(style.strokeStyle);
@@ -339,14 +340,14 @@
 			_setChecked($cb_county, cb_county);
 			$c_map_text.val(color);
 			$n_map_text.val(fontSize);
-			
+
 			var style_bg = geo.bg;
 			$c_map_color.val(style_bg.color);
 			_setChecked($cb_map_bgcolor, style_bg.flag);
-			
+
 			util_ui.select($s_map_text).selected(flag);
-			
-			
+
+
 			var bound = geo.bound;
 			var wn = bound.wn;
 			var es = bound.es;
@@ -392,8 +393,26 @@
 			_clearMapConf();
 		});
 	});
-	
-	
+
+	$('#btn_default_map_conf').click(function() {
+		var $item = $map_conf_list.find('.on');
+		var index = $item.index();
+		if (index == -1) {
+			return _alert('请选中要设置成默认地图的项!');
+		}
+		_confirm('确定要把选中项设置成默认吗？', function() {
+			for (var i = 0, j = conf_data_geo.length; i<j; i++) {
+				if (i === index) {
+					conf_data_geo[i].default = true;
+				} else {
+					delete conf_data_geo[i].default;
+				}
+			}
+			_saveConfData();
+
+			$item.addClass('default').siblings().removeClass('default');
+		});
+	});
 	// 图例相关
-	require('./p_setting_blendent');			
+	require('./p_setting_blendent');
 }()
