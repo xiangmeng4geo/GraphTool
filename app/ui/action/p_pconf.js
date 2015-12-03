@@ -104,4 +104,7 @@
 		_alert('保存成功!');
 		window.close();
 	});
+	$('.btn_close').on('click', function() {
+		window.close();
+	});
 }()

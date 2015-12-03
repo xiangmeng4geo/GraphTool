@@ -60,7 +60,7 @@ Core.init(function(){
 			});
 		});
 	}
-	$('#btn_quite, .btn_close').click(function(){
+	$('#btn_quite, .btn_close_main').click(function(){
 		window.close();
 	});
 	var win_setting;

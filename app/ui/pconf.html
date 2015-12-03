@@ -4,44 +4,53 @@
 		<meta charset="utf-8" />
 		<title>蓝π蚂蚁制图</title>
 	</head>
-	<body css="reset p_pconf">
+	<body css="reset p_pconf" class="frameless">
 		<tmpl hidden>
-			<tab>
-				<item class="on">数据</item>
-				<item>其它</item>
-			</tab>
-			<tab-content>
-				<item class="on">
-					<div class="row">
-						<label>数据类型</label>
-						<div class="select" id="shanxi_s_data_type">
-						<!--<select id="shanxi_s_data_type">
-							<option value="shanxi">test</option>
-						</select>-->
-						</div>
-					</div>
-					<div class="data_detail_list">
-						<div class="shanxi">
+			<div class="main br5">
+				<div class="title_wrap">
+					系统设置
+					<div class="btn_close"></div>
+					<div class="titlebar"></div>
+				</div>
+				<div class="content_wrap">
+					<tab>
+						<item class="on">数据</item>
+						<item>其它</item>
+					</tab>
+					<tab-content>
+						<item class="on">
 							<div class="row">
-								<label>命令参数</label>
-								<textarea id="shanxi_txt_command"></textarea>
+								<label>数据类型</label>
+								<div class="select" id="shanxi_s_data_type">
+								<!--<select id="shanxi_s_data_type">
+									<option value="shanxi">test</option>
+								</select>-->
+								</div>
 							</div>
-						</div>
+							<div class="data_detail_list">
+								<div class="shanxi">
+									<div class="row">
+										<label>命令参数</label>
+										<textarea id="shanxi_txt_command"></textarea>
+									</div>
+								</div>
+							</div>
+						</item>
+						<item>
+							<div class="row">
+								<label>地图方案</label>
+								<div class="select" id="s_map"></div>
+							</div>
+							<div class="row">
+								<label>配色方案</label>
+								<div class="select" id="s_legend"></div>
+							</div>
+						</item>
+					</tab-content>
+					<div class="btns_bottom">
+						<input type="button" value="保存" id="btn_save"/>
 					</div>
-				</item>
-				<item>
-					<div class="row">
-						<label>地图方案</label>
-						<div class="select" id="s_map"></div>
-					</div>
-					<div class="row">
-						<label>配色方案</label>
-						<div class="select" id="s_legend"></div>
-					</div>
-				</item>
-			</tab-content>
-			<div class="btns_bottom">
-				<input type="button" value="保存" id="btn_save"/>
+				</div>
 			</div>
 		</tmpl>
 	</body>

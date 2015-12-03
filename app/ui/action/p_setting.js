@@ -39,6 +39,9 @@ Core.init(function(model) {
 			$this.find('label').attr('for', id);
 		});
 	});
+	$('.btn_close').on('click', function() {
+		window.close();
+	});
 	// 对resize-horizontal组件初始化
 	{
 		$doc.on('mouseup.resize', function(){

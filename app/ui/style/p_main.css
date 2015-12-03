@@ -492,10 +492,10 @@
 .btn_max:active{
 	background-position: -2px -184px;
 }
-.btns_main .btn_close{
+.btns_main .btn_close_main{
 	background-position: -2px -54px;
 }
-.btn_close:active{
+.btn_close_main:active{
 	background-position: -2px -2px;
 }
 .btn_setting ul{

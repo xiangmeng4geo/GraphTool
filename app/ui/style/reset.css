@@ -325,7 +325,9 @@ tr:nth-child(2n+1) td{
 }
 .main{
 	height: 100%;
-	background-color: white;
+    width: 100%;
+	margin: 0 auto;
+	overflow: hidden;
 }
 .br3{
 	border-radius: 3px;
@@ -524,10 +526,11 @@ tab-content item resize-horizontal:after{
     letter-spacing: 1px;
 }
 .frameless .title_wrap .titlebar{
-	width: 100%;
+	width: auto;
 	height: 100%;
 	position: absolute;
 	left: 0;
+    right: 55px;
 	top: 0;
 }
 .frameless .title_wrap:after{
@@ -548,3 +551,19 @@ tab-content item resize-horizontal:after{
     background-color: #313131;
     color: white;
 }
+
+/*关闭按钮 {*/
+.btn_close{
+	-webkit-app-region: no-drag;
+	position: absolute;
+	right: 8px;
+	top: 0px;
+	width: 43px;
+	height: 20px;
+	background: url(../img/btn_close.png) no-repeat center 0;
+	cursor: pointer;
+}
+.btn_close:hover{
+	background-position: center -23px;
+}
+/*关闭按钮 }*/
