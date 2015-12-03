@@ -1,4 +1,4 @@
-!function() {
+Core.init(function(model) {
 	var C = Core;
 	var $ = C.$;
 	var _require = C.require;
@@ -20,7 +20,25 @@
 		var $this = $(this);
 		$this.next('span').text($this.val());
 	});
+	model.on('save', function() {
+		model.emit('log', 'change system conf');
+		C.emit('sys.change');
+	});
 
+	var _getId = (function() {
+		var id = 0;
+		return function() {
+			return 'cb_' + (id++);
+		}
+	})();
+	model.on('init_checkbox', function() {
+		$('.checkbox').each(function() {
+			var $this = $(this);
+			var id = _getId();
+			$this.find('[type=checkbox]').attr('id', id);
+			$this.find('label').attr('for', id);
+		});
+	});
 	// 对resize-horizontal组件初始化
 	{
 		$doc.on('mouseup.resize', function(){
@@ -130,7 +148,7 @@
 	function _saveConfData() {
 		conf_data_sys.geo = conf_data_geo;
 		product_conf.setSys(conf_data_sys);
-		C.emit('sys.change');
+		model.emit('save');
 	}
 
 	function _saveMapConf(cb) {
@@ -348,7 +366,6 @@
 
 			util_ui.select($s_map_text).selected(flag);
 
-
 			var bound = geo.bound;
 			var wn = bound.wn;
 			var es = bound.es;
@@ -356,6 +373,8 @@
 			$txt_wn_lat.val(wn[1]);
 			$txt_es_lng.val(es[0]);
 			$txt_es_lat.val(es[1]);
+
+			model.emit('init_checkbox');
 		}
 	}
 	function _changeMapConf(index) {
@@ -416,4 +435,4 @@
 	});
 	// 图例相关
 	require('./p_setting_blendent');
-}()
+})

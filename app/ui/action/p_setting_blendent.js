@@ -1,4 +1,4 @@
-!function() {
+Core.init(function(model) {
 	var MAX_VAL = 99999,
 		MIN_VAL = -9999;
 
@@ -42,12 +42,6 @@
 									'</form>'+
 								'</div>'+
 								'</fieldset>';
-	var _getId = (function() {
-		var id = 0;
-		return function() {
-			return 'cb_'+(id++);
-		}
-	})();
 	function getTable(color_arr) {
 		var html_table = '<table cellspacing=1>'+
 								'<tr>'+
@@ -71,14 +65,10 @@
 		});
 		html_table += '</table>';
 
-		var $html = $(html_table);
-		$html.find('.checkbox').each(function() {
-			var id = _getId();
-			var $this = $(this);
-			$this.find('[type=checkbox]').attr('id', id);
-			$this.find('label').attr('for', id);
-		});
-		return $html;
+		setTimeout(function(){
+			model.emit('init_checkbox');
+		}, 0);
+		return html_table;
 	}
 
 	var $legend_left = $('#blendent_conf');
@@ -351,7 +341,7 @@
 	}
 	function _saveConfData() {
 		product_conf.setSys(conf_data_sys);
-		C.emit('sys.change');
+		model.emit('save');
 	}
 	function _clearConf() {
 		$('.btn_dele_lengend').click();
@@ -408,4 +398,4 @@
 		_clearConf();
 		$blendent_conf_list.find('.on').removeClass('on');
 	});
-}()
+})
