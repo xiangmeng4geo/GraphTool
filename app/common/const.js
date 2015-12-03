@@ -20,9 +20,9 @@
 	var path_config = format(path.join(path_base, 'config'));
 	var path_cache = format(path.join(path_base, 'cache'));
 	var path_output = format(path.join(path_base, 'output'));
-	
+
 	var path_img_ball = format(path.join(path_ui, 'img/ball.png'));
-	
+
 	var conf = {
 		GEO: {
 			FILE: format(path.join(path_base, 'data', 'sx.json')),
@@ -53,14 +53,52 @@
 			PATH: format(path.join(path_base, 'logs')),
 			DELAY: 10, 	// 异步写日志间隔(s)
 			DAYS: 3		// 日志保留天数
-		}
+		},
+		TOOLBAR: (function() {
+			var arr = [[
+				{
+					id: 'move',
+					title: '移动'
+				},
+				{
+					id: 'zoomin',
+					title: '放大'
+				},
+				{
+					id: 'zoomout',
+					title: '缩小'
+				}
+			], [
+				{
+					id: 'text',
+					title: '添加文字'
+				},
+				{
+					id: 'img',
+					title: '添加图片'
+				},
+				{
+					id: 'polygon',
+					title: '添加多边形'
+				}
+			], [{
+				id: 'save',
+				title: '保存图片'
+			}]];
+			arr.forEach(function(v) {
+				v.forEach(function(item) {
+					item.icon = path.join(path_ui, 'img/toolbar', item.id+'.png')
+				})
+			});
+			return arr;
+		})()
 	};
-	
+
 	var conf_const;
 	try{
 		conf_const = require('../conf/const');
 	} catch(e) {}
-	
+
 	for (var i in conf_const) {
 		conf[i] = conf_const[i];
 	}

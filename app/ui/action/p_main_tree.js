@@ -28,8 +28,11 @@ Core.init(function(model) {
                 var name = v.name;
                 var child = getNodes(v.childNodes);
                 d.push({
-                    icon: false,
+                    icon: child ? 'folder' : 'file',
                     text: name,
+                    state: {
+                        opened: true
+                    },
                     children: child,
                     type: child ? 'default' : 'file'
                 });
@@ -68,7 +71,6 @@ Core.init(function(model) {
             }, "last", function(new_node) {
                 setTimeout(function() {
                     inst.edit(new_node, null, function() {
-                        console.log('abc');
                         refreshData.call(_instance);
                     });
                 }, 0);
@@ -79,12 +81,13 @@ Core.init(function(model) {
     function _log(msg) {
         model.emit('log', msg);
     }
+
     // 相关的事件说明请参考：https://www.jstree.com/api/#/?q=.jstree%20Event
     // 自定义了'dblclick_node.jstree'事件
     var $tree = $('#tree').jstree({
         'core': {
             "themes": {
-                "stripes": true,
+                // "stripes": true,
                 dots: false
             },
             "strings": {
@@ -111,7 +114,7 @@ Core.init(function(model) {
                         refreshData.call(_instance);
                     });
                 }
-                
+
                 tmp.create.submenu = {
                     'create_folder': {
                         separator_after: true,
@@ -144,11 +147,11 @@ Core.init(function(model) {
         },
         'types': {
             'default': {
-                'icon': 'jstree-themeicon-hidden'
+                'icon': 'jstree-themeicon-hidden test'
             },
             'file': {
                 'valid_children': [],
-                'icon': 'jstree-themeicon-hidden'
+                'icon': 'jstree-themeicon-hidden test'
             }
         },
         "plugins": ["contextmenu", "types", "unique"]
@@ -189,7 +192,7 @@ Core.init(function(model) {
             var nameNew = data.text;
             Config.rename(nameOld, nameNew);//对配置文件进行重命名
             refreshData.call(data.instance);//刷新列表数据
-            
+
             if ('请输入名称' == nameOld) {
                 _log('new ['+nameNew+']');
             } else {
@@ -199,7 +202,7 @@ Core.init(function(model) {
     }).on('delete_node.jstree', function(e, data) {
         var name = data.node.text;
         Config.rm(name);
-        
+
         _log('delete ['+name+']');
     });
 });

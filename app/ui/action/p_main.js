@@ -11,6 +11,7 @@ Core.init(function(){
 
 	var C = Core;
 	var $ = C.$;
+	var CONST_TOOLBAR = C.CONST.TOOLBAR;
 	var _require = C.require;
 	var product_conf = _require('product_conf');
 	var Win = C.Win;
@@ -63,7 +64,7 @@ Core.init(function(){
 		window.close();
 	});
 	var win_setting;
-	$('#btn_setting').click(function(){
+	$('#btn_setting_sys').click(function(){
 		try {
 			win_setting.isFocused();
 			win_setting.focus();
@@ -71,7 +72,38 @@ Core.init(function(){
 			win_setting = Win.openSub('setting');
 		}
 	});
-
+	!function() {
+		function _close(e) {
+			e.stopPropagation();
+			$setting_list.hide();
+		}
+		var $btn_setting = $('.btn_setting'),
+			$setting_list = $btn_setting.find('ul');
+		$doc.on('click', _close);
+		$setting_list.on('click', _close).on('mouseleave', _close);
+		$btn_setting.click(function(e) {
+			e.stopPropagation();
+			if ($setting_list.is(':visible')) {
+				$setting_list.stop(true, true).slideUp();
+			} else {
+				$setting_list.stop(true, true).slideDown();
+			}
+		});
+	}();
+	{
+		var html = '';
+		for (var i = 0, j = CONST_TOOLBAR.length; i<j; i++) {
+			var items = CONST_TOOLBAR[i];
+			for (var i_items = 0, j_items = items.length; i_items<j_items; i_items++) {
+				var val = items[i_items];
+				html += '<div class="toolbar_btn '+val.id+'" title="'+val.title+'"><img src="'+val.icon+'"/></div>';
+			}
+			if (i != j-1) {
+				html += '<div class="toolbar_split"></div>';
+			}
+		}
+		$('.toolbar').append(html);
+	}
 	model.on('product.change', function(productName){
 		// console.log(arguments);
 		// _alert(productName);

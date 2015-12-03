@@ -2895,6 +2895,10 @@
 				}
 				return true;
 			}
+			// zk add 2015-12-02
+			if (this.get_type(obj) == 'file') {
+				return;
+			}
 			if (this.is_closed(obj)) {
 				return this.open_node(obj);
 			}
