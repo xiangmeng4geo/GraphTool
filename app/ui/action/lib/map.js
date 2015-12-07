@@ -659,7 +659,8 @@
         var canvas_geo_fill = _getCtxByPrefix(_this, LAYER_NAME_GEO_FILL).canvas;
         var canvas_geo_stroke = _getCtxByPrefix(_this, LAYER_NAME_GEO_STROKE).canvas;
         var canvas_weather = _getCtxByPrefix(_this, LAYER_NAME_WEATHER).canvas;
-        var canvas_normal = _getCtxByPrefix(_this, LAYER_NAME_NORMAL).canvas;
+        var ctx_normal = _getCtxByPrefix(_this, LAYER_NAME_NORMAL);
+        var canvas_normal = ctx_normal.canvas;
 
         var width = canvas_geo_fill.width,
             height = canvas_geo_fill.height;
@@ -684,6 +685,13 @@
         ctx.drawImage(canvas_geo_stroke, 0, 0, width, height);
         ctx.drawImage(canvas_normal, 0, 0, width, height);
 
+        var shapes = conf.shapes;
+        if (shapes && shapes.length > 0) {
+            for (var i = 0, j = shapes.length; i<j; i++) {
+                shapes[i].draw(ctx, _projection);
+            }
+        }
+        
         var result = canvas_tmp.toDataURL(null, bgcolor);
         return result;
     }

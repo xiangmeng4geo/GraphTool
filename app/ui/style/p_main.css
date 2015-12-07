@@ -140,6 +140,7 @@
 	margin-top: -15px;
 	font-size: 40px;
 	text-shadow: 3px 2px 2px #ccc;
+	z-index: 0;
 }
 #geomap_container .loading{
 	position: absolute;
@@ -290,25 +291,29 @@
 }
 /* ｝ 添加图片用和图片工具 */
 
-.map_layer_text span{
-	display: inline-block;
-	width: 100%;
-}
+
+/*工具添加的图层样式 {*/
 .map_layer{
 	cursor: move;
-}
-.map_layer{
 	position: absolute;
 	left: 0;
 	top: 0;
-	cursor: move;
+	z-index: 10;
+}
+.off.map_layer{
+	z-index: 1;
+}
+.layer_text span{
+	display: inline-block;
+	width: 100%;
+	min-width: 30px;
 }
 .map_layer:after{
 	content: '';
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	border: 2px dashed #ccc;
+	border: 1px solid #00b7ee;
 	left: -2px;
 	top: -2px;
 }
@@ -322,13 +327,12 @@
 .map_layer .ui-resizable-handle{
 	width: 6px;
 	height: 6px;
-	border: 1px solid #ccc;
-	background-color: white;
+	background-color: #00b7ee;
 }
 .map_layer .ui-resizable-n,
 .map_layer .ui-resizable-s{
 	left: 50%;
-	margin-left: -3px;
+	margin-left: -1px;
 }
 .map_layer .ui-resizable-e,
 .map_layer .ui-resizable-w{
@@ -339,11 +343,21 @@
 	right: -5px;
 	bottom: -5px;
 }
-
-.map_layer_image img{
+.map_layer .ui-resizable-ne,
+.map_layer .ui-resizable-se,
+.map_layer .ui-resizable-e{
+	margin-right: 2px;
+}
+.map_layer .ui-resizable-ne,
+.map_layer .ui-resizable-s,
+.map_layer .ui-resizable-sw{
+	margin-bottom: 2px;
+}
+.layer_img img{
 	width: 100%;
 	height: 100%;
 }
+/*工具添加的图层样式 }*/
 
 #tree .bbit-tree-arrows .bbit-tree-elbow-end-minus,
 #tree .bbit-tree-arrows .bbit-tree-elbow-plus,
@@ -585,6 +599,14 @@
 }
 .off .ui-rotatable-handle{
 	display: none;
+}
+.map_layer .ui-rotatable-handle{
+	background-color: #00b7ee;
+}
+.map_layer .ui-rotatable-handle:after{
+	background-color: #00b7ee;
+	border: none;
+	left: -4px;
 }
 
 #zoom_notice{

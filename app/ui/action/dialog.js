@@ -33,6 +33,9 @@
 		},
 		open: function(options, callback) {
 			return dialog.showOpenDialog(win_instance, options, callback);
+		},
+		save: function(options, callback) {
+			return dialog.showSaveDialog(win_instance, options, callback);
 		}
 	};
 	module.exports = Dialog;

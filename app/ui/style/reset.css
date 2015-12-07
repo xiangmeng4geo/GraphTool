@@ -512,7 +512,14 @@ tab-content item resize-horizontal:after{
 /* 设置滚动条的样式 }*/
 
 .frameless .main{
-    position: relative;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: auto;
+    height: auto;
+    border: 1px solid #C2C2C2;
 }
 .frameless .title_wrap{
     position: relative;

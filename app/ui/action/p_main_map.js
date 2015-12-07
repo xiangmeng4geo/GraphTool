@@ -96,13 +96,15 @@ Core.init(function(model) {
     var _getUniqueName = (function() {
         var id = 0;
         return function() {
-            return new Date().getTime() + '-'+(id++)+'.png';    
+            return new Date().getTime() + '-'+(id++)+'.png';
         }
     })();
-    model.on('export', function(save_path) {
+    model.on('export', function(save_path, shapes) {
         var s_time = new Date();
         save_path || (save_path = util_path.join(CONST.PATH.OUTPUT, _getUniqueName()));
-        util_file.Image.save(save_path, geomap.export());
+        util_file.Image.save(save_path, geomap.export({
+            shapes: shapes
+        }));
         var time_used = new Date() - s_time;
         model.emit('log', 'save ['+save_path+'] takes '+time_used+' ms! ');
         model.emit('afterExport', save_path, time_used);
@@ -181,7 +183,7 @@ Core.init(function(model) {
             Shape: Shape,
             Pattern: Pattern
         };
-        
+
         require('./map_ext/shanxi')(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-china-conf'))(_options);
