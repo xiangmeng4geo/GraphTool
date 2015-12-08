@@ -688,10 +688,15 @@
         var shapes = conf.shapes;
         if (shapes && shapes.length > 0) {
             for (var i = 0, j = shapes.length; i<j; i++) {
-                shapes[i].draw(ctx, _projection);
+                var shape = shapes[i];
+                var style = shape.style || {};
+                
+                _getPathStart(ctx, style)();
+                shape.draw(ctx, _projection);
+                _getPathEnd(ctx, style)();
             }
         }
-        
+
         var result = canvas_tmp.toDataURL(null, bgcolor);
         return result;
     }

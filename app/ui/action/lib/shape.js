@@ -104,29 +104,26 @@
 
         var _style = $.extend({}, style);
         var font = [];
-        var font_style = _style['font-style'] || _style['fontStyle'];
-        if (font_style) {
-            font.push(font_style);
-        }
-        var font_weight = _style['font-weight'] || _style['fontWeight'];
-        if (font_weight) {
-            font.push(font_weight);
-        }
-        var font_size = _style['font-size'] || _style['fontSize'];
-        if (font_size) {
-            font.push(parseInt(font_size)+'px');
-        }
-        var font_family = _style['font-family'] || _style['fontFamily'];
-        font.push(font_family || '"Microsoft Yahei"');
+        var font_style = _style['font-style'] || _style['fontStyle'] || 'normal';
+        font.push(font_style);
+
+        var font_weight = _style['font-weight'] || _style['fontWeight'] || 'normal';
+        font.push(font_weight);
+
+        var font_size = _style['font-size'] || _style['fontSize'] || 14;
+        font.push(parseInt(font_size)+'px');
+
+        var font_family = _style['font-family'] || _style['fontFamily'] || '"Microsoft Yahei"';
+        font.push(font_family);
 
         font = font.join(' ');
 
         // [start|end|center|left|right]
-        var text_align = _style['text-align'] || _style['textAlign'] || 'start';
+        var text_align = _style['text-align'] || _style['textAlign'] || 'left';
         // [top|bottom|middle|alphabetic|hanging]
         var text_baseline = _style['text-baseline'] || _style['textBaseline'] || 'top';
 
-        var text_color = _style['color'];
+        var text_color = _style['color'] || '#000000';
 
         var _normal = _style.normal;
         _this.style = {
@@ -187,29 +184,21 @@
     }
     var _cache_img = {};
     function _getImg(src) {
-        if (typeof src === 'string' && src.indexOf('data:image') !== 0) {
+        if (typeof src === 'string') {
             if (_cache_img[src]) {
                 return _cache_img[src];
             } else {
-                // 同步处理image
-                var img_buf = fs.readFileSync(src);
-                var prefix = "data:" + 'image/png' + ";base64,";
-                var base64 = new Buffer(img_buf, 'binary').toString('base64');
-                var data = prefix + base64;
+                var data = src;
+                if (src.indexOf('data:image') !== 0) {
+                    // 同步处理image
+                    var img_buf = fs.readFileSync(src);
+                    var prefix = "data:" + 'image/png' + ";base64,";
+                    var base64 = new Buffer(img_buf, 'binary').toString('base64');
+                    data = prefix + base64;
+                }
                 img = new Image();
                 img.src = data;
                 return img;
-                // img = data;
-                // img = new Image();
-                // loading = true;
-                // img.onload = function() {
-                //     _cache_img[src] = img;
-                //     width = width || img.width;
-                //     height = height || img.height;
-                //     loading = false;
-                //     _this.draw(_this.ctx, _this.projection);
-                // }
-                // img.src = src;
             }
         } else {
             return src;

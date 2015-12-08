@@ -101,7 +101,7 @@
 					if (str) {//命令行调用
 						return;
 					}
-					
+
 					// ui主进程启动时直接得到焦点，否则重新打开
 					if (_window.isOpenedUi()) {
 						_window.setFocusToLast();
@@ -129,7 +129,7 @@
 		}
 		return loginWin;
 	}
-	
+
 	app.on('ready', function() {
 		_getMainWin(true);
 	});
