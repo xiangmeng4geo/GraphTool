@@ -38,8 +38,8 @@ input[type=time],
 input[type=number],
 input[type=password],
 textarea,
-.select,
-.file{
+.ui-select,
+.ui-file{
     background-color: #212121;
 	border: 1px solid #212121;
     border-bottom: 1px solid #484848;
@@ -373,7 +373,7 @@ tr:nth-child(2n+1) td{
     border-radius: 10px;
 }
 
-.file{
+.ui-file{
 	display: inline-block;
 	width: 200px;
 	height: 28px;
@@ -381,7 +381,7 @@ tr:nth-child(2n+1) td{
     position: relative;
     vertical-align: middle;
 }
-.file [type=text]{
+.ui-file [type=text]{
     background: none;
     border: none;
     position: absolute;
@@ -389,7 +389,7 @@ tr:nth-child(2n+1) td{
     margin-top: -12px;
     color: #b7b7b7;
 }
-.file .btn_file_browse{
+.ui-file .btn_file_browse{
     position: absolute;
     right: 3px;
     top: 50%;
@@ -398,7 +398,7 @@ tr:nth-child(2n+1) td{
     margin-top: -10px;
     background: url(../img/icon_file.png) no-repeat center center;
 }
-.select{
+.ui-select{
 	display: inline-block;
 	position: relative;
     height: 20px;
@@ -408,16 +408,16 @@ tr:nth-child(2n+1) td{
 	vertical-align: middle;
 	padding-right: 16px;
 }
-.select span{
+.ui-select span{
 	display: inline-block;
 	width: 100%;
 	height: 100%;
 	cursor: default;
 }
-.select.disable{
+.ui-select.disable{
     color: #ccc;
 }
-.select span:after{
+.ui-select span:after{
 	content: "";
 	position: absolute;
 	margin: auto;
@@ -431,7 +431,7 @@ tr:nth-child(2n+1) td{
 	margin-top: -2px;
 	right: 4px;
 }
-.select ul{
+.ui-select ul{
 	position: absolute;
     z-index: 101;
 	max-height: 300px;
@@ -443,17 +443,17 @@ tr:nth-child(2n+1) td{
 	width: auto;
 	background-color: #202020;
 }
-.select li{
+.ui-select li{
 	padding: 3px;
 	margin-bottom: 2px;
 }
-.select li.selected,
-.select li:hover{
+.ui-select li.ui-selected,
+.ui-select li:hover{
 	background: #1E90FF;
 	color: white;
 }
-.select>span img,
-.select li img{
+.ui-select>span img,
+.ui-select li img{
 	width: 5px;
 	height: 5px;
 }

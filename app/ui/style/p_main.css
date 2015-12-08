@@ -191,9 +191,6 @@
 .geomap_mirror.ui-draggable-disabled{
 	cursor: default !important;
 }
-#geomap_container:hover .map_tool{
-	display: block;
-}
 .map_tool{
 	position: absolute;
 	right: 0;
@@ -203,24 +200,6 @@
 	padding: 10px;
 	display: none;
 }
-#map_tool_reset{
-	background: url(../img/icon_reset.png) no-repeat center center;
-	width: 25px;
-	height: 25px;
-	cursor: pointer;
-}
-/*#geomap,
-#geomap_layer{
-	width: 100%;
-	height: 100%;
-}
-#geomap_layer{
-	position: absolute;
-	left: 0;
-	top: 0;
-}*/
-
-
 
 #work_container{
 	position: absolute;

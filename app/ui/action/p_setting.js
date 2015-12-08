@@ -111,7 +111,7 @@ Core.init(function(model) {
 		});
 	});
 	// 动态显示文件名
-	$doc.delegate('.map_item .file', 'change', function(e, file_path) {
+	$doc.delegate('.map_item .ui-file', 'change', function(e, file_path) {
 		var name = path.basename(file_path) || '';
 		$(this).closest('.map_item').find('.file_name').text(name);
 	});
@@ -196,7 +196,7 @@ Core.init(function(model) {
 			var $this = $(this);
 
 			// var file = $this.find('.f_map_item').val();
-			var file = util_ui.file($this.find('.file'))();
+			var file = util_ui.file($this.find('.ui-file'))();
 			var lineWidth = $this.find('.n_map_item').val();
 			var strokeStyle = $this.find('.c_map_item').val();
 			var fillStyle = $this.find('.c_map_item_fill').val();
@@ -323,7 +323,7 @@ Core.init(function(model) {
 			return _alert('请先配置好当前项目再进行下一个!');
 		}
 		var $html = $(tmpl_map_item);
-		util_ui.file($html.find('.file'), {
+		util_ui.file($html.find('.ui-file'), {
 			width_minus: 8
 		});
 		$map_conf.append($html);
@@ -353,7 +353,7 @@ Core.init(function(model) {
 
 				var $html = $(tmpl_map_item);
 				$map_conf.append($html);
-				var $file = $html.find('.file');
+				var $file = $html.find('.ui-file');
 				$file.trigger('change', file);
 				util_ui.file($file, {
 					width_minus: 8,

@@ -334,6 +334,11 @@ Core.init(function(model) {
         });
     }
 
+    // 还原地图状态
+    fn_list.reset = function() {
+        model.emit('map.reset');
+    }
+
     // 添加拖拽
     {
         $geomap_container.on('dragover',function(e){

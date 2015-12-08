@@ -67,6 +67,10 @@
 				{
 					id: 'zoomout',
 					title: '缩小'
+				},
+				{
+					id: 'reset',
+					title: '还原地图状态'
 				}
 			], [
 				{

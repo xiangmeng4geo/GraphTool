@@ -64,16 +64,16 @@
 		}
 	}
 
-	$doc.delegate('.select', 'mouseleave', function() {
+	$doc.delegate('.ui-select', 'mouseleave', function() {
 		$(this).find('ul').hide();
 	})
-	$doc.delegate('.select>span', 'click', function() {
+	$doc.delegate('.ui-select>span', 'click', function() {
 		var $this = $(this);
 		if (!$this.parent().hasClass('disable')) {
 			$(this).next().show();
 		}
 	});
-	$doc.delegate('.select ul li', 'click', function(e) {
+	$doc.delegate('.ui-select ul li', 'click', function(e) {
 		e.stopPropagation();
 		var $this = $(this).addClass('selected');
 		$this.siblings().removeClass('selected');

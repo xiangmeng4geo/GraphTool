@@ -71,6 +71,19 @@ Core.init(function(model) {
     model.on('map.changeconfig', function(file_path) {
         geomap && geomap.clear();
     });
+    model.on('map.reset', function() {
+        if (_last_key_project) {
+            var arr = _last_key_project.split('_');
+            var leftup = JSON.parse(arr[0]),
+                rightdown = JSON.parse(arr[1]);
+            var p = _getProjection(leftup, rightdown);
+            var translate = p.translate();
+            var scale = p.scale();
+            zoom.translate(translate).scale(scale);
+            projection.translate(translate).scale(scale);
+            model.emit('refresh');
+        }
+    });
     model.on('product.change', function(productName){
         geomap && geomap.clear();
     });
