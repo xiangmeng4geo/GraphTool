@@ -1,5 +1,8 @@
+tab-content item resize-horizontal{
+	left: 160px;
+}
 .list{
-	width: 100px;
+	width: 160px;
 	height: 100%;
 	overflow: auto;
 	position: absolute;
@@ -10,13 +13,39 @@
 	margin: 5px;
 	cursor: pointer;
 	padding: 3px;
+	overflow: hidden;
+	position: relative;
 }
 .list li.on{
-	background-color: #ccc;
+	background-color: #54667d;
+}
+.list li input{
+	position: absolute;
+	left: 0px;
+	top: 50%;
+	margin-top: -6px;
+}
+.list li label{
+	padding-left: 16px;
+	padding-right: 16px;
+	display: block;
+}
+.list li span{
+	position: absolute;
+	right: 2px;
+	top: 50%;
+	margin-top: -6px;
+	display: inline-block;
+	background: url(../img/icon_delete.png);
+	width: 11px;
+	height: 12px;
+}
+#blendent_conf_list li label{
+	padding-left: 3px;
 }
 .content{
 	position: absolute;
-	left: 100px;
+	left: 160px;
 	right: 0;
 	top: 0;
 	bottom: 0;
@@ -47,21 +76,37 @@
 	background-color: rgba(0, 0, 0, 0.1);
 }
 .map_item{
-	border: 1px dotted #ccc;
+	border: 1px dashed #676767;
 	margin: 10px auto;
 	position: relative;
 	margin-top: 40px;
+	margin-bottom: 60px;
 }
 .map_item .btns{
 	position: absolute;
-	left: 0px;
+	right: 0px;
+	top: -26px;
+}
+.map_item .file{
+	width: calc(100% - 40px);
+}
+.map_item [type=range]{
+	width: 100px;
+}
+.map_item .col2{
+	width: 50%;
+}
+.file_name{
+	position: absolute;
+	left: 0;
 	top: -26px;
 }
 .row{
-	margin: 5px;
+	margin: 10px;
 }
 .row .row{
 	margin-left: 20px;
+	color: #b7b7b7;
 }
 #form_legend input[type=number]{
 	width: 40px;
@@ -75,5 +120,56 @@
 }
 
 #map_conf_list .default{
-	color: red;
+	color: #26c9ff;
+}
+#btn_add_map_conf,
+#btn_add_blendent_conf{
+	width: 70%;
+	margin: 20px auto;
+	margin-left: 15%;
+	background: linear-gradient(to bottom, #494949 0%, #414141 100%);
+}
+.middle{
+	text-align: center;
+}
+input[type=range]+span{
+	display: inline-block;
+	width: 20px;
+}
+input[type=checkbox] + label{
+	padding-left: 20px;
+}
+.lnglat [type=text]{
+	width: 120px;
+}
+.map_text input{
+	margin-left: 5px;
+	width: 60px;
+}
+#c_map_text{
+	width: 67px;
+}
+fieldset{
+	border: 1px dashed #676767;
+	position: relative;
+	margin-top: 30px;
+}
+legend{
+	position: absolute;
+	top: -25px;
+	left: 0;
+	width: 100%;
+}
+.btn_dele_lengend{
+	position: absolute;
+	right: 4px;
+}
+.legend_value{
+	color: #b7b7b7;
+}
+.legend_value .col{
+	width: 20%;
+}
+#select_legent_product{
+	margin-left: 20px;
 }

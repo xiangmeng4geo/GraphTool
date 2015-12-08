@@ -30,7 +30,10 @@
 		Dialog.open({
 			filters: types[type] || []
 		}, function(file_path) {
-			$this.prev('.txt_file').val(file_path);
+			if (file_path) {
+				$this.prev('.txt_file').val(file_path);
+				$this.parent().trigger('change', file_path);
+			}
 		});
 	});
 	/**
@@ -50,7 +53,7 @@
 
 		if (!$container.data('inited')) {
 			var tmpl_file = '<input type="text" value="'+options.val+'" placeholder="'+options.placeholder+'" class="txt_file" style="width: calc(100% - '+(width_btn + width_minus)+'px);"/>'+
-						'<input type="button" data-type="'+options.type+'" class="btn_file_browse" value="浏览" style="width:'+width_btn+'px;"/>';
+						'<span data-type="'+options.type+'" class="btn_file_browse" value="浏览" style="width:'+width_btn+'px;"/>';
 			$container.html(tmpl_file);
 			$container.data('inited', true);
 		}

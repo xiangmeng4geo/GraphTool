@@ -1,4 +1,5 @@
 Core.init(function(model) {
+	var path = require('path');
 	var C = Core;
 	var $ = C.$;
 	var _require = C.require;
@@ -31,13 +32,25 @@ Core.init(function(model) {
 			return 'cb_' + (id++);
 		}
 	})();
-	model.on('init_checkbox', function() {
+	function _checkbox() {
+		$('[type=checkbox]').each(function() {
+			var $this = $(this);
+			var $items = $this.parent().siblings('.row');
+			if ($this.prop('checked')) {
+				$items.show();
+			} else {
+				$items.hide();
+			}
+		});
+	}
+	model.on('init_component', function() {
 		$('.checkbox').each(function() {
 			var $this = $(this);
 			var id = _getId();
 			$this.find('[type=checkbox]').attr('id', id);
 			$this.find('label').attr('for', id);
 		});
+		_checkbox();
 	});
 	$('.btn_close').on('click', function() {
 		window.close();
@@ -97,6 +110,12 @@ Core.init(function(model) {
 			$(this).remove();
 		});
 	});
+	// 动态显示文件名
+	$doc.delegate('.map_item .file', 'change', function(e, file_path) {
+		var name = path.basename(file_path) || '';
+		$(this).closest('.map_item').find('.file_name').text(name);
+	});
+	$doc.delegate('[type=checkbox]', 'click', _checkbox);
 
 	function _getChecked($checkbox){
 		return $checkbox.prop('checked');
@@ -282,7 +301,13 @@ Core.init(function(model) {
 		var html = '';
 		for (var i = 0, j = conf_data_geo.length; i<j; i++) {
 			var item = conf_data_geo[i];
-			html += '<li '+(item.default? 'class="default"':'')+'>'+item.name+'</li>';
+			var name = item.name;
+			var id = 'r_id_'+i;
+			html += '<li '+(item.default? 'class="default"':'')+'>'+
+						'<input type="radio" id="'+id+'" name="geo_list" '+(item.default?'checked':'')+'/>'+
+						'<label>'+name+'</label>'+
+						'<span></span>'
+					'</li>';
 		}
 
 		$map_conf_list.html(html);
@@ -302,7 +327,7 @@ Core.init(function(model) {
 			width_minus: 8
 		});
 		$map_conf.append($html);
-
+		model.emit('init_component');
 		// is_can_add_map_file = false;
 	});
 
@@ -328,7 +353,9 @@ Core.init(function(model) {
 
 				var $html = $(tmpl_map_item);
 				$map_conf.append($html);
-				util_ui.file($html.find('.file'), {
+				var $file = $html.find('.file');
+				$file.trigger('change', file);
+				util_ui.file($file, {
 					width_minus: 8,
 					val: file
 				});
@@ -377,7 +404,7 @@ Core.init(function(model) {
 			$txt_es_lng.val(es[0]);
 			$txt_es_lat.val(es[1]);
 
-			model.emit('init_checkbox');
+			model.emit('init_component');
 		}
 	}
 	function _changeMapConf(index) {
@@ -401,22 +428,35 @@ Core.init(function(model) {
 		$map_conf_list.find('.on').removeClass('on');
 		_changeMapConf();
 	});
-
-	$('#btn_dele_map_conf').click(function() {
-		var $item = $map_conf_list.find('.on');
-		var index = $item.index();
-		if (index == -1) {
-			return _alert('请选中要删除的项!');
-		}
+	$map_conf_list.delegate('span', 'click', function() {
+		var $p = $(this).parent();
 		_confirm('确定要删除选中项吗？', function() {
+			var index = $p.index();
 			conf_data_geo.splice(index, 1);
 			_saveConfData();
 
-			$item.remove();
+			$p.remove();
 			_clearMapConf();
 		});
 	});
+	$map_conf_list.delegate('[type=radio]', 'click', function() {
+		var $item = $(this).parent();
+		var index = $item.index();
+		_confirm('些操作会影响所有设置成默认地图的产品，确定要把选中项设置成默认吗？', function() {
+			for (var i = 0, j = conf_data_geo.length; i<j; i++) {
+				if (i === index) {
+					conf_data_geo[i].default = true;
+				} else {
+					delete conf_data_geo[i].default;
+				}
+			}
+			_saveConfData();
 
+			$item.addClass('default').siblings().removeClass('default');
+		}, function() {
+			$item.parent().find('.default [type=radio]').prop('checked', true);
+		});
+	});
 	$('#btn_default_map_conf').click(function() {
 		var $item = $map_conf_list.find('.on');
 		var index = $item.index();

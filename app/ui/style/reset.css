@@ -31,9 +31,6 @@ input, textarea, select, button{
     letter-spacing: 1px;
 	font: 14px/1.6 "Microsoft YaHei",Arial,Helvetica,sans-serif,"宋体";
 }
-input[type=range]{
-    vertical-align: -7px;
-}
 input[type=text],
 input[type=color],
 input[type=date],
@@ -41,7 +38,8 @@ input[type=time],
 input[type=number],
 input[type=password],
 textarea,
-.select{
+.select,
+.file{
     background-color: #212121;
 	border: 1px solid #212121;
     border-bottom: 1px solid #484848;
@@ -114,7 +112,7 @@ button.big{
 	padding: 5px 0;
 	box-shadow: 0 2px 3px #97abc4;
 }
-/*重写checkbox样式*/
+/*重写checkbox样式 {*/
 .checkbox{
     display: inline-block;
 }
@@ -163,6 +161,41 @@ input[type=checkbox]:checked + label:before{
 .labelbefore input[type=checkbox]:checked + label:before{
     right: 2px;
 }
+/*重写checkbox样式 }*/
+.radio{
+    display: inline-block;
+}
+input[type=radio]{
+    position: relative;
+}
+input[type=radio]:after{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    top: 0;
+    right: 0;
+    width: auto;
+    height: auto;
+    content: '';
+    background: url(../img/bg_radio.png) center center no-repeat;
+    background-size: 100% 100%;
+    border: 1px solid #5c5c5c;
+    border-radius: 50%;
+    background: linear-gradient(to bottom, #242324 0%, #3c3b3c 100%);
+}
+input[type=radio]:checked:before{
+    position: absolute;
+    left: 3px;
+    bottom: 3px;
+    top: 3px;
+    right: 3px;
+    width: auto;
+    height: auto;
+    content: '';
+    border-radius: 50%;
+    background-color: #26c9ff;
+    z-index: 1;
+}
 /*不可放大缩小*/
 textarea{resize:none}
 
@@ -185,7 +218,7 @@ table{
     border-radius: 5px;
     overflow: hidden;
     border: 1px solid #000;
-    border-top: 1px solid #999999;
+    /*border-top: 1px solid #999999;*/
 }
 td, th{
     border-left: 1px solid #000;
@@ -201,6 +234,7 @@ th{
     background: linear-gradient(to bottom, #595959 0%, #373737 50%, #2f2f2f 100%);
     border-top: none;
     font-weight: normal;
+    box-shadow: inset 0 0 1px #999999;
 }
 tr:nth-child(2n) td{
     background-color: #2d2d2d;
@@ -343,6 +377,26 @@ tr:nth-child(2n+1) td{
 	display: inline-block;
 	width: 200px;
 	height: 28px;
+    padding: 0;
+    position: relative;
+    vertical-align: middle;
+}
+.file [type=text]{
+    background: none;
+    border: none;
+    position: absolute;
+    top: 50%;
+    margin-top: -12px;
+    color: #b7b7b7;
+}
+.file .btn_file_browse{
+    position: absolute;
+    right: 3px;
+    top: 50%;
+    width: 27px;
+    height: 20px;
+    margin-top: -10px;
+    background: url(../img/icon_file.png) no-repeat center center;
 }
 .select{
 	display: inline-block;
@@ -412,6 +466,11 @@ tab{
     font-size: 14px;
     position: relative;
 }
+.separator{
+    position: relative;
+}
+.separator:before,
+.separator:after,
 tab:before,
 tab:after{
     content: '';
@@ -421,10 +480,12 @@ tab:after{
     left: 0;
     border-bottom: 1px solid #4a4a4a;
 }
+.separator:after,
 tab:after{
     border-bottom: 1px solid #101010;
     bottom: -2px;
 }
+
 tab item{
 	float: left;
 	border-bottom: 3px solid rgba(0, 0, 0, 0);
@@ -479,14 +540,19 @@ tab-content item resize-horizontal{
 	left: 100px;
 	top: 0;
 }
-tab-content item resize-horizontal:after{
+tab-content item resize-horizontal:after,
+tab-content item resize-horizontal:before{
 	content: '';
 	position: absolute;
-	border: 1px solid #ccc;
+	border-left: 1px solid #0a0a0a;
 	left: 2px;
 	top: 10px;
 	bottom: 10px;
 	height: auto;
+}
+tab-content item resize-horizontal:after{
+    left: 3px;
+    border-color: #575757;
 }
 /* 设置滚动条的样式 {*/
 ::-webkit-scrollbar {
@@ -497,13 +563,13 @@ tab-content item resize-horizontal:after{
 ::-webkit-scrollbar-track {
 	/*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
 	/*border-radius: 10px;*/
-	background-color: #d4e3f2;
+	background-color: #242424;
 }
 /* 滚动条滑块 */
 ::-webkit-scrollbar-thumb {
 	/*border-radius: 10px;*/
 	/*background: rgba(0,0,0,0.1);   */
-	background-color: #32689c;
+	background-color: #5e5e5e;
 	/*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);*/
 }
 /*::-webkit-scrollbar-thumb:window-inactive {
@@ -574,3 +640,23 @@ tab-content item resize-horizontal:after{
 	background-position: center -23px;
 }
 /*关闭按钮 }*/
+
+input[type=range] {
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    margin: 0;
+    border: none;
+    background: #2a2a2a;
+    box-shadow: inset 0 1px 0 0 #0d0e0f, inset 0 -1px 0 0 #3a3d42;
+    outline: none;
+    height: 10px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 6px;
+    height: 18px;
+    border: none;
+    background-image: linear-gradient(to bottom, #529de1 0, #26c9ff 100%);
+
+}

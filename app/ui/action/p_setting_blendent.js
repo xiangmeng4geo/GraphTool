@@ -28,16 +28,16 @@ Core.init(function(model) {
 								'<legend>_N_ <input type="button" class="admin btn_dele_lengend" value="删除"/></legend>'+
 								'<div class="legend_value">'+
 									'<form id="form_legend">'+
-										'<div class="mt10">'+
-											'<label>起始颜色</label><input type="color" value="#0000ff" class="color_start"/>'+
-											'<label>终止颜色</label><input type="color" value="#ff0000" class="color_end"/>'+
-											'<label title="雨夹雪时可使用">条纹显示</label><input type="checkbox" class="cb_is_stripe"/>'+
+										'<div class="mt10 clear">'+
+											'<div class="fl col"><label>起始颜色</label><input type="color" value="#0000ff" class="color_start"/></div>'+
+											'<div class="fl col"><label>终止颜色</label><input type="color" value="#ff0000" class="color_end"/></div>'+
+											'<div class="fl col"><div class="checkbox labelbefore"><input type="checkbox" class="cb_is_stripe"/><label title="雨夹雪时可使用">条纹显示</label></div></div>'+
 										'</div>'+
-										'<div class="mt10">'+
-											'<label>最小值</label><input type="number" value="0" class="number_min"/>'+
-											'<label>最大值</label><input type="number" value="40" class="number_max"/>'+
-											'<label>等级数</label><input type="number" value="10" class="number_level"/>'+
-											'<input value="生成等阶颜色值" type="button" class="btn_gen_colors"/>'+
+										'<div class="mt10 clear">'+
+											'<div class="fl col"><label>最小值</label><input type="number" value="0" class="number_min"/></div>'+
+											'<div class="fl col"><label>最大值</label><input type="number" value="40" class="number_max"/></div>'+
+											'<div class="fl col"><label>等级数</label><input type="number" value="10" class="number_level"/></div>'+
+											'<div class="fl col"><input value="生成等阶颜色值" type="button" class="btn_gen_colors"/></div>'+
 										'</div>'+
 									'</form>'+
 								'</div>'+
@@ -66,7 +66,7 @@ Core.init(function(model) {
 		html_table += '</table>';
 
 		setTimeout(function(){
-			model.emit('init_checkbox');
+			model.emit('init_component');
 		}, 0);
 		return html_table;
 	}
@@ -306,7 +306,7 @@ Core.init(function(model) {
 	function _initBledentConfList() {
 		var html = '';
 		for (var i = 0, j = conf_data_legend.length; i<j; i++) {
-			html += '<li>'+conf_data_legend[i].name+'</li>';
+			html += '<li><label>'+conf_data_legend[i].name+'</label><span></span></li>';
 		}
 
 		$blendent_conf_list.html(html);
@@ -380,17 +380,14 @@ Core.init(function(model) {
 		_initBledentConfList();
 		_alert('保存成功！');
 	});
-	$('#btn_dele_blendent_conf').click(function() {
-		var $item = $blendent_conf_list.find('.on');
-		var index = $item.index();
-		if (index == -1) {
-			return _alert('请选中要删除的项!');
-		}
+	$blendent_conf_list.delegate('span', 'click', function() {
+		var $p = $(this).parent();
 		_confirm('确定要删除选中项吗？', function() {
+			var index = $p.index();
 			conf_data_legend.splice(index, 1);
 			_saveConfData();
 
-			$item.remove();
+			$p.remove();
 			_clearConf();
 		});
 	});
