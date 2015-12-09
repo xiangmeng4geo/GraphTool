@@ -46,25 +46,61 @@ Core.init(function(model) {
     var geomap;
     var projection;
     var zoom;
+    var map_click_type;
     function _init() {
         projection = _getProjection(CONST_BOUND.WN, CONST_BOUND.ES);
         zoom = d3.behavior.zoom()
             .translate(projection.translate())
             .scale(projection.scale())
             // .scaleExtent([projection.scale() /4 , projection.scale()*8])
-            .on('zoom', function() {
+            .on('zoomstart', function() {
                 var e = d3.event;
-                projection.scale(e.scale);
-                projection.translate(e.translate);
-                model.emit('refresh');
+                console.log(e);
+                e.sourceEvent.preventDefault();
+            })
+            .on('zoom', function() {
+                // if (map_click_type == 'move') {
+                    var e = d3.event;
+                    projection.scale(e.scale);
+                    projection.translate(e.translate);
+                    model.emit('refresh');
+                // }
             });
         var drag = d3.behavior.drag().on('dragstart', function() {
             $geomap.addClass('dragging');
         }).on('dragend', function() {
             $geomap.removeClass('dragging');
         });
-        d3.select('#geomap').call(zoom).call(drag);
+        d3.select('#geomap').on('click.zoom', function() {
+            if (map_click_type === 'zoomin' || map_click_type ==='zoomout') {
+                var e = d3.event;
+                var opt = {};
+                for (var i in e) {
+                    opt[i] = e[i];
+                }
+                opt.type = 'dblclick';
+                if (map_click_type ==='zoomout') {
+                    opt.shiftKey = true;
+                }
+                var e_new = new MouseEvent('dblclick', opt);
+                this.dispatchEvent(e_new);
+            }
+        }).on('wheel', function() {
+            if (map_click_type != 'move') {
+                d3.event.stopImmediatePropagation();
+            }
+        }).on('mousedown', function() {
+            if (map_click_type != 'move') {
+                d3.event.stopImmediatePropagation();
+            }
+        }).call(zoom).call(drag);
     }
+
+    // 更新地图点击事件的状态(放大、缩小、移动)
+    model.on('map.tool', function(type) {
+        map_click_type = type;
+        $geomap.removeClass().addClass(type);
+    });
     model.on('map.afterRender', function(err, time_used) {
         model.emit('log', 'afterRender takes '+time_used+' ms!');
     });

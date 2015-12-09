@@ -324,11 +324,17 @@ Core.init(function(model) {
     //
     // }
 
-    $('.toolbar_btn').click(function() {
-        var type = $(this).data('type');
+    $('.toolbar_btn').click(function(e) {
+        var $this = $(this);
+        if ($this.is('[data-type=zoomin],[data-type=zoomout],[data-type=move]')) {
+            $('[data-type=zoomin],[data-type=zoomout],[data-type=move]').removeClass('on');
+            $this.addClass('on');
+            _changeMapTool();
+        }
+        var type = $this.data('type');
         var fn = fn_list[type];
         if (fn) {
-            fn();
+            fn(e);
         }
     });
     var fn_list = {};
@@ -396,6 +402,18 @@ Core.init(function(model) {
     // 还原地图状态
     fn_list.reset = function() {
         model.emit('map.reset');
+    }
+    function _changeMapTool(type) {
+        model.emit('map.tool', type);
+    }
+    fn_list.zoomin = function(e) {
+        _changeMapTool('zoomin');
+    }
+    fn_list.zoomout = function(e) {
+        _changeMapTool('zoomout');
+    }
+    fn_list.move = function(e) {
+        _changeMapTool('move');
     }
 
     // 添加拖拽

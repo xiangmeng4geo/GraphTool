@@ -182,15 +182,6 @@
 	opacity: 0;
 }
 
-.geomap_mirror.ui-draggable-handle{
-	cursor: url(../img/openhand.cur) 8 8, default !important;
-}
-.geomap_mirror.ui-draggable-dragging{
-	cursor: url(../img/closedhand.cur) 8 8, move !important;
-}
-.geomap_mirror.ui-draggable-disabled{
-	cursor: default !important;
-}
 .map_tool{
 	position: absolute;
 	right: 0;
@@ -607,10 +598,19 @@ resize-horizontal{
 	z-index: 10;
 }
 #geomap{
+	cursor: default;
+}
+#geomap.move{
 	cursor: url(../img/openhand.cur) 8 8, default !important;
 }
 #geomap.dragging{
 	cursor: url(../img/closedhand.cur) 8 8, move !important;
+}
+#geomap.zoomin{
+	cursor: zoom-in !important;
+}
+#geomap.zoomout{
+	cursor: zoom-out !important;
 }
 #geomap.nodrag{
 	cursor: default !important;
@@ -618,8 +618,6 @@ resize-horizontal{
 .vakata-context{
 	z-index: 1001;
 }
-
-
 
 /*rewrite jstree {*/
 .jstree{
