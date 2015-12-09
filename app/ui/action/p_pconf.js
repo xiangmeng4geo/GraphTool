@@ -1,6 +1,6 @@
 /* global Core */
 /* global _PARAM_ */
-!function() {
+Core.init(function(model) {
 	var C = Core;
 	var $ = C.$;
 	var _require = C.require;
@@ -33,7 +33,6 @@
 			val: v.name
 		});
 	});
-
 	var conf_product = product_conf.read(_PARAM_) || {};
 	var conf_data = conf_product.data || {};
 	var conf_other = conf_product.other || {};
@@ -101,10 +100,12 @@
 		};
 		product_conf.save(_PARAM_, conf);
 
+		model.emit('log', 'change "'+_PARAM_+'"');
+		C.emit('conf.change');
 		_alert('保存成功!');
 		window.close();
 	});
 	$('.btn_close').on('click', function() {
 		window.close();
 	});
-}()
+})

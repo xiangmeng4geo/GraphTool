@@ -81,10 +81,10 @@
 					id: 'img',
 					title: '添加图片'
 				},
-				{
-					id: 'polygon',
-					title: '添加多边形'
-				}
+				// {
+				// 	id: 'polygon',
+				// 	title: '添加多边形'
+				// }
 			], [{
 				id: 'save',
 				title: '保存图片'

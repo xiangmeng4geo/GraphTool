@@ -1,6 +1,19 @@
 !function() {
-	var $ = Core.$;
-	var Dialog = require('./dialog');
+	var C = Core;
+	var $ = C.$;
+	var _require = C.require;
+	var Dialog = _require('./dialog');
+	var _extend = $.extend;
+	var CONST = _require('const');
+	// http://www.zreading.cn/ican/2014/10/css-font-family/
+	var CONST_FONT_FAMILY = CONST.FONT_FAMILY;
+	var CONST_FONT_SIZE = CONST.FONT_SIZE;
+	for (var i = 10; i <= 60; i++) {
+		CONST_FONT_SIZE.push({
+			text: i,
+			val: i
+		});
+	}
 
 	var FILETER_GEO = [{
 		name: 'GeoJSON',
@@ -40,7 +53,7 @@
 	 * 初始化一个file
 	 */
 	function file($container, options){
-		options = $.extend({
+		options = _extend({
 			width_btn: 40,
 			width_minus: 0,
 			type: 'geo',
@@ -84,7 +97,7 @@
 		$this.parent().hide().parent().trigger('change', val_new);
 	})
 	function select($container, options) {
-		options = $.extend({
+		options = _extend({
 			val: null,
 			data: null,
 			onchange: null
@@ -165,11 +178,218 @@
 			}
 		}
 	}
+	// 把style字符串转成对象
+    function _styleToObj(style) {
+        var result = {};
+        var arr = style.split(';');
+        arr.forEach(function(v) {
+            var items = v.trim().split(':');
+            if (items.length == 2) {
+                var val = items[1].trim();
+                if (/^[-\d.]+px$/.test(val)) {
+                    val = parseFloat(val);
+                }
+                result[items[0].trim()] = val;
+            }
+        });
+        return result;
+    }
+	function editText($container, options) {
+		options = _extend({
+			text: '',
+			style: null,
+			onchange: null
+		}, options);
+
+		var text = options.text;
+
+		var $textarea;
+		var $editText;
+		var onchange = options.onchange || function(){};
+
+		var html = '<div class="editText">';
+			html += '<textarea placeholder="请输入文字"></textarea>';
+			html += '<div class="row">'+
+						'<div class="ui-select s_fontfamily"></div>'+
+						'<div class="ui-select s_fontsize"></div>'+
+						'<div class="ui-edit-btn fontsize_zoomin"></div>'+
+						'<div class="ui-edit-btn fontsize_zoomout"></div>'+
+						'<label>字体颜色:</label><input type="color" class="c_edit_front"/>'+
+					'</div>';
+			html += '<div class="row row2">'+
+						'<div class="ui-edit-btn fontweight"></div>'+
+						'<div class="ui-edit-btn fontstyle"></div>'+
+						'<div class="ui-edit-btn btn_align align_left" data-align="left"></div>'+
+						'<div class="ui-edit-btn btn_align align_center" data-align="center"></div>'+
+						'<div class="ui-edit-btn btn_align align_right" data-align="right"></div>'+
+						// '<label>背景颜色:</label><input type="color" class="c_edit_bg" value=""/>'+
+					'</div>';
+			html += '<div class="row ui-edit-size">'+
+						'<div class="col4">X:<input type="number" class="n_x"/></div>'+
+						'<div class="col4">Y:<input type="number" class="n_y"/></div>'+
+						'<div class="col4">W:<input type="number" class="n_w"/></div>'+
+						'<div class="col4"><span class="ui-edit-btn wh_lock fl"></span>H:<input type="number" class="n_h"/></div>'+
+					'</div>';
+		html += '</div>';
+
+		$container.append(html);
+
+		$textarea = $container.find('textarea');
+		$editText = $container.find('.editText');
+
+		var $n_x = $container.find('.n_x');
+		var $n_y = $container.find('.n_y');
+		var $n_w = $container.find('.n_w');
+		var $n_h = $container.find('.n_h');
+		function _change() {
+			var css = {
+				'font-family': s_font_family.val(),
+				'font-size': s_font_size.val(),
+				'color': $c_edit_front.val(),
+				// 'background-color': $c_edit_bg.val(),
+				'font-weight': $fontweight.is('.on')? 'bold': 'normal',
+				'font-style': $fontstyle.is('.on')? 'italic': 'normal'
+			}
+			var $align_item = $btn_align.filter('.on');
+			if ($align_item.length > 0) {
+				css['text-align'] = $align_item.data('align');
+			}
+			$textarea.css(css);
+
+			onchange();
+		}
+		var s_font_family = select($container.find('.s_fontfamily'), {
+			data: CONST_FONT_FAMILY,
+			onchange: function() {
+				_change();
+			}
+		});
+		var $font_size = $container.find('.s_fontsize');
+		var s_font_size = select($font_size, {
+			val: 14,
+			data: CONST_FONT_SIZE,
+			onchange: function() {
+				_change();
+			}
+		});
+		$container.find('.fontsize_zoomin').click(function() {
+			var val = s_font_size.val();
+			s_font_size.selected(val+1);
+			_change();
+		});
+		$container.find('.fontsize_zoomout').click(function() {
+			var val = s_font_size.val();
+			s_font_size.selected(val-1);
+			_change();
+		});
+		var $c_edit_front = $container.find('.c_edit_front').on('change', _change);
+		var $c_edit_bg = $container.find('.c_edit_bg').on('change', _change);
+		var $fontweight = $container.find('.fontweight').on('click', function() {
+			var $this = $(this);
+			if ($this.is('.on')) {
+				$this.removeClass('on');
+			} else {
+				$this.addClass('on');
+			}
+			_change();
+		});
+		var $fontstyle = $container.find('.fontstyle').on('click', function() {
+			var $this = $(this);
+			if ($this.is('.on')) {
+				$this.removeClass('on');
+			} else {
+				$this.addClass('on');
+			}
+			_change();
+		});
+
+		$textarea.on('input', onchange);
+		if (text) {
+			$textarea.val(text);
+		}
+		var $btn_align = $container.find('.btn_align').on('click', function() {
+			$(this).addClass('on').siblings().removeClass('on');
+			_change();
+		});
+		$container.find('.ui-edit-size [type=number]').on('input', onchange);
+
+		$container.delegate('input,textarea', 'keydown', function(e) {
+			e.stopPropagation();
+		});
+		function _style(style) {
+			if (!style) {
+				return;
+			}
+			if (!$.isPlainObject(style)) {
+				style = _styleToObj(style);
+			}
+			s_font_family.selected(style['font-family']);
+			var fontSize = style['font-size'];
+			fontSize > 0 && s_font_size.selected(fontSize);
+			if (style['font-style'] == 'italic') {
+				$fontweight.addClass('on');
+			}
+			var align = style['text-align'];
+			if (align) {
+				$btn_align.filter('[data-align='+align+']').addClass();
+			}
+			var color = style['color'];
+			color && $c_edit_front.val(color);
+
+			$n_x.val(style.left);
+			$n_y.val(style.top);
+			$n_w.val(style.width);
+			$n_h.val(style.height);
+
+			_change();
+		}
+		_style(options.style);
+		return {
+			_w: $editText.outerWidth(),
+			_h: $editText.outerHeight(),
+			show: function() {
+				$editText.show();
+			},
+			hide: function() {
+				$editText.hide();
+			},
+			getText: function() {
+				return $textarea.val();
+			},
+			setText: function(text) {
+				$textarea.val(text);
+			},
+			getStyle: function() {
+				return $textarea.attr('style');
+			},
+			setPos: function(pos) {
+				$editText.css(pos);
+			},
+			setStyle: _style,
+			getSize: function() {
+				return {
+					left: parseFloat($n_x.val()),
+					top: parseFloat($n_y.val()),
+					width: parseFloat($n_w.val()),
+					height: parseFloat($n_h.val())
+				}
+			}
+		}
+	}
+	// var edit = editText($('body'), {
+	// 	onchange: function() {
+	// 		console.log(edit.getText(), edit.getStyle());
+	// 	}
+	// });
 	UI.file = file;
 	UI.select = select;
+	UI.edit = editText;
 
 	var Util = {
-		UI: UI
+		UI: UI,
+		util: {
+			style2obj: _styleToObj
+		}
 	};
 	/*颜色转换*/
 	!function(){

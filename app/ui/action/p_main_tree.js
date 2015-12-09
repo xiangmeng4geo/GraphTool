@@ -84,6 +84,9 @@ Core.init(function(model) {
     C.on('sys.change', function() {
         _productNameCurrent = null;
     });
+    C.on('conf.change', function(name) {
+        _productNameCurrent = null;
+    });
 
     // 相关的事件说明请参考：https://www.jstree.com/api/#/?q=.jstree%20Event
     // 自定义了'dblclick_node.jstree'事件

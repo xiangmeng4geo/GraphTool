@@ -73,7 +73,11 @@
 			return dialog.showOpenDialog(win_instance, options, callback);
 		},
 		save: function(options, callback) {
-			return dialog.showSaveDialog(win_instance, options, callback);
+			return dialog.showSaveDialog(win_instance, options, function(file_path) {
+				if (file_path) {
+					callback && callback();
+				}
+			});
 		}
 	};
 	module.exports = Dialog;

@@ -21,5 +21,58 @@
 	"DATA_TYPE": [{
 		"text": "命令行",
 		"val": "shanxi"
+	}],
+	"FONT_FAMILY": [{
+		"text": "微软雅黑",
+		"val": "Microsoft YaHei"
+	}, {
+		"text": "宋体",
+		"val": "SimSun"
+	}, {
+		"text": "黑体",
+		"val": "SimHei"
+	}, {
+		"text": "新宋体",
+		"val": "NSimSun"
+	}, {
+		"text": "楷体",
+		"val": "KaiTi"
+	}],
+	"FONT_SIZE": [{
+		"text": "初号",
+		"val": 56
+	}, {
+		"text": "小初",
+		"val": 48
+	}, {
+		"text": "一号",
+		"val": 34
+	}, {
+		"text": "小一",
+		"val": 32
+	}, {
+		"text": "二号",
+		"val": 29
+	}, {
+		"text": "小二",
+		"val": 24
+	}, {
+		"text": "三号",
+		"val": 21
+	}, {
+		"text": "小三",
+		"val": 20
+	}, {
+		"text": "四号",
+		"val": 18
+	}, {
+		"text": "小四",
+		"val": 16
+	}, {
+		"text": "五号",
+		"val": 14
+	}, {
+		"text": "小五",
+		"val": 12
 	}]
 }

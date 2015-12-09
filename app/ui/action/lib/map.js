@@ -161,7 +161,7 @@
             var end = _getPathEnd(ctx_stroke, style);
             for (var i = 0, j = arcs.size(); i<j; i++){
                 start();
-                _drawPath(ctx, arcs.getArcIter(i));
+                _drawPath(ctx_stroke, arcs.getArcIter(i));
                 end();
             }
         }
@@ -690,7 +690,7 @@
             for (var i = 0, j = shapes.length; i<j; i++) {
                 var shape = shapes[i];
                 var style = shape.style || {};
-                
+
                 _getPathStart(ctx, style)();
                 shape.draw(ctx, _projection);
                 _getPathEnd(ctx, style)();

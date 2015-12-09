@@ -10,6 +10,9 @@ Core.init(function(model) {
     var dialog = _require('dialog');
     var path = require('path');
     var Shape = _require('shape');
+    var component = _require('component');
+    var UI = component.UI;
+    var style2obj = component.util.style2obj;
 
     // 引入jquery-ui模块
     _require('j.ui');
@@ -88,6 +91,7 @@ Core.init(function(model) {
         }
     });
 
+    // 添加编辑模块
     // 创建图层
     function _createLayer(option) {
         _unedit();
@@ -127,7 +131,6 @@ Core.init(function(model) {
                 $(this).removeClass('off').trigger('edit', true);
             }).on('contextmenu', function(e) {
                 e.stopPropagation();
-
             });
         $html.appendTo($geomap_container);
         return $html;
@@ -135,21 +138,76 @@ Core.init(function(model) {
 
     // 文字图层
     function TextLayer(option) {
+        function _change() {
+            var css = {};
+            var pos = $html.position();
+            var left = pos.left,
+                top = pos.top;
+            var $p = $html.parent();
+            var w = $p.width();
+            var h = $p.height();
+            var _w = edit._w,
+                _h = edit._h;
+            var height_layer = $html.height();
+            if (w > 0 && h > 0) {
+                var css = {};
+                if (left + _w > w) {
+                    css.left = 'auto';
+                    css.right = 0;
+                } else {
+                    css.left = 0;
+                    css.right = 'auto'
+                }
+
+                if (top + height_layer + _h > h) {
+                    css.top = 'auto';
+                    css.bottom = '100%';
+                } else {
+                    css.top = '100%';
+                    css.bottom = 'auto';
+                }
+                edit.setPos(css);
+            }
+            edit.setStyle($html.attr('style'));
+        }
         option = $.extend(true, {
             pos: {
                 left: $geomap_container.width() / 2,
                 top: $geomap_container.height() / 2
+            },
+            resize: {
+                resize: _change
+            },
+            drag: {
+                // handle: 'span.btn_handle',
+                drag: _change
             }
         }, option);
-        var $html = _createLayer({
-            edit: option.edit,
-            css: option.style
-        });
+        var $html = _createLayer(option);
 
-        $html.css(option.pos)
+        var text = option.text || '';
+        $html.on('edit', function(e, flag) {
+            if (flag) {
+                edit.show();
+            } else {
+                edit.hide();
+            }
+        }).css(option.pos)
             .addClass('layer_text')
-            .append('<span>' + (option.text || '') + '</span>');
+            .append('<span class="btn_handle">' + text + '</span>');
 
+        var $span = $html.find('.btn_handle');
+        var edit = UI.edit($html, {
+    		onchange: function() {
+                $span.text(edit.getText());
+                var style = style2obj(edit.getStyle());
+                $span.css(style);
+                $html.css(edit.getSize());
+    		}
+    	});
+        edit.setText(text);
+        _change();
+        edit.show();
         return $html;
     }
 
@@ -278,11 +336,11 @@ Core.init(function(model) {
     fn_list.text = function() {
         TextLayer({
             edit: true,
-            style: {
+            css: {
                 width: 100,
                 height: 30
             },
-            text: '请输入文字'
+            text: ''
         })
     }
 
@@ -317,7 +375,8 @@ Core.init(function(model) {
                 var $this = $(this);
                 var pos = $this.position();
                 if ($this.is('.layer_text')) {
-                    shapes.push(new Shape.Text($this.text(), $.extend(_styleToObj($this.attr('style')), {
+                    var $item = $this.find('.btn_handle');
+                    shapes.push(new Shape.Text($item.text(), $.extend(_styleToObj($item.attr('style')), {
                         x: pos.left,
                         y: pos.top
                     })));
