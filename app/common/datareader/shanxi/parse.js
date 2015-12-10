@@ -25,10 +25,11 @@
 			} else {
 				conf_result = util_file.readJson(conf_path);
 				if (!conf_result) {
-					model.emit('error', new Error('get content of "'+conf_path+'" error!'));
+					err = new Error('get content of "'+conf_path+'" error!');
+					model.emit('error', err);
 				}
 			}
-			
+
 			model.emit('map.changeconfig', util.extend(true, {
 				map: conf.other.map,
 				legend: conf.other.legend,

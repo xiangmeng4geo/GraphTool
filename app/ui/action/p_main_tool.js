@@ -13,7 +13,16 @@ Core.init(function(model) {
     var component = _require('component');
     var UI = component.UI;
     var style2obj = component.util.style2obj;
+    var CONST_PATH_GALLERY = _require('const').PATH.GALLERY;
 
+    // 定义图片过滤器
+    var CONST_FILTER_IMAGE = [{
+        name: '图片',
+        extensions: ['png', 'jpg']
+    }];
+    function _isImage(file_path) {
+        return /\.(png|jpg)$/i.test(file_path);
+    }
     // 引入jquery-ui模块
     _require('j.ui');
 
@@ -45,7 +54,7 @@ Core.init(function(model) {
             msg: '保存成功，用时'+time_used+'ms!',
             detail: '保存在"'+save_path+'"',
             buttons: [{
-                name: '打开目录',
+                name: '打开所在目录',
                 cb: function() {
                     shell.showItemInFolder(save_path);
                 }
@@ -59,22 +68,6 @@ Core.init(function(model) {
             }]
         });
     });
-    // 把style字符串转成对象
-    function _styleToObj(style) {
-        var result = {};
-        var arr = style.split(';');
-        arr.forEach(function(v) {
-            var items = v.trim().split(':');
-            if (items.length == 2) {
-                var val = items[1].trim();
-                if (/^[-\d.]+px$/.test(val)) {
-                    val = parseFloat(val);
-                }
-                result[items[0].trim()] = val;
-            }
-        });
-        return result;
-    }
 
     // 清除所有选项的编辑状态
     function _unedit() {
@@ -222,7 +215,7 @@ Core.init(function(model) {
         }, option);
         var pos = option.pos;
         var src = option.src;
-        if (!/\.(png|jpg)/i.test(path.extname(src))) {
+        if (!_isImage(path.extname(src))) {
             return;
         }
 
@@ -327,17 +320,24 @@ Core.init(function(model) {
     $('.toolbar_btn').click(function(e) {
         var $this = $(this);
         if ($this.is('[data-type=zoomin],[data-type=zoomout],[data-type=move]')) {
+            var flag = $this.hasClass('on');
             $('[data-type=zoomin],[data-type=zoomout],[data-type=move]').removeClass('on');
-            $this.addClass('on');
+
             _changeMapTool();
+            if (!flag) {
+                $this.addClass('on');
+            } else {
+                return;
+            }
         }
         var type = $this.data('type');
         var fn = fn_list[type];
         if (fn) {
-            fn(e);
+            fn.apply(this, e);
         }
     });
     var fn_list = {};
+
     // 添加文字
     fn_list.text = function() {
         TextLayer({
@@ -351,13 +351,9 @@ Core.init(function(model) {
     }
 
     // 添加图片
-    var filters = [{
-        name: '图片',
-        extensions: ['png', 'jpg']
-    }];
     fn_list.img = function() {
         dialog.open({
-            filters: filters
+            filters: CONST_FILTER_IMAGE
     	}, function(file_paths) {
             if (file_paths && file_paths.length > 0) {
                 file_paths.forEach(function(file_path) {
@@ -369,12 +365,136 @@ Core.init(function(model) {
         })
     }
 
+    var $c_right = $('#c_right');
+    // 打开图片库
+    fn_list.gallery = function() {
+        var $this = $(this);
+        var $gallery = $c_right.find('.gallery');
+        if ($gallery.length == 0) {
+            var list = util_file.readdir(CONST_PATH_GALLERY);
+
+            if (!list || list.length == 0) {
+                util_file.mkdir(CONST_PATH_GALLERY);
+                dialog.confirm1({
+                    msg: '图片库目录里还没有添加图片!',
+                    buttons: [{
+                        name: '打开目录',
+                        cb: function() {
+                            shell.openItem(CONST_PATH_GALLERY);
+                        }
+                    }, {
+                        name: 'yes'
+                    }]
+                });
+                return;
+            }
+            var data_select = [];
+            function _each(list, deep) {
+                deep || (deep = 0);
+                for (var i = 0, j = list.length; i<j; i++) {
+                    var item = list[i];
+                    if (item.sub) {
+                        var path_name = item.name;
+                        var name = path.basename(path_name);
+
+                        var _str = '';
+                        for (var _i = 0; _i<deep; _i++) {
+                            _str += '<span class="placeholder"></span>';
+                        }
+                        data_select.push({
+                            text: _str+name,
+                            val: path_name
+                        });
+                        _each(item.sub, deep+1);
+                    }
+                }
+            }
+            _each(list);
+            var html = '<div class="gallery">'+
+                            '<div class="title">图片库<span class="btn_retract"/></div>'+
+                            '<div class="ui-select s_gallery"></div>'+
+                            '<ul class="gallery_items">'+
+                            '</ul>'+
+                        '</div>';
+            var $html = $(html);
+            $c_right.append($html);
+
+            function _getList(arr, val) {
+                var result_arr = [];
+                for (var i = 0, j = arr.length; i<j; i++) {
+                    var item = arr[i],
+                        sub = item.sub;
+
+                    if (val === undefined || item.name == val) {
+                        if (sub) {
+                            for (var _i = 0, _j = sub.length; _i<_j; _i++) {
+                                var _item = sub[_i];
+                                var _sub = _item.sub;
+
+                                if (_sub) { //添加子目录里文件
+                                    if (val == undefined) {
+                                        result_arr = result_arr.concat(_getList(_item.sub));
+                                    }
+                                } else {
+                                    if (_isImage(_item.name)) {
+                                        result_arr.push(_item.name);
+                                    }
+                                }
+                            }
+                        } else {
+                            if (_isImage(item.name)) {
+                                result_arr.push(item.name);
+                            }
+                        }
+                    } else{
+                        if (sub) {
+                            // 寻找下级
+                            result_arr = result_arr.concat(_getList(sub, val));
+                        }
+                    }
+                }
+                return result_arr;
+            }
+            function _showList(val) {
+                var imgs = _getList(list, val);
+                var html = '';
+                for (var i = 0, j = imgs.length; i<j; i++) {
+                    html += '<li><img src="'+imgs[i]+'" draggable="true"/></li>';
+                }
+                $html.find('.gallery_items').html(html || '<center>暂无图片</center>');
+            }
+            // 初次进入显示全部
+            _showList();
+            var s_gallery = UI.select($html.find('.s_gallery'), {
+                data: data_select,
+                getShowVal: function($item) {
+                    var $wrap = $('<div>').append($item.html());
+                    $wrap.find('.placeholder').remove();
+                    return $wrap.html();
+                },
+                onchange: function(e, val) {
+                    _showList(val);
+                }
+            });
+            $gallery = $c_right.find('.gallery');
+            $html.find('.btn_retract').click(function() {
+                $gallery.toggleClass('show');
+                $this.toggleClass('on');
+            });
+            setTimeout(function() {
+                $gallery.addClass('show');
+            }, 10);
+        } else {
+            $gallery.toggleClass('show');
+        }
+        $this.toggleClass('on');
+    }
     // 保存
     fn_list.save = function() {
         dialog.save({
             title: '选择保存路径',
             defaultPath: new Date().getTime()+'.png',
-            filters: filters
+            filters: CONST_FILTER_IMAGE
         }, function(file_paths) {
             var shapes = [];
             $('.map_layer').each(function() {
@@ -382,7 +502,7 @@ Core.init(function(model) {
                 var pos = $this.position();
                 if ($this.is('.layer_text')) {
                     var $item = $this.find('.btn_handle');
-                    shapes.push(new Shape.Text($item.text(), $.extend(_styleToObj($item.attr('style')), {
+                    shapes.push(new Shape.Text($item.text(), $.extend(style2obj($item.attr('style')), {
                         x: pos.left,
                         y: pos.top,
                         width: $this.width(),
@@ -429,10 +549,15 @@ Core.init(function(model) {
     		e.stopPropagation();
     		e = e.originalEvent;
             var dataTransfer = e.dataTransfer;
-    		// var drag_img = dataTransfer.getData('Text');
     		var x = e.offsetX,y = e.offsetY;
             var files = dataTransfer.files;
-    		if(files && files.length > 0){
+    		var drag_img = dataTransfer.getData('Text');
+    		if(files && files.length > 0 || drag_img) {
+                if (drag_img) {
+                    files = [{
+                        path: decodeURIComponent(drag_img).replace('file:///', '')
+                    }];
+                }
     			$.each(files, function(i, file){
                     ImageLayer({
                         src: file.path,

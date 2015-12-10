@@ -21,9 +21,8 @@
         var conrec = _require('conrec').setModel(model);
 
         // 主要监听命令行调用时配置文件更新
-        model.on('map.changeconfig', function(file_path) {
+        model.on('map.changeconfig', function(file_path, err) {
             var conf = util.isPlainObject(file_path) ? file_path: util_file.readJson(file_path);
-
             _changeConf(conf);
         });
         function _afterChangeConf(err, t_start) {

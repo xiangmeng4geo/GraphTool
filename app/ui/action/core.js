@@ -31,7 +31,7 @@
 	});
 
 	function _error(err) {
-		console.log(err);
+		// console.log(err);
 		var info = err.msg || err.message || err;
 		logger.error(info);
 	}

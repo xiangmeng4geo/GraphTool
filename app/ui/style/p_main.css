@@ -53,7 +53,7 @@
 	position: absolute;
 	top: 0;
 	left: 300px;
-	overflow: auto;
+	overflow: hidden;
 	background-color: #242424;
 	width: auto;
 	height: 100%;
@@ -769,3 +769,83 @@ resize-horizontal{
 	border-top: 1px solid #1f1f1f;
 	border-bottom: 1px solid #4b4b4b;
 }
+
+/*gallery {*/
+.gallery{
+	position: absolute;
+	z-index: 102;
+	top: 10px;
+	bottom: 10px;
+	right: -100%;
+	width: 350px;
+	height: auto;
+	border: 1px solid #515151;
+	box-shadow: 0 0 10px #1c1c1c;
+	border-radius: 5px;
+	background-color: #303030;
+	transition: right 0.8s;
+}
+.gallery.show{
+	right: 10px;
+}
+.gallery .title{
+	border-bottom: 1px solid #404040;
+	padding: 3px 0;
+	color: white;
+	background: linear-gradient(to bottom, #454849 0%,#0b0c0c 100%);
+	position: relative;
+	text-indent: 20px;
+}
+.gallery .title:after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 60%;
+    top: 20%;
+    left: 0;
+    background-color: #26c9ff;
+}
+.gallery .btn_retract{
+	position: absolute;
+	width: 13px;
+	height: 11px;
+	background: url(../img/icon_retract.png) center center;
+	right: 10px;
+	top: 50%;
+	margin-top: -6px;
+	cursor: pointer;
+}
+.gallery_items{
+	position: absolute;
+	top: 80px;
+	bottom: 0;
+	height: auto;
+	width: 100%;
+	overflow: auto;
+	border-top: 1px solid #0e0e0e;
+}
+.gallery_items li{
+	float: left;
+	width: 33.33%;
+	text-align: center;
+	margin: 5px 0;
+}
+.gallery_items center{
+	color: white;
+	font-size: 16px;
+	line-height: 40px;
+}
+.gallery_items li img{
+	width: 80px;
+	height: 80px;
+}
+.s_gallery{
+	width: 85%;
+	margin: 10px auto;
+	display: block;
+}
+.s_gallery .placeholder{
+	display: inline-block;
+	width: 20px;
+}
+/*gallery }*/

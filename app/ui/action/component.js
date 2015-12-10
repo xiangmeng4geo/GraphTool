@@ -93,20 +93,28 @@
 		var $select_show_text = $this.parent().prev('span');
 
 		var val_new = $this.data('val');
-		$select_show_text.data('val', val_new).html($this.html());
-		$this.parent().hide().parent().trigger('change', val_new);
+		var $container = $this.parent().hide().parent();
+		var getShowVal = $container.data('getShowVal') || function($item) {
+			return $item.html();
+		};
+		$select_show_text.data('val', val_new).html(getShowVal($this));
+		$container.trigger('change', val_new);
 	})
 	function select($container, options) {
 		options = _extend({
 			val: null,
 			data: null,
-			onchange: null
+			onchange: null,
+			getShowVal: function($item) {
+				return $item.html();
+			}
 		}, options);
 
 		var data = options.data || [];
 		var val_selected = options.val;
 		if (!$container.data('inited') || data.length > 0) {
 			var onchange = options.onchange || function(){};
+			$container.data('getShowVal', options.getShowVal);
 
 			var html = '<ul>';
 			for (var i = 0, j = data.length; i<j; i++) {
@@ -126,7 +134,7 @@
 			if ($val.length == 0) {
 				$val = $html.find('li:first');
 			}
-			var tmpl = '<span>'+$val.html()+'</span>';
+			var tmpl = '<span class="ui-select-val">'+$val.html()+'</span>';
 			$container.html(tmpl+html).on('change', onchange);
 			$container.data('inited', true);
 		}

@@ -156,9 +156,11 @@
                     ctx_fill.restore();
                 }
             }
-        } else if ('polyline' === type || 'polygon' === type) {
-            var start = _getPathStart(ctx_stroke, style);
-            var end = _getPathEnd(ctx_stroke, style);
+        } else if ('polyline' === type) {
+            var style_stroke = $.extend({}, style);
+            delete style_stroke['fillStyle'];
+            var start = _getPathStart(ctx_stroke, style_stroke);
+            var end = _getPathEnd(ctx_stroke, style_stroke);
             for (var i = 0, j = arcs.size(); i<j; i++){
                 start();
                 _drawPath(ctx_stroke, arcs.getArcIter(i));

@@ -20,6 +20,7 @@
 	var path_config = format(path.join(path_base, 'config'));
 	var path_cache = format(path.join(path_base, 'cache'));
 	var path_output = format(path.join(path_base, 'output'));
+	var path_gallery = format(path.join(path_base, 'image'));
 
 	var path_img_ball = format(path.join(path_ui, 'img/ball.png'));
 
@@ -47,7 +48,8 @@
 			WORKBENCH: path_workbench,
 			COMMON: path_common,
 			CACHE: path_cache,
-			OUTPUT: path_output
+			OUTPUT: path_output,
+			GALLERY: path_gallery
 		},
 		LOG: {
 			PATH: format(path.join(path_base, 'logs')),
@@ -80,6 +82,10 @@
 				{
 					id: 'img',
 					title: '添加图片'
+				},
+				{
+					id: 'gallery',
+					title: '打开图片库'
 				},
 				// {
 				// 	id: 'polygon',

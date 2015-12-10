@@ -4,6 +4,7 @@ node_modules/
 app/logs/
 app/cache/*
 app/output/*
+app/image/*
 shell/build/target/*
 shell/build/x64/*
 shell/build/ia32/*

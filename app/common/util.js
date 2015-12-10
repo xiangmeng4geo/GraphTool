@@ -91,6 +91,33 @@
 		img_data = new Buffer(img_data, 'base64');
 		write(save_file_name, img_data);
 	}
+	// 遍历目录
+	function readdir(dir, attr) {
+		attr || (attr = {});
+		var is_not_recursive = attr.is_not_recursive;
+		if(fs.existsSync(dir)) {
+			var stat = fs.statSync(dir);
+			if(stat.isDirectory()) {
+				var return_val = [];
+				var files = fs.readdirSync(dir);
+				var is_mtime = attr.mtime;
+				files.sort().forEach(function(file) {
+					var fullName = path.join(dir, file);
+					var stat_file = fs.statSync(fullName);
+					var isDir = stat_file.isDirectory();
+					var obj = {name: fullName};
+					if(is_mtime){
+						obj.mtime = stat_file.mtime;
+					}
+					if (isDir) {
+						obj.sub = is_not_recursive? []: readdir(fullName);
+					}
+					return_val.push(obj);
+				});
+				return return_val;
+			}
+		}
+	}
 	var file = {
 		read: read,
 		readJson: readJson,
@@ -101,7 +128,8 @@
 		mkdir: mkdirSync,
 		Image: {
 			save: saveBase64
-		}
+		},
+		readdir: readdir
 	}
 
 	/**
@@ -174,7 +202,7 @@
 		var arr = [];
 		var x_num = Math.ceil((lng1 - lng0)/GRID_SPACE),
 			y_num = Math.ceil((lat1 - lat0)/GRID_SPACE);
-	
+
 		for(var i = 0; i < x_num; i++){
 			var x = lng0 + GRID_SPACE * i;
 			var val = [];

@@ -424,7 +424,7 @@ tr:nth-child(2n+1) td{
 	vertical-align: middle;
 	padding-right: 16px;
 }
-.ui-select span{
+.ui-select .ui-select-val{
 	display: inline-block;
 	width: 100%;
 	height: 100%;
@@ -433,7 +433,7 @@ tr:nth-child(2n+1) td{
 .ui-select.disable{
     color: #ccc;
 }
-.ui-select span:after{
+.ui-select .ui-select-val:after{
 	content: "";
 	position: absolute;
 	margin: auto;
