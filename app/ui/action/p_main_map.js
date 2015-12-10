@@ -53,18 +53,11 @@ Core.init(function(model) {
             .translate(projection.translate())
             .scale(projection.scale())
             // .scaleExtent([projection.scale() /4 , projection.scale()*8])
-            .on('zoomstart', function() {
-                var e = d3.event;
-                console.log(e);
-                e.sourceEvent.preventDefault();
-            })
             .on('zoom', function() {
-                // if (map_click_type == 'move') {
-                    var e = d3.event;
-                    projection.scale(e.scale);
-                    projection.translate(e.translate);
-                    model.emit('refresh');
-                // }
+                var e = d3.event;
+                projection.scale(e.scale);
+                projection.translate(e.translate);
+                model.emit('refresh');
             });
         var drag = d3.behavior.drag().on('dragstart', function() {
             $geomap.addClass('dragging');
@@ -89,7 +82,10 @@ Core.init(function(model) {
             if (map_click_type != 'move') {
                 d3.event.stopImmediatePropagation();
             }
-        }).on('mousedown', function() {
+        }).on('mousedown', function(e) {
+            // 触发依赖于mousedown的事件
+            $geomap.trigger('_mousedown', e);
+            // 阻止zoom里的拖动事件
             if (map_click_type != 'move') {
                 d3.event.stopImmediatePropagation();
             }

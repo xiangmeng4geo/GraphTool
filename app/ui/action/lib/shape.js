@@ -1,5 +1,6 @@
 !function() {
-    var fs = require('fs');
+    var electron = require('electron');
+    var nativeImage = electron.nativeImage;
 
     var TEXT_TEST = '国';
     var $ = Core.$;
@@ -118,9 +119,9 @@
 
         font = font.join(' ');
 
-        // [start|end|center|left|right]
+        // [center|left|right]
         var text_align = _style['text-align'] || _style['textAlign'] || 'left';
-        // [top|bottom|middle|alphabetic|hanging]
+        // [top|bottom|middle]
         var text_baseline = _style['text-baseline'] || _style['textBaseline'] || 'top';
 
         var text_color = _style['color'] || '#000000';
@@ -132,7 +133,6 @@
             normal: undefined === _normal? true: !!_normal
         };
 
-
         var lineheight = _getTextHeight(TEXT_TEST, font);
 
         text = (''+text).split('\n');
@@ -143,6 +143,22 @@
             x_offset = _style['offset-x'] || _style['offsetX'] || 0,
             y_offset = _style['offset-y'] || _style['offsetY'] || 0;
 
+        var width = _style.width,
+            height = _style.height;
+        if (width > 0) {
+            if (text_align == 'center') {
+                x += width/2;
+            } else if (text_align == 'right') {
+                x += width;
+            }
+        }
+        if (height > 0) {
+            if (text_baseline == 'middle') {
+                y += height/2;
+            } else if (text_baseline == 'bottom') {
+                y += height;
+            }
+        }
         var img_style;
         var flag = style.flag;
         if (flag) {
@@ -191,10 +207,8 @@
                 var data = src;
                 if (src.indexOf('data:image') !== 0) {
                     // 同步处理image
-                    var img_buf = fs.readFileSync(src);
-                    var prefix = "data:" + 'image/png' + ";base64,";
-                    var base64 = new Buffer(img_buf, 'binary').toString('base64');
-                    data = prefix + base64;
+                    var image = nativeImage.createFromPath(src);
+                    data = image.toDataURL();
                 }
                 img = new Image();
                 img.src = data;

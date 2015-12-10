@@ -81,7 +81,7 @@ Core.init(function(model) {
         $('.map_layer').addClass('off').trigger('edit', false);
     }
 
-    var $geomap_container = $('#geomap_container').on('mousedown', _unedit);
+    var $geomap_container = $('#geomap_container').on('_mousedown', _unedit);
 
     // 添加删除功能
     $(document).on('keydown', function(e) {
@@ -384,7 +384,9 @@ Core.init(function(model) {
                     var $item = $this.find('.btn_handle');
                     shapes.push(new Shape.Text($item.text(), $.extend(_styleToObj($item.attr('style')), {
                         x: pos.left,
-                        y: pos.top
+                        y: pos.top,
+                        width: $this.width(),
+                        height: $this.height()
                     })));
                 } else if($this.is('.layer_img')) {
                     shapes.push(new Shape.Image($this.find('._img').attr('src'), {

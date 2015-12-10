@@ -1484,7 +1484,7 @@
 			touchtime, event = d3_eventDispatch(zoom, "zoomstart", "zoom", "zoomend"),
 			x0, x1, y0, y1;
 
-		function zoom(g) {console.log(g, d3_behavior_zoomWheel);
+		function zoom(g) {
 			g.on(mousedown, mousedowned).on(d3_behavior_zoomWheel + ".zoom", mousewheeled).on("dblclick.zoom",
 				dblclicked).on(touchstart, touchstarted);
 		}
@@ -1767,7 +1767,7 @@
 			zoomed(dispatch);
 		}
 
-		function dblclicked() {console.log(d3.event);
+		function dblclicked() {
 			var dispatch = event.of(this, arguments),
 				p = d3.mouse(this),
 				l = location(p),
