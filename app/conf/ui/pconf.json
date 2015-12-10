@@ -1,6 +1,8 @@
 {
 	"width": 800,
 	"height": 600,
+	"minWidth": 590,
+	"minHeight": 400,
 	"frame": false,
 	"transparent": true
 }

@@ -1,14 +1,28 @@
 #shanxi_txt_command{
-	width: 500px;
+	width: calc(100% - 100px);
 	height: 200px;
 	line-height: 20px;
 }
 tab-content{
-	bottom: 50px;
+	bottom: 60px;
+	overflow: auto;
 }
 .btns_bottom{
 	position: absolute;
 	left: 0;
-	bottom: 0;
-	height: 50px;
+	bottom: 10px;
+	height: 40px;
+	width: 100%;
+    text-align: center;
+}
+tab-content>item{
+	padding: 10px;
+	height: auto;
+}
+.row{
+	margin: 10px 0;
+	position: relative;
+}
+label{
+	vertical-align: top;
 }
