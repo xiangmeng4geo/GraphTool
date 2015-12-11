@@ -87,7 +87,7 @@ tab-content item resize-horizontal{
 	right: 0px;
 	top: -26px;
 }
-.map_item .file{
+.map_item .ui-file{
 	width: calc(100% - 40px);
 }
 .map_item [type=range]{

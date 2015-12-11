@@ -18,6 +18,12 @@ tab-content{
 tab-content>item{
 	padding: 10px;
 	height: auto;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: auto;
+	left: 0;
+	right: 0;
 }
 .row{
 	margin: 10px 0;

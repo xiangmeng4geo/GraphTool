@@ -1,0 +1,25 @@
+body{}
+.logo{
+	height: 70px;
+}
+#version,#listence{
+	text-align: center;
+}
+h2{
+	text-align: center;
+	margin-top: 30px;
+}
+p{
+	text-indent: 30px;
+}
+.frameless .content_wrap{
+	left: 0;
+	right: 0;
+	width: auto;
+	padding: 10px;
+}
+.logo{
+	width: 320px;
+	margin: 0 auto;
+    background: url(../img/login_logo.png) left center no-repeat;
+}

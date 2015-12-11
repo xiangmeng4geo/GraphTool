@@ -40,20 +40,57 @@ Core.init(function(){
 	var is_autologin = Store.get('user_is_autologin', false);
 	$cb_autologin.prop('checked', is_autologin);
 
+	function _showLoading(cb) {
+		var $main = $('.main');
+		var width = $main.width(),
+			height = $main.height();
+		var $canvas = $('<canvas>').css({
+			position: 'absolute',
+			left: 0,
+			top: 0,
+			'z-index': 102,
+			'background-color': 'rgba(0, 0, 0, 0.8)',
+			'border-radius': 10
+		}).attr({
+			width: width,
+			height: height
+		}).appendTo('.main');
+
+		var lightLoader = _require('p_login_loading');
+		var cl = new lightLoader($canvas.get(0), width, height);
+		cl.updateLoader = function() {
+			this.loaded += 0.6;
+			if (this.loaded >= 100) {
+				cb();
+				cl.stop();
+			}
+		}
+		cl.init();
+	}
 	var verification = util_verification.get();
 	function afterLogin(login_flag, true_fn, false_fn){
 		if(login_flag){
-			var $initializing = $('.initializing').show();
+			// var $initializing = $('.initializing').show();
+
 			var start_time = new Date();
 			var min_init_time = 2000;
-			(true_fn || function(){})();
-
-			C.on('main.loaded', function(){
-				setTimeout(function(){
+			var num_loaded = 2;
+			function cb() {
+				if (--num_loaded <= 0) {
 					C.emit('login.closed');
 					close();
-				}, min_init_time);
-			});
+				}
+			}
+			_showLoading(cb);
+			(true_fn || function(){})();
+			C.on('main.loaded', cb);
+			// C.on('main.loaded', function(){
+			// 	min_init_time = Math.max(new Date() - start_time, min_init_time);
+			// 	setTimeout(function(){
+			// 		console.log(12);
+			//
+			// 	}, min_init_time);
+			// });
 			C.Win.open('main');
 		}else{
 			(false_fn || function(){
@@ -107,6 +144,23 @@ Core.init(function(){
 		});
 	});
 
-	// Core.WIN.openDevTools();
 
 });
+
+
+
+/*========================================================*/
+/* Define Canvas and Initialize
+/*========================================================*/
+// if(isCanvasSupported){
+  // var c = document.createElement('canvas');
+  // c.width = 400;
+  // c.height = 100;
+  // var cw = c.width;
+  // var ch = c.height;
+  // document.getElementsByClassName('main')[0].appendChild(c);
+  // var cl = new lightLoader(c, cw, ch);
+  //
+  // // setupRAF();
+  // cl.init();
+// }

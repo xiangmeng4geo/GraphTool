@@ -1,5 +1,5 @@
 /* global Core */
-/* global _PARAM_ */
+/* global product_name */
 Core.init(function(model) {
 	var C = Core;
 	var $ = C.$;
@@ -33,7 +33,9 @@ Core.init(function(model) {
 			val: v.name
 		});
 	});
-	var conf_product = product_conf.read(_PARAM_) || {};
+	var product_name = _PARAM_;
+	$('.title_wrap span').text('【'+product_name+'】配置');
+	var conf_product = product_conf.read(product_name) || {};
 	var conf_data = conf_product.data || {};
 	var conf_other = conf_product.other || {};
 
@@ -87,7 +89,7 @@ Core.init(function(model) {
 				return _alert('请输入命令！');
 			}
 
-			command = command.replace(/_PRODUCT_/g, _PARAM_);
+			command = command.replace(/_PRODUCT_/g, product_name);
 			_conf_data.val = {
 				command: command
 			}
@@ -98,9 +100,9 @@ Core.init(function(model) {
 			map: s_map.val(),
 			legend: s_legend.val()
 		};
-		product_conf.save(_PARAM_, conf);
+		product_conf.save(product_name, conf);
 
-		model.emit('log', 'change "'+_PARAM_+'"');
+		model.emit('log', 'change "'+product_name+'"');
 		C.emit('conf.change');
 		_alert('保存成功!');
 		window.close();

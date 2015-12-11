@@ -5,6 +5,7 @@ Core.init(function() {
 	var C = Core;
 	C.on('login.closed', function() {
 		C.emit('ready');
+		C.Win.WIN.maximize();
 	});
 }, function(model) {
 	'use strict'
@@ -59,8 +60,21 @@ Core.init(function() {
 			});
 		});
 	}
-	$('#btn_quite, .btn_close_main').click(function() {
+	$('#btn_quite').click(function() {
+		Win.open('login');
+		$btn_close_main.click();
+	});
+	var $btn_close_main = $('.btn_close_main').click(function() {
 		window.close();
+	});
+	var win_about;
+	$('#btn_about').click(function() {
+		try {
+			win_about.isFocused();
+			win_about.focus();
+		} catch (e) {
+			win_about = Win.openSub('about');
+		}
 	});
 	var win_setting;
 	$('#btn_setting_sys').click(function() {

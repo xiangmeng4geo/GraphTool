@@ -2,6 +2,7 @@
 	"width": 880,
 	"minWidth": 880,
 	"height": 600,
+	"minHeight": 600,
 	"frame": false,
 	"transparent": true
 }

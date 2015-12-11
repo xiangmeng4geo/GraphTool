@@ -4,6 +4,9 @@
 	overflow: hidden;
 	position: relative;
 }
+.frameless.shadow .main{
+	border: none;
+}
 
 .top{
 	height: 62px;
