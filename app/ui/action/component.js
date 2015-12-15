@@ -40,9 +40,10 @@
 	$doc.delegate('.btn_file_browse', 'click', function() {
 		var $this = $(this);
 		var type = $this.data('type');
-		Dialog.open({
+		var opt = $.extend(true, {
 			filters: types[type] || []
-		}, function(file_path) {
+		}, $this.data('dialog'));
+		Dialog.open(opt, function(file_path) {
 			if (file_path) {
 				$this.prev('.txt_file').val(file_path);
 				$this.parent().trigger('change', file_path);
@@ -53,27 +54,38 @@
 	 * 初始化一个file
 	 */
 	function file($container, options){
-		options = _extend({
+		options = _extend(true, {
 			width_btn: 40,
 			width_minus: 0,
 			type: 'geo',
 			val: '',
-			placeholder: ''
+			placeholder: '',
+			onchange: null,
+			dialogOpt: {}
 		}, options);
 
 		var width_btn = options.width_btn;
 		var width_minus = options.width_minus;
 
 		if (!$container.data('inited')) {
+			var onchange = options.onchange;
 			var tmpl_file = '<input type="text" value="'+options.val+'" placeholder="'+options.placeholder+'" class="txt_file" style="width: calc(100% - '+(width_btn + width_minus)+'px);"/>'+
-						'<span data-type="'+options.type+'" class="btn_file_browse" value="浏览" style="width:'+width_btn+'px;"/>';
+						'<span data-type="'+options.type+'" data-dialog=\''+JSON.stringify(options.dialogOpt)+'\' class="btn_file_browse" value="浏览" style="width:'+width_btn+'px;"/>';
 			$container.html(tmpl_file);
+			if (onchange) {
+				$container.on('change', onchange);
+			}
 			$container.data('inited', true);
 		}
 		var $txt_file = $container.find('.txt_file');
 
-		return function() {
-			return $txt_file.val();
+		return {
+			val: function() {
+				return $txt_file.val();
+			},
+			setVal: function(val) {
+				$txt_file.val(val);
+			}
 		}
 	}
 
@@ -97,7 +109,7 @@
 		var getShowVal = $container.data('getShowVal') || function($item) {
 			return $item.html();
 		};
-		$select_show_text.data('val', val_new).html(getShowVal($this));
+		$select_show_text.data('val', val_new).html(getShowVal($this));console.log('change');
 		$container.trigger('change', val_new);
 	})
 	function select($container, options) {
@@ -119,9 +131,14 @@
 			var html = '<ul>';
 			for (var i = 0, j = data.length; i<j; i++) {
 				var item = data[i];
-				var text = item.text;
-				var val = item.val;
-				var type = item.type;
+				var text, val, type;
+				if ($.isPlainObject(item)) {
+					text = item.text;
+					val = item.val;
+					type = item.type;
+				} else {
+					text = val = item;
+				}
 				var classStr = '';
 				if (val_selected === val) {
 					classStr = ' class="selected"';
@@ -134,7 +151,7 @@
 			if ($val.length == 0) {
 				$val = $html.find('li:first');
 			}
-			var tmpl = '<span class="ui-select-val">'+$val.html()+'</span>';
+			var tmpl = '<span class="ui-select-val" title="'+$val.text()+'">'+$val.html()+'</span>';
 			$container.html(tmpl+html).on('change', onchange);
 			$container.data('inited', true);
 		}

@@ -37,6 +37,7 @@ input[type=date],
 input[type=time],
 input[type=number],
 input[type=password],
+input[type=date],
 textarea,
 .ui-select,
 .ui-file{
@@ -106,7 +107,8 @@ button:hover{
     background-image: linear-gradient(to bottom, #2e2e2e 0%, #363636 100%);
 }
 input[disabled]{
-	background-color: #e5eef3;
+    background-color: #444444;
+	color: #99999;
 }
 /*input[type=button].big,
 button.big{
@@ -392,7 +394,7 @@ tr:nth-child(2n+1) td{
 .ui-file{
 	display: inline-block;
 	width: 200px;
-	height: 28px;
+	height: 26px;
     padding: 0;
     position: relative;
     vertical-align: middle;
@@ -429,6 +431,9 @@ tr:nth-child(2n+1) td{
 	width: 100%;
 	height: 100%;
 	cursor: default;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .ui-select.disable{
     color: #ccc;

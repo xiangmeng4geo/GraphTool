@@ -1,0 +1,1 @@
+{"data":{"type":"micaps","val":{"file":{"is_newest":false,"val":{"start":"2015-10-13","end":"2015-11-15"}},"dir_in":"C:\\Windows\\System32\\drivers","file_rule":{"is_common":false,"val":"test"},"file_type":2,"file_hour":6,"col":8,"arithmetic":{"type":"*","val":10}}},"other":{"map":"","legend":"降水配色"}}

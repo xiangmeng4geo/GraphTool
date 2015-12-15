@@ -1,5 +1,8 @@
+.ds_ib{
+	display: inline-block;
+}
 #shanxi_txt_command{
-	width: calc(100% - 100px);
+	width: calc(100% - 110px);
 	height: 200px;
 	line-height: 20px;
 }
@@ -31,4 +34,48 @@ tab-content>item{
 }
 label{
 	vertical-align: top;
+}
+.file_rule_prefix{
+	width: 100px;
+	display: inline-block;
+}
+#file_dir_in{
+	width: 568px;
+}
+#text_file_rule_custom{
+	width: 537px;
+}
+#select_file_rule_common_date{
+	width: 150px;
+}
+#select_value_col{
+	width: 360px;
+}
+#select_value_arithmetic{
+	width: 70px;
+}
+#s_data_type{
+	width: 88px;
+}
+#text_file_rule_common_prefix,
+#text_file_rule_common_postfix{
+	width: 129px;
+}
+#file_rule_example{
+	margin-left: 5px;
+	color: #bbb;
+	margin-bottom: 10px;
+	font-size: 12px;
+	display: inline-block;
+}
+#file_rule_example span{
+	text-decoration: underline;
+}
+#is_newest_yes,
+#is_newest_no{
+	margin-left: 10px;
+	color: #eeeeee;
+}
+#cb_is_newest + label{
+	padding-left: 20px;
 }
