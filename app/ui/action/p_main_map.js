@@ -100,6 +100,10 @@ Core.init(function(model) {
     model.on('map.afterRender', function(err, time_used) {
         model.emit('log', 'afterRender takes '+time_used+' ms!');
     });
+    // 这里的事件会晚于'map.changeconfig', 暂时去掉
+    // model.on('product.change', function(productName){
+    //     geomap && geomap.clear();
+    // });
     model.on('map.changeconfig', function(file_path) {
         geomap && geomap.clear();
     });
@@ -115,9 +119,6 @@ Core.init(function(model) {
             projection.translate(translate).scale(scale);
             model.emit('refresh');
         }
-    });
-    model.on('product.change', function(productName){
-        geomap && geomap.clear();
     });
     model.on('projection.changeview', function(a, b) {
         var key = _getKeyOfProjection(a, b);

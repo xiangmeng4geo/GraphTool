@@ -1,9 +1,10 @@
 !function() {
+    var C = Core;
+    var $ = C.$;
     var electron = require('electron');
     var nativeImage = electron.nativeImage;
 
     var TEXT_TEST = '国';
-    var $ = Core.$;
 
     function _getPixelRatio() {
         var deviceRatio = window.devicePixelRatio || window.webkitDevicePixelRatio || 1;
@@ -48,6 +49,7 @@
         _this.style = style;
         _this.draw = function(ctx, projection) {
             _drawPath(ctx, points, projection, true);
+            ctx.fill();
         }
     }
     function Polyline(points, style) {

@@ -530,9 +530,8 @@
 						return _get(val, v.colors, is_return_index);
 					}
 				}
-			} else {
-				return _get(val, blendent[0].colors, is_return_index);
 			}
+			return _get(val, blendent[0].colors, is_return_index);
 		}
 	}
 

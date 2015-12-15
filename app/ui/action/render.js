@@ -1,5 +1,8 @@
 !function() {
-    var Shape = Core.require('shape');
+    var _require = Core.require;
+    var util = _require('util');
+    var Shape = _require('shape');
+    var Pattern = _require('pattern');
     var _model;
     // 处理conrec后的数据
     function _conrec(data) {
@@ -59,10 +62,102 @@
             }
         }
     }
+    // 渲染micaps数据
+    function _micaps(data, blendentJson) {
+        var _getColor = util.color(blendentJson, true);
+        var shapes = [];
+        // 14类中的面
+		var areas = data.areas;
+        if (areas) {
+            var len = areas.length;
+			if (len > 0) {
+                /*判断是不是大风降温数据 {*/
+				var is_bigwind = false;
+				for (var i = 0; i<len; i++) {
+					var text = areas[i].symbols.text;
+					if (/^040$/.test(text.trim())){
+						is_bigwind = true;
+						break;
+					}
+				}
+				/*判断是不是大风降温数据 }*/
+                for (var i = 0; i<len; i++){
+                    var v = areas[i];
+                    var symbols = v.symbols;
+					var val_area = symbols? symbols.text : '';
+                    var code = v.code;
+                    var color = _getColor(val_area, code);
+                    if(code == 24){
+						// strokeColor = 'red';
+						color = Pattern.Streak({
+							strokeStyle: color,
+							space: 1
+						});
+					}
+                    // 处理雨夹雪颜色
+                    v.items.isObj = true;
+                    shapes.push(new Shape.Polygon(v.items, {
+                        fillStyle: color
+                    }));
+                }
+            }
+        }
+        // 14类中的特殊线，如冷锋、暖锋
+		var line_symbols = data.line_symbols;
+		if (line_symbols) {
+            var color_symbols = {
+				2: 'blue',
+				3: 'red',
+				38: 'red'
+			};
+            for (var i = 0, j = line_symbols.length; i<j; i++){
+                var v = line_symbols[i];
+				if(v.code == 0){
+					return;
+				}
+                // 霜冻线在地图内，其它都可在地图区域外
+				if(v.code == 38){
+					// delete option.zlevel;
+					// option_special.width = 8;
+				}
+                v.items.isObj = true;
+                shapes.push(new Shape.Polyline(v.items, {
+                    strokeStyle: color_symbols[v.code],
+                    lineWidth: 2
+                }));
+			}
+        }
+        // 14类中的普通线
+		var lines = data.lines;
+		if(lines){
+            for (var i = 0,j = lines.length; i<j; i++) {
+                var v = lines[i];
+				var point_arr = [];
+				var points = line.point;
+				if (points.length >= 2) {
+                    points.isObj = true;
+                    shapes.push(new Shape.Polyline(points, {
+                        strokeStyle: '#1010FF',
+                        lineWidth: 2
+                    }));
+				}
+				var flags = line.flags;
+				if(flags && flags.items && flags.items.length > 0){
+					var text = flags.text;
+                    shapes.push(new Shape.Text(text, 'left:'+v.x+'px;top:'+v.y+'px;font-size: 12px'));
+				}
+			}
+		}
+        if (shapes && shapes.length > 0) {
+            _model.emit('render', shapes);
+        }
+        // var symbols = data.symbols;
+    }
     module.exports = {
         setModel: _setModel,
         conrec: _conrec,
         text: _text,
-        img: _img
+        img: _img,
+        micaps: _micaps
     };
 }()
