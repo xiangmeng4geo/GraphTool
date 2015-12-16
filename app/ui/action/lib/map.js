@@ -265,7 +265,12 @@
         if (!_isArray(geo_files)) {
             geo_files = [geo_files];
         }
-        geo_files = geo_files.slice(0);
+        geo_files = geo_files.slice(0).filter(function(v) {
+            if (v.is_use) {
+                return v;
+            }
+        });
+
 
         // 先保存数据，再同步画数据
         function _importNext() {

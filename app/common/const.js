@@ -2,12 +2,12 @@
 /**
  * 定义常量
  */
-!function(){
+! function() {
 	'use strict'
 
 	var path = require('path');
 
-	function format(url){
+	function format(url) {
 		var arr = url.replace(/\\/g, '/').split(':');
 		return [arr[0].toUpperCase(), arr[1]].join(':');
 	}
@@ -53,51 +53,47 @@
 		},
 		LOG: {
 			PATH: format(path.join(path_base, 'logs')),
-			DELAY: 10, 	// 异步写日志间隔(s)
-			DAYS: 3		// 日志保留天数
+			DELAY: 10, // 异步写日志间隔(s)
+			DAYS: 3 // 日志保留天数
 		},
 		TOOLBAR: (function() {
-			var arr = [[
-				{
+			var arr = [
+				[{
 					id: 'move',
 					title: '移动'
-				},
-				{
+				}, {
 					id: 'zoomin',
 					title: '放大'
-				},
-				{
+				}, {
 					id: 'zoomout',
 					title: '缩小'
-				},
-				{
+				}, {
 					id: 'reset',
 					title: '还原地图状态'
-				}
-			], [
-				{
-					id: 'text',
-					title: '添加文字'
-				},
-				{
-					id: 'img',
-					title: '添加图片'
-				},
-				{
-					id: 'gallery',
-					title: '打开图片库'
-				},
-				// {
-				// 	id: 'polygon',
-				// 	title: '添加多边形'
-				// }
-			], [{
-				id: 'save',
-				title: '保存图片'
-			}]];
+				}],
+				[{
+						id: 'text',
+						title: '添加文字'
+					}, {
+						id: 'img',
+						title: '添加图片'
+					}, {
+						id: 'gallery',
+						title: '打开图片库'
+					},
+					// {
+					// 	id: 'polygon',
+					// 	title: '添加多边形'
+					// }
+				],
+				[{
+					id: 'save',
+					title: '保存图片'
+				}]
+			];
 			arr.forEach(function(v) {
 				v.forEach(function(item) {
-					item.icon = path.join(path_ui, 'img/toolbar', item.id+'.png')
+					item.icon = path.join(path_ui, 'img/toolbar', item.id + '.png')
 				})
 			});
 			return arr;
@@ -105,9 +101,9 @@
 	};
 
 	var conf_const;
-	try{
+	try {
 		conf_const = require('../conf/const');
-	} catch(e) {}
+	} catch (e) {}
 
 	for (var i in conf_const) {
 		conf[i] = conf_const[i];
