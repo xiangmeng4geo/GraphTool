@@ -5,6 +5,7 @@
 		path = require('path'),
 		crypto = require('crypto');
 
+	require('./prop');
 	var file_verification = 'verification';
 	var CONST = require('./const');
 	var CONST_PATH_CONF = CONST.PATH.CONF;
@@ -232,7 +233,7 @@
 	 * })(param, cb)
 	 */
 	var Async = {};
-	var Thread = process.type? require('./libs/threads.node'): require('webworker-threads');
+	var Thread = process.type? require('./libs/threads.node'): require('webworker-thread-release');
 
 	Async.init = function init(path_js, cb_info){
 		var t = Thread.create();
@@ -535,6 +536,54 @@
 		}
 	}
 
+	/**
+	替换字符串中的变量
+	var data = {
+		t: new Date(),
+		t1: new Date('2014/12/15 12:00'),
+		t2: new Date('2015/10/11 03:00'),
+		w: 100,
+		h: 200
+	}
+	{{T}} {{T0}} {{}} data.t
+	{{T1}} data.t1
+	{{T2}} data.t2
+	{{W}} data.w
+	{{H}} data.h
+
+	_variate(data)('{{}}');
+	*/
+	var _variate = function(data) {
+		var reg = /{{(T2|T1||T0|T|W|H)?([^{}]*)}}/gi;
+		data = data || {};
+		var data_new = {};
+		if (data) {
+			for (var i in data) {
+				var key = i.toLowerCase();
+				data_new[key] = data[i];
+			}
+		}
+		return function(str) {
+			return str.replace(reg, function(m0, m1, m2, m3) {
+				if (m1) {
+					m1 = m1.toLowerCase();
+				}
+				var val = data_new[m1];
+				if (val == undefined) {
+					 val = data_new['t'] || new Date();
+				}
+				if (val) {
+					if (val instanceof Date) {
+						return (val).format(m2)
+					} else {
+						return val+m2;
+					}
+				} else {
+					return m0;
+				}
+			});
+		}
+	};
 	/*对外提供API*/
 	Util.verification = verification;
 	Util.file = file;
@@ -552,6 +601,7 @@
 	Util.extend = _extend;
 
 	Util.color = color;
+	Util.variate = _variate;
 
 	module.exports = Util;
 }();

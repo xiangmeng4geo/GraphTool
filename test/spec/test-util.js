@@ -243,4 +243,23 @@ describe('Util', function() {
 			extend({age: 10}, {name: 'test'}, {man: [1, 2, 3]}).should.deep.equal({age: 10, name: 'test', man: [1, 2, 3]});
 		})
 	});
+	describe('variate', function() {
+		var variate = Util.variate;
+		var data = {
+			t: new Date('2013/09/01 05:03'),
+			t1: new Date('2014/12/15 12:00'),
+			t2: new Date('2015/10/11 03:00'),
+			w: 100,
+			h: 200
+		}
+		it('should get format str', function() {
+			variate()('a').should.equal('a');
+			variate(data)('a').should.equal('a');
+			variate(data)('{{yyyy}}').should.equal('2013');
+			variate(data)('{{T1yyyy}}').should.equal('2014');
+			variate(data)('{{T2yyyy}}').should.equal('2015');
+			variate(data)('{{W}}').should.equal('100');
+			variate(data)('{{H}}').should.equal('200');
+		})
+	});
 });
