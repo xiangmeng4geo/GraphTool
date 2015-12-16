@@ -6,7 +6,7 @@
 <ArchiveFiles>
 <FileData>
 <FldRef>1</FldRef>
-<FullName/>
+<FullName>F:\source\node_projects\GraphTool\shell\build\x64\*.*</FullName>
 <FileName>*.*</FileName>
 <Source>F:\source\node_projects\GraphTool\shell\build\x64</Source>
 <Ext>*</Ext>
@@ -3154,7 +3154,7 @@ g_HandleSystemReboot();
 </SessionVar>
 <SessionVar>
 <Name>%ProductVer%</Name>
-<Value>v1.0.0</Value>
+<Value>v1.0.2</Value>
 <Type>1</Type>
 </SessionVar>
 <SessionVar>
@@ -3179,7 +3179,7 @@ g_HandleSystemReboot();
 </SessionVar>
 <SessionVar>
 <Name>%AppFolder%</Name>
-<Value>%ProgramFilesFolder%\%ProductName_en%</Value>
+<Value>%ProgramFilesFolder%\BPA\%ProductName_en%</Value>
 <Type>2</Type>
 </SessionVar>
 <SessionVar>
@@ -3189,7 +3189,7 @@ g_HandleSystemReboot();
 </SessionVar>
 <SessionVar>
 <Name>%ProductName_en%</Name>
-<Value>BPA</Value>
+<Value>GT</Value>
 <Type>10</Type>
 </SessionVar>
 </SUF7SessionVars>
@@ -3202,8 +3202,8 @@ g_HandleSystemReboot();
 <PostBuildProg/>
 <PostBuildCmdLine/>
 <PostBuildWait>0</PostBuildWait>
-<Filename>BPA-64-1.0.0.exe</Filename>
-<OutputFolder>C:\Users\Administrator\Desktop</OutputFolder>
+<Filename>BPA-64-1.0.2.exe</Filename>
+<OutputFolder>I:\docs\2015\蓝PI相关\制图\安装包</OutputFolder>
 <SegmentSizeMode>0</SegmentSizeMode>
 <CustomSegSize>100</CustomSegSize>
 <CustomSegSizeMode>2</CustomSegSizeMode>

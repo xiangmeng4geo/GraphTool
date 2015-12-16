@@ -3149,7 +3149,7 @@ g_HandleSystemReboot();
 </SessionVar>
 <SessionVar>
 <Name>%ProductVer%</Name>
-<Value>v1.0.0</Value>
+<Value>v1.0.2</Value>
 <Type>1</Type>
 </SessionVar>
 <SessionVar>
