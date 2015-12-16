@@ -4,6 +4,7 @@ Core.init(function(model) {
     var _require = C.require;
     var util = _require('util');
     var util_file = util.file;
+    var util_variate = util.variate;
     var electron = require('electron');
     var nativeImage = electron.nativeImage;
     var shell = electron.shell;
@@ -13,7 +14,10 @@ Core.init(function(model) {
     var component = _require('component');
     var UI = component.UI;
     var style2obj = component.util.style2obj;
-    var CONST_PATH_GALLERY = _require('const').PATH.GALLERY;
+    var CONST_PATH = _require('const').PATH;
+    var CONST_PATH_GALLERY = CONST_PATH.GALLERY;
+    var CONST_PATH_OUTPUT = CONST_PATH.OUTPUT;
+    var product_conf = _require('product_conf');
 
     // 定义图片过滤器
     var CONST_FILTER_IMAGE = [{
@@ -47,6 +51,10 @@ Core.init(function(model) {
         $('.toolbar').append(html);
     }
 
+    var _current_product_name;
+    model.on('product.change', function(name) {
+        _current_product_name = name;
+    });
     // 保存成功后的提示
     model.on('afterExport', function(save_path, time_used) {
         // dialog.alert('保存成功，用时'+time_used+'ms!');
@@ -491,9 +499,37 @@ Core.init(function(model) {
     }
     // 保存
     fn_list.save = function() {
+        var _format = util_variate({
+            p: _current_product_name,
+            t: new Date(),
+            w: $geomap_container.width(),
+            h: $geomap_container.height()
+        });
+        var out_dir;
+        var filename;
+        if (_current_product_name) {
+            var conf = product_conf.read(_current_product_name);
+            if (conf) {
+                var conf_save = conf.save;
+                if (conf_save) {
+                    out_dir = conf_save.dir;
+                    filename = conf.file;
+                    if (!_isImage(filename)) {
+                        filename += '.png';
+                    }
+                }
+            }
+        }
+        if (!out_dir) {
+            out_dir = CONST_PATH_OUTPUT;
+        }
+        if (!filename) {
+            filename = '{{P}}_{{W}}x{{H}}_{{yyyyMMddhhmmss}}.png';
+        }
+        filename = _format(filename);
         dialog.save({
             title: '选择保存路径',
-            defaultPath: new Date().getTime()+'.png',
+            defaultPath: path.join(out_dir, filename),
             filters: CONST_FILTER_IMAGE
         }, function(file_paths) {
             var shapes = [];

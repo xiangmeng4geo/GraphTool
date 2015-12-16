@@ -1,10 +1,12 @@
 .DS_Store
 .vscode/
 node_modules/
+app/config/
 app/logs/
 app/cache/*
 app/output/*
 app/image/*
+shell/testdata/data/
 shell/build/target/*
 shell/build/x64/*
 shell/build/ia32/*

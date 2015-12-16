@@ -75,7 +75,7 @@
 		save: function(options, callback) {
 			return dialog.showSaveDialog(win_instance, options, function(file_path) {
 				if (file_path) {
-					callback && callback();
+					callback && callback(file_path);
 				}
 			});
 		}
