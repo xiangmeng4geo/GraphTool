@@ -1,12 +1,16 @@
 Core.init(function(model) {
     var C = Core;
     var $ = C.$;
+    var WIN = C.Win.Win;
     var _require = C.require;
     var util = _require('util');
     var util_file = util.file;
     var util_variate = util.variate;
     var electron = require('electron');
     var nativeImage = electron.nativeImage;
+    var remote = electron.remote;
+    var Menu = remote.Menu;
+    var MenuItem = remote.MenuItem;
     var shell = electron.shell;
     var dialog = _require('dialog');
     var path = require('path');
@@ -14,19 +18,19 @@ Core.init(function(model) {
     var component = _require('component');
     var UI = component.UI;
     var style2obj = component.util.style2obj;
-    var CONST_PATH = _require('const').PATH;
+    var CONST = _require('const');
+    var CONST_PATH = CONST.PATH;
     var CONST_PATH_GALLERY = CONST_PATH.GALLERY;
     var CONST_PATH_OUTPUT = CONST_PATH.OUTPUT;
     var product_conf = _require('product_conf');
+    var _alert = dialog.alert;
 
     // 定义图片过滤器
-    var CONST_FILTER_IMAGE = [{
-        name: '图片',
-        extensions: ['png', 'jpg']
-    }];
-    function _isImage(file_path) {
-        return /\.(png|jpg)$/i.test(file_path);
-    }
+    var CONST_FILTER_IMAGE = CONST.FILTER_IMAGE;
+    var _isImage = component.util.isImg;
+    // function _isImage(file_path) {
+    //     return /\.(png|jpg)$/i.test(file_path);
+    // }
     // 引入jquery-ui模块
     _require('j.ui');
 
@@ -54,6 +58,7 @@ Core.init(function(model) {
     var _current_product_name;
     model.on('product.change', function(name) {
         _current_product_name = name;
+        $('.map_layer').remove();
     });
     // 保存成功后的提示
     model.on('afterExport', function(save_path, time_used) {
@@ -91,7 +96,93 @@ Core.init(function(model) {
             $('.map_layer:not(.off)').remove();
         }
     });
+    model.on('asset.add', function(assets) {
+        if (!assets) {
+            return;
+        }
+        for (var i = 0, j = assets.length; i<j; i++) {
+            var item = assets[i];
+            if (!item.flag) {
+                continue;
+            }
+            var text = item.text;
+            var style = item.style || '';
+            var styleObj = style2obj(style);
+            var pos = {
+                left: styleObj.left || 0,
+                top: styleObj.top || 0,
+                center: false
+            }
+            var $html = '';
+            if (!!text) {
+                // styleObj.text = text;
+                $html = TextLayer({
+                    text: text,
+                    pos: pos,
+                    css: {
+                        width: styleObj.width,
+                        height: styleObj.height
+                    }, 
+                    style: styleObj
+                });
+            } else {
+                $html = ImageLayer({
+                    src: item.src,
+                    pos: pos,
+                    width: styleObj.width,
+                    height: styleObj.height,
+                    style: styleObj
+                });
+            }
+            if ($html) {
+                $html.data('assets', true);
+            }
+        }
+    });
+    var _showMenuAssets = (function() {
+        var $layer;
+        var menu = new Menu();
+        var menu_add_asset = new MenuItem({label: '添加到附属资源', 'click': function() {
+            if ($layer && _current_product_name) {
+                var data;
+                if ($layer.is('.layer_text')) {
+                    var $item = $layer.find('textarea');
+                    var text = $item.val();
+                    if (!text) {
+                        _alert('请先输入文字!');
+                    } else {
+                        var pos = $layer.position();
+                        data = {
+                            text: text,
+                            style: ($item.attr('style') || '')+'width: '+$layer.width()+'px; height: '+$layer.height()+'px; left: '+pos.left+'px; top: '+pos.top+'px;'
+                        };   
+                    }
+                } else if ($layer.is('.layer_img')) {
+                    var $img = $layer.find('._img');
+                    var src = $img.data('src') || $img.attr('src');
+                    data = {
+                        src: src,
+                        style: $layer.attr('style') || ''
+                    };
+                }
+                if (data) {
+                    data.flag = true;
+                    var conf = product_conf.read(_current_product_name);
+                    $layer.data('asset', true);
+                    (conf.assets || (conf.assets = [])).push(data);
+                    product_conf.save(_current_product_name, conf);
 
+                    _alert('已经保存到“'+_current_product_name+'”的附属资源中！');
+                }
+            }
+            $layer = null;
+        }});
+        menu.append(menu_add_asset);
+        return function($html) {
+            $layer = $html;
+            menu.popup(WIN);
+        }
+    })();
     // 添加编辑模块
     // 创建图层
     function _createLayer(option) {
@@ -132,6 +223,13 @@ Core.init(function(model) {
                 $(this).removeClass('off').trigger('edit', true);
             }).on('contextmenu', function(e) {
                 e.stopPropagation();
+                if (_current_product_name) {
+                    if ($html.data('asset')) {
+                        _alert('已添加，不用重复添加！');
+                    } else {
+                        _showMenuAssets($html);
+                    }
+                }
             });
         $html.appendTo($geomap_container);
         return $html;
@@ -199,16 +297,21 @@ Core.init(function(model) {
 
         var $span = $html.find('.btn_handle');
         var edit = UI.edit($html, {
+            style: option.style || '',
     		onchange: function() {
-                $span.text(edit.getText());
-                var style = style2obj(edit.getStyle());
-                $span.css(style);
-                $html.css(edit.getSize());
+                if (edit) {
+                    $span.text(edit.getText());
+                    var style = style2obj(edit.getStyle());
+                    $span.css(style);
+                    $html.css(edit.getSize());
+                }
     		}
     	});
         edit.setText(text);
         _change();
-        edit.show();
+        if (option.edit) {
+            edit.show();
+        }
         return $html;
     }
 
@@ -231,6 +334,11 @@ Core.init(function(model) {
             left: pos.left,
             top: pos.top
         };
+        var style = option.style;
+        if (style) {
+            css = $.extend(true, style, css);
+        }
+        // console.log(style, css, option);
         if (util_file.exists(src)) {
             var image = nativeImage.createFromPath(src);
             var size = image.getSize();
@@ -284,7 +392,7 @@ Core.init(function(model) {
                 rotate: {}
             });
             $html.addClass('layer_img')
-                .append('<img src="' + image.toDataURL() + '" class="_img"/>')
+                .append('<img src="' + image.toDataURL() + '" data-src="'+src+'" class="_img"/>')
                 .data('size', {
                     w: width_to,
                     h: height_to
@@ -360,9 +468,7 @@ Core.init(function(model) {
 
     // 添加图片
     fn_list.img = function() {
-        dialog.open({
-            filters: CONST_FILTER_IMAGE
-    	}, function(file_paths) {
+        dialog.imageOpen(function(file_paths) {
             if (file_paths && file_paths.length > 0) {
                 file_paths.forEach(function(file_path) {
                     ImageLayer({
@@ -370,7 +476,18 @@ Core.init(function(model) {
                     });
                 });
             }
-        })
+        });
+     //    dialog.open({
+     //        filters: CONST_FILTER_IMAGE
+    	// }, function(file_paths) {
+     //        if (file_paths && file_paths.length > 0) {
+     //            file_paths.forEach(function(file_path) {
+     //                ImageLayer({
+     //                    src: file_path
+     //                });
+     //            });
+     //        }
+     //    })
     }
 
     var $c_right = $('#c_right');

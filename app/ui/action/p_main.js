@@ -103,17 +103,20 @@ Core.init(function() {
 			}
 		});
 	}();
+	['map', 'tree', 'tool'].forEach(function(v) {
+		_require('p_main_' + v);
+	});
 	model.on('product.change', function(productName) {
 		// console.log(arguments);
 		// _alert(productName);
 		var conf = product_conf.read(productName);
 		if (conf) {
-			_require('datareader').setModel(model).parseConf(conf);
+			// 延时执行，防止对其它事件影响
+			setTimeout(function() {
+				_require('datareader').setModel(model).parseConf(conf);
+			}, 0)
 		} else {
 			_alert('请先对产品进行配置!');
 		}
-	});
-	['map', 'tree', 'tool'].forEach(function(v) {
-		_require('p_main_' + v);
 	});
 });

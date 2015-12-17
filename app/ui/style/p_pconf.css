@@ -79,3 +79,66 @@ label{
 #cb_is_newest + label{
 	padding-left: 20px;
 }
+
+.desc{
+	font-size: 12px;
+	color: #eee;
+	line-height: 20px;
+	height: 40px;
+	overflow: hidden;
+	position: relative;
+	padding-bottom: 20px;
+}
+.desc:after{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	content: '点击查看更多>>';
+	background-color: #313131;
+}
+.desc.show{
+	height: auto;
+}
+.desc.show:after{
+	content: '点击收起';
+}
+.asset{
+	margin: 5px 0;
+}
+.editText{
+	width: calc(100% - 20px);
+	position: static;
+}
+.ui-edit-size{
+	overflow: hidden;
+}
+.editText textarea{
+	width: calc(100% - 20px);
+	color: #000000;
+}
+.editText .ui-edit-btn{
+	margin: 0 8px;
+}
+.editText [type=number]{
+	margin-left: 5px;
+	width: calc(100% - 35px);
+}
+.editText .col4:last-child [type=number]{
+    width: calc(100% - 72px);
+}
+.asset_list{
+	margin-top: 30px;
+}
+.asset_list li{
+	height: 90px;
+}
+.asset_list input[type=checkbox] + label{
+	padding-left: 25px;
+}
+.asset_list img{
+	width: 80px;
+	height: 80px;
+	margin-top: -28px;
+	margin-left: 4px;
+}

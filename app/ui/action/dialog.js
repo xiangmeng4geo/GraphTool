@@ -1,10 +1,13 @@
 !function(){
 	'use strict'
-
+	var C = Core;
+	var _require = C.require;
 	var remote = require('remote');
 
 	var dialog = remote.require('dialog');
 	var win_instance = remote.getCurrentWindow();
+	var CONST = _require('const');
+	var CONST_FILTER_IMAGE = CONST.FILTER_IMAGE;
 
 	/*
 	confirm1({
@@ -71,6 +74,11 @@
 		},
 		open: function(options, callback) {
 			return dialog.showOpenDialog(win_instance, options, callback);
+		},
+		imageOpen: function(callback) {
+			this.open({
+				filters: CONST_FILTER_IMAGE
+			}, callback);
 		},
 		save: function(options, callback) {
 			return dialog.showSaveDialog(win_instance, options, function(file_path) {

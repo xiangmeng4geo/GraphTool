@@ -58,14 +58,15 @@
 
 			file_path = _getNewest.apply(null, param);
 		}
-		model.emit('map.changeconfig', util.extend(true, {
+		model.emit('map.changeconfig', {
 			map: conf.other.map,
 			legend: conf.other.legend,
 			data: {
 				type: 'micaps',
 				file: file_path
-			}
-		}));
+			},
+			assets: conf.assets
+		});
 	}
 	module.exports = _parse;
 }();

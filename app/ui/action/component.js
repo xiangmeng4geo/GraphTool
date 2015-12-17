@@ -259,10 +259,10 @@
 						// '<label>背景颜色:</label><input type="color" class="c_edit_bg" value=""/>'+
 					'</div>';
 			html += '<div class="row ui-edit-size">'+
-						'<div class="col4">X:<input type="number" class="n_x"/></div>'+
-						'<div class="col4">Y:<input type="number" class="n_y"/></div>'+
-						'<div class="col4">W:<input type="number" class="n_w"/></div>'+
-						'<div class="col4"><span class="ui-edit-btn wh_lock fl"></span>H:<input type="number" class="n_h"/></div>'+
+						'<div class="col4">X:<input type="number" class="n_x" value="0"/></div>'+
+						'<div class="col4">Y:<input type="number" class="n_y" value="0"/></div>'+
+						'<div class="col4">W:<input type="number" class="n_w" value="100"/></div>'+
+						'<div class="col4"><span class="ui-edit-btn wh_lock fl"></span>H:<input type="number" class="n_h" value="30"/></div>'+
 					'</div>';
 		html += '</div>';
 
@@ -342,7 +342,7 @@
 			$textarea.val(text);
 		}
 		var $btn_align = $container.find('.btn_align').on('click', function() {
-			$(this).addClass('on').siblings().removeClass('on');
+			$(this).addClass('on').siblings('.btn_align').removeClass('on');
 			_change();
 		});
 		$container.find('.ui-edit-size [type=number]').on('input', onchange);
@@ -360,15 +360,20 @@
 			s_font_family.selected(style['font-family']);
 			var fontSize = style['font-size'];
 			fontSize > 0 && s_font_size.selected(fontSize);
-			if (style['font-style'] == 'italic') {
+			if (style['font-weight'] == 'bold') {
 				$fontweight.addClass('on');
+			}
+			if (style['font-style'] == 'italic') {
+				$fontstyle.addClass('on');
 			}
 			var align = style['text-align'];
 			if (align) {
-				$btn_align.filter('[data-align='+align+']').addClass();
+				$btn_align.filter('[data-align='+align+']').addClass('on');
 			}
 			var color = style['color'];
-			color && $c_edit_front.val(color);
+
+			// conver rgb to hex
+			color && $c_edit_front.val(Util.Color.toHTML(color));
 
 			$n_x.val(style.left);
 			$n_y.val(style.top);
@@ -410,11 +415,6 @@
 			}
 		}
 	}
-	// var edit = editText($('body'), {
-	// 	onchange: function() {
-	// 		console.log(edit.getText(), edit.getStyle());
-	// 	}
-	// });
 	UI.file = file;
 	UI.select = select;
 	UI.edit = editText;
@@ -422,7 +422,10 @@
 	var Util = {
 		UI: UI,
 		util: {
-			style2obj: _styleToObj
+			style2obj: _styleToObj,
+			isImg: function _isImage(file_path) {
+		        return /\.(png|jpg)$/i.test(file_path);
+		    }
 		}
 	};
 	/*颜色转换*/

@@ -8,6 +8,7 @@
     var util_file = util.file;
     var util_path = util.path;
     var getSys = _require('product_conf').getSys;
+    var style2obj = _require('component').util.style2obj;
 
     function init(options) {
         var GeoMap = options.GeoMap,
@@ -21,7 +22,7 @@
         var conrec = _require('conrec').setModel(model);
 
         // 主要监听命令行调用时配置文件更新
-        model.on('map.changeconfig', function(file_path, err) {
+        model.on('map.changeconfig', function(file_path) {
             var conf = util.isPlainObject(file_path) ? file_path: util_file.readJson(file_path);
             _changeConf(conf);
         });
@@ -36,6 +37,7 @@
 
             }
             var legend_name = conf.legend;
+            var assets = conf.assets;
             var data = conf.data;
             var texts = conf.text || [];
             var imgs = conf.imgs || [];
@@ -47,6 +49,9 @@
             var conf_legend = getSys.getLegend(legend_name);
 
             var blendentJson = conf_legend.blendent;
+            
+
+            model.emit('asset.add', assets);
             model.emit('projection.changeview', bound.wn, bound.es);
             model.emit('legend', blendentJson);
             model.emit('geo', conf_geo, function(names_show) {

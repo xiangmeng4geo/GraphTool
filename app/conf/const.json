@@ -169,5 +169,9 @@
 			"val": 26,
 			"text": "(1类：24小时变压;)"
 		}]
-	}
+	},
+	"FILTER_IMAGE": [{
+        "name": "图片",
+        "extensions": ["png", "jpg"]
+    }]
 }

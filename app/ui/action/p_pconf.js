@@ -3,12 +3,20 @@
 Core.init(function(model) {
 	var C = Core;
 	var $ = C.$;
+	var WIN = C.Win.Win;
 	var _require = C.require;
-	var _alert = _require('dialog').alert;
+	var dialog = _require('dialog');
+	var _alert = dialog.alert;
 	var product_conf = _require('product_conf');
 	var CONST = _require('const');
 	var UI = _require('component').UI;
+	var electron = require('electron');
+	var remote = electron.remote;
+    var Menu = remote.Menu;
+    var MenuItem = remote.MenuItem;
+    var nativeImage = electron.nativeImage;
 	var UI_select = UI.select;
+	var UI_edit = UI.edit;
 	var getSys = product_conf.getSys;
 
 	var geo = getSys.getGeo() || [];
@@ -39,6 +47,7 @@ Core.init(function(model) {
 	var conf_product = product_conf.read(product_name) || {};
 	var conf_data = conf_product.data || {};
 	var conf_other = conf_product.other || {};
+	var conf_assets = conf_product.assets || [];
 
 	s_data_geo.unshift({
 		text: '默认地图',
@@ -306,9 +315,9 @@ Core.init(function(model) {
 	_showDataDetail(_type);
 	var fn = method_list[_type];
 	fn && fn.init(conf_data.val || {});
-
+	
 	$('#btn_save').click(function() {
-		var conf = {};
+		var conf = conf_product;
 		var data_type = s_data_type.val();
 		var _conf_data = {
 			type: data_type
@@ -321,6 +330,20 @@ Core.init(function(model) {
 			}
 			_conf_data.val = val;
 		}
+		var assets = [];
+		$asset_list.find('li').each(function() {
+			var $this = $(this);
+			var d = {flag: $this.find('[type=checkbox]').prop('checked')};
+			d.style = $this.data('style');
+			var $span = $this.find('span');
+			if ($span.length > 0) {
+				d.text = $span.text();
+			} else {
+				d.src = $this.find('img').attr('src');
+			}
+			assets.push(d);
+		});
+		conf.assets = assets;
 		conf.data = _conf_data;
 
 		conf.other = {
@@ -337,4 +360,56 @@ Core.init(function(model) {
 	$('.btn_close').on('click', function() {
 		window.close();
 	});
+	$('.desc').click(function() {
+		$(this).toggleClass('show');
+	});
+	var _showMenuDelete = (function() {
+        var $layer;
+        var menu = new Menu();
+        var menu_dele = new MenuItem({label: '删除', 'click': function() {
+            if ($layer) {
+            	dialog.confirm('确定要删除吗？', function() {
+            		$layer.remove();
+            		$layer = null;
+            	}, function() {
+            		$layer = null;
+            	});               
+            }
+        }});
+        menu.append(menu_dele);
+        return function($html) {
+            $layer = $html;
+            menu.popup(WIN);
+        }
+    })();
+	var $asset_list = $('.asset_list');
+	$asset_list.delegate('li', 'contextmenu', function() {
+		_showMenuDelete($(this));
+	});
+	var _getId = (function() {
+		var id = 0;
+		return function() {
+			return 'cb_' + (id++);
+		}
+	})();
+	if (conf_assets) {
+		var html = '';
+		$.each(conf_assets, function(i, v) {
+			html += '<li data-style="'+v.style+'"><div class="checkbox"><input type="checkbox" '+(v.flag?'checked':'')+'/><label>'
+			var is_text = !!v.text;
+			if (is_text) {
+				html += '<span>'+v.text+'</span>';
+			} else {
+				html += '<img src="'+v.src+'"/>';
+			}
+			html += '</label></div></li>';
+		});
+		html && $asset_list.html(html);
+		$('.checkbox').each(function() {
+			var $this = $(this);
+			var id = _getId();
+			$this.find('[type=checkbox]').attr('id', id);
+			$this.find('label').attr('for', id);
+		});
+	}
 })

@@ -129,17 +129,11 @@
         var text_color = _style['color'] || '#000000';
 
         var _normal = _style.normal;
-        _this.style = {
-            textAlign: text_align,
-            textBaseline: text_baseline,
-            normal: undefined === _normal? true: !!_normal
-        };
-
         var lineheight = _getTextHeight(TEXT_TEST, font);
 
         text = (''+text).split('\n');
-        var x = _style.x,
-            y = _style.y,
+        var x = _style.x || _style.left,
+            y = _style.y || _style.top,
             lng = _style.lng,
             lat = _style.lat,
             x_offset = _style['offset-x'] || _style['offsetX'] || 0,
@@ -177,6 +171,11 @@
             };
             y_offset += h/2;
         }
+        _this.style = {
+            textAlign: text_align,
+            textBaseline: text_baseline,
+            normal: undefined === _normal? true: !!_normal
+        };
         _this.draw = function(ctx, projection) {
             var pixel = isNaN(lng) && isNaN(lat)? [x, y]: projection([lng, lat]);
             ctx.font = font;
