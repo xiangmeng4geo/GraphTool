@@ -578,8 +578,11 @@ tab-content item resize-horizontal:after{
 }
 /* 设置滚动条的样式 {*/
 ::-webkit-scrollbar {
-	width: 4px;
+	width: 3px;
 	height: 4px;
+    position: absolute;
+    right: 0;
+    top: 0;
 }
 /* 滚动槽 */
 ::-webkit-scrollbar-track {

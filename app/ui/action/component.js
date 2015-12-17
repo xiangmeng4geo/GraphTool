@@ -88,14 +88,23 @@
 			}
 		}
 	}
-
-	$doc.delegate('.ui-select', 'mouseleave', function() {
-		$(this).find('ul').hide();
-	})
-	$doc.delegate('.ui-select>span', 'click', function() {
+	$doc.delegate('.ui-select', 'mouseenter', function() {
 		var $this = $(this);
-		if (!$this.parent().hasClass('disable')) {
-			$(this).next().show();
+		$this.data('enter', true);
+		clearTimeout($this.data('tt'));
+	})
+	$doc.delegate('.ui-select', 'mouseleave', function() {
+		var $this = $(this);
+		clearTimeout($this.data('tt'));
+		var tt = setTimeout(function() {
+			$this.find('ul').hide();
+		}, 10);
+		$this.data('tt', tt);
+	})
+	$doc.delegate('.ui-select', 'click', function() {
+		var $this = $(this);
+		if (!$this.hasClass('disable')) {
+			$this.find('ul').show();
 		}
 	});
 	$doc.delegate('.ui-select ul li', 'click', function(e) {
@@ -109,7 +118,7 @@
 		var getShowVal = $container.data('getShowVal') || function($item) {
 			return $item.html();
 		};
-		$select_show_text.data('val', val_new).html(getShowVal($this));console.log('change');
+		$select_show_text.data('val', val_new).html(getShowVal($this));
 		$container.trigger('change', val_new);
 	})
 	function select($container, options) {

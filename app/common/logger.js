@@ -3,6 +3,7 @@
 
 	var fs = require('fs');
 	var path = require('path');
+	var util = require('./util');
 
 	var IS_DEBUG = true; // 是否是debug模式
 	var CONST_LOG = require('./const').LOG;
@@ -35,9 +36,7 @@
 		return format;
 	}
 
-	if(!fs.existsSync(PATH_LOG)){
-		fs.mkdirSync(PATH_LOG);
-	}
+	util.file.mkdir(PATH_LOG);
 	var fn_show = (function(){
 		return IS_DEBUG? function(msg, cb){
 			console.log(msg);

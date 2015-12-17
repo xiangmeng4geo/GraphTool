@@ -5,7 +5,7 @@ Core.init(function() {
 	var C = Core;
 	C.on('login.closed', function() {
 		C.emit('ready');
-		C.Win.WIN.maximize();
+		// C.Win.WIN.maximize();
 	});
 }, function(model) {
 	'use strict'

@@ -17,13 +17,14 @@
 	var path_workbench = format(path.join(path_base, 'workbench'));
 	var path_common = format(path.join(path_base, 'common'));
 	var path_conf = format(path.join(path_base, 'conf'));
-	var path_config = format(path.join(path_base, 'config'));
-	var path_cache = format(path.join(path_base, 'cache'));
-	var path_output = format(path.join(path_base, 'output'));
-	var path_gallery = format(path.join(path_base, 'image'));
-
 	var path_img_ball = format(path.join(path_ui, 'img/ball.png'));
 
+	var path_user = path.join(require('os').homedir(), 'BPA', 'GT');
+	var path_config = format(path.join(path_user, 'config'));
+	var path_cache = format(path.join(path_user, 'cache'));
+	var path_output = format(path.join(path_user, 'output'));
+	var path_gallery = format(path.join(path_user, 'image'));
+	var path_log = format(path.join(path_user, 'logs'));
 	var conf = {
 		GEO: {
 			FILE: format(path.join(path_base, 'data', 'sx.json')),
@@ -52,7 +53,7 @@
 			GALLERY: path_gallery
 		},
 		LOG: {
-			PATH: format(path.join(path_base, 'logs')),
+			PATH: path_log,
 			DELAY: 10, // 异步写日志间隔(s)
 			DAYS: 3 // 日志保留天数
 		},
