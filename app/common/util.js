@@ -548,13 +548,14 @@
 	{{T}} {{T0}} {{}} data.t 当前时间
 	{{T1}} data.t1	时间一
 	{{T2}} data.t2	时间二
+	{{T3}} data.t2	时间三(发布时间)
 	{{W}} data.w 	宽度
 	{{H}} data.h	高度
 	{{P}} data.p 	产品名
 	_variate(data)('{{}}');
 	*/
 	var _variate = function(data) {
-		var reg = /{{(T2|T1||T0|T|P|W|H)?([^{}]*)}}/gi;
+		var reg = /{{(T3|T2|T1|T0|T|P|W|H)?([^{}]*)}}/gi;
 		data = data || {};
 		var data_new = {};
 		if (data) {

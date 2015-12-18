@@ -5,19 +5,17 @@ var fs = require('fs'),
 
 var dir_current = __dirname;
 
-//目录可以放在core的同级（开发环境），也可以放在主程序安装目录下（生产环境）
-var dir_core = path.join(dir_current, '../../app');
-if(!fs.existsSync(dir_core)){
-	dir_core = path.join(dir_current, '../../');
-}
-var dir_config = path.join(dir_core, 'config');
+var path_user = path.join(require('os').homedir(), 'BPA', 'GT');
+var dir_config = path.join(path_user, 'config');
 var dir_data = path.join(dir_current, 'data');
 var dir_tmp = path.join(os.tmpdir() || os.tmpDir(), 'gt_testdata');
-console.log(dir_tmp);
+console.log('dir_tmp = '+dir_tmp);
+console.log('dir_config = '+dir_config);
 
 util.mkdirSync(dir_config);
 util.mkdirSync(dir_tmp);
 util.mkdirSync(path.join(dir_config, '.sys'));
+
 fs.readdir(dir_data, function(err, dirs){
 	if(err){
 		console.log(err);
@@ -114,14 +112,43 @@ fs.readdir(dir_data, function(err, dirs){
 									"file_type": file_rule.file_type,
 									"file_hour": file_rule.file_hour,
 									"col": file_rule.col,
-									"arithmetic": file_rule.arithmetic
+									"arithmetic": file_rule.arithmetic,
+									"interpolation_all": conf.other && conf.other.interpolation && conf.other.interpolation.flag
 								}
 							},
 							"other": {
 								"map": "",
 								"legend": ""
+							},
+							"save": {
+								"dir": conf.in_out.dir_out||"",
+								"filename": '{{P}}_{{W}}x{{H}}_{{yyyyMMddhhmmss}}.png'
 							}
 						};
+						var titles = conf.title;
+						if (titles) {
+							var assets = [];
+							for (var i in titles) {
+								var v = titles[i];
+								var style = v.style || '';
+								if (v.center) {
+									style += 'text-align: center;';
+								}
+								if (i == 'title_1') {
+									style += 'width: 100%;height: 40px;left:10px;top:10px;';
+								} else if (i == 'title_2') {
+									style += 'width: 100%;height: 30px;left:10px;top:70px;';
+								} else if (i == 'title_3') {
+									style += 'width: 100%;height: 50px;left:10px;top:750px;';
+								}
+								assets.push({
+									flag: v.is_show,
+									text: v.text,
+									style: style
+								});
+							}
+							conf_new.assets = assets;
+						}
 						fs.writeFileSync(save_file, JSON.stringify(conf_new));
 					}
 				});

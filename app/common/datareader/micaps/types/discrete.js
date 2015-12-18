@@ -10,6 +10,7 @@
 
     function _parse_file(lines, option, cb){
 		option || (option = {});
+        option = option.val || {};
 		var default_option = {
 			x0: 72.5,
 			y0: 17.5,
@@ -21,7 +22,7 @@
 			interpolation_all: false,
             interpolate: 'idw', //当interpolate == false时不进行插值
 			num_of_cols: 5, //数据列数
-			val_col: 5,      //读取第N列值
+			col: 5,      //读取第N列值
 			arithmetic: null
 		}
 		var REG_DEFAULT_VAL = /9{4,}/;
@@ -30,6 +31,34 @@
 				option[i] = default_option[i];
 			}
 		}
+        var x0 = option.x0,
+            y0 = option.y0,
+            x1 = option.x1,
+            y1 = option.y1,
+            grid_space = option.grid_space;
+        var bound = option.bound;
+        if (bound) {
+            var wn = bound.wn,
+                es = bound.es;
+
+            // 用数据里的显示边界对数据进行修正
+            if (wn && wn.length == 2 && es && es.length == 2) {
+                x0 = Math.min(x0, wn[0], es[0]);
+                y0 = Math.min(y0, wn[1], es[1]);
+                x1 = Math.max(x1, wn[0], es[0]);
+                y1 = Math.max(y1, wn[1], es[1]);
+
+                var num = 50;
+                var space = Math.abs(Math.min((x1 - x0)/num, (y1 - y0)/num));
+                grid_space = Math.min(space, grid_space);
+
+                x0 -= grid_space;
+                y0 -= grid_space;
+                x1 += grid_space;
+                y1 += grid_space;
+            }
+        }
+
 		var arithmetic = (function(){
 			var methods = {'*': 1};
 
@@ -40,7 +69,7 @@
 				if(val){
 					return ({
 						'*': function(v){
-							return v*val;
+							return parseInt(v*val*1000)/1000;
 						}
 					})[type];
 				}
@@ -50,7 +79,7 @@
 			}
 		})();
 		var default_val = option.default_val;
-		var val_col = option.val_col - 1;
+		var col = option.col - 1;
 		var numOfCols = option.num_of_cols - 3;
 		var REG_DATA = new RegExp('^\\d+\\s+[\\d.]+\\s+[\\d.]+(\\s+[-\\d.]+){'+numOfCols+'}$');
 		var data = [];
@@ -58,7 +87,7 @@
 			line = line.trim();
 			if(REG_DATA.test(line)){
 				var arr = line.split(/\s+/);
-				var v = arr[val_col];
+				var v = arr[col];
 				if(!isNaN(v) && !REG_DEFAULT_VAL.test(v)){
 					data.push({
 						x: parseFloat(arr[1]),
@@ -70,7 +99,7 @@
 			}
 		});
 
-        var lnglat_arr = util.grid(option.x0, option.y0, option.x1, option.y1, option.grid_space);
+        var lnglat_arr = util.grid(x0, y0, x1, y1, grid_space);
         var interpolate_method = option.interpolate;
 
 

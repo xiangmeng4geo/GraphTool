@@ -38,6 +38,7 @@
             return;
         }
         var error_msg = '['+file_path+']';
+        var bound = options.bound;
         _getData(file_path, function(err, data) {
             if (err) {
                 callback({
@@ -66,10 +67,19 @@
                             lat1 = y;
                         }
                     }
-
+                    if (bound) {
+                        var wn = bound.wn,
+                            es = bound.es;
+                        if (wn && wn.length == 2 && es && es.length == 2) {
+                            lng0 = Math.min(lng0, wn[0], es[0]);
+                            lat0 = Math.min(lat0, wn[1], es[1]);
+                            lng1 = Math.max(lng1, wn[0], es[0]);
+                            lat1 = Math.max(lat1, wn[1], es[1]);
+                        }
+                    }
                     var num = 50;
                     var space = Math.abs(Math.min((lng1 - lng0)/num, (lat1 - lat0)/num));
-                    var space_add = space * 7;
+                    var space_add = space;
 
                     var lnglat_arr = util.grid(lng0 - space_add, lat0 - space_add, lng1 + space_add, lat1 + space_add, space);
 

@@ -58,7 +58,7 @@
 
 			file_path = _getNewest.apply(null, param);
 		}
-		model.emit('map.changeconfig', {
+		model.emit('map.changeconfig', util.extend(true, {
 			map: conf.other.map,
 			legend: conf.other.legend,
 			data: {
@@ -66,7 +66,7 @@
 				file: file_path
 			},
 			assets: conf.assets
-		});
+		}, conf));
 	}
 	module.exports = _parse;
 }();

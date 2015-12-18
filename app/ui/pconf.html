@@ -92,6 +92,9 @@
 										<div class="ui-select" id="select_value_arithmetic"></div>
 								    	<input type="number" id="num_value_arithmetic" value="0.1"/>
 								    </div>
+									<div class="row">
+								    	<input type="checkbox" id="cb_is_interpolation_all"/><label for="cb_is_interpolation_all"> 是否全部插值</label>
+								    </div>
 								</div>
 							</div>
 						</item>
@@ -102,12 +105,20 @@
 						</item>
 						<item>
 							<div class="row">
-								<label>地图方案</label>
+								<label>地图方案：</label>
 								<div class="ui-select" id="s_map"></div>
 							</div>
 							<div class="row">
-								<label>配色方案</label>
+								<label>配色方案：</label>
 								<div class="ui-select" id="s_legend"></div>
+							</div>
+							<div class="row">
+								<label>保存目录：</label>
+								<div class="ui-file" id="file_dir_out"></div>
+							</div>
+							<div class="row">
+								<label>保存名称：</label>
+								<input type="text" id="text_filename_out"/>
 							</div>
 						</item>
 					</tab-content>

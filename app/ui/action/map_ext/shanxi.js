@@ -5,6 +5,7 @@
     var Reader = _require('datareader');
     var Render = _require('render');
     var util = _require('util');
+    var util_variate = util.variate;
     var util_file = util.file;
     var util_path = util.path;
     var getSys = _require('product_conf').getSys;
@@ -21,6 +22,10 @@
         Render.setModel(model);
         var conrec = _require('conrec').setModel(model);
 
+        var _current_product_name;
+        model.on('product.change', function(productName) {
+            _current_product_name = productName;
+        });
         // 主要监听命令行调用时配置文件更新
         model.on('map.changeconfig', function(file_path) {
             var conf = util.isPlainObject(file_path) ? file_path: util_file.readJson(file_path);
@@ -49,13 +54,43 @@
             var conf_legend = getSys.getLegend(legend_name);
 
             var blendentJson = conf_legend.blendent;
-            
 
-            model.emit('asset.add', assets);
             model.emit('projection.changeview', bound.wn, bound.es);
             model.emit('legend', blendentJson);
             model.emit('geo', conf_geo, function(names_show) {
+                if (util.isPlainObject(data)) {
+                    data.bound = bound;
+                }
                 Reader.read(data, function(err, dataJson) {
+                    if (assets) {
+                        var _opt_var = {
+                            p: _current_product_name,
+                            t: new Date(),
+                            w: $geomap.width(),
+                            h: $geomap.height()
+                        }
+                        var t1 = dataJson.t1;
+                        var t2 = dataJson.t2;
+                        var t3 = dataJson.t3 || dataJson.mtime;
+                        if (t1) {
+                            _opt_var.t1 = new Date(t1);
+                        }
+                        if (t2) {
+                            _opt_var.t2 = new Date(t2);
+                        }
+                        if (t3) {
+                            _opt_var.t3 = new Date(t3);
+                        }
+                        var _format = util_variate(_opt_var);
+                        for (var i = 0, j = assets.length; i<j; i++) {
+                            var item = assets[i];
+                            var text = item.text;
+                            if (!!text) {
+                                item.text = _format(text);
+                            }
+                        }
+                        model.emit('asset.add', assets);
+                    }
                     if (err) {
                         _afterChangeConf(err, s_time);
                         return model.emit('error', err);
@@ -87,6 +122,7 @@
                     var data_interpolate = dataJson.interpolate;
                     if (data_interpolate) {
                         conrec(data_interpolate, blendentJson, true, function(err, data_conrec) {
+                            console.log(data_conrec);
                             if (err) {
                                 model.emit('error', err);
                             } else {

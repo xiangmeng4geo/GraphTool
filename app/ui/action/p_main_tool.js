@@ -122,7 +122,7 @@ Core.init(function(model) {
                     css: {
                         width: styleObj.width,
                         height: styleObj.height
-                    }, 
+                    },
                     style: styleObj
                 });
             } else {
@@ -155,7 +155,7 @@ Core.init(function(model) {
                         data = {
                             text: text,
                             style: ($item.attr('style') || '')+'width: '+$layer.width()+'px; height: '+$layer.height()+'px; left: '+pos.left+'px; top: '+pos.top+'px;'
-                        };   
+                        };
                     }
                 } else if ($layer.is('.layer_img')) {
                     var $img = $layer.find('._img');
@@ -630,7 +630,7 @@ Core.init(function(model) {
                 var conf_save = conf.save;
                 if (conf_save) {
                     out_dir = conf_save.dir;
-                    filename = conf.file;
+                    filename = conf_save.file;
                     if (!_isImage(filename)) {
                         filename += '.png';
                     }

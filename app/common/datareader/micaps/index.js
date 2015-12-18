@@ -63,7 +63,26 @@
     							if(str_hour.length == 2 && !isNaN(str_hour)){
     								hour = parseInt(str_hour);
     							}
-    							data_return.time = new Date(year+'-'+month+'-'+day+' '+hour+':00').getTime();
+    							var time = new Date(year+'-'+month+'-'+day+' '+hour+':00').getTime();
+                                data_return.time = time;
+
+                                var val_option = options.val;
+                                if (val_option) {
+                                    var file_type = val_option.file_type;
+                                    var file_hour = val_option.file_hour || 0;
+                                    var one = new Date(time);
+                                    var two = new Date(time);
+                                    // 预报
+                                    if (file_type == 2) {
+                                        one.setHours(one.getHours() + (file_hour - 24));
+                                        two.setHours(two.getHours() + 24);
+                                    } else { //实况
+                                        one.setHours(one.getHours() - file_hour);
+                                    }
+
+                                    data_return.t1 = one.getTime();
+                                    data_return.t2 = two.getTime();
+                                }
     						}
 
     						callback && callback(null, data_return);

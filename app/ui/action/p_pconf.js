@@ -17,6 +17,7 @@ Core.init(function(model) {
     var nativeImage = electron.nativeImage;
 	var UI_select = UI.select;
 	var UI_edit = UI.edit;
+	var UI_file = UI.file;
 	var getSys = product_conf.getSys;
 
 	var geo = getSys.getGeo() || [];
@@ -48,6 +49,7 @@ Core.init(function(model) {
 	var conf_data = conf_product.data || {};
 	var conf_other = conf_product.other || {};
 	var conf_assets = conf_product.assets || [];
+	var conf_save = conf_product.save || {};
 
 	s_data_geo.unshift({
 		text: '默认地图',
@@ -62,6 +64,15 @@ Core.init(function(model) {
 		val: conf_other.legend
 	});
 
+	var file_dir_out = UI_file($('#file_dir_out'), {
+		type: '*',
+		val: conf_save.dir || '',
+		dialogOpt: {
+			properties: ['openDirectory']
+		}
+	});
+
+	var $text_filename_out = $('#text_filename_out').val(conf_save.file || '');
 	var $tabContentItems = $('tab-content item');
 	var $tabItems = $('tab item').click(function() {
 		$(this).addClass('on').siblings().removeClass('on');
@@ -99,16 +110,7 @@ Core.init(function(model) {
 
 		var $file_dir_in = $('#file_dir_in');
 		var $num_value_arithmetic = $('#num_value_arithmetic');
-
-		var file_dir_in = UI.file($file_dir_in, {
-			type: '*',
-			dialogOpt: {
-				properties: ['openDirectory']
-			},
-			onchange: _show_example
-		});
 		var $file_rule_example = $('#file_rule_example span');
-
 		var $radio_file_rule_common = $('#radio_file_rule_common');
 		var $radio_file_rule_custom = $('#radio_file_rule_custom');
 		var $text_file_rule_common_prefix = $('#text_file_rule_common_prefix');
@@ -119,6 +121,7 @@ Core.init(function(model) {
 		var $date_start = $('#date_start');
 		var $date_end = $('#date_end');
 		var $number_newest_days = $('#number_newest_days');
+		var $cb_is_interpolation_all = $('#cb_is_interpolation_all');
 		function _show_example() {
 			var str = file_dir_in.val() || '';
 			if (str) {
@@ -146,6 +149,14 @@ Core.init(function(model) {
 				$is_newest_yes.hide();
 			}
 		}
+
+		var file_dir_in = UI_file($file_dir_in, {
+			type: '*',
+			dialogOpt: {
+				properties: ['openDirectory']
+			},
+			onchange: _show_example
+		});
 		$('[name=file_rule]').click(_show_example);
 		$('.file_rule input').on('keyup', _show_example);
 		var $cb_is_newest = $('#cb_is_newest').click(function() {
@@ -201,6 +212,8 @@ Core.init(function(model) {
 					}
 				}
 				file_dir_in.setVal(val.dir_in || '');
+				var val_save = val.save || {};
+
 				var file_rule = val.file_rule;
 				if (file_rule) {
 					var is_common = file_rule.is_common;
@@ -224,6 +237,7 @@ Core.init(function(model) {
 					select_value_arithmetic.selected(arithmetic.type);
 					$num_value_arithmetic.val(arithmetic.val);
 				}
+				$cb_is_interpolation_all.prop('checked', val.interpolation_all);
 				_show_example();
 			},
 			getVal: function() {
@@ -294,7 +308,8 @@ Core.init(function(model) {
 					arithmetic: {
 						type: select_value_arithmetic.val(),
 						val: parseFloat(val_arithmetic)
-					}
+					},
+					interpolation_all: $cb_is_interpolation_all.prop('checked')
 				}
 			}
 		}
@@ -311,11 +326,12 @@ Core.init(function(model) {
 			_showDataDetail(val);
 		}
 	});
+
 	_type = _type || s_data_type.val()
 	_showDataDetail(_type);
 	var fn = method_list[_type];
 	fn && fn.init(conf_data.val || {});
-	
+
 	$('#btn_save').click(function() {
 		var conf = conf_product;
 		var data_type = s_data_type.val();
@@ -350,6 +366,10 @@ Core.init(function(model) {
 			map: s_map.val(),
 			legend: s_legend.val()
 		};
+		conf.save = {
+			dir: file_dir_out.val(),
+			file: $text_filename_out.val() || ''
+		}
 		product_conf.save(product_name, conf);
 
 		model.emit('log', 'change "'+product_name+'"');
@@ -373,7 +393,7 @@ Core.init(function(model) {
             		$layer = null;
             	}, function() {
             		$layer = null;
-            	});               
+            	});
             }
         }});
         menu.append(menu_dele);
