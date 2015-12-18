@@ -72,9 +72,11 @@
                                     var file_hour = val_option.file_hour || 0;
                                     var one = new Date(time);
                                     var two = new Date(time);
+
                                     // 预报
                                     if (file_type == 2) {
                                         one.setHours(one.getHours() + (file_hour - 24));
+                                        two.setTime(one.getTime());
                                         two.setHours(two.getHours() + 24);
                                     } else { //实况
                                         one.setHours(one.getHours() - file_hour);

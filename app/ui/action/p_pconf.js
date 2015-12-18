@@ -11,9 +11,6 @@ Core.init(function(model) {
 	var CONST = _require('const');
 	var UI = _require('component').UI;
 	var electron = require('electron');
-	var remote = electron.remote;
-    var Menu = remote.Menu;
-    var MenuItem = remote.MenuItem;
     var nativeImage = electron.nativeImage;
 	var UI_select = UI.select;
 	var UI_edit = UI.edit;
@@ -351,9 +348,9 @@ Core.init(function(model) {
 			var $this = $(this);
 			var d = {flag: $this.find('[type=checkbox]').prop('checked')};
 			d.style = $this.data('style');
-			var $span = $this.find('span');
+			var $span = $this.find('textarea');
 			if ($span.length > 0) {
-				d.text = $span.text();
+				d.text = $span.val();
 			} else {
 				d.src = $this.find('img').attr('src');
 			}
@@ -383,28 +380,14 @@ Core.init(function(model) {
 	$('.desc').click(function() {
 		$(this).toggleClass('show');
 	});
-	var _showMenuDelete = (function() {
-        var $layer;
-        var menu = new Menu();
-        var menu_dele = new MenuItem({label: '删除', 'click': function() {
-            if ($layer) {
-            	dialog.confirm('确定要删除吗？', function() {
-            		$layer.remove();
-            		$layer = null;
-            	}, function() {
-            		$layer = null;
-            	});
-            }
-        }});
-        menu.append(menu_dele);
-        return function($html) {
-            $layer = $html;
-            menu.popup(WIN);
-        }
-    })();
+	
 	var $asset_list = $('.asset_list');
-	$asset_list.delegate('li', 'contextmenu', function() {
-		_showMenuDelete($(this));
+	
+	$asset_list.delegate('.btn_dele_asset', 'click', function() {
+		var $layer = $(this).closest('li');
+		dialog.confirm('确定要删除吗？', function() {
+    		$layer.remove();
+    	});
 	});
 	var _getId = (function() {
 		var id = 0;
@@ -414,17 +397,48 @@ Core.init(function(model) {
 	})();
 	if (conf_assets) {
 		var html = '';
+		var html_img = '',
+			html_text = '';
 		$.each(conf_assets, function(i, v) {
-			html += '<li data-style="'+v.style+'"><div class="checkbox"><input type="checkbox" '+(v.flag?'checked':'')+'/><label>'
-			var is_text = !!v.text;
-			if (is_text) {
-				html += '<span>'+v.text+'</span>';
+			var text = v.text;
+			var style = v.style;
+			if (!text) {
+				html_img += '<li data-style="'+style+'">'+
+								'<img src="'+v.src+'"/>'+
+								'<div class="checkbox"><input type="checkbox" '+(v.flag?'checked':'')+'/><label></label></div>'+
+								'<span class="btn_dele_asset"></span>'+
+							'</li>';
 			} else {
-				html += '<img src="'+v.src+'"/>';
+				html_text += '<li data-style="'+style+'">'+
+								'<div class="fl">'+
+									'<div class="checkbox"><input type="checkbox" '+(v.flag?'checked':'')+'/><label></label></div><br/>'+
+									'<span class="btn_dele_asset"></span>'+
+								'</div>'+
+								'<textarea>'+text+'</textarea>'+
+							'</li>';
 			}
-			html += '</label></div></li>';
 		});
-		html && $asset_list.html(html);
+
+		if (html_img) {
+			html += '<div class="asset_imgs">'+
+						'<div class="asset_title">图片资源</div>'+
+						'<ul>';
+			html += 		html_img;
+			html += 	'</ul>'+
+					'</div>';
+		}
+		if (html_text) {
+			html += '<div class="asset_texts">'+
+						'<div class="asset_title">文字资源</div>'+
+						'<ul>';
+			html += 		html_text;
+			html += 	'</ul>'+
+					'</div>';
+		}
+		if (!html) {
+			html += '暂时还没有添加资源，请在地图上对添加完成的组件右键添加！';
+		}
+		$asset_list.html(html);
 		$('.checkbox').each(function() {
 			var $this = $(this);
 			var id = _getId();

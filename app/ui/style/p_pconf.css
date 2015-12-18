@@ -32,6 +32,12 @@ tab-content>item{
 	margin: 10px 0;
 	position: relative;
 }
+.file_rule li{
+	margin: 10px 0;
+}
+.file_rule li:first-child{
+	margin-top: 0;
+}
 label{
 	vertical-align: top;
 }
@@ -71,12 +77,8 @@ label{
 #file_rule_example span{
 	text-decoration: underline;
 }
-#is_newest_yes,
-#is_newest_no{
-	margin-left: 10px;
-	color: #eeeeee;
-}
-#cb_is_newest + label{
+
+input[type=checkbox] + label{
 	padding-left: 20px;
 }
 
@@ -127,24 +129,75 @@ label{
 .editText .col4:last-child [type=number]{
     width: calc(100% - 72px);
 }
-.asset_list{
-	margin-top: 30px;
-}
-.asset_list li{
-	height: 90px;
-}
+
 .asset_list input[type=checkbox] + label{
 	padding-left: 25px;
-}
-.asset_list img{
-	width: 80px;
-	height: 80px;
-	margin-top: -28px;
-	margin-left: 4px;
 }
 #file_dir_out{
 	width: 568px;
 }
 #text_filename_out{
 	width: 563px;
+}
+.btn_dele_asset{
+	/*position: absolute;*/
+	right: 2px;
+	top: 50%;
+	margin-top: -6px;
+	display: inline-block;
+	background: url(../img/icon_delete.png);
+	width: 13px;
+	height: 13px;
+	background-size: 100%;
+}
+.asset_imgs{
+	border-bottom: 1px solid #0a0a0a;
+	margin-bottom: 15px;
+}
+.asset_imgs .checkbox{
+	margin-left: 5px;
+	margin-right: 10px;
+}
+.asset_imgs ul{
+	width: 100%;
+	overflow: hidden;
+}
+.asset_imgs li{
+	float: left;
+	width: 16.66%;
+	text-align: center;
+	margin: 10px;
+}
+.asset_imgs img{
+	width: 90px;
+	height: 90px;
+	display: block;
+	background-color: #212121;
+	border: 1px solid #464646;
+	margin: 0 auto;
+	margin-bottom: 4px;
+}
+.asset_texts li{
+	/*float: left;
+	width: 50%;*/
+	margin: 10px 0;
+}
+.asset_texts li textarea{
+	min-height: 60px;
+	width: calc(100% - 70px);
+	line-height: 20px;
+	background-color: #212121;
+	border: 1px solid #464646;
+	border-radius: 0;
+}
+.asset_texts .checkbox{
+	margin-top: 6px;
+	margin-bottom: 10px;
+}
+.asset_title{
+	font-size: 18px;
+}
+.row .row {
+    margin-left: 20px;
+    color: #b7b7b7;
 }

@@ -48,7 +48,7 @@ textarea,
 	line-height: 20px;
 	/*border-radius: 3px;*/
 	padding: 2px 10px;
-    color: white;
+    color: #b7b7b7;
 }
 input[type=text]:focus,
 input[type=date]:focus,
@@ -405,7 +405,6 @@ tr:nth-child(2n+1) td{
     position: absolute;
     top: 50%;
     margin-top: -12px;
-    color: #b7b7b7;
 }
 .ui-file .btn_file_browse{
     position: absolute;
@@ -434,6 +433,7 @@ tr:nth-child(2n+1) td{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #b7b7b7;
 }
 .ui-select.disable{
     color: #ccc;
