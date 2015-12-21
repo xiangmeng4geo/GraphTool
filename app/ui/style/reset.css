@@ -7,29 +7,29 @@
 }
 /*https://github.com/atom/electron/blob/c7d9352972ff5c90733a3ce0eb3add86fd101905/docs/api/frameless-window.md*/
 .titlebar {
-	-webkit-app-region: drag;
-	-webkit-user-select: none;
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
 }
 html,body{
-	height: 100%;
-	width: 100%;
+    height: 100%;
+    width: 100%;
     padding: 0;
     margin: 0;
 }
 body {
-	padding: 0px;
-	margin: 0px;
-	border: 0;
-	color: #252525;
-	/*-webkit-font-smoothing: antialiased;*/
-	/*background: -webkit-gradient(linear,0 0, 0 100%, color-stop(0,black), color-stop(0.8, rgb(150,150,150)), color-stop(1, rgb(200,200,200)));*/
+    padding: 0px;
+    margin: 0px;
+    border: 0;
+    color: #252525;
+    /*-webkit-font-smoothing: antialiased;*/
+    /*background: -webkit-gradient(linear,0 0, 0 100%, color-stop(0,black), color-stop(0.8, rgb(150,150,150)), color-stop(1, rgb(200,200,200)));*/
 }
 
 /*对表单元素进行中文处理*/
 body,
 input, textarea, select, button{
     letter-spacing: 1px;
-	font: 14px/1.6 "Microsoft YaHei",Arial,Helvetica,sans-serif,"宋体";
+    font: 14px/1.6 "Microsoft YaHei",Arial,Helvetica,sans-serif,"宋体";
 }
 input[type=text],
 input[type=color],
@@ -42,12 +42,12 @@ textarea,
 .ui-select,
 .ui-file{
     background-color: #212121;
-	border: 1px solid #212121;
+    border: 1px solid #212121;
     border-bottom: 1px solid #484848;
-	height: 20px;
-	line-height: 20px;
-	/*border-radius: 3px;*/
-	padding: 2px 10px;
+    height: 20px;
+    line-height: 20px;
+    /*border-radius: 3px;*/
+    padding: 2px 10px;
     color: #b7b7b7;
 }
 input[type=text]:focus,
@@ -59,28 +59,28 @@ textarea:focus{
     border: 1px solid #4c9bb6;
 }
 textarea{
-	border-radius: 8px;
+    border-radius: 8px;
 }
 input[type=text],
 input[type=number],
 input[type=password]{
-	padding-left: 3px;
-	padding-right: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
 }
 
 select{
-	border: 1px solid #d4e3f2;
-	border-radius: 3px;
-	height: 24px;
-	line-height: 24px;
+    border: 1px solid #d4e3f2;
+    border-radius: 3px;
+    height: 24px;
+    line-height: 24px;
 }
 input[type=checkbox],
 input[type=radio]{
-	vertical-align: -2px;
-	margin-left: 1px;
+    vertical-align: -2px;
+    margin-left: 1px;
 }
 input[type=text]:hover, textarea:hover{
-	cursor: text;
+    cursor: text;
 }
 input[type="color"] {border-radius: 3px; border: 6; padding: 0;}
 /*::-webkit-color-swatch-wrapper {width: 100%;}
@@ -96,10 +96,10 @@ button{
     border: none;
     border-top: 1px solid #7d7d7d;
     border-bottom: 1px solid #101010;
-	text-align: center;
-	border-radius: 3px;
-	cursor: pointer;
-	font-size: 12px;
+    text-align: center;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
     color: white;
 }
 input[type=button]:hover,
@@ -108,15 +108,15 @@ button:hover{
 }
 input[disabled]{
     background-color: #444444;
-	color: #99999;
+    color: #99999;
 }
 /*input[type=button].big,
 button.big{
-	font-size: 14px;
-	color: white;
-	background-color: #32689c;
-	padding: 5px 0;
-	box-shadow: 0 2px 3px #97abc4;
+    font-size: 14px;
+    color: white;
+    background-color: #32689c;
+    padding: 5px 0;
+    box-shadow: 0 2px 3px #97abc4;
 }*/
 input[type=button].btn_big,
 button.btn_big{
@@ -135,7 +135,7 @@ button.btn_big:hover{
     display: inline-block;
 }
 input[type=checkbox]{
-	display: none;
+    display: none;
 }
 input[type=checkbox] + label{
     position: relative;
@@ -148,13 +148,13 @@ input[type=checkbox]:checked + label:before{
     content: '';
     position: absolute;
     left: 0px;
-	width: 12px;
-	height: 12px;
+    width: 12px;
+    height: 12px;
     top: 4px;
 }
 input[type=checkbox] + label:after{
     border: 1px solid #999;
-	/*border: 1px solid #d4e3f2;*/
+    /*border: 1px solid #d4e3f2;*/
     border-radius: 2px;
     box-shadow: inset 0 0 10px #191b1b;
 }
@@ -218,21 +218,21 @@ input[type=radio]:checked:before{
 textarea{resize:none}
 
 ul,ol{
-	/*
-	IE6 IE7 IE8(Q) 中如果列表元素设置 'list-style-type:none' 时 'list-style-position:inside' 设置产生的标记框不消失，依然占据布局位置。
-	http://www.w3help.org/zh-cn/causes/RG1002
-	*/
-	list-style:outside none none;
-	padding: 0;
-	margin: 0;
+    /*
+    IE6 IE7 IE8(Q) 中如果列表元素设置 'list-style-type:none' 时 'list-style-position:inside' 设置产生的标记框不消失，依然占据布局位置。
+    http://www.w3help.org/zh-cn/causes/RG1002
+    */
+    list-style:outside none none;
+    padding: 0;
+    margin: 0;
 }
 /*重写table样式 {*/
 table{
-	width: 100%;
-	text-align: center;
-	margin-top: 10px;
-	border-spacing: 0;
-	width: 90%;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+    border-spacing: 0;
+    width: 90%;
     border-radius: 5px;
     overflow: hidden;
     border: 1px solid #000;
@@ -263,138 +263,138 @@ tr:nth-child(2n+1) td{
 /*重写table样式 }*/
 
 .bd_top{
-	border-top: 1px solid #c9c9c9;
+    border-top: 1px solid #c9c9c9;
 }
 .bd_bottom{
-	border-bottom: 1px solid #c9c9c9;
+    border-bottom: 1px solid #c9c9c9;
 }
 .p_bottom10{
-	padding-bottom: 10px;
+    padding-bottom: 10px;
 }
 .cursor_help{
-	cursor: help;
+    cursor: help;
 }
 .fl{
-	float: left;
+    float: left;
 }
 .fr{
-	float: right;
+    float: right;
 }
 .clear{
-	clear: both;
-	overflow: hidden;
+    clear: both;
+    overflow: hidden;
 }
 .mt10{
-	margin-top: 10px;
+    margin-top: 10px;
 }
 .mt20{
-	margin-top: 20px;
+    margin-top: 20px;
 }
 
 /* 图例 { */
 .legend_tmp{
-	position: relative;
-	left: 100%;
-	top: 100%;
-	z-index: -100;
-	/*top: 0;*/
-	width: 100%;
-	height: 100%;
-	min-width: 1024px;
+    position: relative;
+    left: 100%;
+    top: 100%;
+    z-index: -100;
+    /*top: 0;*/
+    width: 100%;
+    height: 100%;
+    min-width: 1024px;
 }
 .legend_landscape{
-	width: 100%;
-	font-size: 20px;
-	font-weight: bold;
+    width: 100%;
+    font-size: 20px;
+    font-weight: bold;
 }
 .legend_landscape ul{
-	overflow: hidden;
+    overflow: hidden;
 }
 .legend_landscape li{
-	float: left;
-	height: 30px;
-	width: 12.5%;
+    float: left;
+    height: 30px;
+    width: 12.5%;
 }
 .legend_landscape li div{
-	background-color: red;
-	width: 100%;
-	height: 100%;
+    background-color: red;
+    width: 100%;
+    height: 100%;
 }
 .legend_landscape li span{
-	width: 100%;
-	height: 100%;
-	line-height: 30px;
-	text-align: center;
-	float: left;
-	margin-top: -30px;
+    width: 100%;
+    height: 100%;
+    line-height: 30px;
+    text-align: center;
+    float: left;
+    margin-top: -30px;
 }
 
 .legend_portrait{
-	position: relative;
-	overflow: hidden;
-	width: auto;
-	display: inline-block;
-	font-weight: bold;
-	font-size: 18px;
+    position: relative;
+    overflow: hidden;
+    width: auto;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 18px;
 }
 .legend_portrait>div{
-	overflow: hidden;
+    overflow: hidden;
 }
 .legend_portrait>div span{
-	width: 45%;
-	margin-right: 20px;
-	float: left;
-	height: 100%;
+    width: 45%;
+    margin-right: 20px;
+    float: left;
+    height: 100%;
 }
 .legend_portrait ul{
-	float: left;
-	margin-right: 20px;
+    float: left;
+    margin-right: 20px;
 }
 .legend_portrait li{
-	text-align: center;
-	margin-bottom: 2px;
-	height: 16px;
-	line-height: 16px;
+    text-align: center;
+    margin-bottom: 2px;
+    height: 16px;
+    line-height: 16px;
 }
 .legend_portrait li div{
-	float: left;
-	width: 30px;
-	height: 100%;
-	background-color: red;
-	margin-right: 2px;
+    float: left;
+    width: 30px;
+    height: 100%;
+    background-color: red;
+    margin-right: 2px;
 }
 /* } 图例 */
 
 .logo_normal{
-	background-image: url(../img/logo.png);
-	background-repeat: no-repeat;
-	background-position: center center;
+    background-image: url(../img/logo.png);
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 .logo_black{
-	background-image: url(../img/logo_black.png);
-	background-repeat: no-repeat;
-	background-position: center center;
+    background-image: url(../img/logo_black.png);
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 .main{
-	height: 100%;
+    height: 100%;
     width: 100%;
-	margin: 0 auto;
-	overflow: hidden;
+    margin: 0 auto;
+    overflow: hidden;
 }
 .br3{
-	border-radius: 3px;
+    border-radius: 3px;
 }
 .br5{
-	border-radius: 5px;
+    border-radius: 5px;
 }
 .br10{
     border-radius: 10px;
 }
 
 .ui-file{
-	display: inline-block;
-	width: 200px;
-	height: 26px;
+    display: inline-block;
+    width: 200px;
+    height: 26px;
     padding: 0;
     position: relative;
     vertical-align: middle;
@@ -416,20 +416,20 @@ tr:nth-child(2n+1) td{
     background: url(../img/icon_file.png) no-repeat center center;
 }
 .ui-select{
-	display: inline-block;
-	position: relative;
+    display: inline-block;
+    position: relative;
     height: 20px;
     line-height: 20px;
     padding: 2px 10px;
-	min-width: 40px;
-	vertical-align: middle;
-	padding-right: 16px;
+    min-width: 40px;
+    vertical-align: middle;
+    padding-right: 16px;
 }
 .ui-select .ui-select-val{
-	display: inline-block;
-	width: 100%;
-	height: 100%;
-	cursor: default;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    cursor: default;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -439,52 +439,52 @@ tr:nth-child(2n+1) td{
     color: #ccc;
 }
 .ui-select .ui-select-val:after{
-	content: "";
-	position: absolute;
-	margin: auto;
-	right: 0;
-	height: 0;
-	width: 0;
-	border: 1px solid transparent;
-	border-top-color: #666666;
-	border-width: 6px 4px;
-	top: 50%;
-	margin-top: -2px;
-	right: 4px;
+    content: "";
+    position: absolute;
+    margin: auto;
+    right: 0;
+    height: 0;
+    width: 0;
+    border: 1px solid transparent;
+    border-top-color: #666666;
+    border-width: 6px 4px;
+    top: 50%;
+    margin-top: -2px;
+    right: 4px;
 }
 .ui-select ul{
-	position: absolute;
+    position: absolute;
     z-index: 101;
-	max-height: 300px;
-	overflow-y: auto;
-	/*border: 1px solid #141414;*/
-	display: none;
-	left: 0;
-	right: 0;
-	width: auto;
-	background-color: #474747;
+    max-height: 300px;
+    overflow-y: auto;
+    /*border: 1px solid #141414;*/
+    display: none;
+    left: 0;
+    right: 0;
+    width: auto;
+    background-color: #474747;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 .ui-select li{
-	padding: 3px;
-	margin-bottom: 2px;
+    padding: 3px;
+    margin-bottom: 2px;
 }
 .ui-select li.selected,
 .ui-select li:hover{
-	background: #54667d;
-	color: white;
+    background: #54667d;
+    color: white;
 }
 .ui-select>span img,
 .ui-select li img{
-	width: 5px;
-	height: 5px;
+    width: 5px;
+    height: 5px;
 }
 
 tab{
-	width: 100%;
-	float: left;
-	height: 30px;
-	line-height: 30px;
+    width: 100%;
+    float: left;
+    height: 30px;
+    line-height: 30px;
     font-size: 14px;
     position: relative;
 }
@@ -496,9 +496,9 @@ tab{
 tab:before,
 tab:after{
     content: '';
-	position: absolute;
+    position: absolute;
     width: 100%;
-	bottom: -1px;
+    bottom: -1px;
     left: 0;
     border-bottom: 1px solid #4a4a4a;
 }
@@ -509,27 +509,27 @@ tab:after{
 }
 
 tab item{
-	float: left;
-	border-bottom: 3px solid rgba(0, 0, 0, 0);
-	position: relative;
-	min-width: 100px;
-	text-align: center;
-	cursor: pointer;
-	height: 28px;
+    float: left;
+    border-bottom: 3px solid rgba(0, 0, 0, 0);
+    position: relative;
+    min-width: 100px;
+    text-align: center;
+    cursor: pointer;
+    height: 28px;
 }
 tab item.on{
-	border-bottom-color: #2cc6f5;
+    border-bottom-color: #2cc6f5;
     background: linear-gradient(to bottom, #46494a 0%, #1e2021 50%, #0f1010 100%);
 }
 
 tab item::before,
 tab item:after {
-	content: '';
-	position: absolute;
-	right: -1px;
-	top: 24%;
-	height: 60%;
-	border-right: 1px solid #4a4a4a;
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 24%;
+    height: 60%;
+    border-right: 1px solid #4a4a4a;
 }
 tab item:after{
     border-right: 1px solid #101010;
@@ -537,40 +537,40 @@ tab item:after{
 }
 
 tab-content{
-	position: absolute;
-	top: 32px;
-	bottom: 0;
-	left: 0;
-	height: auto;
-	width: 100%;
+    position: absolute;
+    top: 32px;
+    bottom: 0;
+    left: 0;
+    height: auto;
+    width: 100%;
 }
 tab-content item{
-	position: relative;
-	display: none;
-	height: 100%;
-	overflow: auto;
+    position: relative;
+    display: none;
+    height: 100%;
+    overflow: auto;
 }
 tab-content item.on{
-	display: block;
+    display: block;
 }
 tab-content item resize-horizontal{
-	position: absolute;
-	height: 100%;
-	width: 6px;
-	cursor: ew-resize;
-	z-index: 10;
-	left: 100px;
-	top: 0;
+    position: absolute;
+    height: 100%;
+    width: 6px;
+    cursor: ew-resize;
+    z-index: 10;
+    left: 100px;
+    top: 0;
 }
 tab-content item resize-horizontal:after,
 tab-content item resize-horizontal:before{
-	content: '';
-	position: absolute;
-	border-left: 1px solid #0a0a0a;
-	left: 2px;
-	top: 10px;
-	bottom: 10px;
-	height: auto;
+    content: '';
+    position: absolute;
+    border-left: 1px solid #0a0a0a;
+    left: 2px;
+    top: 10px;
+    bottom: 10px;
+    height: auto;
 }
 tab-content item resize-horizontal:after{
     left: 3px;
@@ -578,27 +578,27 @@ tab-content item resize-horizontal:after{
 }
 /* 设置滚动条的样式 {*/
 ::-webkit-scrollbar {
-	width: 3px;
-	height: 4px;
+    width: 3px;
+    height: 4px;
     position: absolute;
     right: 0;
     top: 0;
 }
 /* 滚动槽 */
 ::-webkit-scrollbar-track {
-	/*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
-	/*border-radius: 10px;*/
-	background-color: #242424;
+    /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
+    /*border-radius: 10px;*/
+    background-color: #242424;
 }
 /* 滚动条滑块 */
 ::-webkit-scrollbar-thumb {
-	/*border-radius: 10px;*/
-	/*background: rgba(0,0,0,0.1);   */
-	background-color: #5e5e5e;
-	/*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);*/
+    /*border-radius: 10px;*/
+    /*background: rgba(0,0,0,0.1);   */
+    background-color: #5e5e5e;
+    /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);*/
 }
 /*::-webkit-scrollbar-thumb:window-inactive {
-	background: rgba(255,0,0,0.4);
+    background: rgba(255,0,0,0.4);
 }*/
 /* 设置滚动条的样式 }*/
 
@@ -634,12 +634,12 @@ tab-content item resize-horizontal:after{
     letter-spacing: 1px;
 }
 .frameless .title_wrap .titlebar{
-	width: auto;
-	height: 100%;
-	position: absolute;
-	left: 0;
+    width: auto;
+    height: 100%;
+    position: absolute;
+    left: 0;
     right: 55px;
-	top: 0;
+    top: 0;
 }
 .frameless .title_wrap:after{
     content: '';
@@ -662,17 +662,17 @@ tab-content item resize-horizontal:after{
 
 /*关闭按钮 {*/
 .btn_close{
-	-webkit-app-region: no-drag;
-	position: absolute;
-	right: 8px;
-	top: 0px;
-	width: 43px;
-	height: 20px;
-	background: url(../img/btn_close.png) no-repeat center 0;
-	cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: absolute;
+    right: 8px;
+    top: 0px;
+    width: 43px;
+    height: 20px;
+    background: url(../img/btn_close.png) no-repeat center 0;
+    cursor: pointer;
 }
 .btn_close:hover{
-	background-position: center -23px;
+    background-position: center -23px;
 }
 /*关闭按钮 }*/
 

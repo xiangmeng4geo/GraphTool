@@ -49,9 +49,8 @@ Core.init(function(){
 			left: 0,
 			top: 0,
 			'z-index': 102,
-			'background-color': 'rgba(0, 0, 0, 0.8)',
-			'border-radius': 10
-		}).attr({
+			'background-color': 'rgba(0, 0, 0, 0.8)'
+		}).addClass('br5').attr({
 			width: width,
 			height: height
 		}).appendTo('.main');
@@ -61,8 +60,8 @@ Core.init(function(){
 		cl.updateLoader = function() {
 			this.loaded += 0.6;
 			if (this.loaded >= 100) {
-				cb();
 				cl.stop();
+				cb();
 			}
 		}
 		cl.init();
@@ -70,8 +69,6 @@ Core.init(function(){
 	var verification = util_verification.get();
 	function afterLogin(login_flag, true_fn, false_fn){
 		if(login_flag){
-			// var $initializing = $('.initializing').show();
-
 			var start_time = new Date();
 			var min_init_time = 2000;
 			var num_loaded = 2;
@@ -84,13 +81,6 @@ Core.init(function(){
 			_showLoading(cb);
 			(true_fn || function(){})();
 			C.on('main.loaded', cb);
-			// C.on('main.loaded', function(){
-			// 	min_init_time = Math.max(new Date() - start_time, min_init_time);
-			// 	setTimeout(function(){
-			// 		console.log(12);
-			//
-			// 	}, min_init_time);
-			// });
 			C.Win.open('main');
 		}else{
 			(false_fn || function(){
@@ -143,24 +133,4 @@ Core.init(function(){
 			}
 		});
 	});
-
-
 });
-
-
-
-/*========================================================*/
-/* Define Canvas and Initialize
-/*========================================================*/
-// if(isCanvasSupported){
-  // var c = document.createElement('canvas');
-  // c.width = 400;
-  // c.height = 100;
-  // var cw = c.width;
-  // var ch = c.height;
-  // document.getElementsByClassName('main')[0].appendChild(c);
-  // var cl = new lightLoader(c, cw, ch);
-  //
-  // // setupRAF();
-  // cl.init();
-// }

@@ -109,5 +109,7 @@
 	for (var i in conf_const) {
 		conf[i] = conf_const[i];
 	}
+
+	conf.COMMAND = true;
 	module.exports = conf;
 }();

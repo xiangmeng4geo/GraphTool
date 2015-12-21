@@ -10,8 +10,8 @@
 	var path = require('path');
 	var _window = require('./window');
 	var logger = require('../common/logger');
-	var command = require('./command');
 	var CONST = require('../common/const');
+	var CONST_COMMAND = CONST.COMMAND;
 	var util = require('../common/util');
 	var util_file_mkdir = util.file.mkdir
 	//
@@ -81,17 +81,19 @@
 					str += d;
 					clearTimeout(tt_data);
 					clearTimeout(tt_focus);
-					tt_data = setTimeout(function() {
-						// 解析命令行参数
-						command(str, function(err, msg) {
-							var info = {};
-							err && (info.err = err);
-							msg && (info.msg = msg);
-							var str = JSON.stringify(info);
-							(err || msg) && c.write(str);
-							c.end('\n');
-						});
-					}, 100);
+					if (CONST_COMMAND) {
+						tt_data = setTimeout(function() {
+							// 解析命令行参数
+							require('./command')(str, function(err, msg) {
+								var info = {};
+								err && (info.err = err);
+								msg && (info.msg = msg);
+								var str = JSON.stringify(info);
+								(err || msg) && c.write(str);
+								c.end('\n');
+							});
+						}, 100);
+					}
 				}).on('end', function(){
 					/**
 					 * 直接写在end事件里的回调一直不会触发！！

@@ -33,7 +33,14 @@
 		 * https://github.com/atom/electron/blob/master/docs/api/frameless-window.md#limitations
 		 */
 		// conf.transparent = true;
-		conf.show = false;
+		// conf.darkTheme = true;
+		// conf.backgroundColor = 'rgba(0,0,0,0)'
+		// conf.frame = false;
+		// conf.show = true;
+
+		if (conf.show == 'undefined') {
+			conf.show = true;
+		}
 		conf.titleBarStyle = 'hidden';
 		var win = new BrowserWindow(conf);
 		// win.openDevTools();
