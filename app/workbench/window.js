@@ -9,6 +9,7 @@
 	var path = require('path');
 	var fs = require('fs');
 	var CONST = require('../common/const');
+	var util = require('../common/util');
 	var PATH = CONST.PATH;
 	// var BrowserWindow = IS_PROCESS_MAIN? require('browser-window'): require('remote').require('browser-window');
 	var BrowserWindow = require('browser-window');
@@ -21,27 +22,22 @@
 		var conf;
 		try{
 			conf = require(path.join(PATH.UI_CONF, name+'.json'));
-		}catch(e){
-			conf = {
-				width: 800,
-				height: 600
-			}
-		}
+		}catch(e){}
+		conf = util.extend({
+			width: 800,
+			height: 600,
+			show: true,
+			autoHideMenuBar: true,
+    		useContentSize: true
+		}, conf);
 		/**
 		 * 考虑到transparent对窗体的很多限制，暂时取消
 		 *
 		 * https://github.com/atom/electron/blob/master/docs/api/frameless-window.md#limitations
 		 */
-		// conf.transparent = true;
-		// conf.darkTheme = true;
-		// conf.backgroundColor = 'rgba(0,0,0,0)'
-		// conf.frame = false;
-		// conf.show = true;
+		conf.transparent = false;
+		conf.show = false;
 
-		if (conf.show == 'undefined') {
-			conf.show = true;
-		}
-		conf.titleBarStyle = 'hidden';
 		var win = new BrowserWindow(conf);
 		// win.openDevTools();
 		// 当窗口关闭时清除`win_stack`中的标识
