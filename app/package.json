@@ -1,5 +1,5 @@
 {
-  "name"    : "BPA-GraphTool",
-  "version" : "1.0.4",
+  "name"    : "GraphTool",
+  "version" : "1.0.5",
   "main"    : "workbench/bootstrap.js"
 }
