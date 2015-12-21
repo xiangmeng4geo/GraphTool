@@ -7,7 +7,7 @@
 			lineCap: 'butt',
 			strokeStyle: "green",
 			repeat: 'repeat',
-			space: 2,
+			space: 1,
 		}, options);
 
 		var size = options.space * 3;

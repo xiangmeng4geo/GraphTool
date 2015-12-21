@@ -112,8 +112,17 @@
 
         return height;
     }
-    function _getTextWidth() {
+    function _getTextWidth(text, font) {
+        _ctx_empty.save();
+        if (font) {
+            _ctx_empty.font = font;
+        }
+        text = (text + '').split('\n');
+        var width = _ctx_empty.measureText(text).width;
 
+        _ctx_empty.restore();
+
+        return width;
     }
     /**
      * font-size | fontSize
@@ -294,4 +303,9 @@
     exports.Polyline = Polyline;
     exports.Text = Text;
     exports.Image = ImageShape;
+
+    exports.util = {
+        getTextHeight: _getTextHeight,
+        getTextWidth: _getTextWidth
+    };
 }()

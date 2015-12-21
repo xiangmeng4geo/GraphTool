@@ -1,7 +1,13 @@
 !function() {
-	var $ = Core.$;
-	
+	var C = Core;
+	var $ = C.$;
+	var _require = C.require;
+	var shape = _require('shape');
+	var pattern = _require('pattern');
+	var util_shape = shape.util;
+
 	var TYPE_DEFAULT = 'a';
+
 	var fn_method = {};
 
 	function _getCanvas(width, height) {
@@ -131,29 +137,103 @@
 		return Legend(conf_legend.blendent[0].colors, options);
 	}
 
-	function LegendB(colors, options) {
+	// 常规上下显示 
+	function LegendB(legend, options) {
 		options = $.extend({
 			width: 100,
 			height: 20,
 			lineWidth: 1,
 			strokeStyle: '#000',
-			fontSize: 12
+			fontSize: 14
 		}, options);
 
-		var width = options.width;
+		var font_color = '#000';
+		var font = 'bold '+options.fontSize+'px sans-serif';
+
+		var width = Math.max(options.width, 100*legend.length);
 		var height = options.height;
 		var lineWidth = options.lineWidth || 0;
 		var strokeStyle = options.strokeStyle;
 
-		colors = colors.slice(0);
-		var len = colors.length;
-		//从小到大
-		colors.sort(function(a, b){
-			return a.val[0] - b.val[0];
-		});
+		var canvas = _getCanvas(width, height);
+		var ctx = canvas.getContext('2d');
 
+		var height_block = 16;
+		var x_add = 0;
+		var width_block = 30;
+		var width_test = 0;
+		var width_text_arr = [];
+		var len_arr = [];
+		var height_test = 0;
+		var len_legend = legend.length;
+		for (var i = 0; i<len_legend; i++) {
+			var colors = legend[i].colors.slice(0);
+			width_test += width_block;
+			var w_arr = [];
+			colors.forEach(function(c, ci) {
+				w_arr.push(util_shape.getTextWidth(c.text, font));
+			});
+			var w_text = Math.max.apply(Math, w_arr);
+			width_text_arr.push(w_text);
 
+			width_test += w_text + 4;
+			len_arr.push(colors.length);
+		}
+		var _len_test = Math.max.apply(Math, len_arr);
+		height_test = height_block * _len_test + 4*(_len_test - 1);
+
+		canvas = _getCanvas(width_test, height_test);
+		ctx = canvas.getContext('2d');
+		ctx.font = font;
+		ctx.textBaseline = 'middle';
+		ctx.textAlign = 'left';
+		ctx.lineWidth = 0.6;
+
+		for (var i = 0; i<len_legend; i++) {
+			var item = legend[i];
+			var is_stripe = item.is_stripe;
+			var colors = item.colors.slice(0);
+			var len = colors.length;
+			//从小到大
+			colors.sort(function(a, b){
+				return a.val[0] - b.val[0];
+			});
+
+			var w_text = width_text_arr[i];
+
+			var x_text = x_add + width_block + 2;
+			colors.forEach(function(c, ci) {
+				ctx.save();
+				var color = c.color;
+				ctx.fillStyle = is_stripe? pattern.Streak({
+					strokeStyle: color
+				}): color;
+				
+				ctx.strokeStyle = color;
+				ctx.beginPath();
+				var y = ci*(height_block + 4);
+				ctx.moveTo(x_add, y);
+				ctx.lineTo(x_add+width_block, y);
+				ctx.lineTo(x_add+width_block, y+height_block );
+				ctx.lineTo(x_add, y+height_block);
+				ctx.lineTo(x_add, y);
+				ctx.fill();
+				// ctx.fillRect(x_add, y, width_block, height_block);
+				ctx.stroke();
+				ctx.fillStyle = font_color;
+				ctx.fillText(c.text, x_text, y + height_block/2);
+				ctx.restore();
+			});
+			
+			x_add = x_text + 2 + w_text;
+		}
+
+		return canvas;
 	}
+	fn_method['b'] = function(conf_legend, options) {
+		return LegendB(conf_legend.blendent, options);
+	}
+	// 常规左右显示
 	function _parse(conf_legend, options) {
 		options = $.extend({
 			type: TYPE_DEFAULT
