@@ -342,7 +342,7 @@
         var inside_num = 0;
         var len = line_items.length;
         line_items.forEach(function(v_line_item){
-            var flag = _isInsidePolygon(polygon_items,v_line_item.x,v_line_item.y);
+            var flag = _isPointInPolygon(polygon_items,v_line_item.x,v_line_item.y);
 
             if(flag){
                 inside_num++;

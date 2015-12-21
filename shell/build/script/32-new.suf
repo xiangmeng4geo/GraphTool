@@ -2779,9 +2779,9 @@ g_HandleSystemReboot();
 <Filename>BPA-GT-32-1.0.5.exe</Filename>
 <OutputFolder>I:\docs\2015\蓝PI相关\制图\安装包</OutputFolder>
 <SegmentSizeMode>0</SegmentSizeMode>
-<CustomSegSize>100</CustomSegSize>
-<CustomSegSizeMode>2</CustomSegSizeMode>
-<Platform>1</Platform>
+<CustomSegSize>0</CustomSegSize>
+<CustomSegSizeMode>0</CustomSegSizeMode>
+<Platform>0</Platform>
 <CollectLaunchUserInfo>0</CollectLaunchUserInfo>
 <CodeSignLocation/>
 <CodeSignCertificateFile/>

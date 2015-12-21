@@ -57,6 +57,8 @@
 			}
 
 			file_path = _getNewest.apply(null, param);
+
+			model.emit('log', 'read micaps: '+file_path);
 		}
 		model.emit('map.changeconfig', util.extend(true, {
 			map: conf.other.map,

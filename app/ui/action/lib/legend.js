@@ -1,5 +1,14 @@
 !function() {
 	var $ = Core.$;
+	
+	var TYPE_DEFAULT = 'a';
+	var fn_method = {};
+
+	function _getCanvas(width, height) {
+		var $canvas = $('<canvas>').attr('width', width).attr('height', height);
+		var canvas = $canvas.get(0);
+		return canvas;
+	}
 	function Legend(colors, options) {
 		options = $.extend({
 			width: 20,
@@ -18,8 +27,7 @@
 		var TEXT_LEFT = WIDTH_SIZE + 3;
 		var HEIGHT_ARROW = WIDTH_SIZE * 1.3;
 
-		var $canvas = $('<canvas>').attr('width', width).attr('height', height);
-		var canvas = $canvas.get(0);
+		var canvas = _getCanvas(width, height);
 		var ctx = canvas.getContext('2d');
 		
 		var font = options.fontSize+'px sans-serif';
@@ -32,8 +40,7 @@
 		});
 		var width_max = Math.max.apply(Math, textWidths);
 
-		$canvas.attr('width', TEXT_LEFT + WIDTH_SIZE + width_max).attr('height', height);
-		canvas = $canvas.get(0);
+		$(canvas).attr('width', TEXT_LEFT + WIDTH_SIZE + width_max).attr('height', height);
 		ctx = canvas.getContext('2d');
 		
 		// window.ctx = ctx;
@@ -120,11 +127,32 @@
 		}
 		return canvas;
 	}
-	
-	var TYPE_DEFAULT = 'a';
-	var fn_method = {};
 	fn_method[TYPE_DEFAULT] = function(conf_legend, options) {
 		return Legend(conf_legend.blendent[0].colors, options);
+	}
+
+	function LegendB(colors, options) {
+		options = $.extend({
+			width: 100,
+			height: 20,
+			lineWidth: 1,
+			strokeStyle: '#000',
+			fontSize: 12
+		}, options);
+
+		var width = options.width;
+		var height = options.height;
+		var lineWidth = options.lineWidth || 0;
+		var strokeStyle = options.strokeStyle;
+
+		colors = colors.slice(0);
+		var len = colors.length;
+		//从小到大
+		colors.sort(function(a, b){
+			return a.val[0] - b.val[0];
+		});
+
+
 	}
 	function _parse(conf_legend, options) {
 		options = $.extend({

@@ -43,6 +43,38 @@
         }
     }
 
+    // 霜冻线
+    function _drawLine38(points, style, ctx, projection) {
+        var isObj = points.isObj;
+        var _space_point = 6,
+            _width = 10;
+        ctx.save();
+        ctx.strokeStyle = style.strokeStyle;
+        for(var i = _space_point, j = points.length; i < j; i+=_space_point){
+            var start = points[i],
+                end = points[i+1];
+            start = projection(isObj? [start.x, start.y]: start);
+            end = projection(isObj? [end.x, end.y]: end);
+            if(start && end){
+                var x1 = start[0], y1 = start[1],
+                    x2 = end[0], y2 = end[1];
+                if(x1 != x2){
+                    var radiu = Math.atan((y2 - y1)/(x2 - x1));
+                    if(x1 < x2){
+                        radiu += Math.PI;
+                    }
+                    // radiu -=  Math.PI/2;
+                    var x_mid = x1 + (x2 - x1)/2,
+                        y_mid = y1 + (y2 - y1)/2;
+                    var y = y_mid + _width * Math.cos(radiu),
+                        x = x_mid - _width * Math.sin(radiu);
+                    ctx.moveTo(x_mid, y_mid);
+                    ctx.lineTo(x, y);
+                }
+            }
+        } 
+        ctx.restore();  
+    }
     function Polygon(points, style) {
         var _this = this;
 
@@ -57,6 +89,9 @@
 
         _this.style = style;
         _this.draw = function(ctx, projection) {
+            if (style.type == 38) {
+                _drawLine38(points, style, ctx, projection);
+            }
             _drawPath(ctx, points, projection);
         }
     }

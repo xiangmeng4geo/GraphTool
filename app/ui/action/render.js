@@ -113,7 +113,7 @@
             for (var i = 0, j = line_symbols.length; i<j; i++){
                 var v = line_symbols[i];
 				if(v.code == 0){
-					return;
+					continue;
 				}
                 // 霜冻线在地图内，其它都可在地图区域外
 				if(v.code == 38){
@@ -122,6 +122,7 @@
 				}
                 v.items.isObj = true;
                 shapes.push(new Shape.Polyline(v.items, {
+                    type: v.code,
                     strokeStyle: color_symbols[v.code],
                     lineWidth: 2
                 }));
