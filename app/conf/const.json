@@ -82,6 +82,7 @@
 		"TIME": [
 			"yyyyMMddhh",
 			"yyMMddhh",
+			"yyyyMMdd",
 			"yyMMdd",
 			"yyMM",
 			"MMddhh",
