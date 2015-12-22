@@ -6,6 +6,9 @@
 	var pattern = _require('pattern');
 	var util_shape = shape.util;
 
+	var TYPE_A = 'a';
+	var TYPE_B = 'b';
+	var TYPE_C = 'c';
 	var TYPE_DEFAULT = 'a';
 
 	var fn_method = {};
@@ -15,7 +18,7 @@
 		var canvas = $canvas.get(0);
 		return canvas;
 	}
-	function Legend(colors, options) {
+	function LegendA(colors, options) {
 		options = $.extend({
 			width: 20,
 			height: 100,
@@ -25,7 +28,7 @@
 		}, options);
 
 		var width = options.width;
-		var height = options.height;
+		var height = options.height / 2;
 		var lineWidth = options.lineWidth || 0;
 		var strokeStyle = options.strokeStyle;
 
@@ -131,10 +134,16 @@
 			ctx.stroke();
 			ctx.restore();
 		}
-		return canvas;
-	}
-	fn_method[TYPE_DEFAULT] = function(conf_legend, options) {
-		return Legend(conf_legend.blendent[0].colors, options);
+
+		var h = canvas.height;
+		var w = canvas.width;
+		var width_opt = options.width;
+		var height_opt = options.height;
+		return {
+			canvas: canvas,
+			x: width_opt - w - 10,
+			y: (height_opt - h)/2
+		};
 	}
 
 	// 常规上下显示 
@@ -228,19 +237,95 @@
 			x_add = x_text + 2 + w_text;
 		}
 
-		return canvas;
-	}
-	fn_method['b'] = function(conf_legend, options) {
-		return LegendB(conf_legend.blendent, options);
+		var h = canvas.height;
+		var w = canvas.width;
+		var width_opt = options.width;
+		var height_opt = options.height;
+		return {
+			canvas: canvas,
+			x: 10,
+			y: height_opt - 10 - h
+		};
 	}
 	// 常规左右显示
+	function LegendC(legend, options) {
+		options = $.extend({
+			width: 800,
+			lineWidth: 1,
+			strokeStyle: '#000',
+			fontSize: 14
+		}, options);
+
+		var font_color = '#000';
+		var font = 'bold '+options.fontSize+'px sans-serif';
+
+		var len_legend = legend.length;
+		var height_per = 20;
+		var x_margin = 4;
+		var y_margin = 4;
+		var width = options.width;
+		var height = height_per * len_legend + (len_legend - 1) * y_margin;
+
+		var canvas = _getCanvas(width, height);
+		var ctx = canvas.getContext('2d');
+		ctx.font = font;
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+
+		for (var i = 0; i<len_legend; i++) {
+			var item = legend[i];
+			var is_stripe = item.is_stripe;
+			var colors = item.colors.slice(0);
+			var y = i * height_per + i * y_margin;
+			var len_colors = colors.length;
+			var width_per = (width - x_margin * (len_colors - 1)) / len_colors;
+			colors.forEach(function(c, ci) {
+				var x = ci * width_per + x_margin * ci;
+				ctx.save();
+				ctx.moveTo(x, y);
+				var _color = c.color;
+				ctx.fillStyle = is_stripe? pattern.Streak({
+					strokeStyle: _color
+				}): _color;;
+				ctx.strokeStyle = _color;
+				ctx.fillRect(x, y, width_per, height_per);
+				ctx.strokeRect(x, y, width_per, height_per);
+
+				ctx.fillStyle = c.color_text;
+				ctx.fillText(c.text, x+width_per/2, y+height_per/2);
+				ctx.restore();
+			});
+		}
+		var h = canvas.height;
+		var w = canvas.width;
+		var width_opt = options.width;
+		var height_opt = options.height;
+		return {
+			canvas: canvas,
+			x: 0,
+			y: height_opt - h
+		};
+	}
+
+	fn_method[TYPE_A] = function(conf_legend, options) {
+		return LegendA(conf_legend.blendent[0].colors, options);
+	}
+	fn_method[TYPE_B] = function(conf_legend, options) {
+		return LegendB(conf_legend.blendent, options);
+	}
+	fn_method[TYPE_C] = function(conf_legend, options) {
+		return LegendC(conf_legend.blendent, options);
+	}
+
 	function _parse(conf_legend, options) {
 		options = $.extend({
 			type: TYPE_DEFAULT
 		}, options);
 		
 		var method = fn_method[options.type];
-		return method? method(conf_legend, options): null;
+		if (method) {
+			return method(conf_legend, options);
+		}
 	}
 	
 	module.exports = _parse;

@@ -98,7 +98,20 @@
 				})
 			});
 			return arr;
-		})()
+		})(),
+		LEGEND_STYLE: [{
+			text: '默认样式',
+			val: ''
+		}, {
+			text: '右侧（适合单个图例）',
+			val: 'a'
+		}, {
+			text: '左下',
+			val: 'b'
+		}, {
+			text: '下方',
+			val: 'c'
+		}]
 	};
 
 	var conf_const;

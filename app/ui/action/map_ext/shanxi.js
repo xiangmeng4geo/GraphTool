@@ -56,7 +56,7 @@
             var blendentJson = conf_legend.blendent;
 
             model.emit('projection.changeview', bound.wn, bound.es);
-            model.emit('legend', blendentJson);
+            model.emit('legend', blendentJson, conf.legendStyle);
             model.emit('geo', conf_geo, function(names_show) {
                 if (util.isPlainObject(data)) {
                     data.bound = bound;

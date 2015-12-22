@@ -9,6 +9,7 @@ Core.init(function(model) {
 	var _alert = dialog.alert;
 	var product_conf = _require('product_conf');
 	var CONST = _require('const');
+	var CONST_LEGEND_STYLE = CONST.LEGEND_STYLE.slice(0);
 	var UI = _require('component').UI;
 	var electron = require('electron');
     var nativeImage = electron.nativeImage;
@@ -40,6 +41,7 @@ Core.init(function(model) {
 			val: v.name
 		});
 	});
+
 	var product_name = _PARAM_;
 	$('.title_wrap span').text('【'+product_name+'】配置');
 	var conf_product = product_conf.read(product_name) || {};
@@ -59,6 +61,10 @@ Core.init(function(model) {
 	var s_legend = UI.select($('#s_legend'), {
 		data: s_data_legend,
 		val: conf_other.legend
+	});
+	var s_legend_style = UI.select($('#s_legend_style'), {
+		data: CONST_LEGEND_STYLE,
+		val: conf_other.legend_style
 	});
 
 	var file_dir_out = UI_file($('#file_dir_out'), {
@@ -361,7 +367,8 @@ Core.init(function(model) {
 
 		conf.other = {
 			map: s_map.val(),
-			legend: s_legend.val()
+			legend: s_legend.val(),
+			legend_style: s_legend_style.val()
 		};
 		conf.save = {
 			dir: file_dir_out.val(),

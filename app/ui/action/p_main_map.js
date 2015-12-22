@@ -155,16 +155,29 @@ Core.init(function(model) {
         model.emit('log', 'save ['+save_path+'] takes '+time_used+' ms! ');
         model.emit('afterExport', save_path, time_used);
     });
-    model.on('legend', function(blendent) {
-        var canvas_legend = _require('legend')({
+    model.on('legend', function(blendent, legendStyle) {
+        console.log('legendStyle = ', legendStyle);
+        var result = _require('legend')({
             blendent: blendent
         }, {
-            height: height_map/2
+            type: legendStyle,
+            width: width_map,
+            height: height_map
         });
-        geomap.addOverlay(new Shape.Image(canvas_legend, {
-            x: width_map - canvas_legend.width,
-            y: height_map/4
+
+        geomap.addOverlay(new Shape.Image(result.canvas, {
+            x: result.x,
+            y: result.y
         }));
+        // var canvas_legend = _require('legend')({
+        //     blendent: blendent
+        // }, {
+        //     height: height_map/2
+        // });
+        // geomap.addOverlay(new Shape.Image(canvas_legend, {
+        //     x: width_map - canvas_legend.width,
+        //     y: height_map/4
+        // }));
     });
     model.on('geo', function(options, cb_afterGeo) {
         var textStyle = options.textStyle;

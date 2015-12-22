@@ -33,6 +33,7 @@
 			model.emit('map.changeconfig', util.extend(true, {
 				map: conf.other.map,
 				legend: conf.other.legend,
+				legendStyle: conf.other.legend_style,
 				data: {
 					type: 'shanxi'
 				}
