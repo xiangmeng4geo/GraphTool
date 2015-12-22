@@ -26,6 +26,12 @@ Core.init(function(model) {
 		_alert('请先在系统配置里添加“'+([is_no_geo?'地图方案':'', is_no_legend? '配色方案': ''].join())+'”！');
 		return window.close();
 	}
+	function _getChecked($obj) {
+		return $obj.prop('checked');
+	}
+	function _setChecked($obj, checked) {
+		$obj.prop('checked', !!checked);
+	}
 
 	var s_data_geo = [],
 		s_data_legend = [];
@@ -125,12 +131,13 @@ Core.init(function(model) {
 		var $date_end = $('#date_end');
 		var $number_newest_days = $('#number_newest_days');
 		var $cb_is_interpolation_all = $('#cb_is_interpolation_all');
+		var $cb_is_show_data = $('#cb_is_show_data');
 		function _show_example() {
 			var str = file_dir_in.val() || '';
 			if (str) {
 				str += '\\';
 			}
-			if ($radio_file_rule_common.prop('checked')) {
+			if (_getChecked($radio_file_rule_common)) {
 				str += $text_file_rule_common_prefix.val()||'';
 				str += select_file_rule_common_date.val()||'';
 				str += $text_file_rule_common_postfix.val()||'';
@@ -143,7 +150,7 @@ Core.init(function(model) {
 		}
 
 		function _initNewest(is_newest) {
-			$cb_is_newest.prop('checked', is_newest);
+			_setChecked($cb_is_newest, is_newest);
 			if (is_newest) {
 				$is_newest_yes.show();
 				$is_newest_no.hide();
@@ -163,11 +170,11 @@ Core.init(function(model) {
 		$('[name=file_rule]').click(_show_example);
 		$('.file_rule input').on('keyup', _show_example);
 		var $cb_is_newest = $('#cb_is_newest').click(function() {
-			var is_newest = $(this).prop('checked');
+			var is_newest = _getChecked($(this));
 			_initNewest(is_newest);
 		});
 
-		_initNewest($cb_is_newest.prop('checked'));
+		_initNewest(_getChecked($cb_is_newest));
 		var now = new Date();
 		$date_end.val(now.format('yyyy-MM-dd'));
 		now.setDate(now.getDate() - 2);
@@ -214,6 +221,7 @@ Core.init(function(model) {
 						$date_end.val(val_newest.end);
 					}
 				}
+				_setChecked($cb_is_show_data, val.data && val.data.flag);
 				file_dir_in.setVal(val.dir_in || '');
 				var val_save = val.save || {};
 
@@ -227,7 +235,7 @@ Core.init(function(model) {
 						$text_file_rule_common_postfix.val(val_file_rule.postfix);
 						select_file_rule_common_postfix.selected(val_file_rule.file_suffix);
 					} else {
-						$radio_file_rule_custom.prop('checked', true);
+						_setChecked($radio_file_rule_custom, true);
 						$text_file_rule_custom.val(val_file_rule);
 					}
 				}
@@ -240,7 +248,7 @@ Core.init(function(model) {
 					select_value_arithmetic.selected(arithmetic.type);
 					$num_value_arithmetic.val(arithmetic.val);
 				}
-				$cb_is_interpolation_all.prop('checked', val.interpolation_all);
+				_setChecked($cb_is_interpolation_all, val.interpolation_all);
 				_show_example();
 			},
 			getVal: function() {
@@ -250,7 +258,7 @@ Core.init(function(model) {
 					_alert('请选择数据目录!');
 					return;
 				}
-				var is_newest = $cb_is_newest.prop('checked');
+				var is_newest = _getChecked($cb_is_newest);
 				var newest_val;
 				if (is_newest) {
 					var newest_days = $number_newest_days.val();
@@ -274,7 +282,7 @@ Core.init(function(model) {
 					}
 				}
 				var file_rule_data;
-				var is_common = $radio_file_rule_common.prop('checked');
+				var is_common = _getChecked($radio_file_rule_common);
 				if (is_common) {
 					file_rule_data = {
 						prefix: $text_file_rule_common_prefix.val() || '',
@@ -312,7 +320,10 @@ Core.init(function(model) {
 						type: select_value_arithmetic.val(),
 						val: parseFloat(val_arithmetic)
 					},
-					interpolation_all: $cb_is_interpolation_all.prop('checked')
+					interpolation_all: _getChecked($cb_is_interpolation_all),
+					data: {
+						flag: _getChecked($cb_is_show_data)
+					}
 				}
 			}
 		}
@@ -352,7 +363,7 @@ Core.init(function(model) {
 		var assets = [];
 		$asset_list.find('li').each(function() {
 			var $this = $(this);
-			var d = {flag: $this.find('[type=checkbox]').prop('checked')};
+			var d = {flag: _getChecked($this.find('[type=checkbox]'))};
 			d.style = $this.data('style');
 			var $span = $this.find('textarea');
 			if ($span.length > 0) {

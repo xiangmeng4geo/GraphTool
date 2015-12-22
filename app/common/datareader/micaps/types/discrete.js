@@ -9,9 +9,8 @@
 	var REG_DATA = /^(\d+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+(-?[\d.]+)$/;
 
     function _parse_file(lines, option, cb){
-		option || (option = {});
-        option = option.val || {};
-		var default_option = {
+    	console.log(option);
+		option = util.extend(true, {
 			x0: 72.5,
 			y0: 17.5,
 			x1: 137,
@@ -23,14 +22,10 @@
             interpolate: 'idw', //当interpolate == false时不进行插值
 			num_of_cols: 5, //数据列数
 			col: 5,      //读取第N列值
-			arithmetic: null
-		}
+			arithmetic: null,
+			val: {}
+		}, option);
 		var REG_DEFAULT_VAL = /9{4,}/;
-		for(var i in default_option){
-			if(option[i] === undefined || option[i] === null){
-				option[i] = default_option[i];
-			}
-		}
         var x0 = option.x0,
             y0 = option.y0,
             x1 = option.x1,

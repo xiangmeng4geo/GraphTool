@@ -33,6 +33,7 @@
 	function _parse(conf, model) {
 		var data = conf.data;
 		var file_path;
+		var showData = false;
 		if (data) {
 			var data_conf = data.val;
 			var dir_in = data_conf.dir_in;
@@ -58,12 +59,14 @@
 
 			file_path = _getNewest.apply(null, param);
 
+			showData = data_conf.data && data_conf.data.flag;
 			model.emit('log', 'read micaps: '+file_path);
 		}
 		model.emit('map.changeconfig', util.extend(true, {
 			map: conf.other.map,
 			legend: conf.other.legend,
 			legendStyle: conf.other.legend_style,
+			showData: showData,
 			data: {
 				type: 'micaps',
 				file: file_path

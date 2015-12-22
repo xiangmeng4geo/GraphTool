@@ -156,7 +156,6 @@ Core.init(function(model) {
         model.emit('afterExport', save_path, time_used);
     });
     model.on('legend', function(blendent, legendStyle) {
-        console.log('legendStyle = ', legendStyle);
         var result = _require('legend')({
             blendent: blendent
         }, {
@@ -169,15 +168,6 @@ Core.init(function(model) {
             x: result.x,
             y: result.y
         }));
-        // var canvas_legend = _require('legend')({
-        //     blendent: blendent
-        // }, {
-        //     height: height_map/2
-        // });
-        // geomap.addOverlay(new Shape.Image(canvas_legend, {
-        //     x: width_map - canvas_legend.width,
-        //     y: height_map/4
-        // }));
     });
     model.on('geo', function(options, cb_afterGeo) {
         var textStyle = options.textStyle;

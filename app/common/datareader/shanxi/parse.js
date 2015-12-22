@@ -34,6 +34,7 @@
 				map: conf.other.map,
 				legend: conf.other.legend,
 				legendStyle: conf.other.legend_style,
+				showData: true,
 				data: {
 					type: 'shanxi'
 				}

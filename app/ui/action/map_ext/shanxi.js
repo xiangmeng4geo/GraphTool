@@ -97,7 +97,7 @@
                     }
                     var texts_data = [];
                     var data_origin = dataJson.data;
-                    if (data_origin) {
+                    if (data_origin && conf.showData) {
                         for (var i = 0, j = data_origin.length; i<j; i++) {
                             var item = data_origin[i];
                             var item_show = names_show[item.name];
