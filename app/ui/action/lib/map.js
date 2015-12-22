@@ -307,6 +307,7 @@
      */
     prop.getBondBorder = function() {
         var _this = this;
+        _set(_this, CACHE_NAME_CLIP, null); // 清除数据
         var _data = _get(_this, CACHE_NAME_GEO);
         var _item_deal;
         for (var i = 0, j = _data.length; i<j; i++) {
@@ -422,6 +423,10 @@
      */
     prop.setClip = function() {
         var _this = this;
+        var ctx = _getCtxByPrefix(_this, LAYER_NAME_WEATHER);
+
+        ctx.restore(); // 先还原状态
+
         var data = _get(_this, CACHE_NAME_CLIP);
         if (!data || !data.clip) {
             return;
@@ -432,9 +437,7 @@
         if (!shapes || shapes.length == 0) {
             return;
         }
-        var ctx = _getCtxByPrefix(_this, LAYER_NAME_WEATHER);
-
-        ctx.restore();
+        
         ctx.save();
 
         // TIP: this is important
