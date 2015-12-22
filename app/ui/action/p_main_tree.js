@@ -16,6 +16,7 @@ Core.init(function(model) {
         name: '常用图形',
         childNodes: []
     }];
+    var _temp_data = {};
     if (treeData) {
         var data = [];
 
@@ -36,12 +37,16 @@ Core.init(function(model) {
                     children: child,
                     type: child ? 'default' : 'file'
                 });
+                if (!child) {
+                    _temp_data[name] = 1;
+                }
             });
             return d;
         }
         treeData = getNodes(treeData, 0);
     }
     function refreshData() {
+        _temp_data = {};
         var data = this.get_json();
         function getNodes(arr) {
             if (!arr) {
@@ -54,6 +59,8 @@ Core.init(function(model) {
                 }
                 if (v.type == 'default') {
                     obj.childNodes = getNodes(v.children)
+                } else {
+                    _temp_data[v.text] = 1;
                 }
                 d.push(obj);
             });
@@ -187,23 +194,32 @@ Core.init(function(model) {
         model.emit('tree.ready');
     }).on('rename_node.jstree', function(e, data) {
         var text = data.text.trim();
+        var flag = true;
         if (/[\.\/\\\s]/.test(text)) { //防止对.sys文件夹及文件夹里的文件进行操作
             _alert('名称中不能含有“. / \\”等特殊字符!');
+            flag = false;
+        } else {
+            var nameOld = data.old;
+            var nameNew = data.text;
+            if (_temp_data[nameNew] && nameOld != nameNew) {
+                _alert('请确保名字不重复！');
+                flag = false;
+            } else {
+                Config.rename(nameOld, nameNew);//对配置文件进行重命名
+                refreshData.call(data.instance);//刷新列表数据
+
+                if ('请输入名称' == nameOld) {
+                    _log('new ['+nameNew+']');
+                } else {
+                    _log('rename ['+nameOld+'] to ['+nameNew+']');
+                }
+            }
+        }
+        if (!flag) {
             setTimeout(function() {
                 var _instance = data.instance;
                 _instance.edit(data.node, data.old);
             }, 0)
-        } else {
-            var nameOld = data.old;
-            var nameNew = data.text;
-            Config.rename(nameOld, nameNew);//对配置文件进行重命名
-            refreshData.call(data.instance);//刷新列表数据
-
-            if ('请输入名称' == nameOld) {
-                _log('new ['+nameNew+']');
-            } else {
-                _log('rename ['+nameOld+'] to ['+nameNew+']');
-            }
         }
     }).on('delete_node.jstree', function(e, data) {
         var name = data.node.text;
