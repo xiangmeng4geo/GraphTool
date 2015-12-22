@@ -120,7 +120,10 @@
 		};
 		$select_show_text.data('val', val_new).html(getShowVal($this));
 		$container.trigger('change', val_new);
-	})
+	});
+	function _getComputedStyle($obj, prop) {
+		return getComputedStyle($obj.get(0), false)[prop];
+	}
 	function select($container, options) {
 		options = _extend({
 			val: null,
@@ -136,7 +139,10 @@
 		if (!$container.data('inited') || data.length > 0) {
 			var onchange = options.onchange || function(){};
 			$container.data('getShowVal', options.getShowVal);
+			console.log($container.css('width'), $container.css('min-width'));
 
+			var $html_test = $container.clone();
+			var html_test = '';
 			var html = '<ul>';
 			for (var i = 0, j = data.length; i<j; i++) {
 				var item = data[i];
@@ -153,12 +159,25 @@
 					classStr = ' class="selected"';
 				}
 				html += '<li data-val="'+val+'"'+classStr+'>'+(type == 'img'?'<img src="'+text+'"/>': text)+'</li>';
+				html_test += '<span class="ui-select-val">'+text+'</span><br/>';
 			}
 			html += '</ul>';
 			var $html = $(html);
 			var $val = $html.find('.selected');
 			if ($val.length == 0) {
 				$val = $html.find('li:first');
+			}
+
+			var min_width = _getComputedStyle($container, 'min-width');
+			var width = _getComputedStyle($container, 'width');
+			if (!width || width == 'auto' || width == min_width) {
+				// 对内容检测得到内容的最大宽度
+				$html_test.html(html_test).css('opacity', 0);
+				$html_test.appendTo($('body'));
+				var w_test = $html_test.width() + 10;
+				$html_test.remove();
+				
+				$container.css('width', w_test);
 			}
 			var tmpl = '<span class="ui-select-val" title="'+$val.text()+'">'+$val.html()+'</span>';
 			$container.html(tmpl+html).on('change', onchange);
