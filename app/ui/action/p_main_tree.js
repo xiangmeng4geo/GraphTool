@@ -19,19 +19,19 @@ Core.init(function(model) {
     if (treeData) {
         var data = [];
 
-        function getNodes(arr) {
+        function getNodes(arr, level) {
             if (!arr) {
                 return null;
             }
             var d = [];
             arr.forEach(function(v) {
                 var name = v.name;
-                var child = getNodes(v.childNodes);
+                var child = getNodes(v.childNodes, level+1);
                 d.push({
                     icon: child ? 'folder' : 'file',
                     text: name,
                     state: {
-                        opened: true
+                        opened: level < 1
                     },
                     children: child,
                     type: child ? 'default' : 'file'
@@ -39,7 +39,7 @@ Core.init(function(model) {
             });
             return d;
         }
-        treeData = getNodes(treeData);
+        treeData = getNodes(treeData, 0);
     }
     function refreshData() {
         var data = this.get_json();
