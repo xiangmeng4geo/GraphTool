@@ -122,7 +122,6 @@
                     var data_interpolate = dataJson.interpolate;
                     if (data_interpolate) {
                         conrec(data_interpolate, blendentJson, true, function(err, data_conrec) {
-                            console.log(data_conrec);
                             if (err) {
                                 model.emit('error', err);
                             } else {

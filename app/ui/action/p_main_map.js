@@ -160,7 +160,7 @@ Core.init(function(model) {
         var result = _require('legend')({
             blendent: blendent
         }, {
-            type: legendStyle,
+            type: legendStyle || undefined,
             width: width_map,
             height: height_map
         });
