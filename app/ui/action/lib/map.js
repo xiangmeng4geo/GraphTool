@@ -434,7 +434,8 @@
         var shapes = data.shapes,
             arcs = data.arcs;
 
-        if (!shapes || shapes.length == 0) {
+        var len = shapes.length;
+        if (!shapes || len == 0) {
             return;
         }
         
@@ -442,7 +443,7 @@
 
         // TIP: this is important
         ctx.beginPath();
-        for (var i = 0, j = 1; i<j; i++) {
+        for (var i = 0; i<len; i++) {
             _drawShape(ctx, [shapes[i]], arcs);
         }
         ctx.closePath();

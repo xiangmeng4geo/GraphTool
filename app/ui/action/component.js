@@ -139,7 +139,6 @@
 		if (!$container.data('inited') || data.length > 0) {
 			var onchange = options.onchange || function(){};
 			$container.data('getShowVal', options.getShowVal);
-			console.log($container.css('width'), $container.css('min-width'));
 
 			var $html_test = $container.clone();
 			var html_test = '';
