@@ -1,7 +1,7 @@
 !function(){
     var path = require('path');
-    var PATH_WORKBENCH = path.join(__dirname, '../../..');
-    var util = require(path.join(PATH_WORKBENCH, 'util'));
+    var PATH_COMMON = path.join(__dirname, '../../..');
+    var util = require(path.join(PATH_COMMON, 'util'));
 
     var DEFAULT_VALUE = 999999;
 	var DEFAULT_COLOR = 'rgba(0,0,0,0)';
@@ -9,7 +9,6 @@
 	var REG_DATA = /^(\d+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+(-?[\d.]+)$/;
 
     function _parse_file(lines, option, cb){
-    	console.log(option);
 		option = util.extend(true, {
 			x0: 72.5,
 			y0: 17.5,
@@ -22,8 +21,7 @@
             interpolate: 'idw', //当interpolate == false时不进行插值
 			num_of_cols: 5, //数据列数
 			col: 5,      //读取第N列值
-			arithmetic: null,
-			val: {}
+			arithmetic: null
 		}, option);
 		var REG_DEFAULT_VAL = /9{4,}/;
         var x0 = option.x0,
@@ -35,7 +33,6 @@
         if (bound) {
             var wn = bound.wn,
                 es = bound.es;
-
             // 用数据里的显示边界对数据进行修正
             if (wn && wn.length == 2 && es && es.length == 2) {
                 x0 = Math.min(x0, wn[0], es[0]);
@@ -43,10 +40,10 @@
                 x1 = Math.max(x1, wn[0], es[0]);
                 y1 = Math.max(y1, wn[1], es[1]);
 
-                var num = 50;
+                var num = 80;
                 var space = Math.abs(Math.min((x1 - x0)/num, (y1 - y0)/num));
                 grid_space = Math.min(space, grid_space);
-
+                // grid_space = 3;
                 x0 -= grid_space;
                 y0 -= grid_space;
                 x1 += grid_space;
@@ -104,7 +101,9 @@
                 data: data
             });
         }
-        interpolate_method = require(path.join(PATH_WORKBENCH, 'interpolate/'+interpolate_method));
+        // console.log(data);
+        interpolate_method = require(path.join(PATH_COMMON, 'interpolate/'+interpolate_method));
+        // data = data.slice(0, 25000);
         interpolate_method(data, lnglat_arr, option, function(err, new_data){
             if(err){
                 return cb(err);
@@ -121,6 +120,7 @@
     			interpolate: new_data
     		})
         });
+        // console.log('async after idw');
 	}
 
     exports.parse = _parse_file;

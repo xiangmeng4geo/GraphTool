@@ -146,6 +146,11 @@
 		};
 	}
 
+	function _getColor(colors) {
+		return colors.filter(function(v) {
+			return v.is_checked;
+		});
+	}
 	// 常规上下显示 
 	function LegendB(legend, options) {
 		options = $.extend({
@@ -174,9 +179,12 @@
 		var width_text_arr = [];
 		var len_arr = [];
 		var height_test = 0;
+		legend = legend.filter(function(v) {
+			return v.is_checked
+		});
 		var len_legend = legend.length;
 		for (var i = 0; i<len_legend; i++) {
-			var colors = legend[i].colors.slice(0);
+			var colors = _getColor(legend[i].colors);
 			width_test += width_block;
 			var w_arr = [];
 			colors.forEach(function(c, ci) {
@@ -201,7 +209,7 @@
 		for (var i = 0; i<len_legend; i++) {
 			var item = legend[i];
 			var is_stripe = item.is_stripe;
-			var colors = item.colors.slice(0);
+			var colors = _getColor(item.colors);
 			var len = colors.length;
 			//从小到大
 			colors.sort(function(a, b){
@@ -275,7 +283,7 @@
 		for (var i = 0; i<len_legend; i++) {
 			var item = legend[i];
 			var is_stripe = item.is_stripe;
-			var colors = item.colors.slice(0);
+			var colors = _getColor(item.colors);
 			var y = i * height_per + i * y_margin;
 			var len_colors = colors.length;
 			var width_per = (width - x_margin * (len_colors - 1)) / len_colors;

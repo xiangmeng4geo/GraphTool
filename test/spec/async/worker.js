@@ -9,8 +9,13 @@
 			}
 		}
 	}
-	T.on('init', function(time){
+	var param = '';
+	T.on('initData', function(msg) {
+		T.emit('info', 'from worker:'+msg);
+		param += msg;
+	});
+	T.on('initEnd', function(time){
 		var result = run(time);
-		T.emit('data', result);
+		T.emit('data', 'param = '+param+', result = '+result);
 	});
 }();

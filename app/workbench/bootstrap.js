@@ -5,7 +5,9 @@
 	"use strict";
 
 	var app = require('app');
-	var ipc = require('electron').ipcMain;
+	var electron = require('electron');
+	var ipc = electron.ipcMain;
+	var crashReporter = electron.crashReporter;
 	var BrowserWindow = require('browser-window');
 	var path = require('path');
 	var _window = require('./window');
@@ -13,9 +15,9 @@
 	var CONST = require('../common/const');
 	var CONST_COMMAND = CONST.COMMAND;
 	var util = require('../common/util');
-	var util_file_mkdir = util.file.mkdir
-	//
-	// // 创建必要的目录
+	var util_file_mkdir = util.file.mkdir;
+
+	// 创建必要的目录
 	util_file_mkdir(CONST.PATH.CACHE);
 
 	global.gtStart = (new Date).getTime();
@@ -133,6 +135,19 @@
 	}
 
 	app.on('ready', function() {
+
+			var a = crashReporter.start({
+				productName: app.getName(),
+				companyName: '华新创新网络',
+				submitURL: 'http://10.14.85.116/php/crashreporter/',
+				autoSubmit: true,
+				ignoreSystemCrashHandler: true,
+				extra: {
+					content: 'tonny test',
+					name: 'tonny'
+				}
+			});
+			console.log(crashReporter, a);
 		_getMainWin(true);
 	});
 }();

@@ -20,16 +20,27 @@ exports.parse = function(lines, options, cb){
 			china_end_lat = 60;
 						
 		var data = [];
-		var vals = lines.join('\s').trim().split(REG_BLANK);
+		var vals = lines.join(' ').trim().split(REG_BLANK);
 
 		// 对数据进行处理，防止出现间隔太小的数据
-		var SPACE_MIN = 0.2;
-		var cha_lng = Math.abs(space_lng),
-			cha_lat = Math.abs(space_lat);
-		cha_lng	= cha_lng > SPACE_MIN? Math.ceil(SPACE_MIN/space_lng): 1;
-		cha_lat	= cha_lat > SPACE_MIN? Math.ceil(SPACE_MIN/cha_lat): 1;
+		// var SPACE_MIN = 0.2;
+		// var cha_lng = Math.abs(space_lng),
+		// 	cha_lat = Math.abs(space_lat);
+		// cha_lng	= cha_lng < SPACE_MIN? Math.ceil(SPACE_MIN/space_lng): 1;
+		// cha_lat	= cha_lat < SPACE_MIN? Math.ceil(SPACE_MIN/space_lat): 1;
 
+
+		var cha_x = 1, 
+			cha_y = 1;
+		var NUM_MAX = 80;
+		if (num_lng > NUM_MAX) {
+			cha_x = Math.ceil(Math.abs(lng_end - lng_start)/NUM_MAX/Math.abs(space_lng));
+		}
+		if (num_lat > NUM_MAX) {
+			cha_y = Math.ceil(Math.abs(lat_end - lat_start)/NUM_MAX/Math.abs(space_lat));
+		}
 		var index_read = 0;
+		var data_test = [];
 		for(var i = 0; i<num_lat; i++){
 			var items = [];
 			for(var j = 0; j<num_lng; j++){
@@ -37,8 +48,14 @@ exports.parse = function(lines, options, cb){
 					y = lat_start + space_lat * i;
 				var val = parseFloat(vals[index_read++]);
 				if(x >= china_start_lng && x <= china_end_lng && y >= china_start_lat && y <= china_end_lat){
-					if(x%cha_lng == 0 && y%cha_lat == 0){
+					// if(x%cha_lng == 0 && y%cha_lat == 0){
+					if(i%cha_x == 0 && j%cha_y == 0){
 						items.push({
+							x: x,
+							y: y,
+							v: val
+						});
+						data_test.push({
 							x: x,
 							y: y,
 							v: val

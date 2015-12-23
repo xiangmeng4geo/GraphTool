@@ -233,9 +233,9 @@
 	 * })(param, cb)
 	 */
 	var Async = {};
-	var Thread = process.type? require('./libs/threads.node'): require('webworker-thread-release');
 
 	Async.init = function init(path_js, cb_info){
+		var Thread = process.type? require('./libs/threads.node'): require('webworker-thread-release');
 		var t = Thread.create();
 		t.on('end', function(){
 			t.destroy();
@@ -250,12 +250,22 @@
 		}else{
 			t.load(path_js);
 		}
+		var len_send = 1024 * 999
 		return function(param, cb){
 			if(cb === undefined){
 				cb = param;
 				param = null;
 			}
-			t.emit('init', JSON.stringify(param));
+			var str_param = JSON.stringify(param);
+			var i = 0, len = str_param.length;
+			while(i < len) {
+				var str = str_param.substr(i, len_send);
+				// console.log('str = '+str+' , str_param = '+str_param);
+				t.emit('initData', str);
+				i += len_send;
+			}
+			// t.emit('data', 'hello');
+			t.emit('initEnd', '');
 			t.on('data', function(){
 				var args = [].slice.apply(arguments);
 				args = args.map(function(v){

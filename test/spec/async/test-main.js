@@ -13,10 +13,12 @@ describe('Util.async', function() {
 		time_end;
 	it('load js file', function(done){
 		time_start = new Date();
-		Async.init(path.join(__dirname, 'worker.js'))(1, function(result){
+		Async.init(path.join(__dirname, 'worker.js'), function(result) {
+			// console.log('info: result = '+result);
+		})(1, function(result){
 			// console.log(result, time_start, time_end);
 			// equal(true, time_end - time_start);
-
+			// console.log('result1 = '+result);
 			done();
 
 		})
@@ -41,8 +43,12 @@ describe('Util.async', function() {
 					}
 				}
 			}
-			T.on('init', function(time){
-				var result = run(time);
+			var param_str = '';
+			T.on('initData', function(data) {
+				param_str += data;
+			});
+			T.on('initEnd', function(){
+				var result = run(JSON.parse(param_str));
 				T.emit('data', result);
 			});
 		})(2, function(result){

@@ -56,7 +56,7 @@ describe('datareader.micaps', function(){
                 if(d.length > 0){
                     var v = d[0];
                     // 尝试读取第一行数据
-                    if(v.x == 11.92 && v.y == 78.92 && v.v == 7){
+                    if(v.x == 11.92 && v.y == 78.92 && v.v == 1){
                         return done();
                     }
                 }
@@ -77,7 +77,41 @@ describe('datareader.micaps', function(){
                 if(d.length > 0){
                     var v = d[0];
                     // 尝试读取第一行数据
-                    if(v.x == 11.92 && v.y == 78.92 && v.v == 7){
+                    if(v.x == 11.92 && v.y == 78.92 && v.v == 1){
+                        var data_interpolate = data.interpolate;
+                        var num_total = 0,
+                            num_default = 0;
+                        for(var i = 0, j = data_interpolate.length; i<j; i++){
+                            for(var ii = 0, item = data_interpolate[i], jj = item.length; ii<jj; ii++){
+                                if(data_interpolate[i][ii].v == default_val){
+                                    num_default++;
+                                }
+                                num_total++;
+                            }
+                        }
+                        if(num_default > 0 && num_default != num_total){
+                            return done();
+                        }
+                    }
+                }
+            }catch(e){}
+
+            done(new Error('interpolate data error'));
+        });
+    });
+    it('[type 1, big file] only get interpolate values', function(done){
+        var default_val = 999999;
+        read_micaps({
+            file: _getDataPath('1.1-big'),
+            // val_col: 4,
+            default_val: default_val
+        }, function(err, data){
+            try{
+                var d = data.data;
+                if(d.length > 0){
+                    var v = d[0];
+                    // 尝试读取第一行数据
+                    if(v.x == 124.40 && v.y == 40.10 && v.v == 1){
                         var data_interpolate = data.interpolate;
                         var num_total = 0,
                             num_default = 0;

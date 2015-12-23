@@ -1,6 +1,7 @@
 !function(){
     var fs = require('fs'),
         path = require('path');
+    var util_extend = require('../../util').extend;
     var ERROR_NO_DATA = {
 		code: 1,
 		msg: 'no data'
@@ -15,6 +16,7 @@
 	}
     function parse(options, callback){
         callback || (callback = function(){});
+        options = util_extend(true, {}, options);
         var file_path = options.file;
         fs.readFile(file_path, {
             encoding: 'utf8'
@@ -45,6 +47,11 @@
 
                         options.lineExtra = line_arr.slice(0, 2);
 
+                        var _val = options.val;
+                        if (_val) {
+                            delete options.val;
+                            options = util_extend(options, _val);
+                        }
                         parser.parse(line_arr.slice(2), options, function(err, data_return){
                             data_return.type = type;
                             var stat = fs.statSync(file_path);
