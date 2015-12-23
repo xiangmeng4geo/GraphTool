@@ -164,6 +164,7 @@ Core.init(function(model) {
             height: height_map
         });
 
+        console.log(result);
         geomap.addOverlay(new Shape.Image(result.canvas, {
             x: result.x,
             y: result.y

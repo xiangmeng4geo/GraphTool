@@ -2,7 +2,19 @@
 	var child_process = require('child_process');
 	var path = require('path');
 	var util = require('../../util');
-	var is_can_use_fork = require('os').cpus().length > 4;
+	/* 
+	经过测试在8核的电脑上同时fork了100个子进程，正常运行
+
+	** 这里暂时当最少2个cpu时用子进程，否则在当前进程处理
+
+	http://stackoverflow.com/questions/31252188/node-js-child-process-limits
+
+	the cpu has two cores, a single core can support multiple threads, 
+	and child processes do run in their own threads, so the answer is of 
+	course yes. though, a simple test would have likely brought you to 
+	the same conclusion.
+	*/
+	var is_can_use_fork = require('os').cpus().length >= 2;
 
 	// is_can_use_fork = false;
 	var path_idw = path.join(__dirname, 'idw');

@@ -179,9 +179,6 @@
 		var width_text_arr = [];
 		var len_arr = [];
 		var height_test = 0;
-		legend = legend.filter(function(v) {
-			return v.is_checked
-		});
 		var len_legend = legend.length;
 		for (var i = 0; i<len_legend; i++) {
 			var colors = _getColor(legend[i].colors);
@@ -329,7 +326,6 @@
 		options = $.extend({
 			type: TYPE_DEFAULT
 		}, options);
-		
 		var method = fn_method[options.type];
 		if (method) {
 			return method(conf_legend, options);
