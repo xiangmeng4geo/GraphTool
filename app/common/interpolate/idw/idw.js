@@ -109,7 +109,7 @@
 		// info('Interpolation_IDW_Neighbor takes '+(new Date() - time_start)+' ms!');
 		return lnglat_arr;
 	}
-	process.on('message', function(param) {
+	function idw(param) {
 		var data = param.data, 
 			lnglat_arr = param.lnglat_arr, 
 			option = util.extend({
@@ -123,10 +123,15 @@
 												option.numOfNearest,
 												option.default_val,
 												option.interpolation_all);
+		return result;
+	}
+	process.on('message', function(param) {
 		process.send({
 			err: null,
-			result: result
+			result: idw(param)
 		});
 		process.exit(0);
 	});
+
+	module.exports = idw;
 }();

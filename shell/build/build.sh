@@ -23,8 +23,6 @@ rm -rf $TARGET_64_DIR/resources/default_app
 rm -rf $TARGET_64_DIR/resources/app
 mkdir $TARGET_64_DIR/resources/app
 cp -R $TARGET_DIR/* $TARGET_64_DIR/resources/app
-rm $TARGET_64_DIR/resources/app/common/libs/threads.node
-cp $SHELLPATH/libs/threads-64.node $TARGET_64_DIR/resources/app/common/libs/threads.node
 
 
 rm -rf $TARGET_32_DIR
@@ -35,5 +33,3 @@ rm -rf $TARGET_32_DIR/resources/default_app
 rm -rf $TARGET_32_DIR/resources/app
 mkdir $TARGET_32_DIR/resources/app
 cp -R $TARGET_DIR/* $TARGET_32_DIR/resources/app
-rm $TARGET_32_DIR/resources/app/common/libs/threads.node
-cp $SHELLPATH/libs/threads-32.node $TARGET_32_DIR/resources/app/common/libs/threads.node

@@ -39,7 +39,7 @@
                     _log(msg);
 
                     if (!err && data) {
-                        // util_file.write(cache_path, data);
+                        util_file.write(cache_path, data);
                     }
                     cb && cb.apply(null, arguments);
                 })
