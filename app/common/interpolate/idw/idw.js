@@ -15,7 +15,7 @@
 			numArray2 = new Array(num3),
 			objArray = [[],[]];
 		// info(JSON.stringify(SCoords));
-		info('Interpolation_IDW_Neighbor: '+ 'dataLen = '+num3+', lnglatLen = '+ length*num);
+		// info('Interpolation_IDW_Neighbor: '+ 'dataLen = '+num3+', lnglatLen = '+ length*num);
 		for(num4 = 0; num4 < num; num4++){
 			num5 = 0;
 			while( num5 < length ){
@@ -106,7 +106,7 @@
 				lnglat.v = item;
 			});
 		});
-		info('Interpolation_IDW_Neighbor takes '+(new Date() - time_start)+' ms!');
+		// info('Interpolation_IDW_Neighbor takes '+(new Date() - time_start)+' ms!');
 		return lnglat_arr;
 	}
 	process.on('message', function(param) {

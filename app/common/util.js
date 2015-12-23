@@ -221,65 +221,6 @@
 	}
 
 	/**
-	 * 封闭异步
-	 *
-	 * 基于webworker-thread, 每个异步的模块里只可以是相应的多计算不可以使用外部API(包插require等)
-	 * @param path_js 可以是路径（必须是绝对路径）或函数本身（但不能引用函数外的任务变量）
-	 * eg:
-	 * init('/a/b/worker.js')(param, cb)
-	 *
-	 * init(function(){
-	 * 		// do something
-	 * })(param, cb)
-	 */
-	var Async = {};
-
-	Async.init = function init(path_js, cb_info){
-		var Thread = process.type? require('./libs/threads.node'): require('webworker-thread-release');
-		var t = Thread.create();
-		t.on('end', function(){
-			t.destroy();
-		});
-		t.on('info', cb_info); // 对thread原生函数注册调试
-		t.on('model.log', function(msg) {
-			model_emit_log(msg);
-		});
-		if(typeof path_js === 'function'){
-			var js = '!'+path_js+'()';
-			t.eval(js);
-		}else{
-			t.load(path_js);
-		}
-		var len_send = 1024 * 999
-		return function(param, cb){
-			if(cb === undefined){
-				cb = param;
-				param = null;
-			}
-			var str_param = JSON.stringify(param);
-			var i = 0, len = str_param.length;
-			while(i < len) {
-				var str = str_param.substr(i, len_send);
-				// console.log('str = '+str+' , str_param = '+str_param);
-				t.emit('initData', str);
-				i += len_send;
-			}
-			// t.emit('data', 'hello');
-			t.emit('initEnd', '');
-			t.on('data', function(){
-				var args = [].slice.apply(arguments);
-				args = args.map(function(v){
-					try{
-						v = JSON.parse(v);
-					}catch(e){}
-					return v;
-				});
-				cb.apply(null, args);
-			});
-		}
-	}
-
-	/**
 	 * 数学格式化
 	 */
 	var Digit = {
@@ -602,7 +543,6 @@
 	Util.path = path_util;
 	Util.encrypt = encrypt;
 	Util.grid = grid;
-	Util.Async = Async;
 	Util.Digit = Digit;
 	Util.Polygon = Polygon;
 	Util.serialize = _fn_serialize;
