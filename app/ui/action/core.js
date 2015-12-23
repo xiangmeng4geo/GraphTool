@@ -190,7 +190,6 @@
 	}
 	var $ = load('lib/j');
 	_require('prop');
-	_require('reporter');
 
 	var EXT_CSS = '.css';
 	var $head = $('head');

@@ -135,19 +135,6 @@
 	}
 
 	app.on('ready', function() {
-
-			var a = crashReporter.start({
-				productName: app.getName(),
-				companyName: '华新创新网络',
-				submitURL: 'http://10.14.85.116/php/crashreporter/',
-				autoSubmit: true,
-				ignoreSystemCrashHandler: true,
-				extra: {
-					content: 'tonny test',
-					name: 'tonny'
-				}
-			});
-			console.log(crashReporter, a);
 		_getMainWin(true);
 	});
 }();
