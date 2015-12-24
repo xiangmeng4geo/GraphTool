@@ -36,7 +36,7 @@
 			// name 等于空字符串时加载默认地图
 			if (name === '') {
 				for (var i = 0, j = geo.length; i<j; i++) {
-					if (geo[i].default) {
+					if (geo[i].is_default) {
 						return geo[i];
 					}
 				}

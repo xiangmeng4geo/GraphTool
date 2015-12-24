@@ -183,14 +183,14 @@ Core.init(function(model) {
 	function _saveConfData() {
 		var is_have_default = false;
 		for (var i = 0, j = conf_data_geo.length; i<j; i++) {
-			if (conf_data_geo[i].default) {
+			if (conf_data_geo[i].is_default) {
 				is_have_default = true;
 				break;
 			}
 		}
 		// 没有设置默认地图的话使用第一个
 		if (!is_have_default) {
-			conf_data_geo[0].default = true;
+			conf_data_geo[0].is_default = true;
 		}
 		conf_data_sys.geo = conf_data_geo;
 		product_conf.setSys(conf_data_sys);
@@ -315,6 +315,7 @@ Core.init(function(model) {
 		if (index == -1) {
 			conf_data_geo.push(data);
 		} else {
+			data.is_default = conf_data_geo[index].is_default;
 			conf_data_geo.splice(index, 1, data);
 		}
 
@@ -334,8 +335,8 @@ Core.init(function(model) {
 			var item = conf_data_geo[i];
 			var name = item.name;
 			var id = 'r_id_'+i;
-			html += '<li '+(item.default? 'class="default"':'')+'>'+
-						'<input type="radio" id="'+id+'" name="geo_list" '+(item.default?'checked':'')+'/>'+
+			html += '<li '+(item.is_default? 'class="default"':'')+'>'+
+						'<input type="radio" id="'+id+'" name="geo_list" '+(item.is_default?'checked':'')+'/>'+
 						'<label>'+name+'</label>'+
 						'<span></span>'
 					'</li>';
@@ -346,6 +347,8 @@ Core.init(function(model) {
 	_initMapConfList();
 	$('#btn_save_map').click(function() {
 		_saveMapConf(function() {
+			// 附加复制功能
+			$txt_map_name.val('');
 			_alert('保存成功！');
 		});
 	});
@@ -408,7 +411,7 @@ Core.init(function(model) {
 
 				var is_use_map = _map_conf.is_use;
 				var $is_use_map = $html.find('.is_use_map');
-				_setChecked($is_use_map, is_use_map);console.log(is_use_map);
+				_setChecked($is_use_map, is_use_map);
 				if (!is_use_map) {
 					$is_use_map.parent().siblings('.row').hide();
 				}
@@ -473,7 +476,7 @@ Core.init(function(model) {
 			conf_data_geo.splice(index, 1);
 			_saveConfData();
 
-			if ($p.is('.default')) {
+			if ($p.is('.is_default')) {
 				$p.siblings().first().addClass('default');
 			}
 
@@ -487,16 +490,16 @@ Core.init(function(model) {
 		_confirm('此操作会影响所有设置成默认地图的产品，确定要把选中项设置成默认吗？', function() {
 			for (var i = 0, j = conf_data_geo.length; i<j; i++) {
 				if (i === index) {
-					conf_data_geo[i].default = true;
+					conf_data_geo[i].is_default = true;
 				} else {
-					delete conf_data_geo[i].default;
+					delete conf_data_geo[i].is_default;
 				}
 			}
 			_saveConfData();
 
 			$item.addClass('default').siblings().removeClass('default');
 		}, function() {
-			$item.parent().find('.default [type=radio]').prop('checked', true);
+			$item.parent().find('.is_default [type=radio]').prop('checked', true);
 		});
 	});
 	// 图例相关
