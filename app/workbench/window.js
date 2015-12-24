@@ -39,6 +39,9 @@
 		conf.show = false;
 
 		var win = new BrowserWindow(conf);
+		if (conf.debug) {
+			win.openDevTools();
+		}
 		// win.openDevTools();
 		// 当窗口关闭时清除`win_stack`中的标识
 		win.on('close', function(e){
