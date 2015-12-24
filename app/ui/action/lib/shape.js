@@ -1,8 +1,10 @@
 !function() {
     var C = Core;
     var $ = C.$;
+    var _require = C.require;
     var electron = require('electron');
     var nativeImage = electron.nativeImage;
+    var style2obj = _require('component').util.style2obj;
 
     var TEXT_TEST = '国';
 
@@ -149,6 +151,7 @@
     function Text(text, style) {
         var _this = this;
 
+        style = style2obj(style);
         var _style = $.extend({}, style);
         var font = [];
         var font_style = _style['font-style'] || _style['fontStyle'] || 'normal';
@@ -215,11 +218,23 @@
             };
             y_offset += h/2;
         }
-        _this.style = {
+        var shadowBlur = _style['shadowBlur'],
+            shadowColor = _style['shadowColor'],
+            shadowOffsetX = _style['shadowOffsetX'],
+            shadowOffsetY = _style['shadowOffsetY'];
+            
+        var _style_new = {
             textAlign: text_align,
             textBaseline: text_baseline,
             normal: undefined === _normal? true: !!_normal
         };
+        if (shadowBlur || shadowColor || shadowOffsetY || shadowOffsetX) {
+            _style_new.shadowBlur = shadowBlur || 1;
+            _style_new.shadowColor = shadowColor || '#000000';
+            _style_new.shadowOffsetX = shadowOffsetX || 0;
+            _style_new.shadowOffsetY = shadowOffsetY || 0;
+        }
+        _this.style = _style_new;
         _this.draw = function(ctx, projection) {
             var pixel = isNaN(lng) && isNaN(lat)? [x, y]: projection([lng, lat]);
             ctx.font = font;

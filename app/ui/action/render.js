@@ -132,7 +132,7 @@
 		var lines = data.lines;
 		if(lines){
             for (var i = 0,j = lines.length; i<j; i++) {
-                var v = lines[i];
+                var line = lines[i];
 				var point_arr = [];
 				var points = line.point;
 				if (points.length >= 2) {
@@ -145,14 +145,70 @@
 				var flags = line.flags;
 				if(flags && flags.items && flags.items.length > 0){
 					var text = flags.text;
-                    shapes.push(new Shape.Text(text, 'left:'+v.x+'px;top:'+v.y+'px;font-size: 12px'));
+                    for (i_flag = 0, item_flag = flags.items, j_flag = item_flag.length; i_flag < j_flag; i_flag++) {
+                        var v = item_flag[i_flag];
+                        shapes.push(new Shape.Text(text, 'lng:'+v.x+'px;lat:'+v.y+'px;font-size: 12px'));
+                    }
 				}
 			}
 		}
+        var symbols = data.symbols;
+        if(symbols){
+            for (var i = 0, j = symbols.length; i<j; i++) {
+                var v = symbols[i];
+                var type = v.type;
+
+                var text = '',
+                    color = '',
+                    fontSize = 30,
+                    styleExtra = null,
+                    offset = null,
+                    fontWeight = '';
+                if('60' == type){
+                    text = 'H';
+                    color = '#ff0000';
+                }else if('61' == type){
+                    text = 'L';
+                    color = '#0000ff';
+                }else if('37' == type){
+                    text = '台';
+                    color = '#00ff00';
+                }else if('48' == type){
+                    fontWeight = 'font-weight: bold;';
+                    text = v.text;
+                    fontSize = 14;
+                    styleExtra = {
+                        shadowBlur: '4px',
+                        shadowColor: '#ffffff'
+                    };
+                    offset = {
+                        x: 0,
+                        y: -24
+                    };
+                    // color = '#1010FF';
+
+                    shapes.push(new Shape.Text('╳', 'lng:'+v.x+'px;lat:'+v.y+'px;font-size: 12px'));
+                }
+                if(text){
+                    var _style = 'lng:'+(v.x)+'px;lat:'+v.y+'px;font-size: '+fontSize+'px;'+fontWeight;
+                    if (color) {
+                        _style += 'color:'+color+';';
+                    }
+                    if (offset) {
+                        _style += 'offsetX: '+offset.x+'px; offsetY: '+offset.y+'px;';
+                    }
+                    if (styleExtra) {
+                        for (var prop in styleExtra) {
+                            _style += prop+': '+styleExtra[prop]+';';
+                        }
+                    }
+                    shapes.push(new Shape.Text(text, _style));
+                }
+            }
+        }
         if (shapes && shapes.length > 0) {
             _model.emit('render', shapes);
         }
-        // var symbols = data.symbols;
     }
     module.exports = {
         setModel: _setModel,

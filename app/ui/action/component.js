@@ -5,6 +5,7 @@
 	var Dialog = _require('./dialog');
 	var _extend = $.extend;
 	var CONST = _require('const');
+	var util = _require('util');
 	// http://www.zreading.cn/ican/2014/10/css-font-family/
 	var CONST_FONT_FAMILY = CONST.FONT_FAMILY;
 	var CONST_FONT_SIZE = CONST.FONT_SIZE;
@@ -232,6 +233,9 @@
 	}
 	// 把style字符串转成对象
     function _styleToObj(style) {
+    	if (util.isPlainObject(style)) {
+    		return style;
+    	}
         var result = {};
         var arr = style.split(';');
         arr.forEach(function(v) {
