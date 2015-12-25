@@ -174,7 +174,7 @@
             strokeStyle = style.strokeStyle,
             fillStyle = style.fillStyle,
             flag_fill = style.flag_fill,
-            stroked = strokeStyle && lineWidth !== 0,
+            stroked = strokeStyle || lineWidth !== 0,
             filled = !!fillStyle && (undefined !== flag_fill || null !== flag_fill || flag_fill);
 
         if (stroked) {

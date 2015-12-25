@@ -4,6 +4,19 @@
     var Shape = _require('shape');
     var Pattern = _require('pattern');
     var _model;
+    function _rnd() {
+        var n = Math.floor(255 * Math.random());
+        n = n.toString(16);
+        if (n.length == 1) {
+            n = '0'+n;
+        }
+        return n;
+    }
+    function _rndColor() {
+        // var c = 'rgba('+_rnd()+', '+_rnd()+', '+_rnd()+', 1);'
+        var c = '#'+_rnd()+_rnd()+_rnd();
+        return c;
+    }
     // 处理conrec后的数据
     function _conrec(data) {
         var t_start = new Date();
@@ -23,7 +36,34 @@
                     }));
                 });
             }
+
+            var lines = data.lines;
+            for (var i = 0, j = lines.length; i<j; i++) {
+                var v = lines[i];
+                // if (v.k != 1){
+                //     return;
+                // }
+                var first = v[0],
+                    end = v[v.length - 1];
+                var is_close = first.x == end.x && first.y == end.y;
+                if (is_close) {
+                    continue;
+                }
+                // if (v.len.length == 6) {
+                //     continue;
+                // }
+                console.log(v.len, first, end);
+                v.isObj = true;
+                shapes.push(new Shape.Polyline(v, {
+                    strokeStyle: _rndColor(),
+                    lineWidth: is_close? 5: 3
+                }));
+                var point = v[Math.floor(v.length/2)];
+                shapes.push(new Shape.Text(v.k, 'lng: '+point.x+'; lat: '+point.y+';font-size: 16px;'));
+                // break;
+            }
         }
+        console.log(shapes);
         _model.emit('log', 'render deal data takes '+(new Date() - t_start)+' ms!');
         if (shapes && shapes.length > 0) {
             _model.emit('render', shapes);
