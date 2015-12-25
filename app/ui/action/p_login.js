@@ -12,11 +12,11 @@ Core.init(function(){
 	var util = _require('util');
 	var util_verification = util.verification;
 
-	function close(){
-		window.close();
-	}
+	// function close(){
+	// 	window.close();
+	// }
 
-	$('.btn_close').on('click', close);
+	$('.btn_close').on('click', C.Win.close);
 
 	var $username = $('#username'),
 		$userpwd = $('#userpwd');

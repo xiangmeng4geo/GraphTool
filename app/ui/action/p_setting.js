@@ -56,7 +56,7 @@ Core.init(function(model) {
 		_checkbox();
 	});
 	$('.btn_close').on('click', function() {
-		window.close();
+		C.Win.close();
 	});
 	// 对resize-horizontal组件初始化
 	{

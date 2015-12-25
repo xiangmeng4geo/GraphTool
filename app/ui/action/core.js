@@ -4,11 +4,13 @@
 ! function(window_global) {
 	'use strict'
 
-	var path = require('path');
-	var fs = require('fs');
-	var _remote = require('remote');
-	var ipc = require('electron').ipcRenderer;
+	var _req = require;
+	var path = _req('path');
+	var fs = _req('fs');
+	var _remote = _req('remote');
+	var ipc = _req('electron').ipcRenderer;
 
+	var dialog = _req('./dialog');
 	var win_instance = _remote.getCurrentWindow();
 	var CONST = win_instance.CONST;
 	var CONST_PATH = CONST.PATH;
@@ -18,11 +20,11 @@
 	var CONST_PATH_WORKBENCH = CONST_PATH.WORKBENCH;
 	var CONST_PATH_COMMON = CONST_PATH.COMMON;
 
-	var logger = require(path.join(CONST_PATH_COMMON, 'logger'));
+	var logger = _req(path.join(CONST_PATH_COMMON, 'logger'));
 
 	// 方便各子模块部通信
 	function Model() {}
-	require('util').inherits(Model, require("events").EventEmitter);
+	_req('util').inherits(Model, _req("events").EventEmitter);
 
 	var model = new Model();
 
@@ -71,7 +73,7 @@
 	 */
 	function load(url, subpath) {
 		var _p = path.resolve(CONST_PATH_UI_ACTION, subpath || '', url);
-		return require_safe(require, _p);
+		return require_safe(_req, _p);
 	}
 
 	/**
@@ -79,7 +81,7 @@
 	 */
 	function loadCommon(url, subpath) {
 		var _p = path.resolve(CONST_PATH_COMMON, subpath || '', url);
-		return require_safe(require, _p);
+		return require_safe(_req, _p);
 	}
 	/**
 	 * load module in workbench
@@ -100,7 +102,7 @@
 
 	function _require(name) {
 		for (var i = 0, j = paths_require.length; i < j; i++) {
-			var result = require_safe(require, path.resolve(paths_require[i], name), false);
+			var result = require_safe(_req, path.resolve(paths_require[i], name), false);
 			// console.log(result, path.resolve(paths_require[i], name));
 			if (result) {
 				return result;
@@ -185,6 +187,16 @@
 			return this.open(name, $.extend({
 				is_sub: true
 			}, option));
+		},
+		close: function(confirm, cb_before_close) {
+			if (confirm) {
+				dialog.confirm('确实要退出吗？', function() {
+					cb_before_close && cb_before_close();
+					window.close();
+				});
+			} else {
+				window.close();
+			}
 		},
 		WIN: win_instance
 	}

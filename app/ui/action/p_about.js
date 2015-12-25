@@ -1,9 +1,10 @@
 Core.init(function(){
-	var $ = Core.$;
+	var C = Core;
+	var $ = C.$;
 	var app = require('remote').app;
 	$('#version').text(app.getName() + ' ('+app.getVersion()+')');
 	$('.btn_close').click(function() {
-		window.close();
+		C.Win.close();
 	});
 	// try{
 	// 	$('#listence').text('有效期至');

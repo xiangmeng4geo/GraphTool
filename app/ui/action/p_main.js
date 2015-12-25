@@ -61,11 +61,13 @@ Core.init(function() {
 		});
 	}
 	$('#btn_quite').click(function() {
-		Win.open('login');
-		$btn_close_main.click();
+		Win.close(true, function() {
+			Win.open('login');
+		});
+		
 	});
 	var $btn_close_main = $('.btn_close_main').click(function() {
-		window.close();
+		Win.close(true);
 	});
 	var win_about;
 	$('#btn_about').click(function() {
