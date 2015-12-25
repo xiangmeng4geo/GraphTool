@@ -18,7 +18,7 @@
         return c;
     }
     // 处理conrec后的数据
-    function _conrec(data) {
+    function _conrec1(data) {
         var t_start = new Date();
         var shapes = [];
         if (data) {
@@ -65,6 +65,32 @@
         }
         console.log(shapes);
         _model.emit('log', 'render deal data takes '+(new Date() - t_start)+' ms!');
+        if (shapes && shapes.length > 0) {
+            _model.emit('render', shapes);
+        }
+    }
+    function _conrec(data) {
+        var shapes = [];
+        var list = data.list;
+        for (var i = 0, j = list.length; i<j; i++) {
+            var polygon = list[i];
+            var items = polygon.items;
+            items.isObj = true;
+            shapes.push(new Shape.Polygon(items, {
+                fillStyle: polygon.color,
+                strokeStyle: '#ff0000',
+                lineWidth: 2
+            }));
+        }
+        var lines = data.lines;
+        for (var i = 0, j = lines.length; i<j; i++) {
+            var line = lines[i];
+            line.isObj = true;
+            shapes.push(new Shape.Polyline(line, {
+                strokeStyle: _rndColor(),
+                lineWidth: 3
+            }));
+        }
         if (shapes && shapes.length > 0) {
             _model.emit('render', shapes);
         }

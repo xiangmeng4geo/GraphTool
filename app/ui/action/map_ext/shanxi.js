@@ -96,24 +96,24 @@
                         return model.emit('error', err);
                     }
                     var texts_data = [];
-                    // var data_origin = dataJson.data;
-                    // if (data_origin && conf.showData) {
-                    //     for (var i = 0, j = data_origin.length; i<j; i++) {
-                    //         var item = data_origin[i];
-                    //         var item_show = names_show[item.name];
-                    //         // if (item_show) {
-                    //             texts_data.push({
-                    //                 txt: item.v,
-                    //                 lng: item.x,
-                    //                 lat: item.y,
-                    //                 fontSize: 12,
-                    //                 color: 'rgba(0, 0, 0, 0.8)',
-                    //                 offsetY: -10,
-                    //                 offsetX: 6
-                    //             });
-                    //         // }
-                    //     }
-                    // }
+                    var data_origin = dataJson.data;
+                    if (data_origin && conf.showData) {
+                        for (var i = 0, j = data_origin.length; i<j; i++) {
+                            var item = data_origin[i];
+                            var item_show = names_show[item.name];
+                            // if (item_show) {
+                                texts_data.push({
+                                    txt: item.v,
+                                    lng: item.x,
+                                    lat: item.y,
+                                    fontSize: 12,
+                                    color: 'rgba(0, 0, 0, 0.8)',
+                                    offsetY: -10,
+                                    offsetX: 6
+                                });
+                            // }
+                        }
+                    }
                     // 处理源数据
 
                     Render.text(texts_data);

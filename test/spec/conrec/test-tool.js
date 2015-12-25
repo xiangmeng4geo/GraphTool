@@ -25,6 +25,23 @@ describe('conrec', function() {
 		x: 100,
 		y: 30
 	}];
+	var line1 = [{
+		x: 10,
+		y: 40
+	}, {
+		x: 20,
+		y: 0
+	}];
+	var line2 = [{
+		x: 10,
+		y: 0
+	}, {
+		x: 20,
+		y: 20
+	}, {
+		x: 10,
+		y: 30
+	}];
 	var line_inner = [{
 		x: 30, 
 		y: 30
@@ -51,12 +68,20 @@ describe('conrec', function() {
 		var splitPolygonByLine = tool.splitPolygonByLine;
 
 		var result = splitPolygonByLine(polygon, line);
-		// console.log(JSON.stringify(result));
+		console.log(JSON.stringify(result));
 		result.should.have.length(2);
 
 		var result_island = splitPolygonByLine(polygon, line_inner);
-		// console.log(JSON.stringify(result_island));
+		console.log(JSON.stringify(result_island));
 		result_island.should.have.length(2);
+
+		var result = splitPolygonByLine(polygon, line1);
+		console.log(JSON.stringify(result));
+		result.should.have.length(2);
+
+		var result = splitPolygonByLine(polygon, line2);
+		console.log(JSON.stringify(result));
+		result.should.have.length(2);
 	});
 	it('tool.getBond', function() {
 		var getBound = tool.getBound;
