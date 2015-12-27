@@ -72,16 +72,35 @@
     function _conrec(data) {
         var shapes = [];
         var list = data.list;
-        for (var i = 0, j = list.length; i<j; i++) {
-            var polygon = list[i];
+        var id = 0;
+        document.run = function(toid) {
+            id = toid || id;
+            console.log(id);
+            var polygon = list[id++];
             var items = polygon.items;
             items.isObj = true;
-            shapes.push(new Shape.Polygon(items, {
-                fillStyle: polygon.color,
+            var sub = polygon.sub;
+            if (sub) {
+                sub.forEach(function(v) {
+                    v.isObj = true;
+                });
+            }
+            _model.emit('render', [new Shape.Polygon(items, {
+                fillStyle: polygon.color || _rndColor(),
                 strokeStyle: '#ff0000',
                 lineWidth: 2
-            }));
+            }, sub)]);
         }
+        // for (var i = 0, j = list.length; i<j; i++) {
+        //     var polygon = list[i];
+        //     var items = polygon.items;
+        //     items.isObj = true;
+        //     shapes.push(new Shape.Polygon(items, {
+        //         fillStyle: polygon.color || _rndColor(),
+        //         strokeStyle: '#ff0000',
+        //         lineWidth: 2
+        //     }));
+        // }
         var lines = data.lines;
         for (var i = 0, j = lines.length; i<j; i++) {
             var line = lines[i];
@@ -90,6 +109,8 @@
                 strokeStyle: _rndColor(),
                 lineWidth: 3
             }));
+            var point = line[0];
+            shapes.push(new Shape.Text(i, 'lng: '+point.x+'; lat: '+point.y+';font-size: 16px;'));
         }
         if (shapes && shapes.length > 0) {
             _model.emit('render', shapes);
