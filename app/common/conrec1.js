@@ -1154,6 +1154,7 @@
     }
     SHOW_CONSOLE && console.timeEnd('conrec.afterConrec_new.relation');
     var val_return = {
+      lines: list,
       list: list_return,
       r: relation
     };

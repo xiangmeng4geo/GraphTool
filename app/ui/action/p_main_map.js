@@ -104,6 +104,9 @@ Core.init(function(model) {
     // model.on('product.change', function(productName){
     //     geomap && geomap.clear();
     // });
+    model.on('map.clear', function(file_path) {
+        geomap && geomap.clear();
+    });
     model.on('map.changeconfig', function(file_path) {
         geomap && geomap.clear();
     });

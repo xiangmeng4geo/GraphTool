@@ -62,29 +62,51 @@
 	// 线分割面(前提是这条线的两个端点在多边形上)
 	function _splitPolygonByLine(polygon, line) {
 		var items_polygon = polygon.items.slice(0);
-		// polygon = polygon.slice(0);
 		line = line.slice(0);
 		if (_isClosed(items_polygon)) {
 			items_polygon.pop();
 		}
 
 		if (_isClosed(line)) {
-			var sub = line.slice(0);
-			if (_getArea(items_polygon) * _getArea(line) > 0) {
-				sub.reverse();
+			var line_closed = line.slice(0);
+			if (_getArea(items_polygon) * _getArea(line_closed) > 0) {
+				line_closed.reverse();
 			}
 
 			items_polygon.push(items_polygon[0]);
-			var sub_arr = polygon.sub || [];
-			sub_arr.push(sub);
-			return [{
-				items: items_polygon,
-				sub: sub_arr
-			}, {
+
+			var part1 = {
+				items: items_polygon
+			};
+			var part2 = {
 				items: line
-			}];
+			};
+			var sub = polygon.sub || [];
+			var sub_one = [];
+			var bound_line_closed = _getBound(line_closed);
+			var sub_two;
+			// 对大环切带小环的面进行处理
+			for (var i = 0, j = sub.length; i<j; i++) {
+				var sub_item = sub[i];
+				var bound_sub_item = _getBound(sub_item);
+				if (_isBoundInBound(bound_line_closed, bound_sub_item)) {
+					if (undefined == sub_two) {
+						sub_two = [];
+					}
+					sub_two.push(sub_item);
+				} else {
+					sub_one.push(sub_item);
+				}
+			}
+			sub_one.push(line_closed);
+			if (sub_two && sub_two.length > 0) {
+				part2.sub = sub_two;
+			}
+			if (sub_one.length > 0) {
+				part1.sub = sub_one;
+			}
+			return [part1, part2];
 		} else {
-		console.log(line[0], line[line.length-1]);
 			var p_first_line = line[0],
 				p_end_line = line[line.length - 1];
 			var x_p_first_line = p_first_line.x,
@@ -124,14 +146,14 @@
 
 				if (index_first == -1 && x_p_first_line >= x_min && x_p_first_line <= x_max && y_p_first_line >= y_min && y_p_first_line <= y_max) {
 					index_first = i;
+					var flag_first = -1;
 					if (x_p_first_line == x_v && y_p_first_line == y_v) {
-						var result = _change(x_p_first_line, y_p_first_line, x_v, y_v, x_v_next, y_v_next, true);
-						var x_result = result.x,
-							y_result = result.y;
-						p_first_line.x = x_p_first_line = x_result;
-						p_first_line.y = y_p_first_line = y_result;
+						flag_first = true;
 					} else if (x_p_first_line == x_v_next && y_p_first_line == y_v_next) {
-						var result = _change(x_p_first_line, y_p_first_line, x_v, y_v, x_v_next, y_v_next, false);
+						flag_first = false;
+					}
+					if (flag_first != -1) {
+						var result = _change(x_p_first_line, y_p_first_line, x_v, y_v, x_v_next, y_v_next, flag_first);
 						var x_result = result.x,
 							y_result = result.y;
 						p_first_line.x = x_p_first_line = x_result;
@@ -140,18 +162,18 @@
 				}
 				if (index_end == -1 && x_p_end_line >= x_min && x_p_end_line <= x_max && y_p_end_line >= y_min && y_p_end_line <= y_max) {
 					index_end = i;
+					var flag_end = -1;
 					if (x_p_end_line == x_v && y_p_end_line == y_v) {
-						var result = _change(x_p_end_line, y_p_end_line, x_v, y_v, x_v_next, y_v_next, true);
-						var x_result = result.x,
-							y_result = result.y;
-						p_first_line.x = x_p_first_line = x_result;
-						p_first_line.y = y_p_first_line = y_result;
+						flag_end = true;
 					} else if (x_p_end_line == x_v_next && y_p_end_line == y_v_next) {
-						var result = _change(x_p_end_line, y_p_end_line, x_v, y_v, x_v_next, y_v_next, false);
+						flag_end = false;
+					}
+					if (flag_end != -1) {
+						var result = _change(x_p_end_line, y_p_end_line, x_v, y_v, x_v_next, y_v_next, flag_end);
 						var x_result = result.x,
 							y_result = result.y;
-						p_first_line.x = x_p_first_line = x_result;
-						p_first_line.y = y_p_first_line = y_result;
+						p_end_line.x = x_p_end_line = x_result;
+						p_end_line.y = y_p_end_line = y_result;
 					}
 				}
 			}
@@ -175,16 +197,55 @@
 			var part1 = items_polygon.slice(index_start, index_stop),
 				part2 = items_polygon.slice(index_stop).concat(items_polygon.slice(0, index_start));
 
-			if (index_first > index_end) {
-				var line_new = line.slice(0);
-				line_new.reverse();
-				part1 = part1.concat(line);
-				part2 = part2.concat(line_new);
+			var line_reverse = line.slice(0);	
+			line_reverse.reverse();
+			var area_line = _getArea(line);
+			var area_part = 0; // 防止出一个点或一条直线面积为0的情况
+			var len_part1 = part1.length,
+				len_part2 = part2.length;
+			if (len_part1 > 0 && (area_part = _getArea(part1)) !== 0) {
+				if (area_part * area_line > 0) { // 同方向
+					part1 = part1.concat(line_reverse);
+					part2 = part2.concat(line);
+				} else {
+					part1 = part1.concat(line);
+					part2 = part2.concat(line_reverse);
+				}
+			} else if (len_part2 > 0 && (area_part = _getArea(part2)) !== 0) {
+				if (area_part * area_line > 0) { // 同方向
+					part1 = part1.concat(line);
+					part2 = part2.concat(line_reverse);
+				} else {
+					part1 = part1.concat(line_reverse);
+					part2 = part2.concat(line);
+				}
 			} else {
-				var line_new = line.slice(0);
-				line_new.reverse();
-				part1 = part1.concat(line_new);
-				part2 = part2.concat(line);
+				// 点很少的情况会出现面积为0的情况
+				if (len_part1 > 0) {
+					var p_part1 = part1[0];
+					var x_p_part1 = p_part1.x,
+						y_p_part1 = p_part1.y;
+					if (Math.pow(x_p_part1 - x_p_first_line, 2) + Math.pow(y_p_part1 - y_p_first_line, 2) >
+						Math.pow(x_p_part1 - x_p_end_line, 2) + Math.pow(y_p_part1 - y_p_end_line, 2)) {
+						part1 = part1.concat(line);
+						part2 = part2.concat(line_reverse);
+					} else {
+						part1 = part1.concat(line_reverse);
+						part2 = part2.concat(line);
+					}
+				} else if (len_part2 > 0) {
+					var p_part2 = part2[0];
+					var x_p_p_part2 = p_part2.x,
+						y_p_p_part2 = p_part2.y;
+					if (Math.pow(x_p_p_part2 - x_p_first_line, 2) + Math.pow(y_p_p_part2 - y_p_first_line, 2) >
+						Math.pow(x_p_p_part2 - x_p_end_line, 2) + Math.pow(y_p_p_part2 - y_p_end_line, 2)) {
+						part1 = part1.concat(line_reverse);
+						part2 = part2.concat(line);
+					} else {
+						part1 = part1.concat(line);
+						part2 = part2.concat(line_reverse);
+					}
+				}
 			}
 			if (!_isClosed(part1)) {
 				part1.push(part1[0]);
@@ -203,6 +264,8 @@
 
 					(isPointIn(part1, x, y)? subone: subtwo).push(sub_items);
 				}
+			} else {
+
 			}
 			var one = {items: part1},
 				two = {items: part2};
@@ -223,39 +286,50 @@
 		var polygons_dealing = polygons.slice(0),
 			lines_dealing = lines.slice(0);
 
+		var lines_open = [],
+			lines_closed = [];
 		lines_dealing.map(function(line, i) {
 			line.bound = _getBound(line);
-			// line.isClosed = _isClosed(line)? 1: 0;
-			// line.id = i;
-		});	
-		// lines_dealing.sort(function(a, b) {
-		// 	return b.isClosed - a.isClosed;
-		// });
+			// var _flag_isClosed = _isClosed(line);
+			// if (_flag_isClosed) {
+			// 	lines_open.push(line);
+			// } else {
+			// 	lines_closed.push(line);
+			// }
+			line.id = i;
+		});
+		// 长度从长到短
+		lines_dealing.sort(function(a, b) {
+			return b.length - a.length;
+		});
 		var _num_test = 0;
+		var _test;
+		var _progress = {};
+		var _id_progress = 0;
 		while(true && _num_test++ < 5000) {
 			var _polygon = polygons_dealing.shift();
-			// console.log('_polygon = ', _polygon);
-			var bound_polygon = _getBound(_polygon.items);
+			var _items = _polygon.items;
+			var bound_polygon = _getBound(_items);
 			var sub = _polygon.sub;
-			var sub_bound_arr;
+			var sub_bound_arr = null;;
 			if (sub) {
 				sub_bound_arr = [];
 				sub.map(function(v) {
 					sub_bound_arr.push(_getBound(v));
 				});
 			}
-			// console.log('bound_polygon = ', bound_polygon);
 			var line_in = null;
-			// console.log('lines_dealing.length = ', lines_dealing.length, lines_dealing);
 			for (var i = 0, j = lines_dealing.length; i<j; i++) {
 				var line = lines_dealing[i];
-				// console.log(i, 'line = ', line);
 				var bound_line = line.bound;
 				if (_isBoundInBound(bound_polygon, bound_line)) {
-					var is_in = true;
-					if (sub_bound_arr) {
+					var _p_test = line[Math.floor(line.length/2)];
+
+					// 用线的中点测试是否真正在多边形中（在多边形边界内不一定真正在多边形内，如，在多边形的缺角）
+					var is_in = isPointIn(_items, _p_test.x, _p_test.y);
+					if (is_in && sub_bound_arr) {
 						for (var i_sub = 0, j_sub = sub_bound_arr.length; i_sub < j_sub; i_sub++) {
-							if (_isBoundInBound(sub_bound_arr[i_sub], bound_line)) {
+							if (_isBoundInBound(sub_bound_arr[i_sub], bound_line) && isPointIn(sub[i_sub], _p_test.x, _p_test.y)) {
 								is_in = false;
 								break;
 							}
@@ -267,29 +341,40 @@
 					}
 				}
 			}
-			// console.log('line_in = ', line_in);
 			if (line_in) {
+				// console.log('line_in.id = '+line_in.id);
 				var sub_polygons = _splitPolygonByLine(_polygon, line_in);
 				if (fn_getcolor) {
 					sub_polygons.map(function(v) {
 						v.line = line_in;
 					});
 				}
-				// console.log('sub_polygons = ', sub_polygons);
+				if (line_in.id == 25) {
+					_test = [_polygon];
+				}
+				sub_polygons._line_id = line_in.id;
+
+				_progress[_id_progress++] = sub_polygons;
 				polygons_dealing = sub_polygons.concat(polygons_dealing);// 放在队列最前优先处理
-				// console.log('polygons_dealing = ', polygons_dealing);
 			} else {
-				// _polygon.id = polygons_result.length;
+				_polygon.id = polygons_result.length;
+				// if (_polygon.id == 0) {
+				// 	debugger;
+				// }
 				fn_getcolor && fn_getcolor(_polygon);
-				// console.log('push polygon = ', _polygon);
-				polygons_result.push(_polygon);
+				delete _polygon.lines;
+				// if (!fn_getcolor || _polygon.color) {
+					polygons_result.push(_polygon);
+				// }
 			}
 			if (polygons_dealing.length == 0) {
 				break;
 			}
 		}
-		// console.log(JSON.stringify(polygons_result));
-		// console.log((polygons_result));
+		if (_test) {
+			polygons_result.test = _test;
+		}
+		polygons_result.progress = _progress;
 		return polygons_result;
 	}
 	module.exports = {

@@ -123,43 +123,59 @@ describe('Util', function() {
 		}, {
 			x: 0,
 			y: 10
+		}, {
+			x: 0,
+			y: 0
 		}];
+		var items_test = [{
+				"x": 79.6875,
+				"y": 60
+			}, {
+				"x": 79.95,
+				"y": 59.775
+			}, {
+				"x": 84.9375,
+				"y": 60
+			}];
 		it('[function isPointIn] should in', function(){
-			var result = Polygon.isPointIn(items, 2, 2);
+			// var result = Polygon.isPointIn(items, 2, 2);
+			// equal(true, result);
+
+			var result = Polygon.isPointIn(items_test, 80.125, 60);
 			equal(true, result);
 		});
-		it('[function isPointIn] should not in', function(){
-			var result = Polygon.isPointIn(items, 20, 20);
-			equal(false, result);
-		});
-		it('[function isPolygonIn] should in', function(){
-			var sub_items = [{
-				x: 1,
-				y: 1
-			}, {
-				x: 2,
-				y: 1
-			}, {
-				x: 2,
-				y: 2
-			}];
-			var result = Polygon.isPolygonIn(items, sub_items);
-			equal(true, result);
-		});
-		it('[function isPolygonIn] should not in', function(){
-			var sub_items = [{
-				x: 1,
-				y: 1
-			}, {
-				x: 2,
-				y: 1
-			}, {
-				x: 20,
-				y: 20
-			}];
-			result = Polygon.isPolygonIn(items, sub_items);
-			equal(false, result);
-		});
+		// it('[function isPointIn] should not in', function(){
+		// 	var result = Polygon.isPointIn(items, 20, 20);
+		// 	equal(false, result);
+		// });
+		// it('[function isPolygonIn] should in', function(){
+		// 	var sub_items = [{
+		// 		x: 1,
+		// 		y: 1
+		// 	}, {
+		// 		x: 2,
+		// 		y: 1
+		// 	}, {
+		// 		x: 2,
+		// 		y: 2
+		// 	}];
+		// 	var result = Polygon.isPolygonIn(items, sub_items);
+		// 	equal(true, result);
+		// });
+		// it('[function isPolygonIn] should not in', function(){
+		// 	var sub_items = [{
+		// 		x: 1,
+		// 		y: 1
+		// 	}, {
+		// 		x: 2,
+		// 		y: 1
+		// 	}, {
+		// 		x: 20,
+		// 		y: 20
+		// 	}];
+		// 	result = Polygon.isPolygonIn(items, sub_items);
+		// 	equal(false, result);
+		// });
 	});
 
 	describe('serialize', function(){

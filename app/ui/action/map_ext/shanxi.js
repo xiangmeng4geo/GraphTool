@@ -106,8 +106,8 @@
                     //                 txt: item.v,
                     //                 lng: item.x,
                     //                 lat: item.y,
-                    //                 fontSize: 12,
-                    //                 color: 'rgba(0, 0, 0, 0.8)',
+                    //                 fontSize: 14,
+                    //                 color: '#0000ff',
                     //                 offsetY: -10,
                     //                 offsetX: 6
                     //             });
@@ -136,7 +136,7 @@
                             //     for (var i_items = 0, j_items = items.length; i_items<j_items; i_items ++) {
                             //         var item = items[i_items];
                             //         texts_data.push({
-                            //             txt: item.v,
+                            //             txt: item.v+'_'+item.x +'_'+item.y,
                             //             lng: item.x,
                             //             lat: item.y,
                             //             fontSize: 12,
@@ -144,11 +144,10 @@
                             //             offsetY: -10,
                             //             offsetX: 6
                             //         });
-                            //     }
-                                
+                            //     }                                
                             // }
-
                             // Render.text(texts_data);
+
                             console.log(data_conrec);
                             
                             _afterChangeConf(err, s_time);

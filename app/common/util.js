@@ -252,12 +252,15 @@
         for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
             var xi = vs[i][key_x], yi = vs[i][key_y];
             var xj = vs[j][key_x], yj = vs[j][key_y];
-            if(x == xi && y == yi || x == xj && y == yj){
-                return 1;
+            // if(x == xi && y == yi || x == xj && y == yj){
+            //     return 1;
+            // }
+            // 在线段上或顶点上
+            if (x == xi && x == xj && (y - yi) * (y - yj) <= 0 || (y == yj && y==yi && (x-xi)*(x-xj) <= 0)) {
+            	return true;
             }
             var intersect = ((yi > y) != (yj > y))
                 && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-
             if (intersect) inside = !inside;
         }
 
