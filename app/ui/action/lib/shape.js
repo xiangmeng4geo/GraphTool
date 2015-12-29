@@ -77,12 +77,17 @@
         } 
         ctx.restore();  
     }
-    function Polygon(points, style) {
+    function Polygon(points, style, sub) {
         var _this = this;
 
         _this.style = style;
         _this.draw = function(ctx, projection) {
             _drawPath(ctx, points, projection, true);
+            if (sub) {
+                for (var i = 0, j = sub.length; i<j; i++) {
+                    _drawPath(ctx, sub[i], projection, true);
+                }
+            }
             ctx.fill();
         }
     }

@@ -97,24 +97,25 @@
                     }
                     var texts_data = [];
                     var data_origin = dataJson.data;
-                    if (data_origin && conf.showData) {
-                        for (var i = 0, j = data_origin.length; i<j; i++) {
-                            var item = data_origin[i];
-                            var item_show = names_show[item.name];
-                            // if (item_show) {
-                                texts_data.push({
-                                    txt: item.v,
-                                    lng: item.x,
-                                    lat: item.y,
-                                    fontSize: 12,
-                                    color: 'rgba(0, 0, 0, 0.8)',
-                                    offsetY: -10,
-                                    offsetX: 6
-                                });
-                            // }
-                        }
-                    }
+                    // if (data_origin && conf.showData) {
+                    //     for (var i = 0, j = data_origin.length; i<j; i++) {
+                    //         var item = data_origin[i];
+                    //         var item_show = names_show[item.name];
+                    //         // if (item_show) {
+                    //             texts_data.push({
+                    //                 txt: item.v,
+                    //                 lng: item.x,
+                    //                 lat: item.y,
+                    //                 fontSize: 14,
+                    //                 color: '#0000ff',
+                    //                 offsetY: -10,
+                    //                 offsetX: 6
+                    //             });
+                    //         // }
+                    //     }
+                    // }
                     // 处理源数据
+
                     Render.text(texts_data);
                     Render.text(texts);
                     Render.img(imgs);
@@ -127,6 +128,28 @@
                             } else {
                                 Render.conrec(data_conrec);
                             }
+                            // var texts_data = [];
+                            // var interpolate_data = data_conrec.interpolate_data;
+                            // interpolate_data = data_interpolate;
+                            // for (var i = 0, j = interpolate_data.length; i<j; i++) {
+                            //     var items = interpolate_data[i];
+                            //     for (var i_items = 0, j_items = items.length; i_items<j_items; i_items ++) {
+                            //         var item = items[i_items];
+                            //         texts_data.push({
+                            //             txt: item.v,//+'_'+item.x +'_'+item.y,
+                            //             lng: item.x,
+                            //             lat: item.y,
+                            //             fontSize: 12,
+                            //             color: 'rgba(0, 0, 0, 0.8)',
+                            //             offsetY: -10,
+                            //             offsetX: 6
+                            //         });
+                            //     }                                
+                            // }
+                            // Render.text(texts_data);
+
+                            console.log(data_conrec);
+                            
                             _afterChangeConf(err, s_time);
                         });
                     } else {
