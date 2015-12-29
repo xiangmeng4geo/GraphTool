@@ -559,7 +559,7 @@
             if (conf_bg && conf_bg.flag) {
                 var bg_color = conf_bg.color;
                 if (bg_color) {
-                    ctx_fill.fillStyle = '#71B7fd';
+                    ctx_fill.fillStyle = bg_color;//'#71B7fd';
                     ctx_fill.fillRect(0, 0, _canvas.width, _canvas.height);
                 }
             }
