@@ -94,7 +94,6 @@ describe('conrec', function() {
         idw(data, arr, function(err, data){
             conrec(data, blendent, false, function(err, data) {
                 expect(err).to.be.a('null');
-                data.should.have.property('r');
                 data.should.have.property('list');
                 done();
             });

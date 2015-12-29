@@ -215,7 +215,7 @@ describe('Util', function() {
 		});
 	});
 
-	describe('isfunction', function() {
+	describe('isFunction', function() {
 		var isFunction = Util.isFunction;
 		it('should be function', function() {
 			isFunction(function(){}).should.equal(true);

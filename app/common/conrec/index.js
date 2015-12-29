@@ -222,7 +222,6 @@
 	        	// _model.emit('render', [new Shape.Text('_'+x_min_test+'_'+x_max_test+'_'+y_min_test+'_'+y_max_test, 'lng: '+x_min_test+'; lat: '+y_min_test+';color: #0000ff; font-size: 20px;')]);
 	        }
 		}
-		var Shape = Core.require('shape');
 		// console.log('polygon = ', polygon);
 		// console.log('lines.length = '+lines.length);
 
@@ -265,20 +264,7 @@
 			if (p) {
 				var color = p.c;
 				var text = p.v;
-				// if (polygon.id == 0) {
-					// console.log(p);
-					// console.log(color);
-					// setTimeout(function() {
-						// _model.emit('render', [new Shape.Text(polygon.id + '_'+text+'_'+color, 'lng: '+p.x+'; lat: '+p.y+';color: #ff0000; font-size: 16px;')]);
-					// }, 1000);
-				// }
-				// _model.emit('render', [new Core.require('shape').Text(text, 'lng: '+p.x+'; lat: '+p.y+';color: #ff0000; font-size: 16px;')]);
-				
 				if (color && color != 'rgba(0,0,0,0)') {
-					// var m = /#(\w{2})(\w{2})(\w{2})/.exec(color);
-					// if (m ){
-					// 	color = 'rgba('+(parseInt(m[1], 16))+', '+(parseInt(m[2], 16))+', '+(parseInt(m[3], 16))+', 0.5)';
-					// }
 					polygon.color = color;
 				}
 			}

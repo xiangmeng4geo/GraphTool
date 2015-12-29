@@ -4,6 +4,7 @@ var list = [
     './spec/test-interpolate.idw',
     './spec/test-reader.micaps',
     './spec/test-color',
+    './spec/conrec/test-tool',
     './spec/test-conrec'
 ];
 
