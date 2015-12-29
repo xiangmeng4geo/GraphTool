@@ -56,6 +56,9 @@ Core.init(function(model) {
 	var conf_assets = conf_product.assets || [];
 	var conf_save = conf_product.save || {};
 
+	var $cb_is_show_range_legend = $('#cb_is_show_range_legend');
+	_setChecked($cb_is_show_range_legend, conf_other.is_legend_range);
+
 	s_data_geo.unshift({
 		text: '默认地图',
 		val: ''
@@ -379,7 +382,8 @@ Core.init(function(model) {
 		conf.other = {
 			map: s_map.val(),
 			legend: s_legend.val(),
-			legend_style: s_legend_style.val()
+			legend_style: s_legend_style.val(),
+			is_legend_range: _getChecked($cb_is_show_range_legend)
 		};
 		conf.save = {
 			dir: file_dir_out.val(),

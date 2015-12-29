@@ -288,7 +288,14 @@
                 } else {
                     // dataset.layers[0].shapes.splice(1);
                     geo_file.dataset = dataset;
-                    // console.log(geo_file);
+                    // console.log(geo_file, dataset);
+                    // var layers = dataset.layers;
+                    // for (var i = 0, j = layers.length; i<j; i++) {
+                    //     var d = layers[0].data;
+                    //     if (d) {
+                    //         console.log(d.getRecords());
+                    //     }
+                    // }
                     // if(dataset.layers[0].data){
                     //     console.log(dataset.layers[0].data.getRecords());
                     // }

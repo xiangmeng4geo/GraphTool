@@ -222,7 +222,7 @@
                     };
                     // color = '#1010FF';
 
-                    shapes.push(new Shape.Text('╳', 'lng:'+v.x+'px;lat:'+v.y+'px;font-size: 12px'));
+                    shapes.push(new Shape.Text('╳', 'text-baseline:middle; text-align: center; lng:'+v.x+'px;lat:'+v.y+'px;font-size: 12px'));
                 }
                 if(text){
                     var _style = 'lng:'+(v.x)+'px;lat:'+v.y+'px;font-size: '+fontSize+'px;'+fontWeight;

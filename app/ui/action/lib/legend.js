@@ -323,12 +323,77 @@
 	}
 
 	function _parse(conf_legend, options) {
-		options = $.extend({
+		options = $.extend(true, {
 			type: TYPE_DEFAULT
 		}, options);
 		var method = fn_method[options.type];
 		if (method) {
-			return method(conf_legend, options);
+			var legend_new = conf_legend;
+			var data_filter = options.data_filter;
+			if (data_filter && data_filter.length > 0) {
+				var cache = {};
+				for (var i = 0, j = data_filter.length; i<j; i++) {
+					var data = data_filter[i];
+					var v = data.v;
+					var code = data.code || '_';
+					if (!cache[code]) {
+						var legend_to = null;
+						var legend_arr = conf_legend.blendent;
+						for (var i_legend = 0, j_legend = legend_arr.length; i_legend<j_legend; i_legend++) {
+							var legend = legend_arr[i_legend];
+							if (legend.val.v == code) {
+								legend_to = legend;
+								break;
+							}
+						}
+						if (!legend_to) {
+							legend_to = legend_arr[0];
+						}
+						cache[code] = {
+							arr: [],
+							colors: legend_to.colors,
+							is_stripe: legend_to.is_stripe
+						};
+					}
+
+					cache[code].arr.push(v);
+				}
+				legend_new.blendent = [];
+				for (var i in cache) {
+					var item = cache[i];
+					var arr = item.arr;
+					var min = Math.min.apply(Math, arr);
+					var max = Math.max.apply(Math, arr);
+					var colors = item.colors;
+					var min_index = -1,
+						max_index = -1;
+					for (var i_colors = 0, j_colors = colors.length; i_colors<j_colors; i_colors++) {
+						var val = colors[i_colors].val;
+						var a = val[0], 
+							b = val[1];
+						if (a <= min && b >= min) {
+							min_index = i_colors;
+						} else if (a <= max && b >= max) {
+							var flag = max_index == -1;
+							max_index = i_colors;
+							if (!flag) {
+								break;
+							}
+						}				
+					}
+					if (min_index != -1) {
+						colors = colors.slice(min_index);
+					}
+					if (max_index != -1) {
+						colors = colors.slice(0, max_index+1);
+					}
+					legend_new.blendent.push({
+						is_stripe: item.is_stripe,
+						colors: colors
+					});
+				}
+			}
+			return method(legend_new, options);
 		}
 	}
 	

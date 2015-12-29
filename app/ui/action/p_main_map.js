@@ -158,13 +158,14 @@ Core.init(function(model) {
         model.emit('log', 'save ['+save_path+'] takes '+time_used+' ms! ');
         model.emit('afterExport', save_path, time_used);
     });
-    model.on('legend', function(blendent, legendStyle) {
+    model.on('legend', function(blendent, legendStyle, data_filter) {
         var result = _require('legend')({
             blendent: blendent
         }, {
             type: legendStyle || undefined,
             width: width_map,
-            height: height_map
+            height: height_map,
+            data_filter: data_filter
         });
 
         geomap.addOverlay(new Shape.Image(result.canvas, {

@@ -55,13 +55,15 @@
 
             var blendentJson = conf_legend.blendent;
 
+            var showLegendRange = conf.showLegendRange;
             model.emit('projection.changeview', bound.wn, bound.es);
-            model.emit('legend', blendentJson, conf.legendStyle);
+            
             model.emit('geo', conf_geo, function(names_show) {
                 if (util.isPlainObject(data)) {
                     data.bound = bound;
                 }
                 Reader.read(data, function(err, dataJson) {
+                    console.log(dataJson);
                     if (assets) {
                         var _opt_var = {
                             p: _current_product_name,
@@ -95,11 +97,33 @@
                         _afterChangeConf(err, s_time);
                         return model.emit('error', err);
                     }
+                    if (showLegendRange) {
+                        var data_filter_legend = [];
+                        // 添加14类数据里的值
+                        var areas = dataJson.areas;
+                        if (areas) {
+                            var len = areas.length;
+                            if (len > 0) {
+                                for (var i = 0; i<len; i++) {
+                                    var item = areas[i];
+                                    var symbols = item.symbols;
+                                    var val_area = symbols? symbols.text : '';
+                                    data_filter_legend.push({
+                                        v: val_area,
+                                        code: item.code
+                                    });
+                                }
+                            }
+                        }
+                    }
                     var texts_data = [];
                     var data_origin = dataJson.data;
                     if (data_origin && conf.showData) {
                         for (var i = 0, j = data_origin.length; i<j; i++) {
                             var item = data_origin[i];
+                            if (data_filter_legend) {
+                                data_filter_legend.push(item);
+                            }
                             var item_show = names_show[item.name];
                             // if (item_show) {
                                 texts_data.push({
@@ -114,13 +138,24 @@
                             // }
                         }
                     }
-                    // 处理源数据
 
+                    var data_interpolate = dataJson.interpolate;
+                    if (data_interpolate && data_filter_legend && data_filter_legend.length == 0) {
+                        for (var i = 0, j = data_interpolate.length; i<j; i++) {
+                            var items = data_interpolate[i];
+                            for (var i_items = 0, j_items = items.length; i_items<j_items; i_items++) {
+                                data_filter_legend.push(items[i_items]);
+                            }
+                        }
+                    }
+
+                    model.emit('legend', blendentJson, conf.legendStyle, data_filter_legend);
+
+                    // 处理源数据
                     Render.text(texts_data);
                     Render.text(texts);
                     Render.img(imgs);
 
-                    var data_interpolate = dataJson.interpolate;
                     if (data_interpolate) {
                         conrec(data_interpolate, blendentJson, true, function(err, data_conrec) {
                             if (err) {
