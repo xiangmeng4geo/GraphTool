@@ -1,4 +1,7 @@
 !function() {
+	var PI = Math.PI;
+	var MIN_POINT_NUM = 30;
+
 	var util = require('../util');
 	var utils_polygon = util.Polygon;
   	var isPointIn = utils_polygon.isPointIn;
@@ -58,6 +61,230 @@
 				bound.x_max >= bound_checking.x_max &&
 				bound.y_min <= bound_checking.y_min &&
 				bound.y_max >= bound_checking.y_max;
+	}
+	// B样条插值平滑算法
+	var _smoothBSpline = function(is_points_array){
+	    // https://github.com/Tagussan/BSpline
+	    var BSpline = function(points,degree,copy){
+	        if(copy){
+	            this.points = []
+	            for(var i = 0;i<points.length;i++){
+	                this.points.push(points[i]);
+	            }
+	        }else{
+	            this.points = points;
+	        }
+	        this.degree = degree;
+	        this.dimension = points[0].length;
+	        if(degree == 2){
+	            this.baseFunc = this.basisDeg2;
+	            this.baseFuncRangeInt = 2;
+	        }else if(degree == 3){
+	            this.baseFunc = this.basisDeg3;
+	            this.baseFuncRangeInt = 2;
+	        }else if(degree == 4){
+	            this.baseFunc = this.basisDeg4;
+	            this.baseFuncRangeInt = 3;
+	        }else if(degree == 5){
+	            this.baseFunc = this.basisDeg5;
+	            this.baseFuncRangeInt = 3;
+	        }
+	    };
+
+	    BSpline.prototype.seqAt = function(dim){
+	        var points = this.points;
+	        var margin = this.degree + 1;
+	        return function(n){
+	            if(n < margin){
+	                return points[0][dim];
+	            }else if(points.length + margin <= n){
+	                return points[points.length-1][dim];
+	            }else{
+	                return points[n-margin][dim];
+	            }
+	        };
+	    };
+
+	    BSpline.prototype.basisDeg2 = function(x){
+	        if(-0.5 <= x && x < 0.5){
+	            return 0.75 - x*x;
+	        }else if(0.5 <= x && x <= 1.5){
+	            return 1.125 + (-1.5 + x/2.0)*x;
+	        }else if(-1.5 <= x && x < -0.5){
+	            return 1.125 + (1.5 + x/2.0)*x;
+	        }else{
+	            return 0;
+	        }
+	    };
+
+	    BSpline.prototype.basisDeg3 = function(x){
+	        if(-1 <= x && x < 0){
+	            return 2.0/3.0 + (-1.0 - x/2.0)*x*x;
+	        }else if(1 <= x && x <= 2){
+	            return 4.0/3.0 + x*(-2.0 + (1.0 - x/6.0)*x);
+	        }else if(-2 <= x && x < -1){
+	            return 4.0/3.0 + x*(2.0 + (1.0 + x/6.0)*x);
+	        }else if(0 <= x && x < 1){
+	            return 2.0/3.0 + (-1.0 + x/2.0)*x*x;
+	        }else{
+	            return 0;
+	        }
+	    };
+
+	    BSpline.prototype.basisDeg4 = function(x){
+	        if(-1.5 <= x && x < -0.5){
+	            return 55.0/96.0 + x*(-(5.0/24.0) + x*(-(5.0/4.0) + (-(5.0/6.0) - x/6.0)*x));
+	        }else if(0.5 <= x && x < 1.5){
+	            return 55.0/96.0 + x*(5.0/24.0 + x*(-(5.0/4.0) + (5.0/6.0 - x/6.0)*x));
+	        }else if(1.5 <= x && x <= 2.5){
+	            return 625.0/384.0 + x*(-(125.0/48.0) + x*(25.0/16.0 + (-(5.0/12.0) + x/24.0)*x));
+	        }else if(-2.5 <= x && x <= -1.5){
+	            return 625.0/384.0 + x*(125.0/48.0 + x*(25.0/16.0 + (5.0/12.0 + x/24.0)*x));
+	        }else if(-1.5 <= x && x < 1.5){
+	            return 115.0/192.0 + x*x*(-(5.0/8.0) + x*x/4.0);
+	        }else{
+	            return 0;
+	        }
+	    };
+
+	    BSpline.prototype.basisDeg5 = function(x){
+	        if(-2 <= x && x < -1){
+	            return 17.0/40.0 + x*(-(5.0/8.0) + x*(-(7.0/4.0) + x*(-(5.0/4.0) + (-(3.0/8.0) - x/24.0)*x)));
+	        }else if(0 <= x && x < 1){
+	            return 11.0/20.0 + x*x*(-(1.0/2.0) + (1.0/4.0 - x/12.0)*x*x);
+	        }else if(2 <= x && x <= 3){
+	            return 81.0/40.0 + x*(-(27.0/8.0) + x*(9.0/4.0 + x*(-(3.0/4.0) + (1.0/8.0 - x/120.0)*x)));
+	        }else if(-3 <= x && x < -2){
+	            return 81.0/40.0 + x*(27.0/8.0 + x*(9.0/4.0 + x*(3.0/4.0 + (1.0/8.0 + x/120.0)*x)));
+	        }else if(1 <= x && x < 2){
+	            return 17.0/40.0 + x*(5.0/8.0 + x*(-(7.0/4.0) + x*(5.0/4.0 + (-(3.0/8.0) + x/24.0)*x)));
+	        }else if(-1 <= x && x < 0){
+	            return 11.0/20.0 + x*x*(-(1.0/2.0) + (1.0/4.0 + x/12.0)*x*x);
+	        }else{
+	            return 0;
+	        }
+	    };
+
+	    BSpline.prototype.getInterpol = function(seq,t){
+	        var f = this.baseFunc;
+	        var rangeInt = this.baseFuncRangeInt;
+	        var tInt = Math.floor(t);
+	        var result = 0;
+	        for(var i = tInt - rangeInt;i <= tInt + rangeInt;i++){
+	            result += seq(i)*f(t-i);
+	        }
+	        return result;
+	    };
+
+
+	    BSpline.prototype.calcAt = function(t){
+	        t = t*((this.degree+1)*2+this.points.length);//t must be in [0,1]
+	        // var x = parseFloat(this.getInterpol(this.seqAt('x'),t).toFixed(4)),
+	        //     y = parseFloat(this.getInterpol(this.seqAt('y'),t).toFixed(4))
+
+	        var x = this.getInterpol(this.seqAt('x'),t),
+	            y = this.getInterpol(this.seqAt('y'),t);
+
+	        // 数组形式访问较快
+	        // https://github.com/tonny-zhang/docs/issues/1#user-content-1
+	        return is_points_array? [x, y]: {x: x, y: y};
+	    };
+	    // degree = [2, 5]; factor = [2, 10]
+	    return function(points, degree, factor){
+			degree = degree || 4;
+			var len = points.length;
+			var num = len * (factor || 5);
+			num < MIN_POINT_NUM && (num = Math.max(num*5, MIN_POINT_NUM));
+			// console.log('factor = '+factor+', len = '+len +', num = '+num+', degree = '+degree);
+			var spline = new BSpline(points, degree, true);
+			var points_return = [];
+			var space = 1/num;
+			var x_last, y_last;
+			for(var t = 0; t <= 1; t += space){
+				var interpol = spline.calcAt(t);
+				var x = is_points_array? interpol[0]: interpol.x;
+				var y = is_points_array? interpol[1]: interpol.y;
+				if (x === x_last && y === y_last) {
+					continue;
+				}
+				x_last = x;
+				y_last = y;
+				points_return.push(interpol);
+			}
+			var first = points[0],
+				end = points[len - 1];
+			if (is_points_array) {
+				points_return.unshift([first.x, first.y]);
+				points_return.push([end.x, end.y]);
+			} else {
+				points_return.unshift(first);
+				points_return.push(end);
+			}
+			return points_return;
+	    }
+	};
+	function _smoothItems(items, min_dis, is_points_array) {
+		min_dis || (min_dis = 0);
+		var len = items.length;
+		var is_small = len < MIN_POINT_NUM;
+		var startPoint = items[0];
+		var items_new = [startPoint];
+		for(var i = 1, j = len-1; i<j; i++){
+			var item = items[i];
+			if(is_small || Math.pow(startPoint.x - item.x, 2) + Math.pow(startPoint.y - item.y, 2) > min_dis){
+				items_new.push(item);
+				startPoint = item;
+			}
+		}
+		items_new.push(items[len-1]);
+
+		// 只对闭合曲线进行处理
+		if (_isClosed(items_new)) {
+			// !!可对点少的多边形，进行变形处理
+			// 找到三个点间角度最小的点做项
+			var max_index = 0;
+			var max_angle = 0;
+			for (var i = 1, j = items_new.length-1; i<j; i++) {
+				var p = items_new[i],
+				p_prev = items_new[i == 0? j-1: i - 1],
+				p_next = items_new[i+1 == j? 0: i+1];
+				var x_p = p.x,
+				x_prev = p_prev.x,
+				x_next = p_next.x,
+				y_p = p.y,
+				y_prev = p_prev.y,
+				y_next = p_next.y;
+
+				if (x_p == x_prev && x_p == x_next || (y_p == y_prev && y_p == y_next)) {
+					max_index = i;
+					// max_angle = Math.PI;
+					break;
+				} else {
+					// 向量运算，得到向量夹角
+					var vector_a_x = x_p - x_prev,
+					    vector_a_y = y_p - y_prev,
+					    vector_b_x = x_next - x_p,
+					    vector_b_y = y_next - y_p;
+
+					var cos_angle = (vector_a_x * vector_b_x + vector_a_y * vector_b_y)/
+					(Math.sqrt(vector_a_x*vector_a_x + vector_a_y*vector_a_y) + Math.sqrt(vector_b_x*vector_b_x + vector_b_y*vector_b_y))
+
+					var angle = PI - Math.acos(cos_angle);
+					if (max_angle < angle) {
+					    max_angle = angle;
+					    max_index = i;
+					}
+				}
+			}
+			if (max_index > 0) {
+				items_new.pop();
+				items_new = items_new.slice(max_index).concat(items_new.slice(0, max_index));
+				items_new.push(items_new[0]); // 使新线闭合
+			}
+		}
+		// console.log('items_new', items_new);
+		//   console.log('j='+j, max_index, max_angle/ Math.PI*180, arr);
+		return _smoothBSpline(is_points_array)(items_new, 4);
 	}
 	// 线分割面(前提是这条线的两个端点在多边形上)
 	function _splitPolygonByLine(polygon, line) {
@@ -284,24 +511,18 @@
 		var polygons_result = [];
 
 		var polygons_dealing = polygons.slice(0),
-			lines_dealing = lines.slice(0);
+			lines_dealing = [];
 
-		var lines_open = [],
-			lines_closed = [];
-		lines_dealing.map(function(line, i) {
-			line.bound = _getBound(line);
-			// var _flag_isClosed = _isClosed(line);
-			// if (_flag_isClosed) {
-			// 	lines_open.push(line);
-			// } else {
-			// 	lines_closed.push(line);
-			// }
-			line.id = i;
+		lines.map(function(line, i) {
+			var items = line.items;
+			items.bound = line.bound;
+			// console.log(items);
+			// line.bound || (line.bound = _getBound(line));
+			items.id = i;
+			lines_dealing.push(items);
 		});
-		// 长度从长到短
-		lines_dealing.sort(function(a, b) {
-			return b.length - a.length;
-		});
+		// lines_dealing = lines_dealing.splice(0, 1);
+		// console.log(polygons_dealing.slice(), lines_dealing.slice());
 		var _num_test = 0;
 		var _test;
 		var _progress = {};
@@ -341,31 +562,25 @@
 					}
 				}
 			}
+			// console.log('line_in = ', line_in);
 			if (line_in) {
 				// console.log('line_in.id = '+line_in.id);
 				var sub_polygons = _splitPolygonByLine(_polygon, line_in);
 				if (fn_getcolor) {
 					sub_polygons.map(function(v) {
 						v.line = line_in;
-					});
+					});				
 				}
-				if (line_in.id == 25) {
-					_test = [_polygon];
-				}
-				sub_polygons._line_id = line_in.id;
 
 				_progress[_id_progress++] = sub_polygons;
 				polygons_dealing = sub_polygons.concat(polygons_dealing);// 放在队列最前优先处理
 			} else {
-				_polygon.id = polygons_result.length;
-				// if (_polygon.id == 0) {
-				// 	debugger;
-				// }
+				// _polygon.id = polygons_result.length;
 				fn_getcolor && fn_getcolor(_polygon);
-				delete _polygon.lines;
-				// if (!fn_getcolor || _polygon.color) {
+				delete _polygon.line;
+				if (!fn_getcolor || _polygon.color) {
 					polygons_result.push(_polygon);
-				// }
+				}
 			}
 			if (polygons_dealing.length == 0) {
 				break;
@@ -383,6 +598,7 @@
 		splitPolygonsByLines: _splitPolygonsByLines,
 		isClosed: _isClosed,
 		getBound: _getBound,
-		isBoundInBound: _isBoundInBound
+		isBoundInBound: _isBoundInBound,
+		smoothItems: _smoothItems
 	}
 }()

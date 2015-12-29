@@ -4,8 +4,9 @@
 	var tool = require('./tool');
 	var util_color = util.color;
 	// var tool_getArea = tool.getArea;
-	// var tool_isClosed = tool.isClosed;
+	var tool_isClosed = tool.isClosed;
 	var tool_getBound = tool.getBound;
+	var tool_smoothItems = tool.smoothItems;
 	// var tool_isBoundInBound = tool.isBoundInBound;
 	var splitPolygonsByLines = tool.splitPolygonsByLines;  
 	var utils_polygon = util.Polygon;
@@ -218,12 +219,47 @@
 	        			}
 	        		}
 	        	}
-	        	_model.emit('render', [new Shape.Text(polygon.id+'_'+x_min_test+'_'+x_max_test+'_'+y_min_test+'_'+y_max_test, 'lng: '+x_min_test+'; lat: '+y_min_test+';color: #0000ff; font-size: 20px;')]);
+	        	// _model.emit('render', [new Shape.Text('_'+x_min_test+'_'+x_max_test+'_'+y_min_test+'_'+y_max_test, 'lng: '+x_min_test+'; lat: '+y_min_test+';color: #0000ff; font-size: 20px;')]);
 	        }
 		}
 		var Shape = Core.require('shape');
 		// console.log('polygon = ', polygon);
 		// console.log('lines.length = '+lines.length);
+
+		var MIN_DIS = Math.pow(0.2, 2);
+	    if (x_step < 0.5) {
+	        MIN_DIS = Math.pow(Math.max(0.1, x_step*2), 2)
+	    }
+	    // console.log('old', lines[0]);
+	    // console.log('new', tool_smoothItems(lines[0], MIN_DIS, false));
+	    var lines_open = [],
+			lines_closed = [];
+		lines.map(function(line, i) {
+			var _flag_isClosed = tool_isClosed(line);
+			var line_obj = {
+				bound: tool_getBound(line),
+				_isClosed: _flag_isClosed,
+				items: line
+			}
+			line._isClosed = _flag_isClosed;
+			if (_flag_isClosed) {
+				lines_closed.push(line_obj);
+			} else {
+				lines_open.push(line_obj);
+			}
+		});
+
+		// 长度从长到短
+		lines_open.sort(function(a, b) {
+			return b.items.length - a.items.length;
+		});
+		lines_closed.sort(function(a, b) {
+			return b.items.length - a.items.length;
+		});
+		lines = lines_open.concat(lines_closed);
+		for (var i = 0, j = lines.length; i<j; i++) {
+			lines[i].items = tool_smoothItems(lines[i].items, MIN_DIS, false);
+		}
 		var result = splitPolygonsByLines([polygon], lines, function(polygon) {
 			var p = _getColor(polygon);
 			if (p) {
@@ -233,7 +269,7 @@
 					// console.log(p);
 					// console.log(color);
 					// setTimeout(function() {
-					// 	_model.emit('render', [new Shape.Text(text, 'lng: '+p.x+'; lat: '+p.y+';color: #ff0000; font-size: 16px;')]);
+						// _model.emit('render', [new Shape.Text(polygon.id + '_'+text+'_'+color, 'lng: '+p.x+'; lat: '+p.y+';color: #ff0000; font-size: 16px;')]);
 					// }, 1000);
 				// }
 				// _model.emit('render', [new Core.require('shape').Text(text, 'lng: '+p.x+'; lat: '+p.y+';color: #ff0000; font-size: 16px;')]);

@@ -121,7 +121,7 @@
 
         for (var i = 0, j = list.length; i<j; i++) {
             (function(polygon) {
-                // if (i == 0) {
+                // if (i == 1) {
                 // setTimeout(function() {
                     var items = polygon.items;
                     items.isObj = true;
@@ -133,10 +133,11 @@
                     }
                     _model.emit('render', [new Shape.Polygon(items, {
                         fillStyle: polygon.color || _rndColor(),
-                        strokeStyle: _rndColor(),
-                        lineWidth: 1
+                        // strokeStyle: _rndColor(),
+                        // lineWidth: 1
                     }, sub)]);
                 // }, 2000*i);
+                // if (i == 2) {
                     // items.forEach(function(p, p_i) {
                     //     var x = p.x,
                     //         y = p.y;
@@ -146,8 +147,9 @@
                     //     }
                     //     var text = p_i+'_'+x+'_'+y;
                     //     // text = p_i;
-                    //     shapes.push(new Shape.Text(text, 'lng: '+x+'; lat: '+y+';color: #ff0000; font-size: 16px;'+offset));
+                    //     shapes.push(new Shape.Text(text, 'lng: '+x+'; lat: '+y+';color: #0000ff; font-size: 16px;'+offset));
                     // })
+                // }
                 // }
             })(list[i]);
             // var polygon = list[i];
@@ -200,7 +202,7 @@
         // }
         // var lines = data.lines;
         // for (var i = 0, j = lines.length; i<j; i++) {
-        //     var line = lines[i];
+        //     var line = lines[i].items;
         //     line.isObj = true;
         //     shapes.push(new Shape.Polyline(line, {
         //         strokeStyle: _rndColor(),
