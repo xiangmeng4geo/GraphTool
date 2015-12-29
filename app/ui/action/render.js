@@ -18,210 +18,48 @@
         return c;
     }
     // 处理conrec后的数据
-    function _conrec1(data) {
+    function _conrec(data) {
         var t_start = new Date();
         var shapes = [];
         if (data) {
-            var relation = data.r,
-                data_list = data.list;
+            var data_list = data.list;
             // 处理插值完后的数据
-            if (relation && relation.length > 0 && data_list && data_list.length > 0) {
-                relation.forEach(function(v, i) {
-                    var index = v[0],
-                        color = v[1],
-                        indexs_clip = v[2];
+            if (data_list && data_list.length > 0) {
 
-                    shapes.push(new Shape.Polygon(data_list[index], {
-                        fillStyle: color
-                    }));
+                data_list.forEach(function(polygon, i) {
+                    var items = polygon.items;
+                    items.isObj = true;
+                    var sub = polygon.sub;
+                    if (sub) {
+                        sub.forEach(function(v) {
+                            v.isObj = true;
+                        });
+                    }
+
+                    shapes.push(new Shape.Polygon(items, {
+                        fillStyle: polygon.color,
+                        // strokeStyle: '#ff0000',
+                        // lineWidth: 2
+                    }, sub));
                 });
             }
 
-            var lines = data.lines;
-            if (lines) {
-                for (var i = 0, j = lines.length; i<j; i++) {
-                    var v = lines[i];
-                    // if (v.k != 1){
-                    //     return;
-                    // }
-                    var first = v[0],
-                        end = v[v.length - 1];
-                    var is_close = first.x == end.x && first.y == end.y;
-                    // if (is_close) {
-                    //     continue;
-                    // }
-                    // if (v.len.length == 6) {
-                    //     continue;
-                    // }
-                    console.log(v.len, first, end);
-                    v.isObj = true;
-                    shapes.push(new Shape.Polyline(v, {
-                        strokeStyle: _rndColor(),
-                        lineWidth: is_close? 5: 3
-                    }));
-                    var point = v[Math.floor(v.length/2)];
-                    shapes.push(new Shape.Text(v.k, 'lng: '+point.x+'; lat: '+point.y+';font-size: 16px;'));
-                    // break;
-                }
-            }
-        }
-        console.log(shapes);
-        _model.emit('log', 'render deal data takes '+(new Date() - t_start)+' ms!');
-        if (shapes && shapes.length > 0) {
-            _model.emit('render', shapes);
-        }
-    }
-    function _conrec(data) {
-        var shapes = [];
-        var list = data.list;
-        var id = 0;
-        // document.run = function(toid) {
-        //     id = toid || id;
-        //     console.log(id);
-        //     var polygon = list[id++];
-        //     var items = polygon.items;
-        //     items.isObj = true;
-        //     var sub = polygon.sub;
-        //     if (sub) {
-        //         sub.forEach(function(v) {
-        //             v.isObj = true;
-        //         });
-        //     }
-        //     _model.emit('render', [new Shape.Polygon(items, {
-        //         fillStyle: polygon.color || _rndColor(),
-        //         strokeStyle: '#ff0000',
-        //         lineWidth: 2
-        //     }, sub)]);
-        // }
-        var id_progress = 0;
-        var progress = list.progress;
-        document.progress = function(toid) {
-            _model.emit('map.clear');
-            id_progress = toid || id_progress;
-            console.log(id);
-            var polygons = progress[id++];
-            polygons.forEach(function(polygon, i){
-                setTimeout(function() {
-                    var items = polygon.items;
-                    items.isObj = true;
-                    var sub = polygon.sub;
-                    if (sub) {
-                        sub.forEach(function(v) {
-                            v.isObj = true;
-                        });
-                    }
-                    _model.emit('render', [new Shape.Polygon(items, {
-                        fillStyle: polygon.color || _rndColor(),
-                        strokeStyle: '#ff0000',
-                        lineWidth: 2
-                    }, sub)]);
-                }, 1000*i);                
-            });
-        }
-
-        for (var i = 0, j = list.length; i<j; i++) {
-            (function(polygon) {
-                // if (i == 1) {
-                // setTimeout(function() {
-                    var items = polygon.items;
-                    items.isObj = true;
-                    var sub = polygon.sub;
-                    if (sub) {
-                        sub.forEach(function(v) {
-                            v.isObj = true;
-                        });
-                    }
-                    _model.emit('render', [new Shape.Polygon(items, {
-                        fillStyle: polygon.color || _rndColor(),
-                        // strokeStyle: _rndColor(),
-                        // lineWidth: 1
-                    }, sub)]);
-                // }, 2000*i);
-                // if (i == 2) {
-                    // items.forEach(function(p, p_i) {
-                    //     var x = p.x,
-                    //         y = p.y;
-                    //     var offset = '';
-                    //     if (p_i == 61) {
-                    //         offset = 'offsetY: 12px;';
-                    //     }
-                    //     var text = p_i+'_'+x+'_'+y;
-                    //     // text = p_i;
-                    //     shapes.push(new Shape.Text(text, 'lng: '+x+'; lat: '+y+';color: #0000ff; font-size: 16px;'+offset));
-                    // })
-                // }
-                // }
-            })(list[i]);
-            // var polygon = list[i];
-            // var items = polygon.items;
-            // items.isObj = true;
-            // shapes.push(new Shape.Polygon(items, {
-            //     fillStyle: polygon.color || _rndColor(),
-            //     // strokeStyle: '#ff0000',
-            //     // lineWidth: 1
-            // }));
-
-            // if (i == 9) {
-            //     items.forEach(function(p, p_i) {
-            //         var x = p.x,
-            //             y = p.y;
-            //         var offset = '';
-            //         if (p_i == 61) {
-            //             offset = 'offsetY: 12px;';
-            //         }
-            //         var text = p_i+'_'+x+'_'+y;
-            //         text = p_i;
-            //         shapes.push(new Shape.Text(text, 'lng: '+x+'; lat: '+y+';color: #ff0000; font-size: 16px;'+offset));
-            //     })
+            // var lines = data.lines;
+            // if (lines) {
+            //     for (var i = 0, j = lines.length; i<j; i++) {
+            //         var v = lines[i].items;
+            //         var first = v[0],
+            //             end = v[v.length - 1];
+            //         var is_close = first.x == end.x && first.y == end.y;
+            //         v.isObj = true;
+            //         shapes.push(new Shape.Polyline(v, {
+            //             strokeStyle: _rndColor(),
+            //             lineWidth: 1
+            //         }));
+            //     }
             // }
         }
-        // var _test = list.test;
-        // if (_test) {
-        //     for (var i = 0, j = _test.length; i<j; i++) {
-        //         var polygon = _test[i];
-        //         var items = polygon.items;
-        //         items.isObj = true;
-        //         shapes.push(new Shape.Polygon(items, {
-        //             fillStyle: _rndColor(),
-        //             strokeStyle: '#00ff00',
-        //             lineWidth: 1
-        //         }));
-
-        //         items.forEach(function(p, p_i) {
-        //             var x = p.x,
-        //                 y = p.y;
-        //             var offset = '';
-        //             if (p_i == 61) {
-        //                 offset = 'offsetY: 12px;';
-        //             }
-        //             var text = p_i+'_'+x+'_'+y;
-        //             text = p_i;
-        //             shapes.push(new Shape.Text(text, 'lng: '+x+'; lat: '+y+';color: #ff0000; font-size: 16px;'+offset));
-        //         })
-        //     }
-        // }
-        // var lines = data.lines;
-        // for (var i = 0, j = lines.length; i<j; i++) {
-        //     var line = lines[i].items;
-        //     line.isObj = true;
-        //     shapes.push(new Shape.Polyline(line, {
-        //         strokeStyle: _rndColor(),
-        //         lineWidth: 1
-        //     }));
-        //     var point = line[0];
-        //     shapes.push(new Shape.Text(line.id, 'lng: '+point.x+'; lat: '+point.y+';font-size: 18px;color: green;font-weight: bold;'));
-        //     // if (line.id == 9) {
-        //     //     line.forEach(function(p, p_i) {
-        //     //         var x = p.x,
-        //     //             y = p.y;
-        //     //         var offset = '';
-        //     //         if (p_i == 61) {
-        //     //             offset = 'offsetY: 12px;';
-        //     //         }
-        //     //         shapes.push(new Shape.Text(p_i+'_'+x+'_'+y, 'lng: '+x+'; lat: '+y+';color: #ff0000; font-size: 16px;'+offset));
-        //     //     })
-        //     // }
-        // }
+        _model.emit('log', 'render deal data takes '+(new Date() - t_start)+' ms!');
         if (shapes && shapes.length > 0) {
             _model.emit('render', shapes);
         }
