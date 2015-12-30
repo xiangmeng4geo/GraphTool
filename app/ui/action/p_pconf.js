@@ -9,6 +9,7 @@ Core.init(function(model) {
 	var _alert = dialog.alert;
 	var product_conf = _require('product_conf');
 	var CONST = _require('const');
+	var CONST_SIZE = CONST.SIZE;
 	var CONST_LEGEND_STYLE = CONST.LEGEND_STYLE.slice(0);
 	var UI = _require('component').UI;
 	var electron = require('electron');
@@ -20,6 +21,8 @@ Core.init(function(model) {
 
 	var geo = getSys.getGeo() || [];
 	var legend = getSys.getLegend() || [];
+	var size = getSys.getSize() || [];
+
 	var is_no_geo = geo.length == 0;
 	var is_no_legend = legend.length == 0;
 	if (is_no_geo || is_no_legend) {
@@ -34,7 +37,8 @@ Core.init(function(model) {
 	}
 
 	var s_data_geo = [],
-		s_data_legend = [];
+		s_data_legend = [],
+		s_data_size = [];
 	geo.forEach(function(v) {
 		s_data_geo.push({
 			text: v.name,
@@ -46,6 +50,16 @@ Core.init(function(model) {
 			text: v.name,
 			val: v.name
 		});
+	});
+	size.forEach(function(v, i) {
+		s_data_size.push({
+			text: v.name+'('+v.width+'X'+v.height+')',
+			val: i
+		});
+	});
+	s_data_size.unshift({
+		text: CONST_SIZE.NAME+'('+CONST_SIZE.WIDTH+'X'+CONST_SIZE.HEIGHT+')',
+		val: -1
 	});
 
 	var product_name = _PARAM_;
@@ -70,6 +84,10 @@ Core.init(function(model) {
 	var s_legend = UI.select($('#s_legend'), {
 		data: s_data_legend,
 		val: conf_other.legend
+	});
+	var s_size = UI.select($('#s_size'), {
+		data: s_data_size,
+		val: conf_other.size
 	});
 	var s_legend_style = UI.select($('#s_legend_style'), {
 		data: CONST_LEGEND_STYLE,
@@ -383,7 +401,8 @@ Core.init(function(model) {
 			map: s_map.val(),
 			legend: s_legend.val(),
 			legend_style: s_legend_style.val(),
-			is_legend_range: _getChecked($cb_is_show_range_legend)
+			is_legend_range: _getChecked($cb_is_show_range_legend),
+			size: s_size.val()
 		};
 		conf.save = {
 			dir: file_dir_out.val(),

@@ -7,7 +7,7 @@
     var Menu = electron.Menu;
     var Tray = electron.Tray;
     var Shell = electron.shell;
-    var window = require('./window');
+    var _window = require('./window');
     var dialog = require('dialog');
 
     function showTray() {
@@ -28,7 +28,7 @@
             {
                 label: '退出',
                 click: function() {
-                    if (window.isOpenedUi()) {
+                    if (_window.isOpenedUi()) {
                         if (win) {
                             dialog.showMessageBox(win, {
                 				type: 'info',
@@ -53,9 +53,10 @@
     }
     var win;
     app.on('ready', function() {
+        _runSocket();
         showTray();
         // 主进程直接打开服务窗口
-        win = window.open('service');
+        win = _window.open('service');
     });
 
     function _runjs(conf) {
@@ -99,12 +100,12 @@
             win.isFocused();
             _runjs(conf);
         } catch(e){
-            win = window.getInstance('service');
+            win = _window.getInstance('service');
 
             win.webContents.on('ready', function() {
                 _runjs(conf);
             });
-            window.load(win, 'service');
+            _window.load(win, 'service');
         }
     }
     /**
@@ -163,5 +164,46 @@
     // _parse('-f e:/test/1.txt -c -d abc', function() {
     //     console.log(arguments);
     // });
+
+    // 启动socket供外部调用
+    function _runSocket() {
+        var net = require('net');
+        var socket = path.join('\\\\?\\pipe', 'BPA-GRAPHTOOL-COMMAND');
+        net.connect({path: socket}, function(){
+            
+        }).on('error', function(err){
+            try{
+                require('fs').unlinkSync(socket);
+            }catch(e){
+                if(e.code != 'ENOENT'){
+                    throw e;
+                }
+            }
+
+            net.createServer(function(c){
+                var tt_data ;
+                var str = '';
+                c.on('data', function(d){
+                    str += d;
+                    clearTimeout(tt_data);
+                    tt_data = setTimeout(function() {
+                        // 解析命令行参数
+                        _parse(str, function(err, msg) {
+                            var info = {};
+                            err && (info.err = err);
+                            msg && (info.msg = msg);
+                            var str = JSON.stringify(info);
+                            (err || msg) && c.write(str);
+                            c.end('\n');
+                        });
+                    }, 100);
+                }).on('end', function(){
+                    /**
+                     * 直接写在end事件里的回调一直不会触发！！
+                     */
+                });
+            }).listen(socket);
+        });
+    }
     module.exports = _parse;
 }()

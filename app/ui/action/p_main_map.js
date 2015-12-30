@@ -123,6 +123,22 @@ Core.init(function(model) {
             model.emit('refresh');
         }
     });
+    model.on('map.changesize', function(size_obj) {
+        if (size_obj) {
+            var w = size_obj.width,
+                h = size_obj.height;
+            if (width_map != w || height_map != h) {
+                $geomap_container.width(w);
+                $geomap_container.height(h);
+                model.emit('log', 'size change from ('+width_map+'x'+height_map+') to ('+w+'x'+h+')!');
+                height_map = h;
+                width_map = w;
+
+                geomap && geomap.resize(size_obj);
+                model.emit('map.reset');
+            }
+        }
+    });
     model.on('projection.changeview', function(a, b) {
         var key = _getKeyOfProjection(a, b);
         if (key !== _last_key_project) {

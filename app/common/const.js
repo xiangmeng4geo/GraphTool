@@ -123,6 +123,6 @@
 		conf[i] = conf_const[i];
 	}
 
-	conf.COMMAND = true;
+	conf.COMMAND = false;
 	module.exports = conf;
 }();

@@ -613,8 +613,29 @@
     /**
      * 重置尺寸
      */
-    prop.resize = function() {
-
+    prop.resize = function(size_obj) {
+        var _this = this;
+        var width_new, height_new;
+        if (size_obj) {
+            width_new = size_obj.width;
+            height_new = size_obj.height;
+        }
+        if (!width_new || !height_new) {
+            var options = _get(_this, 'options');
+            var $container = $(options.container);
+            if ($container && $container.length > 0) {
+                width_new = $container.width();
+                height_new = $container.height();
+            }
+        }
+        if (width_new && height_new) {
+            [LAYER_NAME_GEO_FILL, LAYER_NAME_WEATHER, LAYER_NAME_GEO_STROKE, LAYER_NAME_NORMAL].forEach(function(v) {
+                var id = _getCanvasId(_this, v);
+                var canvas = $('#'+id).get(0);
+                canvas.width = width_new;
+                canvas.height = height_new;
+            });
+        }
     }
     /**
      * 清除图层
@@ -657,7 +678,7 @@
         var $canvas_geo = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_GEO_STROKE)).appendTo($div);
         var $canvas_normal = _getCanvas(width, height, _getCanvasId(_this, LAYER_NAME_NORMAL)).appendTo($div);
 
-        $canvas_weather.get(0).getContext('2d').save();
+        // $canvas_weather.get(0).getContext('2d').save();
         _set(_this, 'options', options);
 
         // _this.config();

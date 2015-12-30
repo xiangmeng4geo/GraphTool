@@ -5,7 +5,9 @@
 	var util = require('./util');
 	var util_path = util.path;
 	var util_file = util.file;
-	var CONST_PATH_CONFIG = require('./const').PATH.CONFIG;
+	var CONST = require('./const');
+	var CONST_PATH_CONFIG = CONST.PATH.CONFIG;
+	var CONST_SIZE = CONST.SIZE;
 	var CONST_EXT = '.json';
 
 	function _getPathByName(name){
@@ -63,6 +65,29 @@
 					return legend[i];
 				}
 			}
+		}
+	}
+	_getSys.getSize = function(index) {
+		var conf = _getSys() || {};
+		var size = conf.size || [{
+			name: CONST_SIZE.NAME,
+			width: CONST_SIZE.WIDTH,
+			height: CONST_SIZE.HEIGHT
+		}];
+		if (index !== undefined) {
+			var val = size[index];
+			if (!val) {
+				for (var i = 0, j = size.length; i<j; i++) {
+					var v = size[i];
+					if (v.is_default) {
+						val = v;
+						break;
+					}
+				}
+			}
+			return val;
+		} else {
+			return size;
 		}
 	}
 	function _saveSys(json) {

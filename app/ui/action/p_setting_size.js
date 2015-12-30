@@ -77,8 +77,8 @@ Core.init(function(model) {
 
 			size_arr.push({
 				name: name,
-				width: width,
-				height: height,
+				width: parseFloat(width) || CONST_SIZE_WIDTH,
+				height: parseFloat(height) || CONST_SIZE_HEIGHT,
 				is_default: is_default
 			});
 		}

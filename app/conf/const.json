@@ -176,6 +176,7 @@
         "extensions": ["png", "jpg"]
     }],
     "SIZE": {
+    	"NAME": "默认尺寸",
     	"WIDTH": 800,
     	"HEIGHT": 800,
     	"MINWIDTH": 100,

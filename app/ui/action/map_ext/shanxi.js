@@ -8,7 +8,8 @@
     var util_variate = util.variate;
     var util_file = util.file;
     var util_path = util.path;
-    var getSys = _require('product_conf').getSys;
+    var product_conf = _require('product_conf');
+    var getSys = product_conf.getSys;
     var style2obj = _require('component').util.style2obj;
 
     function init(options) {
@@ -56,6 +57,8 @@
             var blendentJson = conf_legend.blendent;
 
             var showLegendRange = conf.showLegendRange;
+            var size = conf.size;
+            model.emit('map.changesize', getSys.getSize(size));
             model.emit('projection.changeview', bound.wn, bound.es);
             
             model.emit('geo', conf_geo, function(names_show) {

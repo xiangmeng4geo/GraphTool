@@ -2,7 +2,7 @@
 /* global global */
 /* global __dirname */
 !function(){
-	"use strict";
+	// "use strict";
 
 	var app = require('app');
 	var electron = require('electron');
@@ -16,6 +16,22 @@
 	var CONST_COMMAND = CONST.COMMAND;
 	var util = require('../common/util');
 	var util_file_mkdir = util.file.mkdir;
+
+	var is_use_command = CONST_COMMAND;
+	if (!is_use_command) {
+		var argv = process.argv;
+		for (var i = 0, j = argv.length; i<j; i++) {
+			if (argv[i].indexOf('--command') > -1) {
+				is_use_command = true;
+				break;
+			}
+		}
+	}
+	
+	if (is_use_command) {
+		// 和解耦合
+		require('./command');
+	}
 
 	// 创建必要的目录
 	util_file_mkdir(CONST.PATH.CACHE);
@@ -76,43 +92,13 @@
 			}
 			onSingle();
 			net.createServer(function(c){
-				var tt_focus;
-				var tt_data;
-				var str = '';
-				c.on('data', function(d){
-					str += d;
-					clearTimeout(tt_data);
-					clearTimeout(tt_focus);
-					if (CONST_COMMAND) {
-						tt_data = setTimeout(function() {
-							// 解析命令行参数
-							require('./command')(str, function(err, msg) {
-								var info = {};
-								err && (info.err = err);
-								msg && (info.msg = msg);
-								var str = JSON.stringify(info);
-								(err || msg) && c.write(str);
-								c.end('\n');
-							});
-						}, 100);
-					}
-				}).on('end', function(){
-					/**
-					 * 直接写在end事件里的回调一直不会触发！！
-					 */
-				});
-				tt_focus = setTimeout(function() {
-					if (str) {//命令行调用
-						return;
-					}
-
-					// ui主进程启动时直接得到焦点，否则重新打开
-					if (_window.isOpenedUi()) {
-						_window.setFocusToLast();
-					} else {
-						_getMainWin();
-					}
-				}, 100);
+				// ui主进程启动时直接得到焦点，否则重新打开
+				if (_window.isOpenedUi()) {
+					_window.setFocusToLast();
+				} else {
+					_getMainWin();
+				}
+				
 			}).listen(socket);
 		}).on('data', function(){
 		}).on('close', function(){

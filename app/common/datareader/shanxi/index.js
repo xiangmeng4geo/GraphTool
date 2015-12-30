@@ -90,7 +90,7 @@
                             });
                         } else {
                             callback(null, {
-                                data: data,
+                                // data: data,
                                 interpolate: data_idw
                             });
                         }

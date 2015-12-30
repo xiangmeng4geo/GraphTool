@@ -67,6 +67,7 @@
 			legend: conf.other.legend,
 			legendStyle: conf.other.legend_style,
 			showLegendRange: !!conf.other.is_legend_range,
+			size: conf.other.size,
 			showData: showData,
 			data: {
 				type: 'micaps',
