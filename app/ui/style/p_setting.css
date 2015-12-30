@@ -123,7 +123,8 @@ tab-content item resize-horizontal{
 	color: #26c9ff;
 }
 #btn_add_map_conf,
-#btn_add_blendent_conf{
+#btn_add_blendent_conf,
+.btn_add_big{
 	width: 70%;
 	margin: 20px auto;
 	margin-left: 15%;
@@ -172,4 +173,43 @@ legend{
 }
 #select_legent_product{
 	margin-left: 20px;
+}
+
+.table_sys_size{
+	width: 96%;
+	margin-left: 2%;
+}
+.btn_dele_sys_size{
+	display: inline-block;
+	background: url(../img/icon_delete.png);
+	width: 11px;
+	height: 12px;
+	cursor: pointer;
+}
+.btns_sys_size_wrap{
+	width: 50%;
+	margin: 10px auto;
+}
+.btns_sys_size_wrap .btn_add_big{
+	width: 30%;
+	margin: 10px 8% ;
+}
+input.txt_sys_size,
+input.txt_sys_size:focus{
+	border: none;
+	background: none;
+}
+.txt_sys_size_width{
+	text-align: right;
+	margin-right: 3px;
+	width: 40%;
+}
+.txt_sys_size_height{
+	text-align: left;
+	margin-left: 3px;
+	width: 40%;
+}
+.txt_sys_size_name{
+	width: 100%;
+    text-align: center;
 }

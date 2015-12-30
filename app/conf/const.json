@@ -174,5 +174,11 @@
 	"FILTER_IMAGE": [{
         "name": "图片",
         "extensions": ["png", "jpg"]
-    }]
+    }],
+    "SIZE": {
+    	"WIDTH": 800,
+    	"HEIGHT": 800,
+    	"MINWIDTH": 100,
+    	"MINHEIGHT": 100
+    }
 }

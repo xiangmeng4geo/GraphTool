@@ -158,8 +158,9 @@
 				if (val_selected === val) {
 					classStr = ' class="selected"';
 				}
-				html += '<li data-val="'+val+'"'+classStr+'>'+(type == 'img'?'<img src="'+text+'"/>': text)+'</li>';
-				html_test += '<span class="ui-select-val">'+text+'</span><br/>';
+				var content = (type == 'img'?'<img src="'+text+'"/>': text);
+				html += '<li data-val="'+val+'"'+classStr+'>'+content+'</li>';
+				html_test += '<span class="ui-select-val">'+content+'</span><br/>';
 			}
 			html += '</ul>';
 			var $html = $(html);
@@ -169,7 +170,7 @@
 			}
 
 			var min_width = _getComputedStyle($container, 'min-width');
-			var width = _getComputedStyle($container, 'width');
+			var width = _getComputedStyle($container, 'width'); 
 			if (!width || width == 'auto' || width == min_width) {
 				// 对内容检测得到内容的最大宽度
 				$html_test.html(html_test).css('opacity', 0);
