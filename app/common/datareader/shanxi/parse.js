@@ -36,7 +36,7 @@
 				legendStyle: conf.other.legend_style,
 				showLegendRange: !!conf.other.is_legend_range,
 				size: conf.other.size,
-				showData: true,
+				showData: false,
 				data: {
 					type: 'shanxi'
 				}

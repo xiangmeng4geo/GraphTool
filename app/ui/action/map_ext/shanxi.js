@@ -2,6 +2,7 @@
     var C = Core;
     var _require = C.require;
     var CONST = _require('const');
+    var CONST_SIZE = CONST.SIZE;
     var Reader = _require('datareader');
     var Render = _require('render');
     var util = _require('util');
@@ -45,7 +46,7 @@
             var legend_name = conf.legend;
             var assets = conf.assets;
             var data = conf.data;
-            var texts = conf.text || [];
+            var texts = conf.texts || [];
             var imgs = conf.imgs || [];
 
             var conf_geo = getSys.getGeo(map_name);
@@ -58,7 +59,21 @@
 
             var showLegendRange = conf.showLegendRange;
             var size = conf.size;
-            model.emit('map.changesize', getSys.getSize(size));
+            var toSize = {
+                width: CONST_SIZE.WIDTH,
+                height: CONST_SIZE.HEIGHT
+            };
+            var _width = conf.width,
+                _height = conf.height;
+            if (_width && _height) {
+                toSize = {
+                    width: _width,
+                    height: _height
+                };
+            } else {
+                toSize = getSys.getSize(size) || toSize;
+            }
+            model.emit('map.changesize', toSize);
             model.emit('projection.changeview', bound.wn, bound.es);
             
             model.emit('geo', conf_geo, function(names_show) {
