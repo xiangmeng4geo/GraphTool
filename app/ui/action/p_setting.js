@@ -36,7 +36,7 @@ Core.init(function(model) {
 		$('[type=checkbox]').each(function() {
 			var $this = $(this);
 			var $p = $this.parent();
-			if ($p.is('.row')) {
+			if ($p.is('.row,.checkbox')) {
 				var $items = $p.siblings('.row');
 				if ($this.prop('checked')) {
 					$items.show();
@@ -120,15 +120,15 @@ Core.init(function(model) {
 	});
 	$doc.delegate('[type=checkbox]', 'click', _checkbox);
 	// 绑定是否使用地图
-	$doc.delegate('.is_use_map', 'click', function() {
-		var $this = $(this);
-		var $items = $this.parent().siblings('.row');
-		if ($this.prop('checked')) {
-			$items.show();
-		} else {
-			$items.hide();
-		}
-	});
+	// $doc.delegate('.is_use_map', 'click', function() {
+	// 	var $this = $(this);
+	// 	var $items = $this.parent().siblings('.row');
+	// 	if ($this.prop('checked')) {
+	// 		$items.show();
+	// 	} else {
+	// 		$items.hide();
+	// 	}
+	// });
 
 	function _getChecked($checkbox){
 		return $checkbox.prop('checked');

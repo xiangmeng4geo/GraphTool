@@ -631,7 +631,7 @@ Core.init(function(model) {
                 if (conf_save) {
                     out_dir = conf_save.dir;
                     filename = conf_save.file;
-                    if (!_isImage(filename)) {
+                    if (filename && !_isImage(filename)) {
                         filename += '.png';
                     }
                 }

@@ -58,7 +58,7 @@
             var blendentJson = conf_legend.blendent;
 
             var showLegendRange = conf.showLegendRange;
-            var size = conf.size;
+            var size = conf.size || '';
             var toSize = {
                 width: CONST_SIZE.WIDTH,
                 height: CONST_SIZE.HEIGHT
@@ -175,6 +175,22 @@
                     Render.img(imgs);
 
                     if (data_interpolate) {
+                        // var texts_data = [];
+                        // for (var i = 0, j = data_interpolate.length; i<j; i++) {
+                        //     for (var i_items = 0, items = data_interpolate[i], j_items = items.length; i_items<j_items; i_items++) {
+                        //         var item = items[i_items];
+                        //         texts_data.push({
+                        //             txt: item.v,
+                        //             lng: item.x,
+                        //             lat: item.y,
+                        //             fontSize: 14,
+                        //             color: '#00ff00',
+                        //             offsetY: -10,
+                        //             offsetX: 6
+                        //         });
+                        //     }
+                        // }
+                        // Render.text(texts_data);
                         conrec(data_interpolate, blendentJson, true, function(err, data_conrec) {
                             if (err) {
                                 model.emit('error', err);
