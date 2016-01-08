@@ -2407,6 +2407,7 @@ function ArcCollection() {
     if (nn instanceof Array) nn = new Uint32Array(nn);
     if (xx instanceof Array) xx = new Float64Array(xx);
     if (yy instanceof Array) yy = new Float64Array(yy);
+
     _xx = xx;
     _yy = yy;
     _nn = nn;
@@ -6154,6 +6155,16 @@ function PathImporter(opts, reservedPoints) {
           xx = xx.subarray(0, pointId);
           yy = yy.subarray(0, pointId);
         }
+        // 当有prj文件时对数据进行投影转换
+        if (opts && opts._prj) {
+          var _content_prj = opts._prj;
+          var _proj4 = require('./proj4')(_content_prj);
+          for (var i_xx = 0, j_xx = xx.length; i_xx < j_xx; i_xx++) {
+            var _val_prj = _proj4.inverse([xx[i_xx], yy[i_xx]]);
+            xx[i_xx] = _val_prj[0];
+            yy[i_xx] = _val_prj[1];
+          }
+        }
         arcs = new ArcCollection(nn, xx, yy);
 
         // TODO: move shape validation after snapping (which may corrupt shapes)
@@ -7651,7 +7662,6 @@ TopoJSON.GeometryImporter = function(opts) {
     if (properties.length > 0) {
       lyr.data = new DataTable(properties);
     }
-    // console.log(lyr.shapes)
     return lyr;
   };
 };
@@ -8671,7 +8681,6 @@ function ShpReader(src) {
       zbounds: bin.readFloat64Array(2),
       mbounds: bin.readFloat64Array(2)
     };
-
     if (header.signature != 9994) {
       error("Not a valid .shp file");
     }
@@ -8957,7 +8966,8 @@ MapShaper.importShp = function(src, opts) {
     }
   });
 
-  return importer.done();
+  var result = importer.done();
+  return result;
 };
 
 // Convert a dataset to Shapefile files
@@ -9260,9 +9270,6 @@ function readFile(filepath, cb) {
 
     fs.readFile(filepath, function(err, buf) {
         if (err) {
-            for(var i in err){
-                console.log(i, err[i]);
-            }
             return cb(new Error('"'+err.path+'"不存在!'));
         }
         if (isBinary) {
@@ -9280,7 +9287,18 @@ function importFile(filepath, cb){
         if (err) {
             cb(err);
         } else {
-            cb(null, MapShaper.importFileContent(content, filepath));
+          var opts;
+          var ext = path.extname(filepath).toLowerCase();
+          if (ext == '.shp') {
+            var src_prj = path.join(path.dirname(filepath), path.basename(filepath).replace(path.extname(filepath), '.prj'));
+            if (fs.existsSync(src_prj)) {
+              var content_prj = fs.readFileSync(src_prj).toString();
+              opts = {
+                _prj: content_prj
+              };
+            }
+          }
+          cb(null, MapShaper.importFileContent(content, filepath, opts));
         }
     });
 }
