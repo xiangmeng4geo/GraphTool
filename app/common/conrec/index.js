@@ -174,6 +174,9 @@
 
 					for(var i = 0, j = p.length; i<j; i++){
 						var val = p[i];
+						if (!val[0]) {
+							continue;
+						}
 						var x_p = val[0].x,
 							y_p = val[0].y;
 						if (_isInPolygonForColor(polygon, x_p, y_p)) {
