@@ -2657,7 +2657,11 @@ end
 <Event>
 <Name>On Pre Install</Name>
 <Args/>
-<Script/>
+<Script>_appfolder = SessionVar.Expand("%AppFolder%");
+_isExist = Folder.DoesExist(_appfolder);
+if (_isExist == true) then
+	Folder.DeleteTree(_appfolder, nil);
+end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -2718,7 +2722,7 @@ g_HandleSystemReboot();
 </SessionVar>
 <SessionVar>
 <Name>%ProductVer%</Name>
-<Value>1.0.7</Value>
+<Value>1.0.8</Value>
 <Type>1</Type>
 </SessionVar>
 <SessionVar>
@@ -2776,7 +2780,7 @@ g_HandleSystemReboot();
 <PostBuildProg/>
 <PostBuildCmdLine/>
 <PostBuildWait>0</PostBuildWait>
-<Filename>BPA-GT-32-1.0.7.exe</Filename>
+<Filename>BPA-GT-32-1.0.8.exe</Filename>
 <OutputFolder>I:\docs\2015\蓝PI相关\制图\安装包</OutputFolder>
 <SegmentSizeMode>0</SegmentSizeMode>
 <CustomSegSize>0</CustomSegSize>
