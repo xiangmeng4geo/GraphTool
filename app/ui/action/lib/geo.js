@@ -6155,7 +6155,9 @@ function PathImporter(opts, reservedPoints) {
           xx = xx.subarray(0, pointId);
           yy = yy.subarray(0, pointId);
         }
+        
         // 当有prj文件时对数据进行投影转换
+        // https://github.com/tonny-zhang/GraphTool/issues/35
         if (opts && opts._prj) {
           var _content_prj = opts._prj;
           var _proj4 = require('./proj4')(_content_prj);
@@ -9289,6 +9291,8 @@ function importFile(filepath, cb){
         } else {
           var opts;
           var ext = path.extname(filepath).toLowerCase();
+
+          // https://github.com/tonny-zhang/GraphTool/issues/35
           if (ext == '.shp') {
             var src_prj = path.join(path.dirname(filepath), path.basename(filepath).replace(path.extname(filepath), '.prj'));
             if (fs.existsSync(src_prj)) {
