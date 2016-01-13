@@ -259,6 +259,8 @@
 			return b.items.length - a.items.length;
 		});
 		lines = lines_open.concat(lines_closed);
+		// lines = lines.slice(2, 4);
+		// lines = [lines[2]];
 		for (var i = 0, j = lines.length; i<j; i++) {
 			lines[i].items = tool_smoothItems(lines[i].items, MIN_DIS, false);
 		}

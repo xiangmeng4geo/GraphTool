@@ -25,7 +25,7 @@
             var data_list = data.list;
             // 处理插值完后的数据
             if (data_list && data_list.length > 0) {
-
+                // data_list = data_list.slice(24, 25);
                 data_list.forEach(function(polygon, i) {
                     var items = polygon.items;
                     items.isObj = true;
@@ -41,6 +41,10 @@
                         // strokeStyle: '#ff0000',
                         // lineWidth: 2
                     }, sub));
+
+                    // items.forEach(function(p, i) {
+                    //     shapes.push(new Shape.Text(i, 'lng:'+p.x+';lat:'+p.y+';color:blue'));
+                    // });
                 });
             }
 
@@ -56,11 +60,20 @@
             //             strokeStyle: _rndColor(),
             //             lineWidth: 1
             //         }));
+
+            //         shapes.push(new Shape.Text(i, 'lng:'+first.x+';lat:'+first.y+';color:blue'));
             //     }
             // }
         }
         _model.emit('log', 'render deal data takes '+(new Date() - t_start)+' ms!');
         if (shapes && shapes.length > 0) {
+            // for (var i = 0, j = shapes.length; i<j; i++) {
+            //     (function(arr, time) {
+            //         setTimeout(function() {
+            //             _model.emit('render', arr);
+            //         }, time);
+            //     })([shapes[i]], i*400)
+            // }
             _model.emit('render', shapes);
         }
     }

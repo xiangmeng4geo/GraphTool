@@ -423,49 +423,51 @@
 			
 			var part1 = items_polygon.slice(index_start, index_stop),
 				part2 = items_polygon.slice(index_stop).concat(items_polygon.slice(0, index_start));
-
 			var line_reverse = line.slice(0);	
 			line_reverse.reverse();
 			var area_line = _getArea(line);
 			var area_part = 0; // 防止出一个点或一条直线面积为0的情况
 			var len_part1 = part1.length,
 				len_part2 = part2.length;
-			if (len_part1 > 0 && (area_part = _getArea(part1)) !== 0) {
-				if (area_part * area_line > 0) { // 同方向
-					part1 = part1.concat(line_reverse);
-					part2 = part2.concat(line);
-				} else {
-					part1 = part1.concat(line);
-					part2 = part2.concat(line_reverse);
-				}
-			} else if (len_part2 > 0 && (area_part = _getArea(part2)) !== 0) {
-				if (area_part * area_line > 0) { // 同方向
-					part1 = part1.concat(line);
-					part2 = part2.concat(line_reverse);
-				} else {
-					part1 = part1.concat(line_reverse);
-					part2 = part2.concat(line);
-				}
-			} else {
+			// if (len_part1 > 0 && (area_part = _getArea(part1)) !== 0) {
+			// 	if (area_part * area_line > 0) { // 同方向
+			// 		part1 = part1.concat(line_reverse);
+			// 		part2 = part2.concat(line);
+			// 	} else {
+			// 		part1 = part1.concat(line);
+			// 		part2 = part2.concat(line_reverse);
+			// 	}
+			// } else if (len_part2 > 0 && (area_part = _getArea(part2)) !== 0) {
+			// 	if (area_part * area_line > 0) { // 同方向
+			// 		part1 = part1.concat(line);
+			// 		part2 = part2.concat(line_reverse);
+			// 	} else {
+			// 		part1 = part1.concat(line_reverse);
+			// 		part2 = part2.concat(line);
+			// 	}
+			// } else {
 				// 点很少的情况会出现面积为0的情况
-				if (len_part1 > 0) {
+				/*分割后的两个部分不可能点都为1个，如果有一个部分是一个点的话对线的判断逻辑会有误差，因此这里加强判断*/
+				if (len_part1 > 1) {
 					var p_part1 = part1[0];
 					var x_p_part1 = p_part1.x,
 						y_p_part1 = p_part1.y;
-					if (Math.pow(x_p_part1 - x_p_first_line, 2) + Math.pow(y_p_part1 - y_p_first_line, 2) >
-						Math.pow(x_p_part1 - x_p_end_line, 2) + Math.pow(y_p_part1 - y_p_end_line, 2)) {
+					var cha = (Math.pow(x_p_part1 - x_p_first_line, 2) + Math.pow(y_p_part1 - y_p_first_line, 2)) -
+						(Math.pow(x_p_part1 - x_p_end_line, 2) + Math.pow(y_p_part1 - y_p_end_line, 2));
+					if (cha > 0) {
 						part1 = part1.concat(line);
 						part2 = part2.concat(line_reverse);
 					} else {
 						part1 = part1.concat(line_reverse);
 						part2 = part2.concat(line);
 					}
-				} else if (len_part2 > 0) {
+				} else if (len_part2 > 1) {
 					var p_part2 = part2[0];
 					var x_p_p_part2 = p_part2.x,
 						y_p_p_part2 = p_part2.y;
-					if (Math.pow(x_p_p_part2 - x_p_first_line, 2) + Math.pow(y_p_p_part2 - y_p_first_line, 2) >
-						Math.pow(x_p_p_part2 - x_p_end_line, 2) + Math.pow(y_p_p_part2 - y_p_end_line, 2)) {
+					var cha = (Math.pow(x_p_p_part2 - x_p_first_line, 2) + Math.pow(y_p_p_part2 - y_p_first_line, 2)) -
+						(Math.pow(x_p_p_part2 - x_p_end_line, 2) + Math.pow(y_p_p_part2 - y_p_end_line, 2));
+					if (cha >0) {
 						part1 = part1.concat(line_reverse);
 						part2 = part2.concat(line);
 					} else {
@@ -473,7 +475,7 @@
 						part2 = part2.concat(line_reverse);
 					}
 				}
-			}
+			// }
 			if (!_isClosed(part1)) {
 				part1.push(part1[0]);
 			}
@@ -521,7 +523,8 @@
 			items.id = i;
 			lines_dealing.push(items);
 		});
-		// lines_dealing = lines_dealing.splice(0, 1);
+
+		// lines_dealing = lines_dealing.splice(3, 1);
 		// console.log(polygons_dealing.slice(), lines_dealing.slice());
 		var _num_test = 0;
 		var _test;

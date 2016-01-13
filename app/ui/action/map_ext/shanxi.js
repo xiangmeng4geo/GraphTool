@@ -27,15 +27,20 @@
         var _current_product_name;
         model.on('product.change', function(productName) {
             _current_product_name = productName;
+            model.emit('loading.show');
         });
         // 主要监听命令行调用时配置文件更新
         model.on('map.changeconfig', function(file_path) {
+            // if (err) {
+            //   return  model.emit('log.user.error', err);
+            // } 
             var conf = util.isPlainObject(file_path) ? file_path: util_file.readJson(file_path);
             _changeConf(conf);
         });
         function _afterChangeConf(err, t_start) {
             var t_used = new Date() - t_start;
             model.emit('map.afterRender', err, t_used);
+            model.emit('loading.hide');
         }
         function _changeConf(conf) {
             var s_time = new Date();
@@ -82,6 +87,10 @@
                 }
                 Reader.read(data, function(err, dataJson) {
                     console.log(dataJson);
+                    if (err) {
+                        _afterChangeConf(err, s_time);
+                        return model.emit('log.user.error', err);
+                    }
                     if (assets) {
                         var _opt_var = {
                             p: _current_product_name,
@@ -110,10 +119,6 @@
                             }
                         }
                         model.emit('asset.add', assets);
-                    }
-                    if (err) {
-                        _afterChangeConf(err, s_time);
-                        return model.emit('error', err);
                     }
                     if (showLegendRange) {
                         var data_filter_legend = [];
@@ -175,12 +180,21 @@
                     Render.img(imgs);
 
                     if (data_interpolate) {
+                        conrec(data_interpolate, blendentJson, true, function(err, data_conrec) {
+                            if (err) {
+                                model.emit('error', err);
+                            } else {
+                                Render.conrec(data_conrec);
+                            }
+                            
+                            _afterChangeConf(err, s_time);
+                        });
                         // var texts_data = [];
                         // for (var i = 0, j = data_interpolate.length; i<j; i++) {
                         //     for (var i_items = 0, items = data_interpolate[i], j_items = items.length; i_items<j_items; i_items++) {
                         //         var item = items[i_items];
                         //         texts_data.push({
-                        //             txt: item.v,
+                        //             txt: item.v+'_'+item.level,
                         //             lng: item.x,
                         //             lat: item.y,
                         //             fontSize: 14,
@@ -191,15 +205,6 @@
                         //     }
                         // }
                         // Render.text(texts_data);
-                        conrec(data_interpolate, blendentJson, true, function(err, data_conrec) {
-                            if (err) {
-                                model.emit('error', err);
-                            } else {
-                                Render.conrec(data_conrec);
-                            }
-                            
-                            _afterChangeConf(err, s_time);
-                        });
                     } else {
                         Render.micaps(dataJson, blendentJson);
                         _afterChangeConf(err, s_time);

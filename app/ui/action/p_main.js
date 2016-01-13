@@ -21,6 +21,30 @@ Core.init(function() {
 	C.emit('main.loaded');
 	// var win = C.remote('window');
 
+	var $console_panel = $('#console_panel');
+	var msg_list = [];
+	function _fn_log_user(msg) {
+		var is_error = msg instanceof Error;
+		model.emit(is_error? 'error':'log', msg);
+		// var info = '<p '+(is_error?'style="color:red"':'')+'>'+(new Date().format('hh:mm:ss'))+' ['+(is_error?'error':'info') + '] "'+(msg.msg || msg.message || msg)+'"</p>'
+		// // msg_list.unshift();
+		// $console_panel.html(info);
+	}
+	model.on('log.user', _fn_log_user);
+	model.on('log.user.error', function(err) {
+		var info = err.msg || err.message || err;
+		_alert(info);
+		_fn_log_user(err);
+	});
+
+	var $loading = $('.loading');
+
+	model.on('loading.show', function() {
+		$loading.show();
+	});
+	model.on('loading.hide', function() {
+		$loading.hide();
+	});
 	var $doc = $(document);
 
 	$('.btn_min').click(function() {

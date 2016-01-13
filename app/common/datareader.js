@@ -7,7 +7,10 @@
 
     // var _log = util.Model.log;
     function _log(msg) {
-        _model && _model.emit('log', msg);
+        _model && _model.emit('log.user', msg);
+    }
+    function _err(err) {
+        _model && _model.emit('log.user.error', err);
     }
     var _model;
     var Reader = {};
@@ -54,7 +57,7 @@
         try{
             _parser = require('./datareader/'+conf.data.type+'/parse');
         } catch(e) {
-            _model && _model.emit('error', new Error('no support parse method of reader!'));
+            _err(new Error('no support parse method of reader!'));
         }
         if (_parser) {
             _parser(conf, _model);

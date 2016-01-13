@@ -86,7 +86,7 @@ Core.init(function(model) {
     }
     var _productNameCurrent;
     function _log(msg) {
-        model.emit('log', msg);
+        model.emit('log.user', msg);
     }
     C.on('sys.change', function() {
         _productNameCurrent = null;

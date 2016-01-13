@@ -18,6 +18,7 @@
 		var canvas = $canvas.get(0);
 		return canvas;
 	}
+	// 右侧上下显示
 	function LegendA(colors, options) {
 		options = $.extend({
 			width: 20,
@@ -219,18 +220,25 @@
 			colors.forEach(function(c, ci) {
 				ctx.save();
 				var color = c.color;
-				ctx.fillStyle = is_stripe? pattern.Streak({
-					strokeStyle: color
-				}): color;
+
 				
-				ctx.strokeStyle = color;
 				ctx.beginPath();
 				var y = ci*(height_block + 4);
+
+				ctx.fillStyle = '#ffffff';
+				ctx.fillRect(x_add, y, width_block, height_block);
+				
 				ctx.moveTo(x_add, y);
 				ctx.lineTo(x_add+width_block, y);
 				ctx.lineTo(x_add+width_block, y+height_block );
 				ctx.lineTo(x_add, y+height_block);
 				ctx.lineTo(x_add, y);
+
+				ctx.fillStyle = is_stripe? pattern.Streak({
+					strokeStyle: color
+				}): color;
+				
+				ctx.strokeStyle = color;
 				ctx.fill();
 				// ctx.fillRect(x_add, y, width_block, height_block);
 				ctx.stroke();
@@ -287,6 +295,9 @@
 			colors.forEach(function(c, ci) {
 				var x = ci * width_per + x_margin * ci;
 				ctx.save();
+				ctx.fillStyle = '#ffffff';
+				ctx.fillRect(x, y, width_per, height_per);
+
 				ctx.moveTo(x, y);
 				var _color = c.color;
 				ctx.fillStyle = is_stripe? pattern.Streak({
