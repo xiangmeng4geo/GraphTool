@@ -470,7 +470,9 @@
 			for (var i = 0, j = range.length; i<j; i++) {
 				var case_range = range[i];
 				var val_range = case_range.val;
-				if(val > val_range[0] && val <= val_range[1]){
+				
+				// 防止出现最小值为边界值问题
+				if(val >= val_range[0] && val <= val_range[1]){
 					var c = !use_check || case_range.is_checked? case_range.color: COLOR_TRANSPANT;
 					return is_return_index? [c, i]: c;
 				}
