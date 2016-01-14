@@ -28,6 +28,9 @@
 			return b - a;
 		});
 	}
+	function _isDefault(v) {
+		return /^9{3,}/.test(v);
+	}
 	function conrec(rasterData, blendent, is_points_array /*返回的点是否为数组*/ , cb) {
 		var color_method = util_color(blendent);
 		if (!color_method) {
@@ -55,6 +58,11 @@
 				var color = color_info[0],
 					color_level = color_info[1];
 				c_cache[color] = true;
+				if (_isDefault(v.v)) {
+					color_level = 999;
+				} else {
+					color_level = color_level % 2;
+				}
 				arr.push({
 					x: v.x,
 					y: v.y,
@@ -62,6 +70,7 @@
 					level: color_level,
 					c: color || COLOR_TRANSPANT
 				});
+				rasterData[i][j].level = color_level;
 				_arr_d.push(color_level * 2);
 			}
 			_new_interpolate_data.push(arr);
@@ -114,6 +123,7 @@
 		var c = new Conrec();
 		c.contour(data_arr, 0, xArr.length - 1, 0, yArr.length - 1, xArr, yArr, zArr.length, zArr);
 		var lines = c.contourList();
+		console.log(lines);
 		var x_start = rasterData[0][0].x, x_step = rasterData[1][0].x - rasterData[0][0].x,
       		y_start = rasterData[0][0].y, y_step = rasterData[0][1].y - rasterData[0][0].y;
 		
@@ -194,7 +204,7 @@
 	        	for (var i = 0, j = p_test.length; i<j; i++) {
 	        		var item = p_test[i][0];
 	        		_p_arr.push(item);
-	        		if (!/9{3,}/.test(item.v)) {
+	        		if (!_isDefault(item.v)) {
 	        			v_sum += item.v;
 	        		}
 	        	}
@@ -261,9 +271,9 @@
 		lines = lines_open.concat(lines_closed);
 		// lines = lines.slice(2, 4);
 		// lines = [lines[2]];
-		for (var i = 0, j = lines.length; i<j; i++) {
-			lines[i].items = tool_smoothItems(lines[i].items, MIN_DIS, false);
-		}
+		// for (var i = 0, j = lines.length; i<j; i++) {
+		// 	lines[i].items = tool_smoothItems(lines[i].items, MIN_DIS, false);
+		// }
 		var result = splitPolygonsByLines([polygon], lines, function(polygon) {
 			var p = _getColor(polygon);
 			if (p) {
@@ -278,6 +288,7 @@
 			list: result,
 			lines: lines
 		}
+		console.log(return_val);
 		cb && cb(null, return_val);
 	}
 	conrec.setModel = function(model) {
