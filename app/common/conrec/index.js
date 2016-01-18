@@ -31,6 +31,9 @@
 	function _isDefault(v) {
 		return /^9{3,}/.test(v);
 	}
+	var LEVEL_DEFAULT = -2;
+	var LEVEL_MIN = -1;
+	var LEVEL_MAX = 15;
 	function conrec(rasterData, blendent, is_points_array /*返回的点是否为数组*/ , cb) {
 		var color_method = util_color(blendent);
 		if (!color_method) {
@@ -46,6 +49,8 @@
 			return cb(new Error('conrec data error!'));
 		}
 
+		var data_cache = {};
+		var data_default_cache = [];
 		var c_cache = {};
 		var data_arr = [];
 		var _new_interpolate_data = [];
@@ -58,11 +63,14 @@
 				var color = color_info[0],
 					color_level = color_info[1];
 				c_cache[color] = true;
-				if (_isDefault(v.v)) {
-					color_level = 999;
+				var _is_default = _isDefault(v.v);
+				if (_is_default) {
+					color_level = LEVEL_DEFAULT;
+					data_default_cache.push([i, j]);
 				} else {
-					color_level = color_level % 2;
+					data_cache[i+'_'+j] = 1;
 				}
+				// color_level = color_level%5;
 				arr.push({
 					x: v.x,
 					y: v.y,
@@ -98,7 +106,7 @@
 				x: x0,
 				y: y1
 			}]
-		};		
+		};
 		var zArr = [];
 		// 对分割线进行过滤，减小计算
 		var colors = blendent[0].colors.filter(function(c, i) {
@@ -111,6 +119,43 @@
 		colors.map(function(v, i) {
 			zArr.push(v.k);
 		});
+console.log(zArr);
+		var z_min = Math.min.apply(Math, zArr);
+		var z_max = Math.max.apply(Math, zArr);
+		var z_middle = (z_min + z_max)/2;// 得到中间值
+
+		var v_tmp;
+		var n_arround = 1;console.log(data_default_cache.length);
+		// while((v_tmp = data_default_cache.shift())) {
+		// 	var i = v_tmp[0],
+		// 		j = v_tmp[1];
+		// 	var sum = 0;
+		// 	var num = 0;
+		// 	for (var i_start = i - n_arround, i_end = i + n_arround; i_start<i_end; i_start++) {
+		// 		for (var j_start = j - n_arround, j_end = j + n_arround; j_start<j_end; j_start++) {
+		// 			var _key = i_start + '_' + j_start;
+		// 			if (data_cache[_key]) {
+		// 				var _v = data_arr[i_start][j_start];
+		// 				if (_v != LEVEL_DEFAULT*2) {
+		// 					sum += _v;
+		// 					num ++;
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// 	console.log('len = ', data_default_cache.length, new Date().getTime());
+		// 	if (num > 0) {
+		// 		var to_v = sum / num;
+		// 		// console.log('---', to_v, sum, num);
+		// 		to_v *= (to_v > z_middle? 1.3: 0.7);
+		// 		console.log(data_default_cache.length, to_v);
+		// 		// to_v = LEVEL_MAX;
+		// 		data_arr[i][j] = to_v;
+		// 		data_cache[i+'_'+j] = 1;
+		// 	} else {
+		// 		data_default_cache.push(v_tmp);
+		// 	}
+		// }
 
 		var xArr = [],
 			yArr = [];
@@ -170,16 +215,28 @@
 
 	          		var p = [];
 					try{
-						p.push([rasterData[x_min][y_min], x_min, y_min]);
+						var v = rasterData[x_min][y_min];
+						if (v) {
+							p.push([v, x_min, y_min]);
+						}
 					}catch(e){};
 					try{
-						p.push([rasterData[x_max][y_min], x_max, y_min]);
+						var v = rasterData[x_max][y_min];
+						if (v) {
+							p.push([v, x_max, y_min]);
+						}
 					}catch(e){};
 					try{
-						p.push([rasterData[x_min][y_max], x_min, y_max]);
+						var v = rasterData[x_min][y_max];
+						if (v) {
+							p.push([v, x_min, y_max]);
+						}
 					}catch(e){};
 					try{
-						p.push([rasterData[x_max][y_max], x_max, y_max]);
+						var v = rasterData[x_max][y_max];
+						if (v) {
+							p.push([v, x_max, y_max]);
+						}
 					}catch(e){};
 
 					for(var i = 0, j = p.length; i<j; i++){

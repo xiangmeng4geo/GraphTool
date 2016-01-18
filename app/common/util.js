@@ -196,6 +196,7 @@
 	 */
 	function grid(lng0, lat0, lng1, lat1, GRID_SPACE){
 		GRID_SPACE || (GRID_SPACE = 0.5);
+		// GRID_SPACE = 10;
 		lng0 = parseFloat(lng0);
 		lat0 = parseFloat(lat0);
 		lng1 = parseFloat(lng1);

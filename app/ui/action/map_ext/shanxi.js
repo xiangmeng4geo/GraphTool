@@ -193,6 +193,9 @@
                         // for (var i = 0, j = data_interpolate.length; i<j; i++) {
                         //     for (var i_items = 0, items = data_interpolate[i], j_items = items.length; i_items<j_items; i_items++) {
                         //         var item = items[i_items];
+                        //         if (item.v == 999999) {
+                        //             item.v = '_'
+                        //         }
                         //         texts_data.push({
                         //             txt: item.v+'_'+item.level,
                         //             lng: item.x,

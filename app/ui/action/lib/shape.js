@@ -40,9 +40,9 @@
             ctx.lineTo(x, y);
         }
 
-        if (needClose) {
-            ctx.lineTo(pixel_first[0], pixel_first[1]);
-        }
+        // if (needClose) {
+        //     ctx.lineTo(pixel_first[0], pixel_first[1]);
+        // }
     }
 
     // 霜冻线
