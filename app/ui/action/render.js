@@ -24,29 +24,29 @@
         if (data) {
             var data_list = data.list;
             // 处理插值完后的数据
-            if (data_list && data_list.length > 0) {
-                // data_list = data_list.slice(24, 25);
-                data_list.forEach(function(polygon, i) {
-                    var items = polygon.items;
-                    items.isObj = true;
-                    var sub = polygon.sub;
-                    if (sub) {
-                        sub.forEach(function(v) {
-                            v.isObj = true;
-                        });
-                    }
+            // if (data_list && data_list.length > 0) {
+            //     // data_list = data_list.slice(24, 25);
+            //     data_list.forEach(function(polygon, i) {
+            //         var items = polygon.items;
+            //         items.isObj = true;
+            //         var sub = polygon.sub;
+            //         if (sub) {
+            //             sub.forEach(function(v) {
+            //                 v.isObj = true;
+            //             });
+            //         }
 
-                    shapes.push(new Shape.Polygon(items, {
-                        fillStyle: polygon.color,
-                        // strokeStyle: '#ff0000',
-                        // lineWidth: 2
-                    }, sub));
+            //         shapes.push(new Shape.Polygon(items, {
+            //             fillStyle: polygon.color,
+            //             // strokeStyle: '#ff0000',
+            //             // lineWidth: 2
+            //         }, sub));
 
-                    // items.forEach(function(p, i) {
-                    //     shapes.push(new Shape.Text(i, 'lng:'+p.x+';lat:'+p.y+';color:blue'));
-                    // });
-                });
-            }
+            //         // items.forEach(function(p, i) {
+            //         //     shapes.push(new Shape.Text(i, 'lng:'+p.x+';lat:'+p.y+';color:blue'));
+            //         // });
+            //     });
+            // }
 
             var lines = data.lines;
             if (lines) {

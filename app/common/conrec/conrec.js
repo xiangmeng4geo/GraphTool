@@ -403,16 +403,16 @@
 						p2_new = _sectByPoint(p3, p4, LEVEL_DEFAUTL);
 					_drawDefaultLineByPoint(p1_new, p2_new);
 				}
-				for (var k = 0; k < nc; k++) {
-					var _level = z[k];
+				// for (var k = 0; k < nc; k++) {
+				// 	var _level = z[k];
 
-					if (_checkBetween(p1, p2, _level) && _checkBetween(p3, p4, _level)) {
-						var p1_new = _sectByPoint(p1, p2, _level),
-							p2_new = _sectByPoint(p3, p4, _level);
+				// 	if (_checkBetween(p1, p2, _level) && _checkBetween(p3, p4, _level)) {
+				// 		var p1_new = _sectByPoint(p1, p2, _level),
+				// 			p2_new = _sectByPoint(p3, p4, _level);
 
-						_drawLineByPoint(p1_new, p2_new, k);
-					}
-				}
+				// 		_drawLineByPoint(p1_new, p2_new, k);
+				// 	}
+				// }
 			}
 			function _drawLineByPoint(p1, p2, index) {
 				index = index || 0;
