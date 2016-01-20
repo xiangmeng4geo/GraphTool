@@ -5,6 +5,7 @@ var list = [
     './spec/test-reader.micaps',
     './spec/test-color',
     './spec/conrec/test-tool',
+    './spec/conrec/test-tool-other',
     './spec/test-conrec'
 ];
 

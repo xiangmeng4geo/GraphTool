@@ -93,6 +93,7 @@ describe('conrec', function() {
     it('should get result', function(done) {
         idw(data, arr, function(err, data){
             conrec(data, blendent, false, function(err, data) {
+            	// console.log(data.list);
                 expect(err).to.be.a('null');
                 data.should.have.property('list');
                 done();

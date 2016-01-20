@@ -119,13 +119,13 @@
 		colors.map(function(v, i) {
 			zArr.push(v.k);
 		});
-console.log(zArr);
+
 		var z_min = Math.min.apply(Math, zArr);
 		var z_max = Math.max.apply(Math, zArr);
 		var z_middle = (z_min + z_max)/2;// 得到中间值
 
 		var v_tmp;
-		var n_arround = 1;console.log(data_default_cache.length);
+		var n_arround = 1;
 		// while((v_tmp = data_default_cache.shift())) {
 		// 	var i = v_tmp[0],
 		// 		j = v_tmp[1];
@@ -168,10 +168,11 @@ console.log(zArr);
 		var c = new Conrec();
 		c.contour(data_arr, 0, xArr.length - 1, 0, yArr.length - 1, xArr, yArr, zArr.length, zArr);
 		var lines = c.contourList();
-		console.log(lines);
 		var x_start = rasterData[0][0].x, x_step = rasterData[1][0].x - rasterData[0][0].x,
       		y_start = rasterData[0][0].y, y_step = rasterData[0][1].y - rasterData[0][0].y;
 		
+		var lines_group = tool.groupLines(lines, tool_getBound(polygon.items), Math.max(x_step, y_step));
+		lines = lines_group.slice();
 		function _isInPolygonForColor(polygon, x_p, y_p) {
 			var items = polygon.items;
 			var sub = polygon.sub;
@@ -193,12 +194,12 @@ console.log(zArr);
 			return false;
 		}
 		function _getColor(polygon) {
-			var line = polygon.line;
+			// var line = polygon.line;
 			var items = polygon.items;
 			var sub = polygon.sub;
 			var p_test = null;
-			for (var i_line = 0, j_line = line.length; i_line < j_line; i_line++) {
-				var point = line[i_line];// 取中间点
+			for (var i_line = 0, j_line = items.length; i_line < j_line; i_line++) {
+				var point = items[i_line];// 取中间点
 				var x = point.x,
 					y = point.y;
 				var x_per = (x - x_start) / x_step,
@@ -275,7 +276,7 @@ console.log(zArr);
 	        		y_step_test = y_max_test - y_min_test;
 
 	        	var num_test = 0;
-	        	while (num_test++ < 100) {
+	        	while (num_test++ < 200) {
 	        		var x_test = x_min_test + x_step_test * Math.random(),
 	        			y_test = y_min_test + y_step_test * Math.random();
 	        		// console.log('test begin', num_test, x_test, y_test);
@@ -305,47 +306,54 @@ console.log(zArr);
 			lines_closed = [];
 		lines.map(function(line, i) {
 			var _flag_isClosed = tool_isClosed(line);
-			var line_obj = {
-				bound: tool_getBound(line),
-				_isClosed: _flag_isClosed,
-				items: line
-			}
+			// var line_obj = {
+			// 	bound: tool_getBound(line),
+			// 	_isClosed: _flag_isClosed,
+			// 	items: line
+			// }
+			line.bound = tool_getBound(line);
 			line._isClosed = _flag_isClosed;
 			if (_flag_isClosed) {
-				lines_closed.push(line_obj);
+				lines_closed.push(line);
 			} else {
-				lines_open.push(line_obj);
+				lines_open.push(line);
 			}
 		});
 
 		// 长度从长到短
 		lines_open.sort(function(a, b) {
-			return b.items.length - a.items.length;
+			return b.length - a.length;
 		});
 		lines_closed.sort(function(a, b) {
-			return b.items.length - a.items.length;
+			return b.length - a.length;
 		});
 		lines = lines_open.concat(lines_closed);
 		// lines = lines.slice(2, 4);
 		// lines = [lines[2]];
 		// for (var i = 0, j = lines.length; i<j; i++) {
-		// 	lines[i].items = tool_smoothItems(lines[i].items, MIN_DIS, false);
+		// 	lines[i] = tool_smoothItems(lines[i], MIN_DIS, false);
 		// }
 		var result = splitPolygonsByLines([polygon], lines, function(polygon) {
 			var p = _getColor(polygon);
 			if (p) {
 				var color = p.c;
 				var text = p.v;
+				// color = color == 'rgba(0,0,0,0)'? 'rgba(255, 0, 0, 0.5)': color;
 				if (color && color != 'rgba(0,0,0,0)') {
 					polygon.color = color;
 				}
 			}
+		}, true);
+		
+		// 暂时按面积从大到小顺序排列（后续排查sub没起作用问题）
+		result.sort(function(a, b) {
+			return Math.abs(b.area) - Math.abs(a.area);
 		});
 		var return_val = {
 			list: result,
 			lines: lines
 		}
-		console.log(return_val);
+		// console.log(return_val);
 		cb && cb(null, return_val);
 	}
 	conrec.setModel = function(model) {

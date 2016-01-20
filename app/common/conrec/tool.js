@@ -509,19 +509,16 @@
 		}
 		return [];
 	}
-	function _splitPolygonsByLines(polygons, lines, fn_getcolor) {
+	function _splitPolygonsByLines(polygons, lines, fn_getcolor, flag_add_area) {
 		var polygons_result = [];
 
 		var polygons_dealing = polygons.slice(0),
 			lines_dealing = [];
 
 		lines.map(function(line, i) {
-			var items = line.items;
-			items.bound = line.bound;
-			// console.log(items);
-			// line.bound || (line.bound = _getBound(line));
-			items.id = i;
-			lines_dealing.push(items);
+			line.bound || (line.bound = _getBound(line));
+			line.id = i;
+			lines_dealing.push(line);
 		});
 
 		// lines_dealing = lines_dealing.splice(3, 1);
@@ -582,6 +579,9 @@
 				fn_getcolor && fn_getcolor(_polygon);
 				delete _polygon.line;
 				if (!fn_getcolor || _polygon.color) {
+					if (flag_add_area) {
+						_polygon.area = _getArea(_polygon.items);
+					}
 					polygons_result.push(_polygon);
 				}
 			}
@@ -589,11 +589,357 @@
 				break;
 			}
 		}
-		if (_test) {
-			polygons_result.test = _test;
-		}
-		polygons_result.progress = _progress;
+		
+		// polygons_result.progress = _progress;
 		return polygons_result;
+	}
+	// 对conrec得到的线进行分组（主要针对局部插值）
+	var LEVEL_DEFAULT = -2;
+	function _groupLines(lines, bound, step) {
+		var lines_open = [],
+			lines_closed = [],
+			lines_out_bound = [],
+			lines_waiting_deal = [];
+
+		var x_min = bound.x_min,
+			x_max = bound.x_max,
+			y_min = bound.y_min,
+			y_max = bound.y_max;
+
+		lines.map(function(line, i) {
+			var _flag_isClosed = _isClosed(line);
+
+			// var line_obj = {
+			// 	bound: _getBound(line),
+			// 	_isClosed: _flag_isClosed,
+			// 	items: line
+			// }
+
+			var line_obj = line;
+			line_obj.bound = _getBound(line);
+			line_obj._isClosed = _flag_isClosed;
+			if (_flag_isClosed) {
+				if (line.k == LEVEL_DEFAULT) {
+					lines_out_bound.push(line_obj);
+				} else {
+					lines_closed.push(line_obj);
+				}
+			} else {
+				var a = line[0],
+					x_a = a.x,
+					y_a = a.y,
+					b = line[line.length - 1],
+					x_b = b.x,
+					y_b = b.y;
+				if (((x_a == x_min && y_a >= y_min && y_a <= y_max) || 
+					(x_a == x_max && y_a >= y_min && y_a <= y_max) || 
+					(y_a == y_min && x_a >= x_min && x_a <= x_max) ||
+					(y_a == x_max && x_a >= x_min && x_a <= x_max)) && 
+					((x_b == x_min && y_b >= y_min && y_b <= y_max) || 
+					(x_b == x_max && y_b >= y_min && y_b <= y_max) || 
+					(y_b == y_min && x_b >= x_min && x_b <= x_max) ||
+					(y_b == x_max && x_b >= x_min && x_b <= x_max))) {
+					lines_open.push(line_obj);
+				} else if (line.k != LEVEL_DEFAULT) {
+					lines_waiting_deal.push(line_obj);
+				}
+			}
+		});
+		// console.log('open = '+lines_open.length+', close = '+lines_closed.length+', out = '+lines_out_bound.length+', wait = '+lines_waiting_deal.length);
+		var _cache_line = {};
+		for (var i = 0, j = lines_out_bound.length; i<j; i++) {
+			var line_out = lines_out_bound[i];
+			var bound_line_out = line_out.bound;
+			var arr_lines_in = [];
+			for (var i_line = 0, j_line = lines_waiting_deal.length; i_line<j_line; i_line++) {
+				var line_test = lines_waiting_deal[i_line];
+				var _first = line_test[0],
+					_end = line_test[line_test.length - 1];
+				if (_isBoundInBound(bound_line_out, line_test.bound) && isPointIn(line_out, _first.x, _first.y)) {
+					line_test._dis = _getDis(_first.x, _first.y, _end.x, _end.y);
+					arr_lines_in.push(line_test);
+					lines_waiting_deal.splice(i_line, 1);
+					j_line--;
+					i_line--;
+				}
+			}
+			if (arr_lines_in.length == 0) {
+				lines_closed.push(line_out);
+			} else {
+				arr_lines_in.sort(function(a, b) {
+					return a._dis - b._dis;
+				});
+				// if (i == 4) {
+					// console.log(arr_lines_in.slice());
+					_cache_line['line'+i] = {
+						out: line_out,
+						arr_in: arr_lines_in
+					};
+				// }
+			}
+		}
+		for (var i in _cache_line) {
+			lines_closed = lines_closed.concat(_attemptCloseLines(_cache_line[i], step));
+		}
+		// console.log('open = '+lines_open.length+', close = '+lines_closed.length+', _cache_line = ', _cache_line);
+
+		return lines_open.concat(lines_closed);
+	}
+	function _getDis(x1, y1, x2, y2) {
+		return Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2);
+	}
+	function _getDisByPoint(p1, p2) {
+		return _getDis(p1.x, p1.y, p2.x, p2.y);
+	}
+	function _getMinDisToOut(x, y, items) {
+		var index_min = 0;
+		var dis = _getDis(x, y, items[0].x, items[0].y);
+
+		for (var i = 1, j = items.length; i<j; i++) {
+			var d = _getDis(x, y, items[i].x, items[i].y);
+			if (d < dis) {
+				dis = d;
+				index_min = i;
+			}
+		}
+		return {
+			d: dis,
+			i: index_min
+		};
+	}
+	// 查看首尾点是否可以连结（和其它线段有交点的不可以连结）
+	function _isCanLinkSelf(items) {
+		var len = items.length;
+		var first = items[0],
+			end = items[len - 1];
+		var x_first = first.x,
+			y_first = first.y,
+			x_end = end.x,
+			y_end = end.y;
+
+		var x_min = Math.min(x_first, x_end),
+			x_max = Math.max(x_first, x_end),
+			y_min = Math.min(y_first, y_end),
+			y_max = Math.max(y_first, y_end);
+		for (var i = 0, j = i+1; i<len-1; i++, j++) {
+			var one = items[i],
+				two = items[j];
+			var x_one = one.x,
+				y_one = one.y,
+				x_two = two.x,
+				y_two = two.y;
+			var is_have_same_point = ((x_first == x_one && y_first == y_one) ||
+										(x_first == x_two && y_first == y_two) ||
+										(x_end == x_one && y_first == y_one) ||
+										(x_end == x_two && y_first == y_two));
+			if (x_first == x_end) {
+				// 在不同侧
+				// console.log('test11', x_one - x_first, x_two - x_first);
+				var flag = (x_one - x_first) * (x_two - x_first);
+				if (flag < 0) {
+					var y_min_1 = Math.min(y_one, y_two),
+						y_max_1 = Math.max(y_one, y_two);
+					if (y_min_1 >= y_min || y_max_1 <= y_max_1) {
+						// console.log('test1', y_min_1, y_min, y_max_1, y_max_1);
+						return false;
+					}
+				} else if (flag == 0) {
+					// 为相反方向时线重合（有相交）
+					if (x_one == x_two && (y_end - y_first) * (y_two - y_one) < 0) {
+						return false;
+					}
+				}
+			} else {
+				var k = (y_first - y_end) / (x_first - x_end);
+				var b = (x_first * y_end - x_end * y_first)/(x_first - x_end);
+
+				var y1 = k*x_one + b,
+					y2 = k*x_two + b;
+				// 在不同侧
+				// console.log('y1='+y1+', y_one = '+y_one+',y2='+y2+', y_two = '+y_two);
+				var flag = (y1 - y_one) * (y2 - y_two);
+				if (flag <= 0) {
+					if (x_one == x_two) {
+						if (!is_have_same_point) {
+							if (y1 > y_min && y1 < y_max) {
+								return false;
+							}
+						}
+					} else {
+						var k_test = (y_one - y_two) / (x_one - x_two);
+						if (is_have_same_point) {
+							// 有相同点且斜率相同且方向相反
+							if (k == k_test && (y_end - y_first) * (y_two - y_one) < 0) {
+								return false;
+							}
+						} else {
+							var b_test = (x_one * y_two - x_two * y_one) / (x_one - x_two);
+							var x_test = (b_test - b) / (k - k_test);
+							var y_test = k * x_test + b;
+							// 两线段有交点
+							if (x_test >= x_min && x_test <= x_max && y_test >= y_min && y_test <= y_max) {
+								return false;
+							}
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+	// 连接两条线
+	function _linkLines(items_one, items_two) {
+		items_one = items_one.slice();
+		items_two = items_two.slice();
+
+		var p_first_one = items_one[0],
+			p_end_one = items_one[items_one.length - 1],
+			p_first_two = items_two[0],
+			p_end_two = items_two[items_two.length - 1];
+		var dis_a = _getDisByPoint(p_first_one, p_first_two),
+			dis_b = _getDisByPoint(p_first_one, p_end_two),
+			dis_c = _getDisByPoint(p_end_one, p_first_two),
+			dis_d = _getDisByPoint(p_end_one, p_end_two);
+
+		var dis_min = Math.min(dis_a, dis_b, dis_c, dis_d);
+		if (dis_min == dis_a) {
+			items_one.reverse();
+			return items_one.concat(items_two);
+		} else if (dis_min == dis_b) {
+			return items_two.concat(items_one);
+		} else if (dis_min == dis_c) {
+			return items_one.concat(items_two);
+		} else if (dis_min == dis_d) {
+			items_two.reverse();
+			return items_one.concat(items_two);
+		}
+	}
+	function _attemptCloseLines(obj, step) {
+		var dis_max_can_link = Math.pow(step, 2) * 2;
+		var line_out = obj.out,
+			arr_in = obj.arr_in;
+
+		// arr_in.splice(1);
+		// arr_in = [arr_in[1]];
+		var p_first_out = line_out[0],
+			p_end_out = line_out[line_out.length - 1];
+		var x_p_first_out = p_first_out.x,
+			y_p_first_out = p_first_out.y,
+			x_p_end_out = p_end_out.x,
+			y_p_end_out = p_end_out.y;
+
+		var arr_return = [line_out];
+		
+		var temp_line;
+		while((temp_line = arr_in.shift())) {
+			var len_items = temp_line.length;
+			var k = temp_line.k;
+			var p_first = temp_line[0],
+				p_end = temp_line[len_items - 1];
+			var x_p_first = p_first.x,
+				y_p_first = p_first.y,
+				x_p_end = p_end.x,
+				y_p_end = p_end.y;
+
+			// arr_return.push(temp_line);
+			// continue;
+
+			var is_little_points = len_items < 4;
+			var dis_min = _getDis(x_p_first, y_p_first, x_p_end, y_p_end);
+			if (dis_min < dis_max_can_link && !is_little_points) {
+				// console.log(dis_min , dis_max_can_link, len_items);
+				// 处理首尾两个点连结时和其它线段有交点
+				
+				var flag = _isCanLinkSelf(temp_line);
+				if (flag) {
+					temp_line.push(temp_line[0]);
+					arr_return.push(temp_line);
+					continue;
+				}
+			}
+			// continue;
+			var dis_min_in = dis_min,
+				index_min_in = -1;
+			// 寻找距离此线最近的线
+			for (var i = 0, j = arr_in.length; i<j; i++) {
+				var line_in = arr_in[i],
+					k_in = line_in.k;
+				if (k_in == k) {
+					var p_first_test = line_in[0],
+						p_end_test = line_in[line_in.length - 1];
+					var x_p_first_test = p_first_test.x,
+						y_p_first_test = p_first_test.y,
+						x_p_end_test = p_end_test.x,
+						y_p_end_test = p_end_test.y;
+
+					var dis_test = _getDis(x_p_first, y_p_first, x_p_first_test, y_p_first_test);
+					if (dis_test < dis_min_in) {
+						dis_min_in = dis_test;
+						index_min_in = i;
+					}
+					dis_test = _getDis(x_p_first, y_p_first, x_p_end_test, y_p_end_test);
+					if (dis_test < dis_min_in) {
+						dis_min_in = dis_test;
+						index_min_in = i;
+					}
+					dis_test = _getDis(x_p_end, y_p_end, x_p_first_test, y_p_first_test);
+					if (dis_test < dis_min_in) {
+						dis_min_in = dis_test;
+						index_min_in = i;
+					}
+					dis_test = _getDis(x_p_end, y_p_end, x_p_end_test, y_p_end_test);
+					if (dis_test < dis_min_in) {
+						dis_min_in = dis_test;
+						index_min_in = i;
+					}
+				}
+			}
+
+			var dis_min_out_first = _getMinDisToOut(x_p_first, y_p_first, line_out),
+				dis_min_out_end = _getMinDisToOut(x_p_end, y_p_end, line_out);
+
+			var dis_min_out = Math.min(dis_min_out_first.d, dis_min_out_end.d);
+
+			// 两个线组成新的线
+			if (dis_min_in < dis_max_can_link && dis_min_in < dis_min && index_min_in != -1) {
+				var line_in_test = arr_in[index_min_in];
+
+				temp_line = _linkLines(line_in_test, temp_line);
+				temp_line.k = k;
+				arr_in.splice(index_min_in, 1);
+				arr_in.push(temp_line); // 把新组成的线重新放回等待下次处理
+			} else if (dis_min <= dis_min_out && !is_little_points) { //自身闭合
+				temp_line.push(temp_line[0]);
+				arr_return.push(temp_line);
+			} else { // 与个层线形成闭合
+				var index_min = Math.min(dis_min_out_first.i, dis_min_out_end.i),
+					index_max = Math.max(dis_min_out_first.i, dis_min_out_end.i);
+
+				var items_new;
+				if (index_max - index_min + 1 < line_out.length/2) {
+					items_new = line_out.slice(index_min, index_max+1);
+				} else {
+					items_new = line_out.slice(index_max).concat(line_out.slice(0, index_min + 1));
+				}
+
+				var p_first_new = items_new[0],
+					p_end_new = items_new[items_new.length - 1];
+				var x_p_first_new = p_first_new.x,
+					y_p_first_new = p_first_new.y,
+					x_p_end_new = p_end_new.x,
+					y_p_end_new = p_end_new.y;
+
+				if (_getDis(x_p_first, y_p_first, x_p_first_new, y_p_first_new) <
+					_getDis(x_p_first, y_p_first, x_p_end_new, y_p_end_new)) {
+					items_new.reverse();
+				}
+				temp_line = temp_line.concat(items_new);
+				temp_line.push(temp_line[0]);
+				temp_line.k = k;
+				arr_return.push(temp_line);
+			}
+		}
+		return arr_return;
 	}
 	module.exports = {
 		getArea: _getArea,
@@ -602,6 +948,8 @@
 		isClosed: _isClosed,
 		getBound: _getBound,
 		isBoundInBound: _isBoundInBound,
-		smoothItems: _smoothItems
+		smoothItems: _smoothItems,
+		groupLines: _groupLines,
+		linkLines: _linkLines
 	}
 }()

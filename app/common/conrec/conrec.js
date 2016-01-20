@@ -82,7 +82,7 @@
 			// c is the case selector based on which of ma and/or mb are set
 			var c = ((ma != null) ? 1 : 0) | ((mb != null) ? 2 : 0);
 
-			console.log(ma && ma.closed ?'Y':'', mb && mb.closed ?'Y':'');
+			// console.log(ma && ma.closed ?'Y':'', mb && mb.closed ?'Y':'');
 			switch (c) {
 				case 0: // both unmatched, add as new sequence
 					var aa = {
@@ -705,6 +705,7 @@
 
 						continue;
 					}
+					// continue;
 					// var temp1, temp2;
 					// temp1 = Math.min(_a, _b);
 					// temp2 = Math.min(_c, _d);

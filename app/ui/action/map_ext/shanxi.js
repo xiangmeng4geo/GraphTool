@@ -189,25 +189,25 @@
                             
                             _afterChangeConf(err, s_time);
                         });
-                        var texts_data = [];
-                        for (var i = 0, j = data_interpolate.length; i<j; i++) {
-                            for (var i_items = 0, items = data_interpolate[i], j_items = items.length; i_items<j_items; i_items++) {
-                                var item = items[i_items];
-                                if (item.v == 999999) {
-                                    item.v = '_'
-                                }
-                                texts_data.push({
-                                    txt: item.v+'_'+item.level,
-                                    lng: item.x,
-                                    lat: item.y,
-                                    fontSize: 14,
-                                    color: '#00ff00',
-                                    offsetY: -10,
-                                    offsetX: 6
-                                });
-                            }
-                        }
-                        Render.text(texts_data);
+                        // var texts_data = [];
+                        // for (var i = 0, j = data_interpolate.length; i<j; i++) {
+                        //     for (var i_items = 0, items = data_interpolate[i], j_items = items.length; i_items<j_items; i_items++) {
+                        //         var item = items[i_items];
+                        //         if (item.v == 999999) {
+                        //             item.v = '_'
+                        //         }
+                        //         texts_data.push({
+                        //             txt: item.v+'_'+item.level,
+                        //             lng: item.x,
+                        //             lat: item.y,
+                        //             fontSize: 14,
+                        //             color: '#00ff00',
+                        //             offsetY: -10,
+                        //             offsetX: 6
+                        //         });
+                        //     }
+                        // }
+                        // Render.text(texts_data);
                     } else {
                         Render.micaps(dataJson, blendentJson);
                         _afterChangeConf(err, s_time);
