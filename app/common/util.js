@@ -453,7 +453,7 @@
 		// Return the modified object
 		return target;
 	}
-	var COLOR_TRANSPANT = CONST.COLOR.TRANSPANT;
+	var COLOR_TRANSPANT = CONST.COLOR.TRANSPARENT;
 	function color(blendent, use_check) {
 		var len_blendent = 0;
 		if (!blendent || (len_blendent = blendent.length) == 0) {

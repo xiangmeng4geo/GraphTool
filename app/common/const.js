@@ -38,7 +38,7 @@
 			}]
 		},
 		COLOR: {
-			TRANSPANT: 'rgba(0,0,0,0)'
+			TRANSPARENT: 'rgba(0,0,0,0)'
 		},
 		PATH: {
 			BASE: path_base,

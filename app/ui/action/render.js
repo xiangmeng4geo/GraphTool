@@ -19,6 +19,7 @@
     }
     // 处理conrec后的数据
     function _conrec(data) {
+        console.log(data);
         var t_start = new Date();
         var shapes = [];
         if (data) {

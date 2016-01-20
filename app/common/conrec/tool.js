@@ -1,6 +1,7 @@
 !function() {
 	var PI = Math.PI;
 	var MIN_POINT_NUM = 30;
+	var NUM_MIN = 0.00001;
 
 	var util = require('../util');
 	var utils_polygon = util.Polygon;
@@ -57,10 +58,14 @@
 		}
 	}
 	function _isBoundInBound(bound, bound_checking) {
-		return bound.x_min <= bound_checking.x_min &&
-				bound.x_max >= bound_checking.x_max &&
-				bound.y_min <= bound_checking.y_min &&
-				bound.y_max >= bound_checking.y_max;
+		return bound_checking.x_min - bound.x_min >= -NUM_MIN &&
+			   bound.x_max - bound_checking.x_max >= -NUM_MIN && 
+			   bound_checking.y_min - bound.y_min >= -NUM_MIN && 
+			   bound.y_max - bound_checking.y_max >= -NUM_MIN;
+		// return bound.x_min <= bound_checking.x_min &&
+		// 		bound.x_max >= bound_checking.x_max &&
+		// 		bound.y_min <= bound_checking.y_min &&
+		// 		bound.y_max >= bound_checking.y_max;
 	}
 	// B样条插值平滑算法
 	var _smoothBSpline = function(is_points_array){
@@ -605,15 +610,8 @@
 			x_max = bound.x_max,
 			y_min = bound.y_min,
 			y_max = bound.y_max;
-
 		lines.map(function(line, i) {
 			var _flag_isClosed = _isClosed(line);
-
-			// var line_obj = {
-			// 	bound: _getBound(line),
-			// 	_isClosed: _flag_isClosed,
-			// 	items: line
-			// }
 
 			var line_obj = line;
 			line_obj.bound = _getBound(line);
@@ -634,11 +632,11 @@
 				if (((x_a == x_min && y_a >= y_min && y_a <= y_max) || 
 					(x_a == x_max && y_a >= y_min && y_a <= y_max) || 
 					(y_a == y_min && x_a >= x_min && x_a <= x_max) ||
-					(y_a == x_max && x_a >= x_min && x_a <= x_max)) && 
+					(y_a == y_max && x_a >= x_min && x_a <= x_max)) && 
 					((x_b == x_min && y_b >= y_min && y_b <= y_max) || 
 					(x_b == x_max && y_b >= y_min && y_b <= y_max) || 
 					(y_b == y_min && x_b >= x_min && x_b <= x_max) ||
-					(y_b == x_max && x_b >= x_min && x_b <= x_max))) {
+					(y_b == y_max && x_b >= x_min && x_b <= x_max))) {
 					lines_open.push(line_obj);
 				} else if (line.k != LEVEL_DEFAULT) {
 					lines_waiting_deal.push(line_obj);
@@ -814,6 +812,30 @@
 			return items_one.concat(items_two);
 		}
 	}
+	function _closeByOutline(line, outline) {
+		outline = outline.slice();
+		var p_first_line = line[0];
+		if (_getDisByPoint(p_first_line, outline[0]) < 
+			_getDisByPoint(p_first_line, outline[outline.length - 1])) {
+			outline.reverse();
+		}
+		var items_new = outline;
+		// outline.unshift(line[line.length - 1]);
+		// outline.push(p_first_line);
+		// for (var i = 1, j = outline.length - 2; i<=j; i++) {
+		// 	var prev = outline[i-1],
+		// 		current = outline[i],
+		// 		next = outline[i+1];
+
+		// 	var x = (prev.x + current.x*2 + next.x)/4,
+		// 		y = (prev.y + current.y*2 + next.y)/4;
+		// 	items_new.push({
+		// 		x: x,
+		// 		y: y
+		// 	});
+		// }
+		return line.concat(items_new);
+	}
 	function _attemptCloseLines(obj, step) {
 		var dis_max_can_link = Math.pow(step, 2) * 2;
 		var line_out = obj.out,
@@ -922,18 +944,20 @@
 					items_new = line_out.slice(index_max).concat(line_out.slice(0, index_min + 1));
 				}
 
-				var p_first_new = items_new[0],
-					p_end_new = items_new[items_new.length - 1];
-				var x_p_first_new = p_first_new.x,
-					y_p_first_new = p_first_new.y,
-					x_p_end_new = p_end_new.x,
-					y_p_end_new = p_end_new.y;
+				temp_line = _closeByOutline(temp_line, items_new);
 
-				if (_getDis(x_p_first, y_p_first, x_p_first_new, y_p_first_new) <
-					_getDis(x_p_first, y_p_first, x_p_end_new, y_p_end_new)) {
-					items_new.reverse();
-				}
-				temp_line = temp_line.concat(items_new);
+				// var p_first_new = items_new[0],
+				// 	p_end_new = items_new[items_new.length - 1];
+				// var x_p_first_new = p_first_new.x,
+				// 	y_p_first_new = p_first_new.y,
+				// 	x_p_end_new = p_end_new.x,
+				// 	y_p_end_new = p_end_new.y;
+
+				// if (_getDis(x_p_first, y_p_first, x_p_first_new, y_p_first_new) <
+				// 	_getDis(x_p_first, y_p_first, x_p_end_new, y_p_end_new)) {
+				// 	items_new.reverse();
+				// }
+				// temp_line = temp_line.concat(items_new);
 				temp_line.push(temp_line[0]);
 				temp_line.k = k;
 				arr_return.push(temp_line);

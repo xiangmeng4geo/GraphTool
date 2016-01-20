@@ -13,6 +13,7 @@
   	var isPointIn = utils_polygon.isPointIn;
     var isPolygonIn = utils_polygon.isPolygonIn;
 	var Conrec = require('./conrec');
+	var COLOR_TRANSPARENT = require('../const').COLOR.TRANSPARENT;
 
 	var util_log = function(msg) {
 		_model && _model.emit('log', msg);
@@ -76,7 +77,7 @@
 					y: v.y,
 					v: v.v,
 					level: color_level,
-					c: color || COLOR_TRANSPANT
+					c: color || COLOR_TRANSPARENT
 				});
 				rasterData[i][j].level = color_level;
 				_arr_d.push(color_level * 2);
@@ -120,43 +121,6 @@
 			zArr.push(v.k);
 		});
 
-		var z_min = Math.min.apply(Math, zArr);
-		var z_max = Math.max.apply(Math, zArr);
-		var z_middle = (z_min + z_max)/2;// 得到中间值
-
-		var v_tmp;
-		var n_arround = 1;
-		// while((v_tmp = data_default_cache.shift())) {
-		// 	var i = v_tmp[0],
-		// 		j = v_tmp[1];
-		// 	var sum = 0;
-		// 	var num = 0;
-		// 	for (var i_start = i - n_arround, i_end = i + n_arround; i_start<i_end; i_start++) {
-		// 		for (var j_start = j - n_arround, j_end = j + n_arround; j_start<j_end; j_start++) {
-		// 			var _key = i_start + '_' + j_start;
-		// 			if (data_cache[_key]) {
-		// 				var _v = data_arr[i_start][j_start];
-		// 				if (_v != LEVEL_DEFAULT*2) {
-		// 					sum += _v;
-		// 					num ++;
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// 	console.log('len = ', data_default_cache.length, new Date().getTime());
-		// 	if (num > 0) {
-		// 		var to_v = sum / num;
-		// 		// console.log('---', to_v, sum, num);
-		// 		to_v *= (to_v > z_middle? 1.3: 0.7);
-		// 		console.log(data_default_cache.length, to_v);
-		// 		// to_v = LEVEL_MAX;
-		// 		data_arr[i][j] = to_v;
-		// 		data_cache[i+'_'+j] = 1;
-		// 	} else {
-		// 		data_default_cache.push(v_tmp);
-		// 	}
-		// }
-
 		var xArr = [],
 			yArr = [];
 		rasterData.map(function(v) {
@@ -171,6 +135,7 @@
 		var x_start = rasterData[0][0].x, x_step = rasterData[1][0].x - rasterData[0][0].x,
       		y_start = rasterData[0][0].y, y_step = rasterData[0][1].y - rasterData[0][0].y;
 		
+		// lines.splice(1);
 		var lines_group = tool.groupLines(lines, tool_getBound(polygon.items), Math.max(x_step, y_step));
 		lines = lines_group.slice();
 		function _isInPolygonForColor(polygon, x_p, y_p) {
@@ -206,7 +171,7 @@
 	          		y_per = (y - y_start) / y_step;
 	          	if(x_per % 1 == 0 && y_per % 1 == 0) {
 					try{
-						return rasterData[x_per][y_per];
+						return _new_interpolate_data[x_per][y_per];
 					}catch(e){}
 	          	} else {
 		          	var x_min = Math.floor(x_per),
@@ -216,25 +181,25 @@
 
 	          		var p = [];
 					try{
-						var v = rasterData[x_min][y_min];
+						var v = _new_interpolate_data[x_min][y_min];
 						if (v) {
 							p.push([v, x_min, y_min]);
 						}
 					}catch(e){};
 					try{
-						var v = rasterData[x_max][y_min];
+						var v = _new_interpolate_data[x_max][y_min];
 						if (v) {
 							p.push([v, x_max, y_min]);
 						}
 					}catch(e){};
 					try{
-						var v = rasterData[x_min][y_max];
+						var v = _new_interpolate_data[x_min][y_max];
 						if (v) {
 							p.push([v, x_min, y_max]);
 						}
 					}catch(e){};
 					try{
-						var v = rasterData[x_max][y_max];
+						var v = _new_interpolate_data[x_max][y_max];
 						if (v) {
 							p.push([v, x_max, y_max]);
 						}
@@ -282,12 +247,13 @@
 	        		// console.log('test begin', num_test, x_test, y_test);
 	        		if (_isInPolygonForColor(polygon, x_test, y_test)) {
 	        			var c = color_method(v_test);
-	        			// console.log('test', num_test, x_test, y_test, c);
-	        			return {
-	        				x: x,
-	        				y: y,
-	        				c: c
-	        			}
+	        			// if (c != COLOR_TRANSPARENT) {
+		        			return {
+		        				x: x,
+		        				y: y,
+		        				c: c
+		        			}
+	        			// }
 	        		}
 	        	}
 	        	// _model.emit('render', [new Shape.Text('_'+x_min_test+'_'+x_max_test+'_'+y_min_test+'_'+y_max_test, 'lng: '+x_min_test+'; lat: '+y_min_test+';color: #0000ff; font-size: 20px;')]);
@@ -330,16 +296,17 @@
 		lines = lines_open.concat(lines_closed);
 		// lines = lines.slice(2, 4);
 		// lines = [lines[2]];
-		// for (var i = 0, j = lines.length; i<j; i++) {
-		// 	lines[i] = tool_smoothItems(lines[i], MIN_DIS, false);
-		// }
+		for (var i = 0, j = lines.length; i<j; i++) {
+			lines[i] = tool_smoothItems(lines[i], MIN_DIS, false);
+		}
 		var result = splitPolygonsByLines([polygon], lines, function(polygon) {
 			var p = _getColor(polygon);
 			if (p) {
+				// var Shape = Core.require('shape');
+				// _model.emit('render', [new Shape.Text(p.c, 'lng: '+p.x+'; lat: '+p.y+';color: #0000ff; font-size: 20px;')]);
 				var color = p.c;
 				var text = p.v;
-				// color = color == 'rgba(0,0,0,0)'? 'rgba(255, 0, 0, 0.5)': color;
-				if (color && color != 'rgba(0,0,0,0)') {
+				if (color && color != COLOR_TRANSPARENT) {
 					polygon.color = color;
 				}
 			}

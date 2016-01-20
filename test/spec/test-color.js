@@ -44,7 +44,7 @@ describe('Util.color', function() {
 
         result = color(blendent, true);
         result.should.is.a('function');
-        result(4.5).should.equal(CONST.COLOR.TRANSPANT);
-        result(16).should.equal(CONST.COLOR.TRANSPANT);
+        result(4.5).should.equal(CONST.COLOR.TRANSPARENT);
+        result(16).should.equal(CONST.COLOR.TRANSPARENT);
     });
 })
