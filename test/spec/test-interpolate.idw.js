@@ -41,7 +41,8 @@ describe('interpolate.idw', function(){
             numOfNearest: 4,
             default_val: DEFAULT_VAL,
             interpolation_all: false
-        }, function(err, data){
+        }, function(err, result){
+            var data = result.data;
             var num_value = 0,
                 num_total = 0,
                 num_default = 0;
@@ -73,7 +74,8 @@ describe('interpolate.idw', function(){
             numOfNearest: 4,
             default_val: DEFAULT_VAL,
             interpolation_all: true
-        }, function(err, data){
+        }, function(err, result){
+            var data = result.data;
             var num_value = 0,
                 num_total = 0,
                 num_default = 0;
@@ -88,13 +90,13 @@ describe('interpolate.idw', function(){
                     num_total++;
                 }
             }
-            var result = num_default + num_value == num_total && num_default == 0;
+            var result = num_default + num_value == num_total && num_default !== 0;
             time_done = new Date();
             done(result? null: new Error('get some default val'));
         });
         time_end = new Date();
     });
-    // it('[interpolation_all = true]idw should a async function,and should takes a little time', function(){
-    //     equal(true, time_end - time_start < TIME_LITTLE && time_done - time_end > TIME_LITTLE);
-    // });
+    it('[interpolation_all = true]idw should a async function,and should takes a little time', function(){
+        equal(true, time_end - time_start < TIME_LITTLE && time_done - time_end > TIME_LITTLE);
+    });
 });

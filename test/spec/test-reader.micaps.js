@@ -89,7 +89,7 @@ describe('datareader.micaps', function(){
                                 num_total++;
                             }
                         }
-                        if(num_default > 0 && num_default != num_total){
+                        if(num_default == 0 && num_default != num_total){
                             return done();
                         }
                     }
@@ -123,7 +123,7 @@ describe('datareader.micaps', function(){
                                 num_total++;
                             }
                         }
-                        if(num_default > 0 && num_default != num_total){
+                        if(num_default == 0 && num_default != num_total){
                             return done();
                         }
                     }
