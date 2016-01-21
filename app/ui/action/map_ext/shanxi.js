@@ -86,7 +86,6 @@
                     data.bound = bound;
                 }
                 Reader.read(data, function(err, dataJson) {
-                    console.log(dataJson);
                     if (err) {
                         _afterChangeConf(err, s_time);
                         return model.emit('log.user.error', err);
@@ -180,6 +179,9 @@
                     Render.img(imgs);
 
                     if (data_interpolate) {
+                        var flag_interpolate = dataJson.flag_interpolate;
+                        var _method = flag_interpolate === undefined? '不用插值': flag_interpolate? '全局插值': '局部插值'
+                        model.emit('log.user', '系统判定 ['+_method+']!');
                         conrec(data_interpolate, blendentJson, true, function(err, data_conrec) {
                             if (err) {
                                 model.emit('error', err);

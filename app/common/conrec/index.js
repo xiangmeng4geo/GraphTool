@@ -129,11 +129,11 @@
 		rasterData[0].map(function(v) {
 			yArr.push(v.y);
 		});
+		var x_start = rasterData[0][0].x, x_step = rasterData[1][0].x - rasterData[0][0].x,
+      		y_start = rasterData[0][0].y, y_step = rasterData[0][1].y - rasterData[0][0].y;
 		var c = new Conrec();
 		c.contour(data_arr, 0, xArr.length - 1, 0, yArr.length - 1, xArr, yArr, zArr.length, zArr);
 		var lines = c.contourList();
-		var x_start = rasterData[0][0].x, x_step = rasterData[1][0].x - rasterData[0][0].x,
-      		y_start = rasterData[0][0].y, y_step = rasterData[0][1].y - rasterData[0][0].y;
 		
 		// lines.splice(1);
 		var lines_group = tool.groupLines(lines, tool_getBound(polygon.items), Math.max(x_step, y_step));
@@ -259,43 +259,12 @@
 	        	// _model.emit('render', [new Shape.Text('_'+x_min_test+'_'+x_max_test+'_'+y_min_test+'_'+y_max_test, 'lng: '+x_min_test+'; lat: '+y_min_test+';color: #0000ff; font-size: 20px;')]);
 	        }
 		}
-		// console.log('polygon = ', polygon);
-		// console.log('lines.length = '+lines.length);
-
+		// lines = lines.slice(2, 4);
+		// lines = [lines[2]];
 		var MIN_DIS = Math.pow(0.2, 2);
 	    if (x_step < 0.5) {
 	        MIN_DIS = Math.pow(Math.max(0.1, x_step*2), 2)
 	    }
-	    // console.log('old', lines[0]);
-	    // console.log('new', tool_smoothItems(lines[0], MIN_DIS, false));
-	    var lines_open = [],
-			lines_closed = [];
-		lines.map(function(line, i) {
-			var _flag_isClosed = tool_isClosed(line);
-			// var line_obj = {
-			// 	bound: tool_getBound(line),
-			// 	_isClosed: _flag_isClosed,
-			// 	items: line
-			// }
-			line.bound = tool_getBound(line);
-			line._isClosed = _flag_isClosed;
-			if (_flag_isClosed) {
-				lines_closed.push(line);
-			} else {
-				lines_open.push(line);
-			}
-		});
-
-		// 长度从长到短
-		lines_open.sort(function(a, b) {
-			return b.length - a.length;
-		});
-		lines_closed.sort(function(a, b) {
-			return b.length - a.length;
-		});
-		lines = lines_open.concat(lines_closed);
-		// lines = lines.slice(2, 4);
-		// lines = [lines[2]];
 		for (var i = 0, j = lines.length; i<j; i++) {
 			lines[i] = tool_smoothItems(lines[i], MIN_DIS, false);
 		}

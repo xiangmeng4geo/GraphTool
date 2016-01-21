@@ -111,7 +111,10 @@
 		}, {
 			text: '下方',
 			val: 'c'
-		}]
+		}],
+		INTEPOLATE: {
+			PERCENT_CALL_ALL: 0.8 //局部插值和局部插值的分割比，小于这个比例用全局插值，否则用局部插值
+		}
 	};
 
 	var conf_const;

@@ -681,6 +681,13 @@
 		}
 		// console.log('open = '+lines_open.length+', close = '+lines_closed.length+', _cache_line = ', _cache_line);
 
+		// 长度从长到短
+		lines_open.sort(function(a, b) {
+			return b.length - a.length;
+		});
+		lines_closed.sort(function(a, b) {
+			return b.length - a.length;
+		});
 		return lines_open.concat(lines_closed);
 	}
 	function _getDis(x1, y1, x2, y2) {

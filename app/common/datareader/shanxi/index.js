@@ -83,7 +83,7 @@
 
                     var lnglat_arr = util.grid(lng0 - space_add, lat0 - space_add, lng1 + space_add, lat1 + space_add, space);
 
-                    idw(data, lnglat_arr, function(err_idw, data_idw) {
+                    idw(data, lnglat_arr, function(err_idw, result) {
                         if (err_idw) {
                             callback({
                                 msg: error_msg + '[idw interpolate error!]'
@@ -91,7 +91,8 @@
                         } else {
                             callback(null, {
                                 data: data,
-                                interpolate: data_idw
+                                interpolate: result.data,
+                                flag_interpolate: result.flag
                             });
                         }
                     });

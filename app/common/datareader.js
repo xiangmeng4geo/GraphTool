@@ -31,7 +31,7 @@
             var key = util.serialize.md5(opt);
             var cache_path = util_path.join(CONST.PATH.CACHE, key);
 
-            var cache_val = false;//util_file.read(cache_path, true);
+            var cache_val = util_file.read(cache_path, true);
 
             if (cache_val) {
                 _log ('Reader.read from cache ['+cache_path+']');

@@ -104,10 +104,11 @@
         // console.log(data);
         interpolate_method = require(path.join(PATH_COMMON, 'interpolate/'+interpolate_method));
         // data = data.slice(0, 25000);
-        interpolate_method(data, lnglat_arr, option, function(err, new_data){
+        interpolate_method(data, lnglat_arr, option, function(err, result){
             if(err){
                 return cb(err);
             }
+            var new_data = result.data;
             // 对格点上的数据值进行格式化，减小文件体积
     		for(var i = 0, j = new_data.length; i < j; i++){
     			var items = new_data[i];
@@ -117,7 +118,8 @@
     		}
             cb(null, {
     			data: data,
-    			interpolate: new_data
+    			interpolate: new_data,
+                flag_interpolate: result.flag
     		})
         });
         // console.log('async after idw');

@@ -1,10 +1,12 @@
 !function() {
 	var util = require('../../util');
 	var DIS_POINTS = 0.5;
+	var PERCENT_CALL_ALL = require('../../const').INTEPOLATE.PERCENT_CALL_ALL; //局部插值和局部插值的分割比
 	function info(msg) {
 		console.log(msg);
 	}
 	function Interpolation_IDW_Neighbor(SCoords, lnglat_arr, NumberOfNearestNeighbors, unDefData, bCalAllGrids){
+		bCalAllGrids = false;
 		var time_start = new Date();
 		var num4,num5;
 		var length = lnglat_arr.length,	//获取X数组大小
@@ -14,6 +16,7 @@
 			num13 = NumberOfNearestNeighbors,
 			numArray2 = new Array(num3),
 			objArray = [[],[]];
+		var cache = {};
 		// info(JSON.stringify(SCoords));
 		// info('Interpolation_IDW_Neighbor: '+ 'dataLen = '+num3+', lnglatLen = '+ length*num);
 		for(num4 = 0; num4 < num; num4++){
@@ -83,11 +86,35 @@
 						num11 += v;
 					}
 					numArray[num4][num5] = bCalAllGrids || flag? num10 / num11: unDefData;
+					if (!bCalAllGrids) {
+						cache[num4+'_'+num5] = num10 / num11;
+					}
 				}
 				num5++;
 			}
 		}
+		var num_default = 0;
+		var num_total = num * length;
+		for(num4 = 0; num4 < num; num4++){
+			for(num5 = 0; num5 < length; num5++){
+				if (numArray[num4][num5] == unDefData) {
+					num_default++;
+				}
+			}
+		}
+		bCalAllGrids = num_default/num_total < PERCENT_CALL_ALL;
+		// console.log('num_default = '+num_default+', num_total = '+num_total+', p = '+(num_default/num_total)+', isAll = '+bCalAllGrids);
 		if(bCalAllGrids){
+			for(num4 = 0; num4 < num; num4++){
+				for(num5 = 0; num5 < length; num5++){
+					if (numArray[num4][num5] == unDefData) {
+						var v = cache[num4+'_'+num5];
+						if (!isNaN(v)) {
+							numArray[num4][num5] = v;
+						}
+					}
+				}
+			}
 			var num15 = 0.5;
 			for(num4 = 1; num4 < num - 1; num4++){
 				for(num5 = 1; num5 < length - 1; num5++){
@@ -107,7 +134,10 @@
 			});
 		});
 		// info('Interpolation_IDW_Neighbor takes '+(new Date() - time_start)+' ms!');
-		return lnglat_arr;
+		return {
+			data: lnglat_arr,
+			flag: bCalAllGrids //是否为全局插值
+		};
 	}
 	function idw(param) {
 		var data = param.data, 
