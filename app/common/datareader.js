@@ -3,6 +3,7 @@
     var util_path = util.path;
     var util_file = util.file;
     var CONST = require('./const');
+    var debug = CONST.DEBUG;
     var product_conf = require('./product_conf');
 
     // var _log = util.Model.log;
@@ -31,9 +32,9 @@
             var key = util.serialize.md5(opt);
             var cache_path = util_path.join(CONST.PATH.CACHE, key);
 
-            var cache_val = util_file.read(cache_path, true);
+            var cache_val;
 
-            if (cache_val) {
+            if (debug && (cache_val = util_file.read(cache_path, true))) {
                 _log ('Reader.read from cache ['+cache_path+']');
                 cb && cb(null, cache_val);
             } else {

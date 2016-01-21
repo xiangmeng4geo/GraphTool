@@ -428,59 +428,9 @@
 			
 			var part1 = items_polygon.slice(index_start, index_stop),
 				part2 = items_polygon.slice(index_stop).concat(items_polygon.slice(0, index_start));
-			var line_reverse = line.slice(0);	
-			line_reverse.reverse();
-			var area_line = _getArea(line);
-			var area_part = 0; // 防止出一个点或一条直线面积为0的情况
-			var len_part1 = part1.length,
-				len_part2 = part2.length;
-			// if (len_part1 > 0 && (area_part = _getArea(part1)) !== 0) {
-			// 	if (area_part * area_line > 0) { // 同方向
-			// 		part1 = part1.concat(line_reverse);
-			// 		part2 = part2.concat(line);
-			// 	} else {
-			// 		part1 = part1.concat(line);
-			// 		part2 = part2.concat(line_reverse);
-			// 	}
-			// } else if (len_part2 > 0 && (area_part = _getArea(part2)) !== 0) {
-			// 	if (area_part * area_line > 0) { // 同方向
-			// 		part1 = part1.concat(line);
-			// 		part2 = part2.concat(line_reverse);
-			// 	} else {
-			// 		part1 = part1.concat(line_reverse);
-			// 		part2 = part2.concat(line);
-			// 	}
-			// } else {
-				// 点很少的情况会出现面积为0的情况
-				/*分割后的两个部分不可能点都为1个，如果有一个部分是一个点的话对线的判断逻辑会有误差，因此这里加强判断*/
-				if (len_part1 > 1) {
-					var p_part1 = part1[0];
-					var x_p_part1 = p_part1.x,
-						y_p_part1 = p_part1.y;
-					var cha = (Math.pow(x_p_part1 - x_p_first_line, 2) + Math.pow(y_p_part1 - y_p_first_line, 2)) -
-						(Math.pow(x_p_part1 - x_p_end_line, 2) + Math.pow(y_p_part1 - y_p_end_line, 2));
-					if (cha > 0) {
-						part1 = part1.concat(line);
-						part2 = part2.concat(line_reverse);
-					} else {
-						part1 = part1.concat(line_reverse);
-						part2 = part2.concat(line);
-					}
-				} else if (len_part2 > 1) {
-					var p_part2 = part2[0];
-					var x_p_p_part2 = p_part2.x,
-						y_p_p_part2 = p_part2.y;
-					var cha = (Math.pow(x_p_p_part2 - x_p_first_line, 2) + Math.pow(y_p_p_part2 - y_p_first_line, 2)) -
-						(Math.pow(x_p_p_part2 - x_p_end_line, 2) + Math.pow(y_p_p_part2 - y_p_end_line, 2));
-					if (cha >0) {
-						part1 = part1.concat(line_reverse);
-						part2 = part2.concat(line);
-					} else {
-						part1 = part1.concat(line);
-						part2 = part2.concat(line_reverse);
-					}
-				}
-			// }
+
+			part1 = _linkLines(part1, line);
+			part2 = _linkLines(part2, line);
 			if (!_isClosed(part1)) {
 				part1.push(part1[0]);
 			}
@@ -797,6 +747,19 @@
 		items_one = items_one.slice();
 		items_two = items_two.slice();
 
+		var len_one = items_one.length,
+			len_two = items_two.length;
+		var is_zero_one = len_one == 0,
+			is_zero_two = len_two == 0;
+		if (is_zero_one && is_zero_two) {
+			return [];
+		}
+		if (is_zero_one && !is_zero_two) {
+			return items_two;
+		}
+		if (is_zero_two && !is_zero_one) {
+			return items_one;
+		}
 		var p_first_one = items_one[0],
 			p_end_one = items_one[items_one.length - 1],
 			p_first_two = items_two[0],
