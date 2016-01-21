@@ -86,6 +86,7 @@
                     data.bound = bound;
                 }
                 Reader.read(data, function(err, dataJson) {
+                    // console.log(dataJson);
                     if (err) {
                         _afterChangeConf(err, s_time);
                         return model.emit('log.user.error', err);

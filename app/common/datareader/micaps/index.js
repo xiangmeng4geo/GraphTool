@@ -76,10 +76,9 @@
                                 var time = new Date(year+'-'+month+'-'+day+' '+hour+':00').getTime();
                                 data_return.time = time;
 
-                                var val_option = options.val;
-                                if (val_option) {
-                                    var file_type = val_option.file_type;
-                                    var file_hour = val_option.file_hour || 0;
+                                if (options) {
+                                    var file_type = options.file_type;
+                                    var file_hour = options.file_hour || 0;
                                     var one = new Date(time);
                                     var two = new Date(time);
 
