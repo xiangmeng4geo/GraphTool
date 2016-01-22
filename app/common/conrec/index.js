@@ -135,7 +135,9 @@
 		c.contour(data_arr, 0, xArr.length - 1, 0, yArr.length - 1, xArr, yArr, zArr.length, zArr);
 		var lines = c.contourList();
 		
-		// lines.splice(1);
+		// console.log(lines.length);
+		// lines.splice(55);
+		// lines = [lines[54]]
 		var lines_group = tool.groupLines(lines, tool_getBound(polygon.items), Math.max(x_step, y_step));
 		lines = lines_group.slice();
 		function _isInPolygonForColor(polygon, x_p, y_p) {

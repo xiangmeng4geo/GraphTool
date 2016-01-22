@@ -26,6 +26,7 @@
 	var path_gallery = format(path.join(path_user, 'image'));
 	var path_log = format(path.join(path_user, 'logs'));
 	var conf = {
+		DEBUG: true,
 		GEO: {
 			FILE: format(path.join(path_base, 'data', 'sx.json')),
 			FLAGS: [{
