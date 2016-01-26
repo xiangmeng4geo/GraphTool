@@ -19,11 +19,11 @@
 		"ES": [136.60, 14.33]
 	},
 	"DATA_TYPE": [{
-		"text": "命令行",
-		"val": "shanxi"
-	}, {
 		"text": "micaps",
 		"val": "micaps"
+	}, {
+		"text": "命令行",
+		"val": "shanxi"
 	}],
 	"FONT_FAMILY": [{
 		"text": "微软雅黑",

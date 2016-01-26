@@ -52,7 +52,7 @@
             _width = 10;
         ctx.save();
         ctx.strokeStyle = style.strokeStyle;
-        for(var i = _space_point, j = points.length; i < j; i+=_space_point){
+        for(var i = _space_point, j = points.length - 1; i < j; i+=_space_point){
             var start = points[i],
                 end = points[i+1];
             start = projection(isObj? [start.x, start.y]: start);

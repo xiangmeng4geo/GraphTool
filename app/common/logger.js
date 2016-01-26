@@ -11,6 +11,7 @@
 	var LOG_DELAY = CONST_LOG.DELAY || 10;
 
 	var EOL = require('os').EOL;
+	var EXT_LOGFILE = '.log';
 
 
 	function format_date(date, format){
@@ -42,7 +43,7 @@
 			console.log(msg);
 			cb();
 		}: function(msg, cb){
-			var log_file_path = path.join(PATH_LOG, format_date(new Date(), 'yyyy-MM-dd'));
+			var log_file_path = path.join(PATH_LOG, format_date(new Date(), 'yyyy-MM-dd'))+EXT_LOGFILE;
 			fs.appendFile(log_file_path, msg, cb);
 		}
 	})();
