@@ -175,19 +175,22 @@ Core.init(function(model) {
         model.emit('afterExport', save_path, time_used);
     });
     model.on('legend', function(blendent, legendStyle, data_filter) {
-        var result = _require('legend')({
-            blendent: blendent
-        }, {
-            type: legendStyle || undefined,
-            width: width_map,
-            height: height_map,
-            data_filter: data_filter
-        });
+        // 过滤不使用图例的情况
+        if (blendent) {
+            var result = _require('legend')({
+                blendent: blendent
+            }, {
+                type: legendStyle || undefined,
+                width: width_map,
+                height: height_map,
+                data_filter: data_filter
+            });
 
-        geomap.addOverlay(new Shape.Image(result.canvas, {
-            x: result.x,
-            y: result.y
-        }));
+            geomap.addOverlay(new Shape.Image(result.canvas, {
+                x: result.x,
+                y: result.y
+            }));
+        }
     });
     model.on('geo', function(options, cb_afterGeo) {
         var textStyle = options.textStyle;

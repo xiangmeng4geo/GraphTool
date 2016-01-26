@@ -56,6 +56,9 @@
 	_getSys.getLegend = function(name) {
 		var conf = _getSys() || {};
 		var legend = conf.legend || [];
+		legend.unshift({
+			name: '无'
+		});
 		if (!name) {
 			return legend;
 		} else {
@@ -67,13 +70,15 @@
 			}
 		}
 	}
+	var SIZE_DEFAULT = {
+		name: CONST_SIZE.NAME,
+		width: CONST_SIZE.WIDTH,
+		height: CONST_SIZE.HEIGHT
+	};
 	_getSys.getSize = function(index) {
 		var conf = _getSys() || {};
-		var size = conf.size || [{
-			name: CONST_SIZE.NAME,
-			width: CONST_SIZE.WIDTH,
-			height: CONST_SIZE.HEIGHT
-		}];
+		var size = conf.size || [];
+		size.unshift(SIZE_DEFAULT);
 		if (index !== undefined) {
 			var val = size[index];
 			if (!val) {

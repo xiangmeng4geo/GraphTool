@@ -9,7 +9,6 @@ Core.init(function(model) {
 	var _alert = dialog.alert;
 	var product_conf = _require('product_conf');
 	var CONST = _require('const');
-	var CONST_SIZE = CONST.SIZE;
 	var CONST_LEGEND_STYLE = CONST.LEGEND_STYLE.slice(0);
 	var UI = _require('component').UI;
 	var electron = require('electron');
@@ -46,9 +45,10 @@ Core.init(function(model) {
 		});
 	});
 	legend.forEach(function(v) {
+		var name = v.name;
 		s_data_legend.push({
-			text: v.name,
-			val: v.name
+			text: name,
+			val: v.blendent? name: ''
 		});
 	});
 	size.forEach(function(v, i) {
@@ -56,10 +56,6 @@ Core.init(function(model) {
 			text: v.name+'('+v.width+'X'+v.height+')',
 			val: i
 		});
-	});
-	s_data_size.unshift({
-		text: CONST_SIZE.NAME+'('+CONST_SIZE.WIDTH+'X'+CONST_SIZE.HEIGHT+')',
-		val: -1
 	});
 
 	var product_name = _PARAM_;
