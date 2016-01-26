@@ -151,7 +151,7 @@ Core.init(function(model) {
 		var $date_start = $('#date_start');
 		var $date_end = $('#date_end');
 		var $number_newest_days = $('#number_newest_days');
-		var $cb_is_interpolation_all = $('#cb_is_interpolation_all');
+		// var $cb_is_interpolation_all = $('#cb_is_interpolation_all');
 		var $cb_is_show_data = $('#cb_is_show_data');
 		function _show_example() {
 			var str = file_dir_in.val() || '';
@@ -269,7 +269,7 @@ Core.init(function(model) {
 					select_value_arithmetic.selected(arithmetic.type);
 					$num_value_arithmetic.val(arithmetic.val);
 				}
-				_setChecked($cb_is_interpolation_all, val.interpolation_all);
+				// _setChecked($cb_is_interpolation_all, val.interpolation_all);
 				_show_example();
 			},
 			getVal: function() {
@@ -341,7 +341,7 @@ Core.init(function(model) {
 						type: select_value_arithmetic.val(),
 						val: parseFloat(val_arithmetic)
 					},
-					interpolation_all: _getChecked($cb_is_interpolation_all),
+					// interpolation_all: _getChecked($cb_is_interpolation_all),
 					data: {
 						flag: _getChecked($cb_is_show_data)
 					}
