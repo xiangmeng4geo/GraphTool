@@ -371,11 +371,12 @@
 }
 
 .logo{
-	width: 320px;
+	width: 540px;
 	height: 100%;
 
 	margin-left: 30px;
-	background: url(../img/login_logo.png) left center no-repeat
+	background: url(../img/login_logo.png) left center no-repeat;
+	background-size: auto 32px;
 }
 .user_icon{
 	height: 30px;

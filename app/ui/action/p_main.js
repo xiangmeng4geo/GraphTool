@@ -86,6 +86,7 @@ Core.init(function() {
 	}
 	$('#btn_quite').click(function() {
 		Win.close(true, function() {
+			_require('store').rm('user_pwd');
 			Win.open('login');
 		});
 		
