@@ -506,4 +506,6 @@ Core.init(function(model) {
 	require('./p_setting_blendent');
 	// 尺寸模板相关
 	require('./p_setting_size');
+	// 资源管理相关
+	require('./p_setting_assets');
 })

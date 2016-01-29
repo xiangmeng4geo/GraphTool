@@ -5,6 +5,7 @@
     var CONST = require('./const');
     var debug = CONST.DEBUG;
     var product_conf = require('./product_conf');
+    var product_conf_util_assets = product_conf.util.assets;
 
     // var _log = util.Model.log;
     function _log(msg) {
@@ -61,6 +62,9 @@
             _err(new Error('no support parse method of reader!'));
         }
         if (_parser) {
+            if (conf) {
+                conf.assets = product_conf_util_assets(conf.assets, !!conf.flag_sys_assets)
+            }
             _parser(conf, _model);
         }
         return Reader;

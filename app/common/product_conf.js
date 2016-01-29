@@ -95,6 +95,40 @@
 			return size;
 		}
 	}
+	_getSys.getAssets = function(key) {
+		var conf = _getSys() || {};
+		var assets = conf.assets || [];
+		if (key) {
+			for (var i = 0, j = assets.length; i<j; i++) {
+				var item = assets[i];
+				if (item.id == key) {
+					return item;
+				}
+			}
+		} else {
+			return assets;
+		}
+	}
+	function _assets(assets, is_use_sys) {
+		if (!is_use_sys) {
+			return assets;
+		} else {
+			var assets_new = [];
+			for (var i = 0, j = assets.length; i<j; i++) {
+				var item = assets[i];
+				if (item.flag) {
+					var key = item.key;
+					if (key) {
+						item = _getSys.getAssets(key);
+					}
+					if (item) {
+						assets_new.push(item);
+					}
+				}
+			}
+			return assets_new;
+		}
+	}
 	function _saveSys(json) {
 		return _saveConfig(CONST_SYSCONF_NAME, json);
 	}
@@ -112,7 +146,10 @@
 		getSys: _getSys,
 		setSys: _saveSys,
 		getTree: _getTree,
-		setTree: _saveTree
+		setTree: _saveTree,
+		util: {
+			assets: _assets
+		}
 	};
 
 	module.exports = config;

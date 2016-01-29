@@ -21,6 +21,7 @@ Core.init(function(model) {
 	var geo = getSys.getGeo() || [];
 	var legend = getSys.getLegend() || [];
 	var size = getSys.getSize() || [];
+	var assets_sys = getSys.getAssets() || [];
 
 	var is_no_geo = geo.length == 0;
 	var is_no_legend = legend.length == 0;
@@ -104,7 +105,10 @@ Core.init(function(model) {
 		$(this).addClass('on').siblings().removeClass('on');
 		$tabContentItems.removeClass('on').eq($(this).index()).addClass('on');
 	});
+	var $cb_is_use_sys_assets = $('#cb_is_use_sys_assets');
+	_setChecked($cb_is_use_sys_assets, conf_product.flag_sys_assets);
 
+	$cb_is_use_sys_assets.click(_updateAssets);
 	var $s_data_type = $('#s_data_type');
 
 	var $data_detail_list = $('.data_detail_list .data_detail');
@@ -380,14 +384,20 @@ Core.init(function(model) {
 		var assets = [];
 		$asset_list.find('li').each(function() {
 			var $this = $(this);
+			var key = $this.data('key');
 			var d = {flag: _getChecked($this.find('[type=checkbox]'))};
-			d.style = $this.data('style');
-			var $span = $this.find('textarea');
-			if ($span.length > 0) {
-				d.text = $span.val();
+			if (key) {
+				d.key = key;
 			} else {
-				d.src = $this.find('img').attr('src');
+				d.style = $this.data('style');
+				var $span = $this.find('textarea');
+				if ($span.length > 0) {
+					d.text = $span.val();
+				} else {
+					d.src = $this.find('img').attr('src');
+				}
 			}
+			
 			assets.push(d);
 		});
 		conf.assets = assets;
@@ -404,6 +414,7 @@ Core.init(function(model) {
 			dir: file_dir_out.val(),
 			file: $text_filename_out.val() || ''
 		}
+		conf.flag_sys_assets = _getChecked($cb_is_use_sys_assets);
 		product_conf.save(product_name, conf);
 
 		model.emit('log', 'change "'+product_name+'"');
@@ -422,8 +433,13 @@ Core.init(function(model) {
 	
 	$asset_list.delegate('.btn_dele_asset', 'click', function() {
 		var $layer = $(this).closest('li');
+		if ($layer.is('.sys_asset')) {
+			return;
+		}
 		dialog.confirm('确定要删除吗？', function() {
     		$layer.remove();
+    		var index = $layer.data('index');
+    		conf_assets.splice(index, 1);
     	});
 	});
 	var _getId = (function() {
@@ -432,26 +448,59 @@ Core.init(function(model) {
 			return 'cb_' + (id++);
 		}
 	})();
-	if (conf_assets) {
+
+	function _updateAssets() {
+		var assets = [];
+		var is_use_sys = _getChecked($cb_is_use_sys_assets);
+		var _cache = {};
+		for (var i = 0, j = conf_assets.length; i<j; i++) {
+			var item = conf_assets[i];
+			var key = item.key;
+			if (key) {
+				_cache[key] = true;
+				var tmp_item = is_use_sys? getSys.getAssets(key): null;
+				if (tmp_item) {
+					tmp_item.flag = item.flag;
+				}
+				item = tmp_item;
+			} else {
+				item._index = i;
+			}
+			if (item) {
+				assets.push(item);
+			}
+		}
+		if (is_use_sys) {
+			for (var i = 0, j = assets_sys.length; i<j; i++) {
+				var item = assets_sys[i];
+				if (!_cache[item.id]) {
+					assets.push(item);
+				}
+			}
+		}
 		var html = '';
 		var html_img = '',
 			html_text = '';
-		$.each(conf_assets, function(i, v) {
+		$.each(assets, function(i, v) {
+			if (!v) {
+				return;
+			}
+			var key = v.id || '';
 			var text = v.text;
 			var style = v.style;
 			if (!text) {
-				html_img += '<li data-style="'+style+'">'+
+				html_img += '<li data-index="'+v._index+'" data-style="'+style+'" data-key="'+key+'" '+(key?'class="sys_asset"':'')+'>'+
 								'<img src="'+v.src+'"/>'+
 								'<div class="checkbox"><input type="checkbox" '+(v.flag?'checked':'')+'/><label></label></div>'+
 								'<span class="btn_dele_asset"></span>'+
 							'</li>';
 			} else {
-				html_text += '<li data-style="'+style+'">'+
+				html_text += '<li data-index="'+v._index+'" data-style="'+style+'" data-key="'+key+'" '+(key?'class="sys_asset"':'')+'>'+
 								'<div class="fl">'+
 									'<div class="checkbox"><input type="checkbox" '+(v.flag?'checked':'')+'/><label></label></div><br/>'+
 									'<span class="btn_dele_asset"></span>'+
 								'</div>'+
-								'<textarea>'+text+'</textarea>'+
+								'<textarea '+(key?'disabled="disabled"':'')+'>'+text+'</textarea>'+
 							'</li>';
 			}
 		});
@@ -483,4 +532,5 @@ Core.init(function(model) {
 			$this.find('label').attr('for', id);
 		});
 	}
+	_updateAssets();
 })

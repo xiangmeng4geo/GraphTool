@@ -25,6 +25,9 @@ Core.init(function(model) {
     var product_conf = _require('product_conf');
     var _alert = dialog.alert;
 
+    var ASSET_TYPE_PRODUCT = 1,
+        ASSET_TYPE_SYS = 2;
+
     // 定义图片过滤器
     var CONST_FILTER_IMAGE = CONST.FILTER_IMAGE;
     var _isImage = component.util.isImg;
@@ -102,7 +105,7 @@ Core.init(function(model) {
         }
         for (var i = 0, j = assets.length; i<j; i++) {
             var item = assets[i];
-            if (!item.flag) {
+            if (!item || !item.flag) {
                 continue;
             }
             var text = item.text;
@@ -135,15 +138,16 @@ Core.init(function(model) {
                 });
             }
             if ($html) {
-                $html.data('assets', true);
+                $html.data('asset'+(item.id? ASSET_TYPE_SYS: ASSET_TYPE_PRODUCT), true);
             }
         }
     });
     var _showMenuAssets = (function() {
-        var $layer;
-        var menu = new Menu();
-        var menu_add_asset = new MenuItem({label: '添加到附属资源', 'click': function() {
+        function _add(type) {
             if ($layer && _current_product_name) {
+                if ($layer.data('asset'+type)) {
+                    return _alert('已经添加，不用重复添加！');
+                }
                 var data;
                 if ($layer.is('.layer_text')) {
                     var $item = $layer.find('textarea');
@@ -167,17 +171,41 @@ Core.init(function(model) {
                 }
                 if (data) {
                     data.flag = true;
+                    $layer.data('asset'+type, true);
                     var conf = product_conf.read(_current_product_name);
-                    $layer.data('asset', true);
-                    (conf.assets || (conf.assets = [])).push(data);
-                    product_conf.save(_current_product_name, conf);
+                    if (ASSET_TYPE_PRODUCT == type) {
+                        (conf.assets || (conf.assets = [])).push(data);
+                        product_conf.save(_current_product_name, conf);
 
-                    _alert('已经保存到“'+_current_product_name+'”的附属资源中！');
+                        _alert('已经保存到“'+_current_product_name+'”的附属资源中！');
+                    } else if (ASSET_TYPE_SYS == type) {
+                        var conf_sys = product_conf.getSys();
+                        var key = new Date().getTime();
+                        data.id = key;
+                        (conf_sys.assets || (conf_sys.assets = [])).push(data);
+                        product_conf.setSys(conf_sys);
+
+                        (conf.assets || (conf.assets = [])).unshift({
+                            flag: true, 
+                            key: key
+                        });
+                        product_conf.save(_current_product_name, conf);
+                        _alert('已经保存到系统资源！');
+                    }
                 }
             }
             $layer = null;
+        }
+        var $layer;
+        var menu = new Menu();
+        var menu_add_asset_product = new MenuItem({label: '添加到附属资源', 'click': function() {
+            _add(ASSET_TYPE_PRODUCT);
         }});
-        menu.append(menu_add_asset);
+        var menu_add_asset_sys = new MenuItem({label: '添加到系统资源', 'click': function() {
+            _add(ASSET_TYPE_SYS);
+        }});
+        menu.append(menu_add_asset_product);
+        menu.append(menu_add_asset_sys);
         return function($html) {
             $layer = $html;
             menu.popup(WIN);
@@ -224,11 +252,7 @@ Core.init(function(model) {
             }).on('contextmenu', function(e) {
                 e.stopPropagation();
                 if (_current_product_name) {
-                    if ($html.data('asset')) {
-                        _alert('已添加，不用重复添加！');
-                    } else {
-                        _showMenuAssets($html);
-                    }
+                    _showMenuAssets($html);
                 }
             });
         $html.appendTo($geomap_container);

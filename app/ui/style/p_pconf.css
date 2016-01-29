@@ -197,6 +197,9 @@ input[type=checkbox] + label{
 .asset_title{
 	font-size: 18px;
 }
+.sys_asset .btn_dele_asset{
+	background: none;
+}
 .row .row {
     margin-left: 20px;
     color: #b7b7b7;

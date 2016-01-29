@@ -75,8 +75,7 @@
 			data: {
 				type: 'micaps',
 				file: file_path
-			},
-			assets: conf.assets
+			}
 		}, conf));
 	}
 	module.exports = _parse;

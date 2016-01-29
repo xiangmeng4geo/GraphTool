@@ -113,10 +113,17 @@
                         var _format = util_variate(_opt_var);
                         for (var i = 0, j = assets.length; i<j; i++) {
                             var item = assets[i];
-                            var text = item.text;
-                            if (!!text) {
-                                item.text = _format(text);
+                            // var key_assets = item.key;
+                            // if (key_assets) {
+                            //     item = getSys.getAssets(key_assets);
+                            // }
+                            if (item) {
+                                var text = item.text;
+                                if (!!text) {
+                                    item.text = _format(text);
+                                }
                             }
+                            assets[i] = item;
                         }
                         model.emit('asset.add', assets);
                     }
