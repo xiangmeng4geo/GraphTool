@@ -35,7 +35,7 @@
 
             var cache_val;
 
-            if (debug && (cache_val = util_file.read(cache_path, true))) {
+            if (!debug && (cache_val = util_file.read(cache_path, true))) {
                 _log ('Reader.read from cache ['+cache_path+']');
                 cb && cb(null, cache_val);
             } else {

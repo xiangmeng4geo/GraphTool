@@ -457,7 +457,7 @@
                 }
             }
         }
-
+// console.log(return_areas);return;
         //利用分割得到的面的共同特征对面的编码进行填充（只对没有编码强对应关系的面进行同类填充）
         var special_area_index = [];
         return_areas.forEach(function(v, i){
