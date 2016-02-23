@@ -468,8 +468,9 @@
 		}
 		var isHaveMany = len_blendent > 1;
 		function _get(val, range, is_return_index) {
+			var j = range.length-1;
 			// 让后者优先
-			for (var i = range.length-1; i>=0; i--) {
+			for (var i = j; i>=0; i--) {
 				var case_range = range[i];
 				var val_range = case_range.val;
 				
