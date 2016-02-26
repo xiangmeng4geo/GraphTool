@@ -28,17 +28,30 @@
 	var conf_data_sys = product_conf.getSys() || {};
 	var conf_data_legend = conf_data_sys.legend || (conf_data_sys.legend = []);
 	var html_legend = '';
+	var name_legend_cache = localStorage.getItem('name_legend_cache');
 	conf_data_legend.forEach(function(v, i) {
-		if (v.name == '降水预报') {
+		if (v.name == name_legend_cache) {
 			var is_selected = true;
 		}
 		html_legend += '<option value="'+i+'" '+(is_selected?'selected': '')+'>'+v.name+'</option>';
 	});
-	var $legend = $('#legend').html(html_legend);
+	var $legend = $('#legend').html(html_legend).on('change', function() {
+		localStorage.setItem('name_legend_cache', conf_data_legend[$legend.val()].name);
+	});
 
-	$('select').on('change', _showData);
+	$('select,[type=checkbox]').on('change', _showData);
 
+	function is_checked($checkbox) {
+		return $checkbox.prop('checked');
+	}
+
+	var $cb_line_sr = $('#cb_line_sr'), //是否显示雨雪分界线
+		$cb_line_sd = $('#cb_line_sd'), //是否显示霜冻线
+		$cb_val = $('#cb_val'),//是否显示区域值
+		$cb_val_code = $('#cb_val_code'),//是否显示雨雪编码
+		$cb_val_code_other = $('#cb_val_code_other');//是否显示其它编码
 	var _flag_is_added_svg_pattern = false;
+	// 添加百度地图的雨夹雪区域显示
 	var _add_svg_pattern = function(blendent){
 		$('defs').remove();
 		mySvg = $('#allmap svg').get(0);
@@ -261,7 +274,7 @@
 			}
 			var fn_color = util_color(blendent);
 			var areas = data.areas;
-			areas.forEach(function(area) {
+			areas.forEach(function(area, i) {
 				var point_arr = [];
 				area.items.forEach(function(v_v){
 					var point = new BMap.Point(v_v.x, v_v.y);
@@ -269,16 +282,19 @@
 				});
 				var symbols = area.symbols;
 				var code = area.code;
-				console.log(code, symbols.text);
+				// console.log(code, symbols.text);
 				var color = fn_color(symbols?symbols.text:0, code);
 				if (code == 24) {
 					color = 'url(#rain_snow_'+(color.replace('#', ''))+')';
 				}
 
 				var polygon = new BMap.Polygon(point_arr, {strokeColor: color, fillColor: color,fillOpacity: 1, strokeWeight: 1, strokeOpacity:1});
+				polygon.addEventListener("click",function(){
+					console.log(i); 
+				});
 				map.addOverlay(polygon);   //增加面
 
-				if(symbols){
+				if(symbols && is_checked($cb_val)){
 					var text = symbols.text;
 					if(text >= 0){
 						$.each(symbols.items,function(i_text,v_text){
@@ -367,7 +383,10 @@
 					color = 'green';
 				}
 				else if(23 == type || 24 == type || 26 == type || 48 == type){// 处理雨雪的极值
-					text = v.text+'_'+v.type;
+					if (!is_checked($cb_val_code)) {
+						return;
+					}
+					text = v.type;
 					// if(text == 0){
 					// 	return;
 					// }
@@ -376,6 +395,9 @@
 					color = 'black';
 				}
 				else{//测试特殊点标识
+					if (!is_checked($cb_val_code_other)) {
+						return;
+					}
 					color = 'white';
 					text = type;
 				}
@@ -391,6 +413,13 @@
 			var line_symbols = data.line_symbols;
 			if(line_symbols){
 				$.each(line_symbols,function(i,v){
+					var code = v.code;
+					if (code == 38 && !is_checked($cb_line_sd)) {
+						return;
+					}
+					if (code == 0 && !is_checked($cb_line_sr)) {
+						return;
+					}
 					var point_arr = [];
 					draw_line_symbols_flag(v.code,v.items,i);
 					$.each(v.items,function(v_i,v_v){

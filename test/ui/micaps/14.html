@@ -23,10 +23,13 @@ ul{
     <div id="allmap">
     </div>
     <div id="layer-top">
-        <select id="dataList">
-        </select>
-        <select id="legend">
-        </select>
+        文件：<select id="dataList"></select><br/>
+        图例：<select id="legend"></select><br/>
+        <label for="cb_line_sr">是否显示雨雪分界线：</label><input type="checkbox" id="cb_line_sr" checked /><br/>
+        <label for="cb_line_sd">是否显示霜冻线：</label><input type="checkbox" id="cb_line_sd"/><br/>
+        <label for="cb_val">是否显示区域值：</label><input type="checkbox" id="cb_val"/><br/>
+        <label for="cb_val_code">是否显示雨雪编码：</label><input type="checkbox" id="cb_val_code" checked/><br/>
+        <label for="cb_val_code_other">是否显示其它编码：</label><input type="checkbox" id="cb_val_code_other"/><br/>
     </div>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=E8MDMS4BVFEMeAxVP3YddQ6X"></script>
     <script type="text/javascript" src="./14.js"></script>

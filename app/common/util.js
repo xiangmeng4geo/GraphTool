@@ -253,9 +253,9 @@
         for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
             var xi = vs[i][key_x], yi = vs[i][key_y];
             var xj = vs[j][key_x], yj = vs[j][key_y];
-            // if(x == xi && y == yi || x == xj && y == yj){
-            //     return 1;
-            // }
+            if(x == xi && y == yi || x == xj && y == yj){
+                return 1;
+            }
             // 在线段上或顶点上
             if (x == xi && x == xj && (y - yi) * (y - yj) <= 0 || (y == yj && y==yi && (x-xi)*(x-xj) <= 0)) {
             	return true;
@@ -270,14 +270,21 @@
 	/**
 	 * 多边形是否在另一个多边形内
 	 */
-	function _isPolygonInPolygon(polygon_items, sub_polygon_items, is_return_num, key_x, key_y){
+	function _isPolygonInPolygon(polygon_items, sub_polygon_items, is_return_num, key_x, key_y, debug){
 		key_x || (key_x = 'x');
         key_y || (key_y = 'y');
         var inside_num = 0;
         sub_polygon_items.forEach(function(v){
+        	// 对分割得到的新点进行特殊处理
+        	if (v.t) {
+        		inside_num++;
+        		return;
+        	}
             var flag = _isPointInPolygon(polygon_items, v[key_x], v[key_y], key_x, key_y);
             if(flag){
                 inside_num++;
+            } else if (debug) {
+            	console.log(v);
             }
         });
         if(is_return_num){
@@ -471,6 +478,7 @@
 			var j = range.length-1;
 			// 让后者优先
 			for (var i = j; i>=0; i--) {
+			// for (var i = 0; i<=j; i++){
 				var case_range = range[i];
 				var val_range = case_range.val;
 				
