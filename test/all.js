@@ -3,6 +3,7 @@ var list = [
     './spec/test-product_conf',
     './spec/test-interpolate.idw',
     './spec/test-reader.micaps',
+    './spec/test-micaps-14',
     './spec/test-color',
     './spec/conrec/test-tool',
     './spec/conrec/test-tool-other',

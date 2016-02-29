@@ -12,6 +12,8 @@
         CODE_RAIN = 26,     //雨
         CODE_RAIN_SNOW = 24,//雨夹雪
         CODE_MORE = 48;     //更高一个等级
+
+    var NUM_MIN = 0.00001;
     function _parse_file(line_arr, options, cb) {
     	var illegal_index_area = [];
     	var REG_TOW_NUM = /^(-?[\d.]+)\s+([\d.]+)$/,
@@ -262,6 +264,8 @@
         if(content_info.areas.len > 0 && content_info.line_symbols.len > 0){
             _parseArea(content_info);
         }
+        
+        _addCode(content_info);
         // 格式化数据
         _format(content_info);
         /*这里基于数据层的clip操作会影响整个数据的读取时间，暂时去掉*/
@@ -324,6 +328,8 @@
             delete v.area;
             delete v.public_line;
             delete v.type;
+            delete v.line;
+            delete v.line_ids;
         });
         content_info.areas = areas_items;
         if(content_info.line_symbols){
@@ -350,6 +356,7 @@
     }
     /*线分割面成多个面*/
     function _split_area(area, line_items, content_info){
+        var line_ids = area.line_ids;
         var area_items = area.items.slice();
         var return_areas = [];
         var len = line_items.length;
@@ -358,9 +365,11 @@
             var len_return = return_areas.length;
             if(len_return > 0){
                 for(var i = 0; i < len_return; i++){
-                    var _items = return_areas[i].items;
-                    var info = _split_area2two(_items, line_items, content_info, start_line_index);
-
+                    var _area = return_areas[i];
+                    var _items = _area.items;
+                    // console.log('_area.line_ids', _area.line_ids);
+                    var info = _split_area2two(_items, line_items, content_info, start_line_index, line_ids);
+                    // console.log('info2', info);
                     if(info){
                         var areas = info.areas;
                         if(areas && areas.length > 0){
@@ -377,7 +386,8 @@
                     break;
                 }
             }else{
-                var info = _split_area2two(area_items, line_items, content_info, start_line_index);
+                var info = _split_area2two(area_items, line_items, content_info, start_line_index, line_ids);
+                // console.log('info1', info);
                 if(info){
                     var areas = info.areas;
                     if(areas && areas.length > 0){
@@ -393,8 +403,15 @@
         return return_areas;
     }
 
+    var _getLineId = (function() {
+        var _line_id = 1;
+        return function() {
+            return _line_id++;
+        }
+    })();
+    var _cache_public_line = {};
     /*线段把面分割成两部分*/
-    function _split_area2two(area_items, line_items, content_info, start_line_index){
+    function _split_area2two(area_items, line_items, content_info, start_line_index, line_ids){
         start_line_index || (start_line_index = 0); //检测线上点的开始索引
         var areas = []; //存储分割后的面
         var new_line_items = [];
@@ -641,11 +658,18 @@
             }
             areas = [new_line_items.concat(add_items), new_line_items.concat(add_items_other)];
         }
+        var id = _getLineId();
+        // (area_items.line_ids || (area_items.line_ids = [])).push(id);
+        var ids = (line_ids || []).slice(0);
+        ids.push(id);
+        _cache_public_line[id] = new_line_items;
         areas.forEach(function(v, i){
         	areas[i] = {
         		items: v,
                 type: 'add',
-                area: Math.abs(getArea(v))
+                area: Math.abs(getArea(v)),
+                // line: new_line_items,
+                line_ids: ids
         	}
         });
         return {
@@ -726,9 +750,9 @@
         content_info.areas.len = items_arr.length;
 
         _sort_areas(content_info.areas);
-        _addCode(content_info);
         // _dealVal(content_info);
     }
+    /*给各个面添加编码(直接用编码是否在所在区域确定)*/
     function _addCode(content_info) {
     	var areas = content_info.areas.items;
         var symbols = content_info.symbols.items;
@@ -772,7 +796,7 @@
             code_list.sort(function(a, b) {
             	return b.n - a.n;
             });
-            var to_code = CODE_RAIN;
+            var to_code;// = CODE_RAIN;
             if (code_list.length == 0) {
             	for (var i = area_index-1; i>=0; i--) {
             		var area_p = areas[i];
@@ -790,25 +814,123 @@
             } else {
             	to_code = code_list[0].code;
             }
-            area.code = to_code;
+            if (!to_code && area.type == 'add') {
+                to_code = _guessCode(area, area_index, areas);
+                // console.log('guess', to_code);
+            }
+            area.code = to_code || CODE_RAIN;
         });
     }
-    // function _dealVal(content_info) {
-    // 	var areas = content_info.areas.items;
-    // 	areas.forEach(function(area, area_index){
-    //         var area_items = area.items;
-    //         var symbols = area.symbols;
-    //         var items_symbols = symbols.items;
-    //         for (var i = 0, j = items_symbols.length; i<j; i++) {
-    //     		var item = items_symbols[i];
-    //     		if (isInsidePolygon(area_items, item.x, item.y)) {
-        			
-    //     			return;
-    //     		}
-    //     	}
-    //     	console.log('no');
-    //         // area.symbols = null;
-    //     });
-    // }
+    /*得到一个面和其它面的公共边*/
+    function _getLines(area) {
+        var lines = [];
+        var ids = area.line_ids;
+        var items = area.items,
+            len = items.length;
+        for (var i = 0, j = ids.length; i<j; i++) {
+            var id = ids[i];
+            var line = _cache_public_line[id];
+            if (line) {
+                var n_is = 0;
+                for (var i_line = 0, j_line = line.length; i_line<j_line; i_line++) {
+                    var item_line = line[i_line],
+                        x_line = item_line.x,
+                        y_line = item_line.y;
+                    for (var i_items = 0; i_items<len; i_items++) {
+                        var item = items[i_items];
+                        if (item.x == x_line && item.y == y_line) {
+                            n_is++;
+                            break;
+                        }
+                    }
+                }
+                if (n_is == j_line) {
+                    lines.push(line);
+                }
+            }
+        }
+        return lines;
+    }
+    /*根据公共边与面上其它点的位置关系确认编码*/
+    function _guessCodeByLine(area, line) {
+        var items = area.items;
+        var first = line[0],
+            end = line[line.length - 1];
+        var x_first = first.x,
+            y_first = first.y,
+            x_end = end.x,
+            y_end = end.y;
+        if (x_first == x_end) {
+            var _isSnow = function(point) {
+                return point.x <= x_first;
+            }
+        } else {
+            var k = (y_end - y_first)/(x_end - x_first);
+                b = (x_first*y_end - x_end*y_first)/(x_first - x_end);
+            var _isSnow = function(point) {
+                var v = k * point.x + b;
+                var y = point.y;
+                return k >= 0? (y >= v? true: false): (y <= v? true: false);
+            }
+        }
+        function _isInLine(point) {
+            var x = point.x,
+                y = point.y;
+            for (var i = 0, j = line.length; i<j; i++) {
+                var v = line[i];
+                if (v.x == x && v.y == y) {
+                    return true;
+                }
+            }
+        }
+        function _guessIsSnow() {
+            var n_t = 0,
+                n_snow = 0;
+            for (var i = 0, j = items.length; i<j; i++) {
+                var v = items[i],
+                    x = v.x,
+                    y = v.y;
+                if (!_isInLine(v)) {
+                    n_t++;
+                    if (_isSnow(v)) {
+                        n_snow++;
+                    }
+                }
+            }
+            return n_snow/n_t > 0.5;
+        }
+
+        return _guessIsSnow()? CODE_SNOW: CODE_RAIN;
+    }
+    /*猜测不确定面的编码*/
+    function _guessCode(area, area_index, areas) {
+        var lines = _getLines(area);
+        var code_list = [];
+        var _cache = {};
+        var len = lines.length;
+        if (len > 0) {
+            for (var i = 0; i<len; i++) {
+                var code = _guessCodeByLine(area, lines[i]);
+                // console.log('code = ', code);
+                if (code) {
+                    if (_cache[code]) {
+                        _cache[code]++;
+                    } else {
+                        _cache[code] = 1;
+                    }
+                }
+            }
+            for (var i in _cache) {
+                code_list.push({
+                    code: i,
+                    n: _cache[i]
+                });
+            }
+            code_list.sort(function(a, b) {
+                return b.n - a.n;
+            });
+            return code_list[0].code;
+        }
+    }
     exports.parse = _parse_file;
 }()

@@ -18,10 +18,13 @@
 	var dir_data = path.join(__dirname, '../../data/micaps/14');
 	var file_list = fs.readdirSync(dir_data);
 	var html_file_list = '';
+	var file_name_old = localStorage.getItem('file_name');
 	file_list.forEach(function(v) {
-		html_file_list += '<option value="'+v+'">'+v+'</option>';
+		html_file_list += '<option value="'+v+'" '+(file_name_old == v?'selected':'')+'>'+v+'</option>';
 	});
-	var $dataList = $('#dataList').html(html_file_list);
+	var $dataList = $('#dataList').html(html_file_list).on('change', function() {
+		localStorage.setItem('file_name', $(this).val());
+	});
 
 	// 显示要使用图例
 	var product_conf = _require('product_conf');
@@ -261,6 +264,7 @@
 		}
 	}
 	function render(data) {
+		window.data = data;
 		var legend = conf_data_legend[$legend.val()];
 		if (legend) {
 			var blendent = legend.blendent;

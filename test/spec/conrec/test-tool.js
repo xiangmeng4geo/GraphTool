@@ -307,16 +307,16 @@ describe('conrec.tool', function() {
 		}, {
 			items: [{
 				x: 10,
-				y: 0
+				y: 40
 			}, {
 				x: 20,
 				y: 0
 			}, {
 				x: 10,
-				y: 40
+				y: 0
 			}, {
 				x: 10,
-				y: 0
+				y: 40
 			}]
 		}]);
 
@@ -365,7 +365,7 @@ describe('conrec.tool', function() {
 			}]
 		}]);
 	});
-
+return;
 	it('tool.getBond', function() {
 		var getBound = tool.getBound;
 
