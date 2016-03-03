@@ -1,0 +1,28 @@
+﻿{
+    "data": {
+    	"file": "tmp.txt"
+    },
+    "texts": [{
+    	"txt": "陕西省2015年11月17日08时-自动站温度分布图",
+    	"x": 10,
+    	"y": 10,
+    	"fontSize": 20,
+    	"color": "rgba(0, 0, 0, 0.8)"
+    }, {
+    	"txt": "最高：西乡 13.6℃",
+    	"x": 10,
+    	"y": 40,
+    	"fontSize": 18,
+    	"color": "rgba(255, 0, 0, 0.8)"
+    }, {
+        "txt": "最低：神木 0.8℃",
+        "x": 10,
+        "y": 60,
+        "fontSize": 18,
+        "color": "rgba(255, 0, 0, 0.8)"
+    }], 
+    "map": "陕西地图",
+    "legend": "气温配色",
+    "showLegendRange": true,
+    "savepath": "C:/Users/技术/BPA/GT/output/test.png"
+}

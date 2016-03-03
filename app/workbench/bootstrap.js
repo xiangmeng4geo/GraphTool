@@ -72,52 +72,6 @@
 	ipc.on('emit', function(e, data){
 		_emit(data);
 	});
-
-	/**
-	 * 确保主程序是单例模式
-	 */
-	// function ensure_single(onSingle){
-	// 	var net = require('net');
-	// 	var socket = path.join('\\\\?\\pipe', app.getName());
-	// 	net.connect({path: socket}, function(){
-	// 		app.quit();
-	// 	}).on('error', function(err){
-	// 		try{
-	// 			require('fs').unlinkSync(socket);
-	// 		}catch(e){
-	// 			if(e.code != 'ENOENT'){
-	// 				throw e;
-	// 			}
-	// 		}
-	// 		onSingle();
-	// 		net.createServer(function(c){
-	// 			// ui主进程启动时直接得到焦点，否则重新打开
-	// 			if (_window.isOpenedUi()) {
-	// 				_window.setFocusToLast();
-	// 			} else {
-	// 				_getMainWin();
-	// 			}
-				
-	// 		}).listen(socket);
-	// 	}).on('data', function(){
-	// 	}).on('close', function(){
-	// 	});
-	// }
-	function _getMainWin(is_use_single) {
-		var loginWin = _window.getInstance('login');
-		ipc.on('wait.main', function(e, data){
-			loginWin.send('wait.login', true);
-		});
-		function cb() {
-			_window.load(loginWin, 'login');
-		}
-		if (is_use_single) {
-			ensure_single(cb);
-		} else {
-			cb();
-		}
-		return loginWin;
-	}
 	var shouldQuit = app.makeSingleInstance(function() {
 		if (_window.isOpenedUi()) {
 			_window.setFocusToLast();
@@ -129,7 +83,10 @@
 		return;
 	}
 	app.on('ready', function() {
-		// _getMainWin(true);
-		_getMainWin();
+		var loginWin = _window.getInstance('login');
+		ipc.on('wait.main', function(e, data){
+			loginWin.send('wait.login', true);
+		});
+		_window.load(loginWin, 'login');
 	});
 }();

@@ -13,6 +13,9 @@ Core.init(function(model) {
 	var isImg = _require('component').util.isImg;
 	var getSys = _require('product_conf').getSys;
 
+	if (CONST.DEBUG) {
+		C.emit('ready');
+	}
 	_require('p_main_map');
 
 	model.emit('tree.ready');
@@ -27,6 +30,28 @@ Core.init(function(model) {
 			key: _confCurrent._id,
 			err: msg
 		});
+		_end();
+	}
+	var queue = [];
+	var isDealing = false;
+	function _end() {
+		isDealing = false;
+		_deal();
+	}
+	function _deal() {
+		if (queue.length == 0 || isDealing) {
+			return;
+		}
+		isDealing = true;
+		var conf = queue.shift();
+		_confCurrent = conf;
+		var file = conf.file;
+		var name = conf.name;
+		if (file) {
+			_changeFile(file);
+		} else if (name) {
+			_changeProduct(name);
+		}
 	}
 	function _changeProduct(product_name) {
 		var conf = _require('product_conf').read(product_name);
@@ -82,6 +107,8 @@ Core.init(function(model) {
 
 			save_path = path.join(save_dir, filename);
 			model.emit('export', save_path);
+		} else {
+			_error(err);
 		}
     });
 	model.on('afterExport', function(save_path, time_used){
@@ -92,16 +119,11 @@ Core.init(function(model) {
 				time: time_used
 			}
 		});
+		_end();
 	})
 	model.on('command.conf', function(conf) {
-		_confCurrent = conf;
-		var file = conf.file;
-		var name = conf.name;
-		if (file) {
-			_changeFile(file);
-		} else if (name) {
-			_changeProduct(name);
-		}
+		queue.push(conf);
+		_deal();
 	});
 	require('remote').getCurrentWindow().webContents.emit('ready');
 })
