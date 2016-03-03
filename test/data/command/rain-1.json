@@ -63,6 +63,7 @@
         }
     },
     "legend": "降水配色",
+    "showLegendRange": false,
     "texts": [{
     	"txt": "陕西省2015年09月10日08时-自动站雨量分布图",
     	"x": 10,
