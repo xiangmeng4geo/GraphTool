@@ -188,7 +188,7 @@
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
                 ctx.lineWidth = lineWidth;
-                ctx.strokeStyle = strokeStyle;
+                ctx.strokeStyle = strokeStyle || '#d2d2d2';
             }
             //只添加指定属性
             ['shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY',

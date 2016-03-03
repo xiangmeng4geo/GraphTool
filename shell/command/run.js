@@ -41,5 +41,6 @@ function run(conf_name) {
 	});
 }
 
-run('rain.json');
-run('tmp.json');
+// run('rain.json');
+// run('tmp.json');
+run('rain-1.json');

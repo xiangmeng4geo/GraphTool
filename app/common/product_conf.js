@@ -32,6 +32,9 @@
 		return _readConfig(CONST_SYSCONF_NAME);
 	}
 	_getSys.getGeo = function(name) {
+		if (util.isPlainObject(name)) {
+			return name;
+		}
 		var conf = _getSys() || {};
 		var geo = conf.geo || [];
 		if (!name) {
