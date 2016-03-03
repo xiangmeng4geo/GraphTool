@@ -1,4 +1,4 @@
-!function() {
+Core.init(function() {
     var C = Core;
     var _require = C.require;
     var CONST = _require('const');
@@ -42,26 +42,51 @@
             model.emit('map.afterRender', err, t_used);
             model.emit('loading.hide');
         }
+        function _error(err_msg) {
+            model.emit('log.user.error', new Error(err_msg));
+        }
         function _changeConf(conf) {
+            if (!conf) {
+                return _error('没有相关配置！');
+            }
             var s_time = new Date();
             var map_name = conf.map;
-            if (!map_name) {
-
-            }
             var legend_name = conf.legend;
             var assets = conf.assets;
             var data = conf.data;
             var texts = conf.texts || [];
             var imgs = conf.imgs || [];
 
+            if (!map_name) {
+                return _error('请先配置地图!');
+            }
             var conf_geo = getSys.getGeo(map_name);
             var geo_files = conf_geo.maps;
+            if (!geo_files || geo_files.length == 0) {
+                return _error('地理信息文件不可为空！');
+            }
             var textStyle = conf_geo.textStyle;
             var bound = conf_geo.bound;
+            if (!bound || !bound.wn || !bound.es) {
+                return _error('请先地图边界！');
+            }
+            if (!legend_name) {
+                return _error('请先配置图例！');
+            }
             var conf_legend = getSys.getLegend(legend_name);
 
             var blendentJson = conf_legend.blendent;
 
+            if (!blendentJson || blendentJson.length == 0) {
+                return _error('图例配置错误!');
+            }
+            for (var i = 0, j = blendentJson.length; i<j; i++) {
+                var item = blendentJson[i];
+                var colors = item.colors;
+                if (!colors || colors.length == 0) {
+                    return _error('请先配置图例里的值域!');
+                }
+            }
             var showLegendRange = conf.showLegendRange;
             var size = conf.size || '';
             var toSize = {
@@ -228,4 +253,4 @@
     }
 
     module.exports = init;
-}()
+})

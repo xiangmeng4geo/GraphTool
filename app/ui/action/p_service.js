@@ -20,9 +20,11 @@ Core.init(function(model) {
 
 	model.emit('tree.ready');
 
-	model.on('error', function(err) {
+	function fn_err(err) {
 		_error(err.msg || err.message || err);
-	});
+	}
+	model.on('error', fn_err);
+	model.on('log.user.error', fn_err);
 	var _confCurrent;
 	function _error(msg) {
 		model.emit(new Error('[command error] '+msg));
