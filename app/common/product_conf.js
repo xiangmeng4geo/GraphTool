@@ -32,6 +32,7 @@
 		return _readConfig(CONST_SYSCONF_NAME);
 	}
 	_getSys.getGeo = function(name) {
+		// 命令行传入配置
 		if (util.isPlainObject(name)) {
 			return name;
 		}
@@ -57,6 +58,24 @@
 		}
 	}
 	_getSys.getLegend = function(name) {
+		// 命令行传入配置
+		if (util.isPlainObject(name)) {
+			// 对颜色进行排序，保证值从小到大
+			var colors = name.colors;
+			if (colors) {
+				colors.sort(function(a, b) {
+					return a.val[0] - b.val[0];
+				});
+			}
+			return {
+				"blendent": [util.extend(name, {
+					val: {
+						v: '',
+						code: ''
+					}
+				})]
+			}
+		}
 		var conf = _getSys() || {};
 		var legend = conf.legend || [];
 		legend.unshift({

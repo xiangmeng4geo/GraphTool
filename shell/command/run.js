@@ -36,11 +36,14 @@ function run(conf_name) {
 	fs.writeFileSync(file_name_new, JSON.stringify(conf));
 
 	var command_str = bin_path+' -sync -file "'+file_name_new+'"';
+	console.log();
 	command(command_str, function(err, result) {
 		console.log(conf_name, err, result);
+		console.log();
 	});
 }
 
-// run('rain.json');
-// run('tmp.json');
+run('rain.json');
+run('tmp.json');
 run('rain-1.json');
+run('rain-2.json');

@@ -4,7 +4,7 @@
 |----| :----: | :-----: | :----: | :-----: |
 | [data](#data) | Object | Y |  | 主要描述数据文件位置 |
 | map | String<br/>Object | Y |  | 系统配置里地图模板名<br/>[地图相关配置](#mapObject) |
-| legend | String | Y |  | 系统配置里图例模板名 |
+| legend | String<br/>Object | Y |  | 系统配置里图例模板名<br/>[图例相关配置](#legendObject) |
 | showLegendRange | Boolean | Y | true | 是否只显示源数据所在图例区间 |
 | width | Number | N | 800 | 处理图片的宽度 |
 | height | Number | N | 800 | 处理图片的高度 |
@@ -211,5 +211,78 @@
         "flag": false,
         "color": "#000000"
     }
+}
+```
+-----------------
+#### <span id="legendObject">legendObject(图例相关配置)</span> [示例](#legendExample)
+| 字段名 | 类型 | 是否必须 | 默认值 | 描述 |
+|----| :----: | :-----: | :----: | :-----: |
+| is_stripe | Boolean | N | false | 是否使用条纹填充 |
+| [colors](#colorItem) | Array | Y |  | 图例的颜色配置 |
+
+#### <span id="colorItem">colorItem(颜色配置)</span>
+| 字段名 | 类型 | 是否必须 | 默认值 | 描述 |
+|----| :----: | :-----: | :----: | :-----: |
+| is_checked | Boolean | N | false | 是否使用此颜色 |
+| color | String | Y |  | 颜色值 |
+| color_text | String | Y |  | 值域文字显示颜色 |
+| val | Array | Y |  | 值域区间<br/> __必须是小值在前，如：[0, 10]__ |
+| text | String | N |  | 值域对应显示文字 |
+
+
+#### <span id="legendExample">legendObject示例</span>
+```
+{
+    "is_stripe": false,
+    "colors": [{
+        "is_checked": true,
+        "color": "#9df085",
+        "color_text": "#ffffff",
+        "val": [1, 1.5],
+        "text": "1~1.5",
+        "order": 0
+    }, {
+        "is_checked": true,
+        "color": "#33b333",
+        "color_text": "#000000",
+        "val": [1.5, 7],
+        "text": "1.5~7",
+        "order": 0
+    }, {
+        "is_checked": true,
+        "color": "#56b1ff",
+        "color_text": "#000000",
+        "val": [7, 15],
+        "text": "7~15",
+        "order": 0
+    }, {
+        "is_checked": true,
+        "color": "#ffffff",
+        "color_text": "#ffffff",
+        "val": [0, 1],
+        "text": "0~1",
+        "order": 0
+    }, {
+        "is_checked": true,
+        "color": "#0000de",
+        "color_text": "#000000",
+        "val": [15, 40],
+        "text": "15~40",
+        "order": 0
+    }, {
+        "is_checked": true,
+        "color": "#f900f9",
+        "color_text": "#000000",
+        "val": [40, 50],
+        "text": "40~50",
+        "order": 0
+    }, {
+        "is_checked": true,
+        "color": "#750036",
+        "color_text": "#000000",
+        "val": [50, 9999],
+        "text": "50以上",
+        "order": 0
+    }]
 }
 ```
