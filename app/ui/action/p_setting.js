@@ -96,6 +96,7 @@ Core.init(function(model) {
 			$(this).addClass('on').siblings().removeClass('on');
 			$tabContentItems.removeClass('on').eq($(this).index()).addClass('on');
 		});
+		$tabItems.filter('.on').click();
 	}
 
 	$doc.delegate('.map_item .btn_up', 'click', function() {
@@ -189,7 +190,7 @@ Core.init(function(model) {
 			}
 		}
 		// 没有设置默认地图的话使用第一个
-		if (!is_have_default) {
+		if (!is_have_default && conf_data_geo.length > 0) {
 			conf_data_geo[0].is_default = true;
 		}
 		conf_data_sys.geo = conf_data_geo;
@@ -476,7 +477,7 @@ Core.init(function(model) {
 			conf_data_geo.splice(index, 1);
 			_saveConfData();
 
-			if ($p.is('.is_default')) {
+			if ($p.is('.default')) {
 				$p.siblings().first().addClass('default');
 			}
 
@@ -499,7 +500,7 @@ Core.init(function(model) {
 
 			$item.addClass('default').siblings().removeClass('default');
 		}, function() {
-			$item.parent().find('.is_default [type=radio]').prop('checked', true);
+			$item.parent().find('.default [type=radio]').prop('checked', true);
 		});
 	});
 	// 图例相关
@@ -508,4 +509,6 @@ Core.init(function(model) {
 	require('./p_setting_size');
 	// 资源管理相关
 	require('./p_setting_assets');
+	// 系统模板相关
+	require('./p_setting_template');
 })

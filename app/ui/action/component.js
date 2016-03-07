@@ -17,14 +17,14 @@
 	}
 
 	var FILETER_GEO = [{
+		name: 'shp',
+		extensions: ['shp']
+	}, {
 		name: 'GeoJSON',
 		extensions: ['json']
 	}, {
 		name: 'topoJSON',
 		extensions: ['json']
-	},{
-		name: 'shp',
-		extensions: ['shp']
 	}];
 	var FILETER_DEFAULT =
 	function openGeo() {
@@ -127,6 +127,7 @@
 	}
 	function select($container, options) {
 		options = _extend({
+			autoSize: true,
 			val: null,
 			data: null,
 			onchange: null,
@@ -169,16 +170,19 @@
 				$val = $html.find('li:first');
 			}
 
-			var min_width = _getComputedStyle($container, 'min-width');
-			var width = _getComputedStyle($container, 'width'); 
-			if (!width || width == 'auto' || width == min_width) {
-				// 对内容检测得到内容的最大宽度
-				$html_test.html(html_test).css('opacity', 0);
-				$html_test.appendTo($('body'));
-				var w_test = $html_test.width() + 10;
-				$html_test.remove();
-				
-				$container.css('width', w_test);
+			var autoSize = options.autoSize;
+			if (autoSize) {
+				var min_width = _getComputedStyle($container, 'min-width');
+				var width = _getComputedStyle($container, 'width'); 
+				if (!width || width == 'auto' || width == min_width) {
+					// 对内容检测得到内容的最大宽度
+					$html_test.html(html_test).css('opacity', 0);
+					$html_test.appendTo($('body'));
+					var w_test = $html_test.width() + 10;
+					$html_test.remove();
+					
+					$container.css('width', w_test);
+				}
 			}
 			var tmpl = '<span class="ui-select-val" title="'+$val.text()+'">'+$val.html()+'</span>';
 			$container.html(tmpl+html).on('change', onchange);
@@ -316,6 +320,7 @@
 			onchange();
 		}
 		var s_font_family = select($container.find('.s_fontfamily'), {
+			autoSize: false,
 			data: CONST_FONT_FAMILY,
 			onchange: function() {
 				_change();
@@ -323,6 +328,7 @@
 		});
 		var $font_size = $container.find('.s_fontsize');
 		var s_font_size = select($font_size, {
+			autoSize: false,
 			val: 14,
 			data: CONST_FONT_SIZE,
 			onchange: function() {

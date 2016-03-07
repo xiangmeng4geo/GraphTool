@@ -100,14 +100,14 @@
 				</div>
 				<div class="content_wrap">
 					<tab>
-						<item class="on">地图</item>
+						<item>地图</item>
 						<item>图例</item>
 						<item>尺寸模板</item>
 						<item>系统资源</item>
-						<item>系统模板</item>
+						<item class="on">系统模板</item>
 					</tab>
 					<tab-content>
-						<item class="on">
+						<item>
 							<div class="list">
 								<ul id="map_conf_list">
 								</ul>
@@ -203,14 +203,28 @@
 							</div>				
 						</item>
 						<item>
-							<div class="row asset_list">
-								
-							</div>	
+							<div class="row asset_list"></div>	
 						</item>
 						<item>
-							<div class="row asset_list">
-								
-							</div>	
+							<div class="list">
+								<ul id="template_list">
+								</ul>
+								<div class="separator"></div>
+								<input type="button" value="添加系统模板" class="btn_add_big" id="btn_add_template"/>
+							</div>
+							<resize-horizontal></resize-horizontal>
+							<div class="content">
+								<div class="template_info">
+									<div class="row">模板名称:<input type="text" id="txt_template_name"/></div>
+									<div class="row">模板宽度:<input type="number" id="n_template_width"/></div>
+									<div class="row">模板高度:<input type="number" id="n_template_height"/></div>
+									<div class="row">背景图片:</div>
+									<div class="row"><input type="button" value="保存" class="btn_add_big" id="btn_save_template"/></div>
+								</div>
+								<div class="template_main">
+									<div class="template_assets"></div>
+								</div>
+							</div>
 						</item>
 					</tab-content>
 				</div>

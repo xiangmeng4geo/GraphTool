@@ -119,7 +119,7 @@ tab-content item resize-horizontal{
 	text-align: center;
 }
 
-#map_conf_list .default{
+.list .default{
 	color: #26c9ff;
 }
 #btn_add_map_conf,
@@ -274,3 +274,32 @@ input.txt_sys_size:focus{
 	font-size: 18px;
 }
 /*资源管理 }*/
+
+/*系统模板 {*/
+.template_info{
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	height: auto;
+	overflow: auto;
+	width: 200px;
+	text-align: center;
+}
+.template_main{
+	position: absolute;
+	left: 200px;
+	right: 0;
+	width: auto;
+	top: 0;
+	bottom: 0;
+	overflow: auto;
+}
+.template_assets{
+	width: 800px;
+	height: 800px;
+	background-color: white;
+	margin: 10px;
+	position: relative;
+}
+/*系统模板 }*/

@@ -64,4 +64,42 @@
 	width: 100%;
 	height: 100%;
 }
+.map_layer .handle{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 19;
+}
+.map_layer .text{
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	overflow: hidden;
+	z-index: 2;
+}
+.drag_handle{
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    margin-top: -4px;
+    margin-left: -5px;
+    background-color: yellow;
+    border: 1px solid #ccc;
+    -webkit-transform: rotate(45deg);
+    cursor: default;
+    z-index: 2;
+}
+.off .ui-rotatable-handle{
+	display: none;
+}
+.map_layer .ui-rotatable-handle{
+	background-color: #00b7ee;
+}
+.map_layer .ui-rotatable-handle:after{
+	background-color: #00b7ee;
+	border: none;
+	left: -4px;
+}
 /*工具添加的图层样式 }*/

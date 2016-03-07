@@ -78,6 +78,12 @@
 				filters: CONST_FILTER_IMAGE
 			}, callback);
 		},
+		imagesOpen: function(callback) {
+			this.open({
+				filters: CONST_FILTER_IMAGE,
+				properties: ['multiSelections']
+			}, callback);
+		},
 		save: function(options, callback) {
 			return dialog.showSaveDialog(win_instance, options, function(file_path) {
 				if (file_path) {

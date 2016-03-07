@@ -140,6 +140,9 @@ Core.init(function() {
         return $html;
     }
 
+    function _isSvg(ext) {
+        return ext == '.svg';
+    }
     //图片图层
     function ImageLayer(option) {
         option = $.extend(true, {
@@ -151,7 +154,9 @@ Core.init(function() {
         }, option);
         var pos = option.pos;
         var src = option.src;
-        if (!_isImage(path.extname(src))) {
+        var ext = path.extname(src);
+        var flag_is_svg = false;
+        if (!_isImage(ext) && !(flag_is_svg = _isSvg(ext))) {
             return;
         }
 
@@ -165,37 +170,46 @@ Core.init(function() {
         }
         // console.log(style, css, option);
         if (util_file.exists(src)) {
-            var image = nativeImage.createFromPath(src);
-            var size = image.getSize();
-            var width_img = size.width,
-                height_img = size.height;
             var width_opt = option.width,
                 height_opt = option.height;
-
-            var w = 400;
-            var h = 400;
-
+            var src_img;
             var width_to, height_to;
-            if (w / h > width_img / height_img) {
-                if (height_img > h) {
-                    height_to = h;
-                    width_to = w * width_img / height_img;
-                } else {
-                    width_to = width_img;
-                    height_to = height_img;
-                }
+            if (flag_is_svg) {
+                src_img = src
+                width_to = 160;
+                height_to = 160;
             } else {
-                if (width_img > w) {
-                    width_to = w;
-                    height_to = width_to * height_img / width_img;
+                var image = nativeImage.createFromPath(src);
+                src_img = image.toDataURL();
+                if (width_opt && height_opt) {
+                    width_to = width_opt;
+                    height_to = height_opt;
                 } else {
-                    width_to = width_img;
-                    height_to = height_img;
+                    var size = image.getSize();
+                    var width_img = size.width,
+                        height_img = size.height;
+
+                    var w = 400;
+                    var h = 400;
+
+                    if (w / h > width_img / height_img) {
+                        if (height_img > h) {
+                            height_to = h;
+                            width_to = w * width_img / height_img;
+                        } else {
+                            width_to = width_img;
+                            height_to = height_img;
+                        }
+                    } else {
+                        if (width_img > w) {
+                            width_to = w;
+                            height_to = width_to * height_img / width_img;
+                        } else {
+                            width_to = width_img;
+                            height_to = height_img;
+                        }
+                    }        
                 }
-            }
-            if (width_opt && height_opt) {
-                width_to = width_opt;
-                height_to = height_opt;
             }
 
             css.width = width_to;
@@ -217,7 +231,7 @@ Core.init(function() {
                 rotate: {}
             });
             $html.addClass('layer_img')
-                .append('<img src="' + image.toDataURL() + '" data-src="'+src+'" class="_img"/>')
+                .append('<img src="' + src_img + '" data-src="'+src+'" class="_img"/>')
                 .data('size', {
                     w: width_to,
                     h: height_to

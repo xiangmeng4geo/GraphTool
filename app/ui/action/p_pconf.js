@@ -22,6 +22,7 @@ Core.init(function(model) {
 	var legend = getSys.getLegend() || [];
 	var size = getSys.getSize() || [];
 	var assets_sys = getSys.getAssets() || [];
+	var template = getSys.getTemplate() || [];
 
 	var is_no_geo = geo.length == 0;
 	var is_no_legend = legend.length == 0;
@@ -38,7 +39,8 @@ Core.init(function(model) {
 
 	var s_data_geo = [],
 		s_data_legend = [],
-		s_data_size = [];
+		s_data_size = [],
+		s_data_template = [];
 	geo.forEach(function(v) {
 		s_data_geo.push({
 			text: v.name,
@@ -58,6 +60,12 @@ Core.init(function(model) {
 			val: i
 		});
 	});
+	template.forEach(function(v, i) {
+		s_data_template.push({
+			text: v.name+'('+v.width+'X'+v.height+')',
+			val: v.name
+		});
+	});
 
 	var product_name = _PARAM_;
 	$('.title_wrap span').text('【'+product_name+'】配置');
@@ -74,9 +82,17 @@ Core.init(function(model) {
 		text: '默认地图',
 		val: ''
 	});
+	s_data_template.unshift({
+		text: '默认模板',
+		val: ''
+	});
 	var s_map = UI.select($('#s_map'), {
 		data: s_data_geo,
 		val: conf_other.map
+	});
+	var s_template = UI.select($('#s_template'), {
+		data: s_data_template,
+		val: conf_other.template
 	});
 	var s_legend = UI.select($('#s_legend'), {
 		data: s_data_legend,
@@ -409,7 +425,8 @@ Core.init(function(model) {
 			legend: s_legend.val(),
 			legend_style: s_legend_style.val(),
 			is_legend_range: _getChecked($cb_is_show_range_legend),
-			size: s_size.val()
+			size: s_size.val(),
+			template: s_template.val()
 		};
 		conf.save = {
 			dir: file_dir_out.val(),

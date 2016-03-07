@@ -16,6 +16,7 @@ Core.init(function(model) {
     var util_file = util.file;
     var CONST = _require('const');
     var Geo = _require('geo');
+    var map_util = _require('m/map_util');
     var CONST_BOUND = CONST.BOUND;
     var place_arr = util_file.readJson(CONST.GEO.FILE);
 
@@ -35,13 +36,7 @@ Core.init(function(model) {
     }
     function _getProjection(leftup, rightdown) {
         _last_key_project = _getKeyOfProjection(leftup, rightdown);
-        var center = [leftup[0] + (rightdown[0] - leftup[0])/2, leftup[1] + (rightdown[1] - leftup[1])/2];
-        var p = d3.geo.mercator().center(center).translate([width_map/2, height_map/2]);
-        var p_a = p(leftup),
-            p_b = p(rightdown);
-        var scale_old = p.scale();
-        var scale = Math.min(width_map/(p_b[0] - p_a[0]) * scale_old, height_map/(p_b[1] - p_a[1]) * scale_old);
-        return p.scale(scale);
+        return map_util.getProjection(leftup, rightdown, width_map, height_map);
     }
     var geomap;
     var projection;

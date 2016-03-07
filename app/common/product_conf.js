@@ -92,6 +92,28 @@
 			}
 		}
 	}
+	_getSys.getTemplate = function(name) {
+		var conf = _getSys() || {};
+		var template = conf.template || [];
+		if (!name) {
+			// name 等于空字符串时加载默认系统模板
+			if (name === '') {
+				for (var i = 0, j = template.length; i<j; i++) {
+					if (template[i].is_default) {
+						return template[i];
+					}
+				}
+			}
+			return template;
+		} else {
+			name = name.trim();
+			for (var i = 0, j = template.length; i<j; i++) {
+				if (name == template[i].name) {
+					return template[i];
+				}
+			}
+		}
+	}
 	var SIZE_DEFAULT = {
 		name: CONST_SIZE.NAME,
 		width: CONST_SIZE.WIDTH,
