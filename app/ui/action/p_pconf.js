@@ -249,16 +249,17 @@ Core.init(function(model) {
 				var file_rule = val.file_rule;
 				if (file_rule) {
 					var is_common = file_rule.is_common;
-					var val_file_rule = file_rule.val;
-					if (is_common) {
-						$text_file_rule_common_prefix.val(val_file_rule.prefix);
-						select_file_rule_common_date.selected(val_file_rule.date_format);
-						$text_file_rule_common_postfix.val(val_file_rule.postfix);
-						select_file_rule_common_postfix.selected(val_file_rule.file_suffix);
-					} else {
-						_setChecked($radio_file_rule_custom, true);
-						$text_file_rule_custom.val(val_file_rule);
-					}
+					var val_file_rule_common = file_rule.val_common || {};
+					var val_file_rule_custom = file_rule.val_custom || '';
+
+					$text_file_rule_common_prefix.val(val_file_rule_common.prefix);
+					select_file_rule_common_date.selected(val_file_rule_common.date_format);
+					$text_file_rule_common_postfix.val(val_file_rule_common.postfix);
+					select_file_rule_common_postfix.selected(val_file_rule_common.file_suffix);
+
+					_setChecked($radio_file_rule_common, is_common);
+					_setChecked($radio_file_rule_custom, !is_common);
+					$text_file_rule_custom.val(val_file_rule_custom);
 				}
 
 				select_file_type.selected(val.file_type);
@@ -302,22 +303,21 @@ Core.init(function(model) {
 						end: date_end
 					}
 				}
-				var file_rule_data;
 				var is_common = _getChecked($radio_file_rule_common);
-				if (is_common) {
-					file_rule_data = {
-						prefix: $text_file_rule_common_prefix.val() || '',
-						date_format: select_file_rule_common_date.val(),
-						postfix: $text_file_rule_common_postfix.val() || '',
-						file_suffix: select_file_rule_common_postfix.val()||''
-					}
-				} else {
-					file_rule_data = $text_file_rule_custom.val();
-					if (!file_rule_data) {
+				if (!is_common) {
+					var file_rule_data_custom = $text_file_rule_custom.val();
+					if (!file_rule_data_custom) {
 						_alert('请输入自定义规则！');
 						return;
 					}
 				}
+				var file_rule_data_common = {
+					prefix: $text_file_rule_common_prefix.val() || '',
+					date_format: select_file_rule_common_date.val(),
+					postfix: $text_file_rule_common_postfix.val() || '',
+					file_suffix: select_file_rule_common_postfix.val()||''
+				}
+				
 				var val_arithmetic = $num_value_arithmetic.val();
 				if (isNaN(val_arithmetic)) {
 					_alert('请确保数学运算值为数字！');
@@ -332,7 +332,8 @@ Core.init(function(model) {
 					dir_in: dir_in,
 					file_rule: {
 						is_common: is_common,
-						val: file_rule_data
+						val_common: file_rule_data_common,
+						val_custom: file_rule_data_custom
 					},
 					file_type: select_file_type.val(),
 					file_hour: select_file_hour.val(),

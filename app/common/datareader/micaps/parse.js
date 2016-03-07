@@ -42,11 +42,12 @@
 
 			var file_rule = data_conf.file_rule;
 			var is_common = file_rule.is_common;
-			var val_file_rule = file_rule.val;
+			
 			if (is_common) {
+				var val_file_rule = file_rule.val_common || {};
 				param.push(val_file_rule.prefix + val_file_rule.date_format + val_file_rule.postfix + '.' + val_file_rule.file_suffix);
 			} else {
-				param.push(val_file_rule);
+				param.push(file_rule.val_custom);
 			}
 			var file = data_conf.file;
 			var is_newest = file.is_newest;
