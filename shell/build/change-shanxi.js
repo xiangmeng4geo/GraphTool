@@ -22,6 +22,7 @@ var const_file_common_x64 = path.join(dir_x64, 'resources/app/common/const.js');
 
 var content = fs.readFileSync(const_file_common_ia32).toString();
 content = content.replace(/\.COMMAND=([^,;]+)/, '.COMMAND=1');
+content = content.replace(/DEBUG:([^,;]+),/, '');
 
 fs.writeFileSync(const_file_common_ia32, content);
 fs.writeFileSync(const_file_common_x64, content);
