@@ -57,10 +57,10 @@ Core.init(function() {
             var texts = conf.texts || [];
             var imgs = conf.imgs || [];
 
-            if (!map_name) {
+            var conf_geo = getSys.getGeo(map_name);
+            if (!conf_geo) {
                 return _error('请先配置地图!');
             }
-            var conf_geo = getSys.getGeo(map_name);
             var geo_files = conf_geo.maps;
             if (!geo_files || geo_files.length == 0) {
                 return _error('地理信息文件不可为空！');
@@ -70,21 +70,22 @@ Core.init(function() {
             if (!bound || !bound.wn || !bound.es) {
                 return _error('请先地图边界！');
             }
-            if (!legend_name) {
-                return _error('请先配置图例！');
-            }
+            
             var conf_legend = getSys.getLegend(legend_name);
 
             var blendentJson = conf_legend.blendent;
-
-            if (!blendentJson || blendentJson.length == 0) {
-                return _error('图例配置错误!');
-            }
-            for (var i = 0, j = blendentJson.length; i<j; i++) {
-                var item = blendentJson[i];
-                var colors = item.colors;
-                if (!colors || colors.length == 0) {
-                    return _error('请先配置图例里的值域!');
+            if (blendentJson) {
+                var len_blendent = blendentJson.length;
+                if (len_blendent == 0) {
+                    return _error('图例配置错误!');
+                } else {
+                    for (var i = 0; i<len_blendent; i++) {
+                        var item = blendentJson[i];
+                        var colors = item.colors;
+                        if (!colors || colors.length == 0) {
+                            return _error('请先配置图例里的值域!');
+                        }
+                    }
                 }
             }
             var showLegendRange = conf.showLegendRange;
