@@ -7,7 +7,6 @@ Core.init(function(model) {
     var util_file = util.file;
     var util_variate = util.variate;
     var electron = require('electron');
-    var nativeImage = electron.nativeImage;
     var remote = electron.remote;
     var Menu = remote.Menu;
     var MenuItem = remote.MenuItem;
@@ -24,6 +23,7 @@ Core.init(function(model) {
     var CONST_PATH_OUTPUT = CONST_PATH.OUTPUT;
     var product_conf = _require('product_conf');
     var _alert = dialog.alert;
+    var Layer = _require('m/layer');
 
     var ASSET_TYPE_PRODUCT = 1,
         ASSET_TYPE_SYS = 2;
@@ -31,11 +31,6 @@ Core.init(function(model) {
     // 定义图片过滤器
     var CONST_FILTER_IMAGE = CONST.FILTER_IMAGE;
     var _isImage = component.util.isImg;
-    // function _isImage(file_path) {
-    //     return /\.(png|jpg)$/i.test(file_path);
-    // }
-    // 引入jquery-ui模块
-    _require('j.ui');
 
     // 初始化工具栏
     {
@@ -58,6 +53,14 @@ Core.init(function(model) {
         $('.toolbar').append(html);
     }
 
+    var TextLayer = function(option) {
+        var $html = Layer.text(option);
+        $geomap_container.append($html);
+    }
+    var ImageLayer = function(option) {
+        var $html = Layer.img(option);
+        $geomap_container.append($html);
+    }
     var _current_product_name;
     model.on('product.change', function(name) {
         _current_product_name = name;
@@ -85,20 +88,8 @@ Core.init(function(model) {
         });
     });
 
-    // 清除所有选项的编辑状态
-    function _unedit() {
-        $('.map_layer').addClass('off').trigger('edit', false);
-    }
+    var $geomap_container = $('#geomap_container').on('_mousedown', Layer.util.reset);
 
-    var $geomap_container = $('#geomap_container').on('_mousedown', _unedit);
-
-    // 添加删除功能
-    $(document).on('keydown', function(e) {
-        var keyCode = e.keyCode;
-        if (keyCode == 46 || keyCode == 8) {
-            $('.map_layer:not(.off)').remove();
-        }
-    });
     model.on('asset.add', function(assets) {
         if (!assets) {
             return;
@@ -211,251 +202,6 @@ Core.init(function(model) {
             menu.popup(WIN);
         }
     })();
-    // 添加编辑模块
-    // 创建图层
-    function _createLayer(option) {
-        _unedit();
-        option = $.extend(true, {
-            edit: false
-        }, option);
-        var css = option.css;
-        var $html = $('<div class="map_layer"></div>');
-        if (!option.edit) {
-            $html.addClass('off');
-        }
-        if (css) {
-            if ($.isPlainObject(css)) {
-                $html.css(css);
-            } else {
-                $html.attr('style', css);
-            }
-        }
-
-        var rotate_option = option.rotate;
-        if (rotate_option) {
-            $html.rotatable(rotate_option).find('.ui-rotatable-handle').on('dblclick', function() {
-                $html.data('angele', 0).css('transform', 'rotate(0deg)');
-            });
-        }
-
-        var resizable_option = option.resize,
-            draggable_option = option.drag;
-        $html.css('position', 'absolute')
-            .resizable($.extend({
-                handles: 'all'
-            }, resizable_option))
-            .draggable(draggable_option)
-            .on('mousedown', function(e) {
-                e.stopPropagation();
-                _unedit(); //清除其它的编辑样式
-                $(this).removeClass('off').trigger('edit', true);
-            }).on('contextmenu', function(e) {
-                e.stopPropagation();
-                if (_current_product_name) {
-                    _showMenuAssets($html);
-                }
-            });
-        $html.appendTo($geomap_container);
-        return $html;
-    }
-
-    // 文字图层
-    function TextLayer(option) {
-        function _change() {
-            var css = {};
-            var pos = $html.position();
-            var left = pos.left,
-                top = pos.top;
-            var $p = $html.parent();
-            var w = $p.width();
-            var h = $p.height();
-            var _w = edit._w,
-                _h = edit._h;
-            var height_layer = $html.height();
-            if (w > 0 && h > 0) {
-                var css = {};
-                if (left + _w > w) {
-                    css.left = 'auto';
-                    css.right = 0;
-                } else {
-                    css.left = 0;
-                    css.right = 'auto'
-                }
-
-                if (top + height_layer + _h > h) {
-                    css.top = 'auto';
-                    css.bottom = '100%';
-                } else {
-                    css.top = '100%';
-                    css.bottom = 'auto';
-                }
-                edit.setPos(css);
-            }
-            edit.setStyle($html.attr('style'));
-        }
-        option = $.extend(true, {
-            pos: {
-                left: $geomap_container.width() / 2,
-                top: $geomap_container.height() / 2
-            },
-            resize: {
-                resize: _change
-            },
-            drag: {
-                // handle: 'span.btn_handle',
-                drag: _change
-            }
-        }, option);
-        var $html = _createLayer(option);
-
-        var text = option.text || '';
-        $html.on('edit', function(e, flag) {
-            if (flag) {
-                edit.show();
-            } else {
-                edit.hide();
-            }
-        }).css(option.pos)
-            .addClass('layer_text')
-            .append('<span class="btn_handle">' + text + '</span>');
-
-        var $span = $html.find('.btn_handle');
-        var edit = UI.edit($html, {
-            style: option.style || '',
-    		onchange: function() {
-                if (edit) {
-                    $span.text(edit.getText());
-                    var style = style2obj(edit.getStyle());
-                    $span.css(style);
-                    $html.css(edit.getSize());
-                }
-    		}
-    	});
-        edit.setText(text);
-        _change();
-        if (option.edit) {
-            edit.show();
-        }
-        return $html;
-    }
-
-    //图片图层
-    function ImageLayer(option) {
-        option = $.extend(true, {
-            pos: {
-                left: $geomap_container.width()/2,
-                top: $geomap_container.height()/2,
-                center: 1
-            }
-        }, option);
-        var pos = option.pos;
-        var src = option.src;
-        if (!_isImage(path.extname(src))) {
-            return;
-        }
-
-        var css = {
-            left: pos.left,
-            top: pos.top
-        };
-        var style = option.style;
-        if (style) {
-            css = $.extend(true, style, css);
-        }
-        // console.log(style, css, option);
-        if (util_file.exists(src)) {
-            var image = nativeImage.createFromPath(src);
-            var size = image.getSize();
-            var width_img = size.width,
-                height_img = size.height;
-            var width_opt = option.width,
-                height_opt = option.height;
-
-            var w = $geomap_container.width() * 0.6;
-            var h = $geomap_container.height() * 0.6;
-
-            var width_to, height_to;
-            if (w / h > width_img / height_img) {
-                if (height_img > h) {
-                    height_to = h;
-                    width_to = w * width_img / height_img;
-                } else {
-                    width_to = width_img;
-                    height_to = height_img;
-                }
-            } else {
-                if (width_img > w) {
-                    width_to = w;
-                    height_to = width_to * height_img / width_img;
-                } else {
-                    width_to = width_img;
-                    height_to = height_img;
-                }
-            }
-            if (width_opt && height_opt) {
-                width_to = width_opt;
-                height_to = height_opt;
-            }
-
-            css.width = width_to;
-            css.height = height_to;
-            if (pos.center) {
-                var left = pos.left,
-                    top = pos.top;
-
-                if (!isNaN(left)) {
-                    css.left -= width_to / 2;
-                }
-                if (!isNaN(top)) {
-                    css.top -= height_to / 2;
-                }
-            }
-
-            var $html = _createLayer({
-                css: css,
-                rotate: {}
-            });
-            $html.addClass('layer_img')
-                .append('<img src="' + image.toDataURL() + '" data-src="'+src+'" class="_img"/>')
-                .data('size', {
-                    w: width_to,
-                    h: height_to
-                }).on('dblclick', function() {
-                    var $this = $(this);
-                    var size = $this.data('size');
-                    if (size) {
-                        var w = size.w,
-                            h = size.h;
-
-                        var w_now = $this.width(),
-                            h_now = $this.height();
-
-                        var w_to, h_to;
-                        if (w_now > h_now) {
-                            w_to = w_now;
-                            h_to = w_to * h / w;
-                        } else {
-                            h_to = h_now;
-                            w_to = h_to * w / h;
-                        }
-                        $this.css({
-                            width: w_to,
-                            height: h_to
-                        });
-                    }
-                });
-
-            return $html;
-        }
-    }
-
-    // function LableRectLayer() {
-    //
-    // }
-    //
-    // function EllipseLayer() {
-    //
-    // }
 
     $('.toolbar_btn').click(function(e) {
         var $this = $(this);
@@ -501,17 +247,6 @@ Core.init(function(model) {
                 });
             }
         });
-     //    dialog.open({
-     //        filters: CONST_FILTER_IMAGE
-    	// }, function(file_paths) {
-     //        if (file_paths && file_paths.length > 0) {
-     //            file_paths.forEach(function(file_path) {
-     //                ImageLayer({
-     //                    src: file_path
-     //                });
-     //            });
-     //        }
-     //    })
     }
 
     var $c_right = $('#c_right');
