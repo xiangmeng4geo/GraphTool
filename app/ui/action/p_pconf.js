@@ -19,6 +19,9 @@ Core.init(function(model) {
 	var UI_file = UI.file;
 	var getSys = product_conf.getSys;
 
+	var TYPE_PLACEHOLDER = 1,
+		TYPE_NORMAL = 2;
+
 	var geo = getSys.getGeo() || [];
 	var legend = getSys.getLegend() || [];
 	var size = getSys.getSize() || [];
@@ -470,6 +473,16 @@ Core.init(function(model) {
     	});
 	}).delegate('.asset_imgs img', 'click', function() {
 		var $this = $(this);
+		var key = $this.parent().data('key');
+		if (key) {
+			var val_cache = cacheSysAssets[key];
+			if (val_cache) {
+				if (val_cache.type == TYPE_NORMAL) {
+					_alert('不可修改！');
+					return;
+				}
+			}
+		}
 		dialog.imageOpen(function(file_path) {
             $this.attr('src', file_path);
         });

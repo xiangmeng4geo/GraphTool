@@ -10,6 +10,8 @@
 	var CONST_PATH_CONFIG = CONST.PATH.CONFIG;
 	var CONST_SIZE = CONST.SIZE;
 	var CONST_EXT = '.json';
+	var TYPE_PLACEHOLDER = 1,
+		TYPE_NORMAL = 2;
 
 	function _getPathByName(name){
 		return util_path.join(CONST_PATH_CONFIG, name)+CONST_EXT;
@@ -256,6 +258,36 @@
 	function _saveTree(json) {
 		return _saveConfig(CONST_SYS_PRODUCT_TREE_NAME, json);
 	}
+	function _getSize(conf) {
+		var _width = conf.width,
+			_height = conf.height;
+		var toSize  = {
+            width: CONST_SIZE.WIDTH,
+            height: CONST_SIZE.HEIGHT
+        };
+		if (_width && _height) {
+            toSize = {
+                width: _width,
+                height: _height
+            };
+        } else {
+        	if (conf) {
+        		var template_conf = conf.other && conf.other.template;
+        		var template = _getSys.getTemplate(template_conf || '');
+        		if (template) {
+        			var _width = template.width,
+        				_height = template.height;
+        			if (_width && _height) {
+        				toSize = {
+			                width: _width,
+			                height: _height
+			            };
+        			}
+        		}
+        	}
+        }
+        return toSize;
+	}
 	var config = {
 		read: _readConfig,
 		save: _saveConfig,
@@ -269,7 +301,8 @@
 			assets: _assets,
 			asset: {
 				modify: _modifyAssets
-			}
+			},
+			getSize: _getSize
 		}
 	};
 

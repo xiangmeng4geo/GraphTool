@@ -25,8 +25,8 @@ Core.init(function(model) {
     var _alert = dialog.alert;
     var Layer = _require('m/layer');
 
-    var ASSET_TYPE_PRODUCT = 1,
-        ASSET_TYPE_SYS = 2;
+    var TYPE_PLACEHOLDER = 1,
+        TYPE_NORMAL = 2;
 
     // 定义图片过滤器
     var CONST_FILTER_IMAGE = CONST.FILTER_IMAGE;
@@ -131,6 +131,7 @@ Core.init(function(model) {
             } else {
                 $html = ImageLayer({
                     lock: isLock,
+                    lockchange: item.type == TYPE_NORMAL,
                     src: item.src,
                     pos: pos,
                     width: styleObj.width,
@@ -138,9 +139,13 @@ Core.init(function(model) {
                     style: styleObj,
                     onlockchange: (function(item) {
                         return function(src) {
-                            product_conf.util.asset.modify(_current_product_name, item.key, {
-                                src: src
-                            });
+                            if (item.type == TYPE_NORMAL) {
+                                _alert('不可修改！');
+                            } else {
+                                product_conf.util.asset.modify(_current_product_name, item.key, {
+                                    src: src
+                                });
+                            }
                         }
                     })(item)
                 });

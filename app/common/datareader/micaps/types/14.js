@@ -696,6 +696,8 @@
                 }
             });
         });
+        // console.log(JSON.stringify(include_relation));
+        // include_relation = {"0":[1,2,3]}
         var _cache_area = {};
         for(var i in include_relation){
             var line_indexs = include_relation[i];
@@ -821,6 +823,37 @@
             area.code = to_code || CODE_RAIN;
         });
     }
+    function _getBound(items) {
+        var first = items[0];
+        var x_min = first.x,
+            y_min = first.y;
+        var x_max = x_min,
+            y_max = y_min;
+
+        for (var i = 1, j = items.length; i<j; i++) {
+            var val = items[i];
+            var x = val.x,
+                y = val.y;
+            if (x > x_max) {
+                x_max = x;
+            }
+            if (x < x_min) {
+                x_min = x;
+            }
+            if (y > y_max) {
+                y_max = y;
+            }
+            if (y < y_min) {
+                y_min = y;
+            }
+        }
+        return {
+            x_min: x_min, 
+            y_min: y_min,
+            x_max: x_max,
+            y_max: y_max
+        }
+    }
     /*得到一个面和其它面的公共边*/
     function _getLines(area) {
         var lines = [];
@@ -865,12 +898,28 @@
                 return point.x <= x_first;
             }
         } else {
-            var k = (y_end - y_first)/(x_end - x_first);
-                b = (x_first*y_end - x_end*y_first)/(x_first - x_end);
-            var _isSnow = function(point) {
-                var v = k * point.x + b;
-                var y = point.y;
-                return k >= 0? (y >= v? true: false): (y <= v? true: false);
+            /*这里暂时这样处理，后续*/
+            if (line.length/items.length < 0.5) {
+                var bound_line = _getBound(line);
+                var x_min = bound_line.x_min,
+                    x_max = bound_line.x_max,
+                    y_min = bound_line.y_min,
+                    y_max = bound_line.y_max;
+
+                var _isSnow = function(point) {
+                    var x = point.x,
+                        y = point.y;
+                    return y >= y_max;
+                    
+                }    
+            } else {
+                var k = (y_end - y_first)/(x_end - x_first);
+                    b = (x_first*y_end - x_end*y_first)/(x_first - x_end);
+                var _isSnow = function(point) {
+                    var v = k * point.x + b;
+                    var y = point.y;
+                    return k >= 0? (y >= v? true: false): (y <= v? true: false);
+                }
             }
         }
         function _isInLine(point) {
@@ -897,8 +946,10 @@
                     }
                 }
             }
+            // console.log(n_snow, n_t, n_snow/n_t);
             return n_snow/n_t > 0.5;
         }
+
 
         return _guessIsSnow()? CODE_SNOW: CODE_RAIN;
     }
@@ -911,25 +962,50 @@
         if (len > 0) {
             for (var i = 0; i<len; i++) {
                 var code = _guessCodeByLine(area, lines[i]);
-                // console.log('code = ', code);
                 if (code) {
                     if (_cache[code]) {
-                        _cache[code]++;
+                        _cache[code].n++;
                     } else {
-                        _cache[code] = 1;
+                        _cache[code] = {
+                            n: 1
+                        };
                     }
+                    _cache[code].line_index = i;
                 }
             }
             for (var i in _cache) {
                 code_list.push({
                     code: i,
-                    n: _cache[i]
+                    n: _cache[i].n,
+                    index: _cache[i].line_index
                 });
             }
             code_list.sort(function(a, b) {
                 return b.n - a.n;
             });
-            return code_list[0].code;
+            var len = code_list.length;
+            function _getCode(index) {
+                var next_index = index + 1;
+                if (next_index < len) {
+                    var one = code_list[index],
+                        two = code_list[next_index];
+                    if (lines[one.index].length > lines[two.index].length) {
+                        return code_list[index];
+                    } else {
+                        return _getCode(next_index);
+                    }
+                } else {
+                    return code_list[index];
+                }
+            }
+            // console.log(code_list);
+            var item;
+            if (len == 1) {
+                item = code_list[0];
+            } else {
+                item = _getCode(0);
+            }
+            return item.code;
         }
     }
     exports.parse = _parse_file;

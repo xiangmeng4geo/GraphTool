@@ -169,6 +169,7 @@ Core.init(function() {
             }
         }, option);
         var isLock = !!option.lock;
+        var isLockChange = !!option.lockchange;
         var pos = option.pos;
         var src = option.src;
         var ext = path.extname(src);
@@ -255,10 +256,14 @@ Core.init(function() {
                 }).on('dblclick', function() {
                     var $this = $(this);
                     if (isLock) {
-                        dialog.imageOpen(function(file_path) {
-                            $html.find('._img').attr('src', file_path);
-                            option.onlockchange && option.onlockchange(file_path);
-                        });
+                        if (isLockChange) {
+                            option.onlockchange && option.onlockchange();
+                        } else {
+                            dialog.imageOpen(function(file_path) {
+                                $html.find('._img').attr('src', file_path);
+                                option.onlockchange && option.onlockchange(file_path);
+                            });
+                        }
                     }
                     var size = $this.data('size');
                     if (size) {

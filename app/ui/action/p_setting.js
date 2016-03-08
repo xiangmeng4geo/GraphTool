@@ -505,10 +505,6 @@ Core.init(function(model) {
 	});
 	// 图例相关
 	require('./p_setting_blendent');
-	// 尺寸模板相关
-	require('./p_setting_size');
-	// 资源管理相关
-	require('./p_setting_assets');
 	// 系统模板相关
 	require('./p_setting_template');
 })

@@ -10,6 +10,7 @@ Core.init(function() {
     var util_file = util.file;
     var util_path = util.path;
     var product_conf = _require('product_conf');
+    var product_conf_util = product_conf.util;
     var getSys = product_conf.getSys;
     var style2obj = _require('component').util.style2obj;
 
@@ -89,24 +90,13 @@ Core.init(function() {
                 }
             }
             var showLegendRange = conf.showLegendRange;
-            var size = conf.size || '';
-            var toSize = {
-                width: CONST_SIZE.WIDTH,
-                height: CONST_SIZE.HEIGHT
-            };
-            var _width = conf.width,
-                _height = conf.height;
-            if (_width && _height) {
-                toSize = {
-                    width: _width,
-                    height: _height
-                };
-            } else {
-                toSize = getSys.getSize(size) || toSize;
-            }
+            var toSize = product_conf_util.getSize(conf);
             model.emit('map.changesize', toSize);
             model.emit('projection.changeview', bound.wn, bound.es);
             
+            function _renderAssets() {
+                model.emit('asset.add', assets);
+            }
             model.emit('geo', conf_geo, function(names_show) {
                 if (util.isPlainObject(data)) {
                     data.bound = bound;
@@ -115,6 +105,7 @@ Core.init(function() {
                     // console.log(dataJson);
                     if (err) {
                         _afterChangeConf(err, s_time);
+                        _renderAssets();
                         return model.emit('log.user.error', err);
                     }
                     if (assets) {
@@ -151,7 +142,7 @@ Core.init(function() {
                             }
                             assets[i] = item;
                         }
-                        model.emit('asset.add', assets);
+                        _renderAssets();
                     }
                     if (showLegendRange) {
                         var data_filter_legend = [];
