@@ -205,6 +205,8 @@
 							for (var i_ta = 0; i_ta<len; i_ta++) {
 								var item = assets_template[i_ta];
 								if (key == item.id) {
+									item.src_t = item.src;
+									item.text_t = item.text;
 									assets_new.push(util.extend(true, item, asset));
 									cache[key] = true;
 									break;

@@ -165,7 +165,7 @@ Core.init(function(model) {
                 });
             }
             if ($html) {
-                $html.data('asset', true)
+                $html.data('asset', item)
             }
         }
     });
@@ -433,17 +433,33 @@ Core.init(function(model) {
             var shapes = [];
             $('.map_layer').each(function() {
                 var $this = $(this);
+                var info = $this.data('asset');
+                // 当资源是占位资源且没有添加值（修改文字或图片地址）不处理
+                if (info) {
+                    var isPlaceholder = info.type == TYPE_PLACEHOLDER;
+                    var text_t = info.text_t;
+                    var src_t = info.src_t;
+                }
+                
                 var pos = $this.position();
                 if ($this.is('.layer_text')) {
                     var $item = $this.find('.btn_handle');
-                    shapes.push(new Shape.Text($item.text(), $.extend(style2obj($item.attr('style')), {
+                    var text = $item.text().trim();
+                    if (isPlaceholder && text && text == text_t) {
+                        return;
+                    }
+                    shapes.push(new Shape.Text(text, $.extend(style2obj($item.attr('style')), {
                         x: pos.left,
                         y: pos.top,
                         width: $this.width(),
                         height: $this.height()
                     })));
                 } else if($this.is('.layer_img')) {
-                    shapes.push(new Shape.Image($this.find('._img').attr('src'), {
+                    var src = $this.find('._img').attr('src');
+                    if (isPlaceholder && src && src == src_t) {
+                        return;
+                    }
+                    shapes.push(new Shape.Image(src, {
                         width: $this.width(),
                         height: $this.height(),
                         x: pos.left,

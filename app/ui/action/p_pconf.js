@@ -415,7 +415,11 @@ Core.init(function(model) {
 			if ($span.length > 0) {
 				d.text = $span.val();
 			} else {
-				d.src = $this.find('img').attr('src');
+				var $img = $this.find('img');
+				var src = $img.attr('src');
+				if (src != $img.data('src')) {
+					d.src = src;
+				}
 			}
 
 			if (key) {
@@ -528,7 +532,7 @@ Core.init(function(model) {
 			var style = v.style;
 			if (!text) {
 				html_img += '<li data-index="'+index_normal_asset+'" data-style="'+style+'" data-key="'+key+'" '+(isSysAssets?'class="sys_asset"':'')+'>'+
-								'<img src="'+v.src+'"/>'+
+								'<img src="'+v.src+'" '+(v.type == TYPE_PLACEHOLDER?'data-src="'+v.src+'"':'')+'/>'+
 								'<div class="checkbox"><input type="checkbox" '+(isSysAssets || v.flag?'checked':'')+'/><label></label></div>'+
 								'<span class="btn_dele_asset"></span>'+
 							'</li>';
