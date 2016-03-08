@@ -293,8 +293,9 @@
 				}
 
 				var polygon = new BMap.Polygon(point_arr, {strokeColor: color, fillColor: color,fillOpacity: 1, strokeWeight: 1, strokeOpacity:1});
+				polygon.i = i;
 				polygon.addEventListener("click",function(){
-					console.log(i); 
+					console.log('index = '+polygon.i); 
 				});
 				map.addOverlay(polygon);   //增加面
 

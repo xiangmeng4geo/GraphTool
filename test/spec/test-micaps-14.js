@@ -45,6 +45,14 @@ describe('micaps 14', function(){
         })
     }
     _test({
+        desc: '',
+        file: 'rr011208.024',
+        n_area: 12,
+        n_26: 3,
+        n_23: 5,
+        n_24: 4
+    });
+    _test({
         desc: '分割线得到不同等级雨夹雪面',
         file: 'rr021908.072',
         n_area: 24,
