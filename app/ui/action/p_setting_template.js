@@ -38,7 +38,7 @@ Core.init(function(model) {
 	function _text(type) {
 		TextLayer({
 			edit: true,
-            text: '文字点位符',
+            text: '占位文字',
             pos: pos_contextmenu
         }, {
         	type: type
@@ -65,7 +65,7 @@ Core.init(function(model) {
         });
 	}
 	var tmplMenu = [{
-		label: '添加文字占位符',
+		label: '添加占位文字',
 		click: function() {
 			_text(TYPE_PLACEHOLDER);
 		}
@@ -77,7 +77,7 @@ Core.init(function(model) {
 	}, {
 		type: 'separator'
 	},{
-		label: '添加图片占位符',
+		label: '添加占位图片',
 		click: function() {
 			ImageLayer({
                 src: path.join(CONST.PATH.UI, 'img/placeholder.svg'),

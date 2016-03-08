@@ -91,7 +91,7 @@ Core.init(function(model) {
     C.on('sys.change', function() {
         _productNameCurrent = null;
     });
-    C.on('conf.change', function(name) {
+    C.on('conf.change', function() {
         _productNameCurrent = null;
     });
 

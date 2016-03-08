@@ -538,7 +538,7 @@ Core.init(function(model) {
 									'<div class="checkbox"><input type="checkbox" '+(isSysAssets || v.flag?'checked':'')+'/><label></label></div><br/>'+
 									'<span class="btn_dele_asset"></span>'+
 								'</div>'+
-								'<textarea>'+text+'</textarea>'+
+								'<textarea '+(v.type == TYPE_NORMAL?'disabled':'')+'>'+text+'</textarea>'+
 							'</li>';
 			}
 		});

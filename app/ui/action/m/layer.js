@@ -114,14 +114,15 @@ Core.init(function() {
             drag: {
                 // handle: 'span.btn_handle',
                 drag: _change
-            }
+            },
+            canEdit: true
         }, option);
         var isLock = option.lock;
         var $html = _createLayer(option);
 
         var text = option.text || '';
         $html.on('edit', function(e, flag) {
-            if (flag) {
+            if (flag && option.canEdit) {
                 edit.show();
             } else {
                 edit.hide();
@@ -132,11 +133,11 @@ Core.init(function() {
 
         if (isLock) {
             $html.addClass('lock');
-        }    
+        } 
         var $span = $html.find('.btn_handle');
         var edit = UI.edit($html, {
             style: option.style || '',
-    		onchange: function() {
+            onchange: function() {
                 if (edit) {
                     var text = edit.getText();
                     $span.text(text);
@@ -146,8 +147,8 @@ Core.init(function() {
 
                     option.onlockchange && option.onlockchange(text);
                 }
-    		}
-    	});
+            }
+        });
         edit.setText(text);
         _change();
         if (option.edit) {

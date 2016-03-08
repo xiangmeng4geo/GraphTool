@@ -126,6 +126,7 @@ Core.init(function(model) {
                 // styleObj.text = text;
                 $html = TextLayer({
                     lock: isLock,
+                    canEdit: item.type == TYPE_PLACEHOLDER,
                     text: text,
                     pos: pos,
                     css: {
