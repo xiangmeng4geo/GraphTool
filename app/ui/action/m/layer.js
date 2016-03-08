@@ -84,7 +84,7 @@ Core.init(function() {
             var height_layer = $html.height();
             if (w > 0 && h > 0) {
                 var css = {};
-                if (left + _w > w) {
+                if (left + _w > w && _w > $html.width() || left < 0) {
                     css.left = 'auto';
                     css.right = 0;
                 } else {

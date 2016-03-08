@@ -417,6 +417,8 @@
 			_h: $editText.outerHeight(),
 			show: function() {
 				$editText.show();
+				this._w = $editText.outerWidth();
+				this._h = $editText.outerHeight();
 			},
 			hide: function() {
 				$editText.hide();
