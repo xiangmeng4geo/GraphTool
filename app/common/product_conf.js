@@ -231,7 +231,7 @@
 
 		return assets;
 	}
-	function _modifyAssets(name, key, asset_new) {
+	function _modifyAsset(name, key, asset_new) {
 		var conf = _readConfig(name);
 		if (conf) {
 			var assets = conf.assets;
@@ -246,6 +246,16 @@
 					}
 				}
 			}
+		}
+		return false;
+	}
+	function _addAsset(name, asset_new) {
+		var conf = _readConfig(name);
+		if (conf) {
+			var assets = conf.assets;
+			assets.push(asset_new);
+			_saveConfig(name, conf);
+			return true;
 		}
 		return false;
 	}
@@ -300,7 +310,8 @@
 		util: {
 			assets: _assets,
 			asset: {
-				modify: _modifyAssets
+				add: _addAsset,
+				modify: _modifyAsset
 			},
 			getSize: _getSize
 		}

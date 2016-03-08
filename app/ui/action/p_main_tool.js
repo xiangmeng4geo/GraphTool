@@ -53,13 +53,26 @@ Core.init(function(model) {
         $('.toolbar').append(html);
     }
 
+    function bind($html, option) {
+        if ($html) {
+            $html.data('canAdd', !option.lock);
+            $html.on('contextmenu', function(e) {
+                e.stopPropagation();
+                _showMenuAssets($html);
+            });
+        }
+    }
     var TextLayer = function(option) {
         var $html = Layer.text(option);
         $geomap_container.append($html);
+        bind($html, option);
+        return $html;
     }
     var ImageLayer = function(option) {
         var $html = Layer.img(option);
         $geomap_container.append($html);
+        bind($html, option);
+        return $html;
     }
     var _current_product_name;
     model.on('product.change', function(name) {
@@ -151,14 +164,14 @@ Core.init(function(model) {
                 });
             }
             if ($html) {
-                $html.data('asset'+(item.id? ASSET_TYPE_SYS: ASSET_TYPE_PRODUCT), true);
+                $html.data('asset', true)
             }
         }
     });
     var _showMenuAssets = (function() {
-        function _add(type) {
+        function _add() {
             if ($layer && _current_product_name) {
-                if ($layer.data('asset'+type)) {
+                if ($layer.data('asset')) {
                     return _alert('已经添加，不用重复添加！');
                 }
                 var data;
@@ -184,26 +197,13 @@ Core.init(function(model) {
                 }
                 if (data) {
                     data.flag = true;
-                    $layer.data('asset'+type, true);
-                    var conf = product_conf.read(_current_product_name);
-                    if (ASSET_TYPE_PRODUCT == type) {
-                        (conf.assets || (conf.assets = [])).push(data);
-                        product_conf.save(_current_product_name, conf);
+                    $layer.data('asset', true);
 
+                    var flag = product_conf.util.asset.add(_current_product_name, data);
+                    if (flag) {
                         _alert('已经保存到“'+_current_product_name+'”的附属资源中！');
-                    } else if (ASSET_TYPE_SYS == type) {
-                        var conf_sys = product_conf.getSys();
-                        var key = new Date().getTime();
-                        data.id = key;
-                        (conf_sys.assets || (conf_sys.assets = [])).push(data);
-                        product_conf.setSys(conf_sys);
-
-                        (conf.assets || (conf.assets = [])).unshift({
-                            flag: true, 
-                            key: key
-                        });
-                        product_conf.save(_current_product_name, conf);
-                        _alert('已经保存到系统资源！');
+                    } else {
+                        _alert('操作失败，请联系管理员！');
                     }
                 }
             }
@@ -211,17 +211,16 @@ Core.init(function(model) {
         }
         var $layer;
         var menu = new Menu();
-        var menu_add_asset_product = new MenuItem({label: '添加到附属资源', 'click': function() {
-            _add(ASSET_TYPE_PRODUCT);
-        }});
-        var menu_add_asset_sys = new MenuItem({label: '添加到系统资源', 'click': function() {
-            _add(ASSET_TYPE_SYS);
-        }});
+        var menu_add_asset_product = new MenuItem({
+            label: '添加到附属资源', 
+            'click': _add
+        });
         menu.append(menu_add_asset_product);
-        menu.append(menu_add_asset_sys);
         return function($html) {
             $layer = $html;
-            menu.popup(WIN);
+            if ($layer.data('canAdd')) {
+                menu.popup(WIN);
+            }
         }
     })();
 
