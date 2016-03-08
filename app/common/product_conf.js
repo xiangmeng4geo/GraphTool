@@ -5,6 +5,7 @@
 	var util = require('./util');
 	var util_path = util.path;
 	var util_file = util.file;
+	var util_extend = util.extend;
 	var CONST = require('./const');
 	var CONST_PATH_CONFIG = CONST.PATH.CONFIG;
 	var CONST_SIZE = CONST.SIZE;
@@ -153,25 +154,73 @@
 			return assets;
 		}
 	}
-	function _assets(assets, is_use_sys) {
-		if (!is_use_sys) {
-			return assets;
-		} else {
-			var assets_new = [];
-			for (var i = 0, j = assets.length; i<j; i++) {
-				var item = assets[i];
-				if (item.flag) {
-					var key = item.key;
-					if (key) {
-						item = _getSys.getAssets(key);
+	// function _assets(assets, is_use_sys) {
+	// 	if (!is_use_sys) {
+	// 		return assets;
+	// 	} else {
+	// 		var assets_new = [];
+	// 		for (var i = 0, j = assets.length; i<j; i++) {
+	// 			var item = assets[i];
+	// 			if (item.flag) {
+	// 				var key = item.key;
+	// 				if (key) {
+	// 					item = _getSys.getAssets(key);
+	// 				}
+	// 				if (item) {
+	// 					assets_new.push(item);
+	// 				}
+	// 			}
+	// 		}
+	// 		return assets_new;
+	// 	}
+	// }
+	function _assets(assets, conf) {
+		var template = _getSys.getTemplate(conf && conf.other && conf.other.template || '');
+		if (template) {
+			var assets_template = template.assets;
+			if (assets_template && assets_template.length > 0) {
+				var len = assets_template.length;
+				var assets_new = [];
+				for (var i = 0, j = assets.length; i<j; i++) {
+					var asset = assets[i];
+					if (asset.flag) {
+						var key = asset.key;
+						if (key) {
+							for (var i_ta = 0; i_ta<len; i_ta++) {
+								var item = assets_template[i_ta];
+								if (key == item.id) {
+									assets_new.push(util.extend(true, item, asset));
+									break;
+								}
+							}
+						} else {
+							assets_new.push(asset);
+						}
 					}
-					if (item) {
-						assets_new.push(item);
+				}
+				return assets_new;
+			}
+		}
+
+		return assets;
+	}
+	function _modifyAssets(name, key, asset_new) {
+		var conf = _readConfig(name);
+		if (conf) {
+			var assets = conf.assets;
+			if (assets && assets.length > 0) {
+				for (var i = 0, j = assets.length; i<j; i++) {
+					var asset = assets[i];
+					if (asset.key == key) {
+						asset = util_extend(true, asset, asset_new);
+						assets[i] = asset;
+						_saveConfig(name, conf);
+						return true;
 					}
 				}
 			}
-			return assets_new;
 		}
+		return false;
 	}
 	function _saveSys(json) {
 		return _saveConfig(CONST_SYSCONF_NAME, json);
@@ -192,7 +241,10 @@
 		getTree: _getTree,
 		setTree: _saveTree,
 		util: {
-			assets: _assets
+			assets: _assets,
+			asset: {
+				modify: _modifyAssets
+			}
 		}
 	};
 

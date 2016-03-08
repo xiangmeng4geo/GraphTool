@@ -107,25 +107,42 @@ Core.init(function(model) {
                 top: styleObj.top || 0,
                 center: false
             }
+            var isLock = !!item.id && !!item.type;
             var $html = '';
             if (!!text) {
                 // styleObj.text = text;
                 $html = TextLayer({
+                    lock: isLock,
                     text: text,
                     pos: pos,
                     css: {
                         width: styleObj.width,
                         height: styleObj.height
                     },
-                    style: styleObj
+                    style: styleObj,
+                    onlockchange: (function(item) {
+                        return function(text) {
+                            product_conf.util.asset.modify(_current_product_name, item.key, {
+                                text: text
+                            });
+                        }
+                    })(item)
                 });
             } else {
                 $html = ImageLayer({
+                    lock: isLock,
                     src: item.src,
                     pos: pos,
                     width: styleObj.width,
                     height: styleObj.height,
-                    style: styleObj
+                    style: styleObj,
+                    onlockchange: (function(item) {
+                        return function(src) {
+                            product_conf.util.asset.modify(_current_product_name, item.key, {
+                                src: src
+                            });
+                        }
+                    })(item)
                 });
             }
             if ($html) {

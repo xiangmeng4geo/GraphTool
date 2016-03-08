@@ -4,6 +4,7 @@ Core.init(function() {
 		$ = C.$,
 		_require = C.require;
 
+    var dialog = _require('dialog');
     var util = _require('util');
     var util_file = util.file;	
 
@@ -13,6 +14,7 @@ Core.init(function() {
     var UI = component.UI;
     var style2obj = component.util.style2obj;
     var _isImage = component.util.isImg;
+
 	// 引入jquery-ui模块
     _require('j.ui');
     C.addLink('m.layer');
@@ -23,6 +25,7 @@ Core.init(function() {
         option = $.extend(true, {
             edit: false
         }, option);
+        var isLock = option.lock;
         var css = option.css;
         var $html = $('<div class="map_layer"></div>');
         if (!option.edit) {
@@ -37,7 +40,7 @@ Core.init(function() {
         }
 
         var rotate_option = option.rotate;
-        if (rotate_option) {
+        if (!isLock && rotate_option) {
             $html.rotatable(rotate_option).find('.ui-rotatable-handle').on('dblclick', function() {
                 $html.data('angele', 0).css('transform', 'rotate(0deg)');
             });
@@ -45,18 +48,24 @@ Core.init(function() {
 
         var resizable_option = option.resize,
             draggable_option = option.drag;
-        $html.css('position', 'absolute')
-            .resizable($.extend({
+        $html.css('position', 'absolute');
+        if (!isLock) {
+            $html.resizable($.extend({
                 handles: 'all'
             }, resizable_option))
             .draggable(draggable_option)
-            .on('mousedown', function(e) {
-                e.stopPropagation();
-                _reset(); //清除其它的编辑样式
-                $(this).removeClass('off').trigger('edit', true);
-            }).on('contextmenu', function(e) {
-                e.stopPropagation();
-            });
+        }
+            
+        $html.on('mousedown', function(e) {
+            e.stopPropagation();
+            _reset(); //清除其它的编辑样式
+            var $this = $(this).removeClass('off');
+            // if (!isLock) {
+                $this.trigger('edit', true);
+            // }
+        }).on('contextmenu', function(e) {
+            e.stopPropagation();
+        });
         return $html;
     }
 
@@ -107,6 +116,7 @@ Core.init(function() {
                 drag: _change
             }
         }, option);
+        var isLock = option.lock;
         var $html = _createLayer(option);
 
         var text = option.text || '';
@@ -120,15 +130,21 @@ Core.init(function() {
             .addClass('layer_text')
             .append('<span class="btn_handle">' + text + '</span>');
 
+        if (isLock) {
+            $html.addClass('lock');
+        }    
         var $span = $html.find('.btn_handle');
         var edit = UI.edit($html, {
             style: option.style || '',
     		onchange: function() {
                 if (edit) {
-                    $span.text(edit.getText());
+                    var text = edit.getText();
+                    $span.text(text);
                     var style = style2obj(edit.getStyle());
                     $span.css(style);
                     $html.css(edit.getSize());
+
+                    option.onlockchange && option.onlockchange(text);
                 }
     		}
     	});
@@ -152,6 +168,7 @@ Core.init(function() {
                 center: 1
             }
         }, option);
+        var isLock = !!option.lock;
         var pos = option.pos;
         var src = option.src;
         var ext = path.extname(src);
@@ -226,10 +243,10 @@ Core.init(function() {
                 }
             }
 
-            var $html = _createLayer({
+            var $html = _createLayer($.extend(true, option, {
                 css: css,
                 rotate: {}
-            });
+            }));
             $html.addClass('layer_img')
                 .append('<img src="' + src_img + '" data-src="'+src+'" class="_img"/>')
                 .data('size', {
@@ -237,6 +254,16 @@ Core.init(function() {
                     h: height_to
                 }).on('dblclick', function() {
                     var $this = $(this);
+                    if (isLock) {
+                        dialog.imageOpen(function(file_paths) {
+                            if (file_paths && file_paths.length > 0) {
+                                file_paths.forEach(function(file_path) {
+                                    $html.find('._img').attr('src', file_path);
+                                    option.onlockchange && option.onlockchange(file_path);
+                                });
+                            }
+                        });
+                    }
                     var size = $this.data('size');
                     if (size) {
                         var w = size.w,

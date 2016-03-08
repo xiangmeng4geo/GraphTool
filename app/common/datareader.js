@@ -63,7 +63,11 @@
         }
         if (_parser) {
             if (conf) {
-                conf.assets = product_conf_util_assets(conf.assets, !!conf.flag_sys_assets)
+                var assets = conf.assets;
+                if (assets) {
+                    conf.assets = product_conf_util_assets(assets, conf);
+                }
+                // conf.assets = product_conf_util_assets(conf.assets, !!conf.flag_sys_assets)
             }
             _parser(conf, _model);
         }

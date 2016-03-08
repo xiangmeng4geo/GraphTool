@@ -710,6 +710,17 @@ input[type=range]::-webkit-slider-thumb {
     display: none;
     margin-top: 1px;
 }
+.lock .editText:after{
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    width: auto;
+    height: 96px;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 11;
+}
 .editText .row{
     margin: 4px 0;
 }
