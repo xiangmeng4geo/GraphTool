@@ -174,27 +174,52 @@
 	// 		return assets_new;
 	// 	}
 	// }
-	function _assets(assets, conf) {
+	function _assets(assets, conf, option) {
+		option = util_extend({
+			merge: false,
+			useFlag: true
+		}, option);
+		// 传入产品名
+		if (typeof assets == 'string') {
+			var conf = _readConfig(assets);
+			if (conf) {
+				assets = conf.assets;
+			}
+		}
+		var isMerge = option.merge;
+		var isUseFlag = option.useFlag;
 		var template = _getSys.getTemplate(conf && conf.other && conf.other.template || '');
 		if (template) {
 			var assets_template = template.assets;
+			var cache = {};
 			if (assets_template && assets_template.length > 0) {
 				var len = assets_template.length;
 				var assets_new = [];
 				for (var i = 0, j = assets.length; i<j; i++) {
 					var asset = assets[i];
-					if (asset.flag) {
+					if (isUseFlag && asset.flag || !isUseFlag) {
 						var key = asset.key;
 						if (key) {
 							for (var i_ta = 0; i_ta<len; i_ta++) {
 								var item = assets_template[i_ta];
 								if (key == item.id) {
 									assets_new.push(util.extend(true, item, asset));
+									cache[key] = true;
 									break;
 								}
 							}
 						} else {
 							assets_new.push(asset);
+						}
+					}
+				}
+				if (isMerge) {
+					assets_template.reverse();
+					for (var i = 0; i<len; i++) {
+						var asset = assets_template[i];
+						if (!cache[asset.id]) {
+							asset.flag = true;
+							assets_new.unshift(asset);
 						}
 					}
 				}

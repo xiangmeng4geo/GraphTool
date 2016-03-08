@@ -5,6 +5,7 @@ Core.init(function(model) {
 	var $ = C.$;
 	var WIN = C.Win.Win;
 	var _require = C.require;
+	var util_extend = _require('util').extend;
 	var dialog = _require('dialog');
 	var _alert = dialog.alert;
 	var product_conf = _require('product_conf');
@@ -92,7 +93,10 @@ Core.init(function(model) {
 	});
 	var s_template = UI.select($('#s_template'), {
 		data: s_data_template,
-		val: conf_other.template
+		val: conf_other.template,
+		onchange: function() {
+			_updateAssets();
+		}
 	});
 	var s_legend = UI.select($('#s_legend'), {
 		data: s_data_legend,
@@ -403,16 +407,21 @@ Core.init(function(model) {
 			var $this = $(this);
 			var key = $this.data('key');
 			var d = {flag: _getChecked($this.find('[type=checkbox]'))};
+			
+			var $span = $this.find('textarea');
+			if ($span.length > 0) {
+				d.text = $span.val();
+			} else {
+				d.src = $this.find('img').attr('src');
+			}
+
 			if (key) {
-				d.key = key;
+				var d_cache = cacheSysAssets[key];
+				if (d_cache) {
+					d.key = key;
+				}
 			} else {
 				d.style = $this.data('style');
-				var $span = $this.find('textarea');
-				if ($span.length > 0) {
-					d.text = $span.val();
-				} else {
-					d.src = $this.find('img').attr('src');
-				}
 			}
 			
 			assets.push(d);
@@ -459,6 +468,11 @@ Core.init(function(model) {
     		var index = $layer.data('index');
     		conf_assets.splice(index, 1);
     	});
+	}).delegate('.asset_imgs img', 'click', function() {
+		var $this = $(this);
+		dialog.imageOpen(function(file_path) {
+            $this.attr('src', file_path);
+        });
 	});
 	var _getId = (function() {
 		var id = 0;
@@ -467,58 +481,51 @@ Core.init(function(model) {
 		}
 	})();
 
+	var cacheSysAssets = {};
 	function _updateAssets() {
-		var assets = [];
+		cacheSysAssets = {};
+		var assets = product_conf.util.assets(product_name, {
+			other: {
+				template: s_template.val()
+			}
+		}, {
+			merge: true,
+			useFlag: false
+		});
 		var is_use_sys = _getChecked($cb_is_use_sys_assets);
-		var _cache = {};
-		for (var i = 0, j = conf_assets.length; i<j; i++) {
-			var item = conf_assets[i];
-			var key = item.key;
-			if (key) {
-				_cache[key] = true;
-				var tmp_item = is_use_sys? getSys.getAssets(key): null;
-				if (tmp_item) {
-					tmp_item.flag = item.flag;
-				}
-				item = tmp_item;
-			} else {
-				item._index = i;
-			}
-			if (item) {
-				assets.push(item);
-			}
-		}
-		if (is_use_sys) {
-			for (var i = 0, j = assets_sys.length; i<j; i++) {
-				var item = assets_sys[i];
-				if (!_cache[item.id]) {
-					assets.push(item);
-				}
-			}
-		}
 		var html = '';
 		var html_img = '',
 			html_text = '';
+		var index_normal_asset = -1;
 		$.each(assets, function(i, v) {
 			if (!v) {
 				return;
 			}
 			var key = v.id || '';
+			var isSysAssets = !!key && !!v.type;
+			if (!isSysAssets) {
+				index_normal_asset++;
+			} else {
+				cacheSysAssets[key] = v;
+			}
+			if (!is_use_sys && isSysAssets) {
+				return;
+			}
 			var text = v.text;
 			var style = v.style;
 			if (!text) {
-				html_img += '<li data-index="'+v._index+'" data-style="'+style+'" data-key="'+key+'" '+(key?'class="sys_asset"':'')+'>'+
+				html_img += '<li data-index="'+index_normal_asset+'" data-style="'+style+'" data-key="'+key+'" '+(isSysAssets?'class="sys_asset"':'')+'>'+
 								'<img src="'+v.src+'"/>'+
-								'<div class="checkbox"><input type="checkbox" '+(v.flag?'checked':'')+'/><label></label></div>'+
+								'<div class="checkbox"><input type="checkbox" '+(isSysAssets || v.flag?'checked':'')+'/><label></label></div>'+
 								'<span class="btn_dele_asset"></span>'+
 							'</li>';
 			} else {
-				html_text += '<li data-index="'+v._index+'" data-style="'+style+'" data-key="'+key+'" '+(key?'class="sys_asset"':'')+'>'+
+				html_text += '<li data-index="'+index_normal_asset+'" data-style="'+style+'" data-key="'+key+'" '+(isSysAssets?'class="sys_asset"':'')+'>'+
 								'<div class="fl">'+
-									'<div class="checkbox"><input type="checkbox" '+(v.flag?'checked':'')+'/><label></label></div><br/>'+
+									'<div class="checkbox"><input type="checkbox" '+(isSysAssets || v.flag?'checked':'')+'/><label></label></div><br/>'+
 									'<span class="btn_dele_asset"></span>'+
 								'</div>'+
-								'<textarea '+(key?'disabled="disabled"':'')+'>'+text+'</textarea>'+
+								'<textarea>'+text+'</textarea>'+
 							'</li>';
 			}
 		});

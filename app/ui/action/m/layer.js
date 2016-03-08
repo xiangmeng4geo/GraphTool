@@ -255,13 +255,9 @@ Core.init(function() {
                 }).on('dblclick', function() {
                     var $this = $(this);
                     if (isLock) {
-                        dialog.imageOpen(function(file_paths) {
-                            if (file_paths && file_paths.length > 0) {
-                                file_paths.forEach(function(file_path) {
-                                    $html.find('._img').attr('src', file_path);
-                                    option.onlockchange && option.onlockchange(file_path);
-                                });
-                            }
+                        dialog.imageOpen(function(file_path) {
+                            $html.find('._img').attr('src', file_path);
+                            option.onlockchange && option.onlockchange(file_path);
                         });
                     }
                     var size = $this.data('size');

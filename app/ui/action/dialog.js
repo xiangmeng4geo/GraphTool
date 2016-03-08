@@ -76,7 +76,9 @@
 		imageOpen: function(callback) {
 			this.open({
 				filters: CONST_FILTER_IMAGE
-			}, callback);
+			}, function(file_paths) {
+				callback && callback(file_paths[0]);
+			});
 		},
 		imagesOpen: function(callback) {
 			this.open({

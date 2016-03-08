@@ -255,7 +255,7 @@ Core.init(function(model) {
 
     // 添加图片
     fn_list.img = function() {
-        dialog.imageOpen(function(file_paths) {
+        dialog.imagesOpen(function(file_paths) {
             if (file_paths && file_paths.length > 0) {
                 file_paths.forEach(function(file_path) {
                     ImageLayer({
