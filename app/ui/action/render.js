@@ -178,8 +178,8 @@
 						break;
 					}
 				}
-
 				/*判断是不是大风降温数据 }*/
+                
                 for (var i = 0; i<len; i++){
                     var v = areas[i];
                     var symbols = v.symbols;
