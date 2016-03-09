@@ -178,23 +178,40 @@
 						break;
 					}
 				}
+
 				/*判断是不是大风降温数据 }*/
                 for (var i = 0; i<len; i++){
                     var v = areas[i];
                     var symbols = v.symbols;
 					var val_area = symbols? symbols.text : '';
                     var code = v.code;
+                    
+                    var items = v.items;
+                    items.isObj = true;
+                    // 只对大风降温数据进行处理
+                    if(is_bigwind){
+                        if(/^0/.test(val_area)){
+                            // 02、03表示沙尘；04表示大风
+                            if(val_area === '040'){
+                                shapes.push(new Shape.Polyline(items, {
+                                    type: v.code,
+                                    strokeStyle: '#ff0000',
+                                    lineWidth: 2
+                                }));
+                            }
+                            continue;
+                        }
+                    }
                     var color = _getColor(val_area, code);
                     if(code == 24){
+                        // 处理雨夹雪颜色
 						// strokeColor = 'red';
 						color = Pattern.Streak({
 							strokeStyle: color,
 							space: 1
 						});
 					}
-                    // 处理雨夹雪颜色
-                    v.items.isObj = true;
-                    shapes.push(new Shape.Polygon(v.items, {
+                    shapes.push(new Shape.Polygon(items, {
                         fillStyle: color
                     }));
                 }
