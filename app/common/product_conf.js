@@ -186,6 +186,8 @@
 			var conf = _readConfig(assets);
 			if (conf) {
 				assets = conf.assets;
+			} else {
+				assets = [];
 			}
 		}
 		var isMerge = option.merge;
