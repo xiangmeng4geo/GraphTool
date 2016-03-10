@@ -6,6 +6,7 @@ Core.init(function(model) {
     var C = Core;
     var $ = C.$;
     var _require = C.require;
+    var _alert = _require('dialog').alert;
     var util_common = _require('util');
     var util_path = util_common.path;
     var GeoMap = _require('map');
@@ -160,6 +161,9 @@ Core.init(function(model) {
         }
     })();
     model.on('export', function(save_path, shapes) {
+        if (!CONST.LISTENCE || !CONST.LISTENCE.f) {
+            return _alert('您的软件已经到期，不能进行些操作！');
+        }
         var s_time = new Date();
         save_path || (save_path = util_path.join(CONST.PATH.OUTPUT, _getUniqueName()));
         util_file.Image.save(save_path, geomap.export({

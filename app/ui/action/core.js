@@ -172,6 +172,9 @@
 		model.emit(data.type, data.msg);
 	});
 
+	function _close() {
+		window.close();
+	}
 	var Win = {
 		open: function(name, option) {
 			option || (option = {});
@@ -193,10 +196,10 @@
 			if (confirm) {
 				dialog.confirm('确实要退出吗？', function() {
 					cb_before_close && cb_before_close();
-					window.close();
+					_close();
 				});
 			} else {
-				window.close();
+				_close();
 			}
 		},
 		WIN: win_instance
@@ -273,6 +276,7 @@
 					};
 				} else {
 					_alert('没有正确的序列号，请联系管理员，程序将退出！');
+					_close();
 				}
 				setTimeout(_check, delay);
 			}
