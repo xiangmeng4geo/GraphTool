@@ -1,7 +1,6 @@
 !function(){
     var path = require('path');
-    var PATH_WORKBENCH = path.join(__dirname, '../../..');
-    var util = require(path.join(PATH_WORKBENCH, 'util'));
+    var util = require(path.join(__dirname, '../../../util'));
     var PolygonUtil = util.Polygon;
     var isInsidePolygon = PolygonUtil.isPointIn;
     var polygonIsInsidePolygon = PolygonUtil.isPolygonIn;
