@@ -69,7 +69,7 @@ Core.init(function() {
             var textStyle = conf_geo.textStyle;
             var bound = conf_geo.bound;
             if (!bound || !bound.wn || !bound.es) {
-                return _error('请先地图边界！');
+                return _error('请先配置地图边界！');
             }
             
             var conf_legend = getSys.getLegend(legend_name);

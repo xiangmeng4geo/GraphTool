@@ -4,6 +4,7 @@ Core.init(function(model) {
 	var C = Core;//C.Win.WIN.show();
 	var _require = C.require;
 	var util = _require('util');
+	var isPlainObject = util.isPlainObject;
 	var util_file = util.file;
 	var util_path = util.path;
 	var path = require('path');
@@ -75,11 +76,11 @@ Core.init(function(model) {
 				showLegendRange: true
 			}, conf);
 			var map = conf.map;
-			if (!getSys.getGeo(map)) {
+			if (!map || (!isPlainObject(map) && typeof map !== 'string') || !getSys.getGeo(map)) {
 				return _error('请正确配置map字段!');
 			}
 			var legend = conf.legend;
-			if (!legend || !getSys.getLegend(legend)) {
+			if (!legend || (!isPlainObject(legend) && typeof legend !== 'string') || !getSys.getLegend(legend)) {
 				return _error('请正确配置legend字段!');
 			}
 

@@ -26,11 +26,13 @@ function run(conf_name) {
 	var data_dir = path.join(__dirname, '../../test/data/command');
 	var conf_path = path.join(data_dir, conf_name);
 	var conf = require(conf_path);
-	var file = conf.data.file;
-	if (!path.isAbsolute(file)) {
-		file = path.join(data_dir, file);
-	}
-	conf.data.file = file;
+	try {
+		var file = conf.data.file;
+		if (!path.isAbsolute(file)) {
+			file = path.join(data_dir, file);
+		}
+		conf.data.file = file;
+	} catch(e){}
 
 	var file_name_new = path.join(tmpDir, conf_name);
 	fs.writeFileSync(file_name_new, JSON.stringify(conf));
@@ -43,7 +45,8 @@ function run(conf_name) {
 	});
 }
 
-run('rain.json');
-run('tmp.json');
-run('rain-1.json');
-run('rain-2.json');
+// run('rain.json');
+// run('tmp.json');
+// run('rain-1.json');
+// run('rain-2.json');
+run('20160310.json');

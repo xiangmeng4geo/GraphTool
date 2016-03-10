@@ -161,7 +161,7 @@ Core.init(function(model) {
         }
     })();
     model.on('export', function(save_path, shapes) {
-        if (!CONST.LISTENCE || !CONST.LISTENCE.f) {
+        if (!util_common.verification.get(true).listence.f) {
             return _alert('您的软件已经到期，不能进行些操作！');
         }
         var s_time = new Date();
@@ -192,7 +192,7 @@ Core.init(function(model) {
         }
     });
     model.on('geo', function(options, cb_afterGeo) {
-        var textStyle = options.textStyle;
+        var textStyle = options.textStyle || {};
         geomap.setGeo(options, function() {
             var cb_prov = textStyle.prov,
                 cb_city = textStyle.city,

@@ -148,12 +148,21 @@
             }
         }
     }
+    function _imgExists(src) {
+        if (src.indexOf('data:image') !== 0) {
+            return util.file.exists(src);
+        }
+        return true;
+    }
     function _img(imgs) {
         if (imgs) {
             var shapes = [];
             for (var i = 0, j = imgs.length; i<j; i++) {
                 var item = imgs[i];
-                shapes.push(new Shape.Image(item.src, item));
+                var src = item.src;
+                if (_imgExists(src)) {
+                    shapes.push(new Shape.Image(src, item));
+                }
             }
             if (shapes && shapes.length > 0) {
                 _model.emit('render', shapes);

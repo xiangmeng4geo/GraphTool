@@ -5,7 +5,7 @@
 | [data](#data) | Object | Y |  | 主要描述数据文件位置 |
 | map | String<br/>Object | Y |  | 系统配置里地图模板名<br/>[地图相关配置](#mapObject) |
 | legend | String<br/>Object | Y |  | 系统配置里图例模板名<br/>[图例相关配置](#legendObject) |
-| showLegendRange | Boolean | Y | true | 是否只显示源数据所在图例区间 |
+| showLegendRange | Boolean | N | true | 是否只显示源数据所在图例区间 |
 | width | Number | N | 800 | 处理图片的宽度 |
 | height | Number | N | 800 | 处理图片的高度 |
 | [texts](#Text) | Array | N |  | 附加文字资源 |

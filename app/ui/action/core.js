@@ -38,6 +38,9 @@
 		var info = err.msg || err.message || err;
 		logger.error(info);
 	}
+	process.on('uncaughtException', function(err) {
+		model.emit('error', err);
+	});
 	//统一处理其它库里的错误信息
 	model.on('error', _error);
 
@@ -125,7 +128,7 @@
 		try {
 			cb(model);
 		} catch (e) {
-			logger.error(e.stack);
+			model.emit('error', e.stack);
 		}
 	}
 
