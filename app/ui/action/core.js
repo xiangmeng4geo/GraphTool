@@ -11,6 +11,7 @@
 	var ipc = _req('electron').ipcRenderer;
 
 	var dialog = _req('./dialog');
+	var _alert = dialog.alert;
 	var win_instance = _remote.getCurrentWindow();
 	var CONST = win_instance.CONST;
 	var CONST_PATH = CONST.PATH;
@@ -219,6 +220,65 @@
 	};
 	window_global.Core = Core;
 
+	{
+		var util = _require('util');
+		function _getListence() {
+			var conf = util.verification.get();
+			if (conf) {
+				var listence = conf.l;
+				if (listence) {
+					listence = util.encrypt.decode(listence.reverse());
+					if (listence) {
+						var arr = listence.split('|');
+						var time_start = new Date(parseInt(arr[0])),
+							time_end = new Date(parseInt(arr[1]));
+						var time_now = new Date();
+						return {
+							s: time_start,
+							e: time_end,
+							n: time_now,
+							f: time_end > time_start && time_now > time_start && time_now < time_end
+						}
+					}
+				}
+			}
+		}
+		if (!CONST.DEBUG) {
+			var Store = _require('store');
+			var cache_name = '_l_n';
+			var delay = 1000*60;// 1分钟
+			var flag_notice = false;
+			function _check() {
+				var listence = _getListence();
+				if (listence) {
+					var time_schedule = Store.get(cache_name);
+					if(time_schedule){
+						time_schedule = new Date(parseInt(time_schedule));
+					}
+					var flag = listence.f && (!time_schedule || time_schedule > listence.s && time_schedule < listence.e);
+					if (!flag && flag_notice) {
+						_alert('您的软件已经过期，请联系管理员!');
+					}
+					flag_notice = true;
+					if (!time_schedule || time_schedule < listence.s) {
+						time_schedule = listence.s;
+					}
+					Store.set(cache_name, time_schedule.getTime()+delay);
+
+					// 可根据此在其它页面应用
+					CONST.LISTENCE = {
+						s: listence.s,
+						e: listence.e,
+						f: flag
+					};
+				} else {
+					_alert('没有正确的序列号，请联系管理员，程序将退出！');
+				}
+				setTimeout(_check, delay);
+			}
+			setTimeout(_check, 0);
+		}
+	}
 	safe(function() {
 		var str_css = $body.attr('css');
 
@@ -250,38 +310,6 @@
 			if ($body.attr('waiting') === undefined) {
 				emit('ready');
 			}
-
-			// $(function() {
-			// 	var width_screen = screen.width,
-			// 		height_screen = screen.height;
-			// 	var $titlebar = $('.titlebar').on('dblclick', function() {
-			// 		if (!win_instance.isMaximized()) {
-			// 			win_instance.maximize();
-			// 			win_instance.setPosition(0, 0);
-			// 			win_instance.setSize(width_screen, height_screen);
-			// 		} else {
-			// 			win_instance.restore();
-			// 		}
-			// 	});
-			// 	function _off(){
-			// 		$titlebar.off('mousemove');
-			// 	}
-			// 	$titlebar.on('mousedown', function(e_down) {
-			// 		if (win_instance.isMaximized()) {
-			// 			return;
-			// 		}
-			// 		var x_old = e_down.screenX,
-			// 			y_old = e_down.screenY;
-			// 		var pos = win_instance.getPosition();
-			// 		var pos_x = pos[0],
-			// 			pos_y = pos[1];
-			// 		$titlebar.on('mousemove', function(e_move){
-			// 			var x_new = e_move.screenX,
-			// 				y_new = e_move.screenY;
-			// 			win_instance.setPosition(pos_x+x_new-x_old, pos_y+y_new-y_old);
-			// 		});
-			// 	}).on('mouseup', _off).on('mouseleave', _off);
-			// })
 		}
 		if (str_css) {
 			var css_arr = str_css.split(/\s+/);

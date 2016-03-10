@@ -8,7 +8,7 @@ rm -rf $TARGET_DIR
 mkdir $TARGET_DIR
 
 node /f/source/node_projects/compresser/ $APP_PATH $TARGET_DIR
-node $SHELLPATH/change.js
+node $SHELLPATH/change.js $1
 
 rm -rf $TARGET_DIR/cache
 rm -rf $TARGET_DIR/logs

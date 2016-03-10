@@ -5,8 +5,8 @@
 	var path = require('path');
 	var util = require('./util');
 
-	var IS_DEBUG = true; // 是否是debug模式
-	var CONST_LOG = require('./const').LOG;
+	var CONST = require('./const');
+	var CONST_LOG = CONST.LOG;
 	var PATH_LOG = CONST_LOG.PATH;
 	var LOG_DELAY = CONST_LOG.DELAY || 10;
 
@@ -39,7 +39,7 @@
 
 	util.file.mkdir(PATH_LOG);
 	var fn_show = (function(){
-		return IS_DEBUG? function(msg, cb){
+		return CONST.DEBUG? function(msg, cb){
 			console.log(msg);
 			cb();
 		}: function(msg, cb){
@@ -83,6 +83,5 @@
 		}
 	});
 
-	Logger.DEBUG = IS_DEBUG;
 	module.exports = Logger
 }();
