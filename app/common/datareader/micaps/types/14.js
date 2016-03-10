@@ -886,6 +886,7 @@
     /*根据公共边与面上其它点的位置关系确认编码*/
     function _guessCodeByLine(area, line) {
         var items = area.items;
+        var len_items = items.length;
         var first = line[0],
             end = line[line.length - 1];
         var x_first = first.x,
@@ -898,7 +899,8 @@
             }
         } else {
             /*这里暂时这样处理，后续*/
-            if (line.length/items.length < 0.5) {
+            // console.log(line.length/items.length, line.length, items.length);
+            if (len_items > 50 && line.length/len_items < 0.5) {
                 var bound_line = _getBound(line);
                 var x_min = bound_line.x_min,
                     x_max = bound_line.x_max,
@@ -997,7 +999,7 @@
                     return code_list[index];
                 }
             }
-            // console.log(code_list);
+            // console.log('code_list', area_index, len,code_list);
             var item;
             if (len == 1) {
                 item = code_list[0];

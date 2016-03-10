@@ -12,7 +12,7 @@ describe('micaps 14', function(){
     var datareader = util.load('common/datareader');
     function _test(conf) {
         var file = conf.file;
-        var desc = file;
+        var desc = file + (' '+conf.desc || '');
         it(desc, function(done) {
             datareader.read({
                 type: 'micaps',
@@ -51,6 +51,14 @@ describe('micaps 14', function(){
         n_26: 3,
         n_23: 5,
         n_24: 4
+    });
+    _test({
+        desc: '分割出一的一个很小的面为雪',
+        file: 'rr031008.024',
+        n_area: 16,
+        n_26: 8,
+        n_23: 6,
+        n_24: 2
     });
     _test({
         desc: '分割线得到不同等级雨夹雪面',
