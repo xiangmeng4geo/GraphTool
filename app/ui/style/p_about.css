@@ -19,7 +19,8 @@ p{
 	padding: 10px;
 }
 .logo{
-	width: 320px;
+	width: 400px;
 	margin: 0 auto;
     background: url(../img/login_logo.png) left center no-repeat;
+    background-size: 100% auto;
 }

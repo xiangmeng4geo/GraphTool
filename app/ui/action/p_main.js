@@ -94,23 +94,26 @@ Core.init(function() {
 	var $btn_close_main = $('.btn_close_main').click(function() {
 		Win.close(true);
 	});
-	var win_about;
+	var _singleOpen = (function() {
+		var _cache = {};
+		return function(name) {
+			var win = _cache[name];
+			try {
+				win.isFocused();
+				win.focus();
+			} catch (e) {
+				_cache[name] = Win.openSub(name);
+			}
+		}
+	})();
 	$('#btn_about').click(function() {
-		try {
-			win_about.isFocused();
-			win_about.focus();
-		} catch (e) {
-			win_about = Win.openSub('about');
-		}
+		_singleOpen('about');
 	});
-	var win_setting;
+	$('#btn_listence').click(function() {
+		_singleOpen('listence');
+	});
 	$('#btn_setting_sys').click(function() {
-		try {
-			win_setting.isFocused();
-			win_setting.focus();
-		} catch (e) {
-			win_setting = Win.openSub('setting');
-		}
+		_singleOpen('setting');
 	});
 	! function() {
 		function _close(e) {

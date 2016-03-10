@@ -6,7 +6,7 @@ Core.init(function(){
 	$('.btn_close').click(function() {
 		C.Win.close();
 	});
-	// try{
-	// 	$('#listence').text('有效期至');
-	// }catch(e){}
+	try{
+		$('#listence').text('有效期至'+C.require('util').verification.get(true).listence.e.format('yyyy年MM月dd日'));
+	}catch(e){}
 });

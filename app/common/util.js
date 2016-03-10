@@ -184,10 +184,35 @@
 			var conf = verification.get();
 			conf.l = l;
 			file.write(path_file_verification, encrypt.encode(JSON.stringify(conf)));
-		}, get: function(){
+		}, get: function(isFormat){
 			var content = file.read(path_file_verification);
 			content = encrypt.decode(content);
-			return content? JSON.parse(content): null;
+			if (content) {
+				content = JSON.parse(content);
+				var listence = this.parseL(content.l);
+				if (listence) {
+					content.listence = listence
+				}
+				return content;
+			}
+
+			return null;
+		}, parseL: function(listence) {
+			if (listence) {
+				listence = encrypt.decode(listence.reverse());
+				if (listence) {
+					var arr = listence.split('|');
+					var time_start = new Date(parseInt(arr[0])),
+						time_end = new Date(parseInt(arr[1]));
+					var time_now = new Date();
+					return {
+						s: time_start,
+						e: time_end,
+						n: time_now,
+						f: time_end > time_start && time_now > time_start && time_now < time_end
+					}
+				}
+			}
 		}
 	}
 

@@ -21,8 +21,8 @@ if(args.length >= 2){
 		time_e = new Date();
 		time_e.setMonth(time_e.getMonth() + 1);
 
-	var time_start = args[2] || time_s,
-		time_end = args[3] || time_e;
+	var time_start = time_s,
+		time_end = args[2] || time_e;
 	var result = gen(time_start, time_end, true);
 	fs.appendFileSync(path.join(__dirname, './listence'), result);
 	console.log(result);

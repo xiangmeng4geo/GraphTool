@@ -226,24 +226,9 @@
 	{
 		var util = _require('util');
 		function _getListence() {
-			var conf = util.verification.get();
+			var conf = util.verification.get(true);
 			if (conf) {
-				var listence = conf.l;
-				if (listence) {
-					listence = util.encrypt.decode(listence.reverse());
-					if (listence) {
-						var arr = listence.split('|');
-						var time_start = new Date(parseInt(arr[0])),
-							time_end = new Date(parseInt(arr[1]));
-						var time_now = new Date();
-						return {
-							s: time_start,
-							e: time_end,
-							n: time_now,
-							f: time_end > time_start && time_now > time_start && time_now < time_end
-						}
-					}
-				}
+				return conf.listence;
 			}
 		}
 		if (!CONST.DEBUG) {
@@ -267,13 +252,6 @@
 						time_schedule = listence.s;
 					}
 					Store.set(cache_name, time_schedule.getTime()+delay);
-
-					// 可根据此在其它页面应用
-					CONST.LISTENCE = {
-						s: listence.s,
-						e: listence.e,
-						f: flag
-					};
 				} else {
 					_alert('没有正确的序列号，请联系管理员，程序将退出！');
 					_close();

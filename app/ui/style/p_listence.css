@@ -1,0 +1,24 @@
+body{background-color: #e5e6e7;}
+textarea{
+	padding-top: 10px;
+	border: none;
+	background-color: #e5e6e7;
+	border-radius: 0;
+	width: 390px;
+	height: 198px;
+	margin: 10px auto;
+	display: block;
+	border: 1px solid rgba(0,0,0,0);
+}
+.btns{
+	width: 100%;
+	height: 70px;
+}
+.btns input{
+	display: inline-block;
+	width: 40%;
+	margin-left: 6%;
+	margin-top: 17px;
+	height: 30px;
+    font-size: 16px;
+}
