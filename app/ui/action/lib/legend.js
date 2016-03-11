@@ -398,7 +398,7 @@
 					if (max_index == -1) {
 						max_index = j_colors;
 					}
-					colors = colors.slice(min_index, max_index);
+					colors = colors.slice(min_index - 1, max_index + 1);
 					legend_new.blendent.push({
 						is_stripe: item.is_stripe,
 						colors: colors
