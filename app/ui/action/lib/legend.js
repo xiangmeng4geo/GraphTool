@@ -392,12 +392,13 @@
 							}
 						}				
 					}
-					if (min_index != -1) {
-						colors = colors.slice(min_index);
+					if (min_index == -1) {
+						min_index = 0;
 					}
-					if (max_index != -1) {
-						colors = colors.slice(0, max_index+1);
+					if (max_index == -1) {
+						max_index = j_colors;
 					}
+					colors = colors.slice(min_index, max_index);
 					legend_new.blendent.push({
 						is_stripe: item.is_stripe,
 						colors: colors

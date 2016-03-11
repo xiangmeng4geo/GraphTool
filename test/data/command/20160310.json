@@ -1,8 +1,9 @@
 ﻿{
-	"data1": {
+	"data": {
 		"file": "F:/source/node_projects/GraphTool/test/data/command/20160310.txt"
 	},
-	"map": {
+	"map": "陕西地图",
+	"map1": {
 		"maps": [{
 			"is_use": true,
 			"file": "C:\\Users\\技术\\BPA\\GT\\geo\\地市界.shp",
@@ -76,7 +77,6 @@
 	"legend": "温度（2°间隔）",
 	"width": "600",
 	"height": "800",
-	"showLegendRange": false,
 	"texts": [{
 		"txt": "fgfdg",
 		"x": 10,

@@ -1,0 +1,225 @@
+{
+	"data": {
+		"file": "F:/source/node_projects/GraphTool/test/data/command/20160310_2.txt"
+	},
+	"map": {
+		"maps": [{
+			"is_use": true,
+			"file": "C:\\Users\\技术\\BPA\\GT\\geo\\地市界.shp",
+			"style": {
+				"strokeStyle": "#d2d2d2",
+				"lineWidth": "0.2",
+				"fillStyle": "#000000",
+				"flag_fill": false
+			},
+			"clip": true,
+			"borderStyle": {
+				"flag": false,
+				"strokeStyle": "#000000",
+				"lineWidth": "3",
+				"shadowBlur": "5",
+				"shadowColor": "#000000",
+				"shadowOffsetX": "0",
+				"shadowOffsetY": "0",
+				"flag_shadow": false
+			}
+		}, {
+			"is_use": false,
+			"file": "D:\\地图数据\\公路\\省道.shp",
+			"style": {
+				"strokeStyle": "#ff0033",
+				"lineWidth": "0.2",
+				"fillStyle": "#ff0033",
+				"flag_fill": true
+			},
+			"clip": false,
+			"borderStyle": {
+				"flag": true,
+				"strokeStyle": "#ff0033",
+				"lineWidth": "3",
+				"shadowBlur": "5",
+				"shadowColor": "#ff0033",
+				"shadowOffsetX": "0",
+				"shadowOffsetY": "0",
+				"flag_shadow": true
+			}
+		}, {
+			"is_use": true,
+			"file": "C:\\Users\\技术\\BPA\\GT\\geo\\铁路.shp",
+			"style": {
+				"strokeStyle": "#000000",
+				"lineWidth": "0.2",
+				"fillStyle": "#000000",
+				"flag_fill": true
+			},
+			"clip": false,
+			"borderStyle": {
+				"flag": true,
+				"strokeStyle": "#000000",
+				"lineWidth": "3",
+				"shadowBlur": "5",
+				"shadowColor": "#000000",
+				"shadowOffsetX": "0",
+				"shadowOffsetY": "0",
+				"flag_shadow": true
+			}
+		}, {
+			"is_use": false,
+			"file": "D:\\地图数据\\一级河流\\一级河流.shp",
+			"style": {
+				"strokeStyle": "#0033ff",
+				"lineWidth": "0.2",
+				"fillStyle": "#0033ff",
+				"flag_fill": true
+			},
+			"clip": false,
+			"borderStyle": {
+				"flag": true,
+				"strokeStyle": "#0033ff",
+				"lineWidth": "3",
+				"shadowBlur": "5",
+				"shadowColor": "#0033ff",
+				"shadowOffsetX": "0",
+				"shadowOffsetY": "0",
+				"flag_shadow": true
+			}
+		}, {
+			"is_use": true,
+			"file": "C:\\Users\\技术\\BPA\\GT\\geo\\湖泊.shp",
+			"style": {
+				"strokeStyle": "#0099cc",
+				"lineWidth": "0.2",
+				"fillStyle": "#0099cc",
+				"flag_fill": true
+			},
+			"clip": false,
+			"borderStyle": {
+				"flag": true,
+				"strokeStyle": "#0099cc",
+				"lineWidth": "3",
+				"shadowBlur": "5",
+				"shadowColor": "#0099cc",
+				"shadowOffsetX": "0",
+				"shadowOffsetY": "0",
+				"flag_shadow": true
+			}
+		}],
+		"bound": {
+			"wn": [105.487495, 39.585442],
+			"es": [111.23912, 31.706919]
+		},
+		"textStyle": {
+			"city": true,
+			"county": false,
+			"fontSize": 14,
+			"color": "#0a0a0a"
+		},
+		"bg": {
+			"flag": false,
+			"color": "#000000"
+		}
+	},
+	"legend": "温度",
+	"width": "550",
+	"height": "800",
+	"showLegendRange": true,
+	"texts": [{
+		"txt": "cdscds",
+		"x": 10,
+		"y": 10,
+		"fontSize": 20,
+		"color": "rgba(0, 0, 0, 0.8)"
+	}, {
+		"txt": "旬阳 10.4℃",
+		"x": 10,
+		"y": 40,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "白河 9.9℃",
+		"x": 10,
+		"y": 80,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "安康 9.8℃",
+		"x": 10,
+		"y": 120,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "西乡 9.6℃",
+		"x": 10,
+		"y": 160,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "旬阳 10.4℃",
+		"lng": 109.370002746582,
+		"lat": 32.8499984741211,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "白河 9.9℃",
+		"lng": 110.120002746582,
+		"lat": 32.8199996948242,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "安康 9.8℃",
+		"lng": 109.029998779297,
+		"lat": 32.7200012207031,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "西乡 9.6℃",
+		"lng": 107.720001220703,
+		"lat": 32.9799995422363,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "镇安 9.4℃",
+		"lng": 109.150001525879,
+		"lat": 33.4300003051758,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "洋县 9.3℃",
+		"lng": 107.550003051758,
+		"lat": 33.2200012207031,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "山阳 9.3℃",
+		"lng": 109.870002746582,
+		"lat": 33.5499992370605,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "商南 9.2℃",
+		"lng": 110.900001525879,
+		"lat": 33.5299987792969,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "石泉 8.9℃",
+		"lng": 108.269996643066,
+		"lat": 33.0499992370605,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "城固 8.9℃",
+		"lng": 107.330001831055,
+		"lat": 33.1699981689453,
+		"fontSize": 18,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}],
+	"imgs": [{
+		"src": "D:\\水印\\shuiyin1.jpg",
+		"x": 500,
+		"y": 750,
+		"width": 30,
+		"height": 30
+	}],
+	"savepath": "d:\\11.png"
+}

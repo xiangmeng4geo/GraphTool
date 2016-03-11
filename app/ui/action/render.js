@@ -137,6 +137,7 @@
     //  y: 10
     // }]
     function _text(texts) {
+        console.log(texts);
         if (texts) {
             var shapes = [];
             for (var i = 0, j = texts.length; i<j; i++) {
