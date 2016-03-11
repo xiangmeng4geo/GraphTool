@@ -83,6 +83,15 @@
 | textBaseline | String | N | top | 文字垂直方向位置(top、bottom、middle) |
 | offsetX | Number | N | 0 | 文字垂直方向位置 |
 | offsetY | Number | N | 0 | 文字垂直方向位置 |
+| icon | String | N |  | 文字的占位小图标, 值只可以是[BLUE_BALL] |
+| [flag](textFlagObjct) | Object | N |  | 自定义文字的占位小图标和icon的意思一致，两者有配置时忽略icon |
+
+#### <span id="textFlagObjct">textFlagObjct自定义文字占位图标</span>
+| 字段名 | 类型 | 是否必须 | 描述 |
+|----| :----: | :-----: | :-----: |
+| src | String | Y | 图片全路径 |
+| width | Number | Y | 图片显示的宽度 |
+| height | Number | Y | 图片显示的高度 |
 
 #### <span id="Image">Image(assets)</span>
 | 字段名 | 类型 | 是否必须 | 描述 |

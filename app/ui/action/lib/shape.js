@@ -2,9 +2,11 @@
     var C = Core;
     var $ = C.$;
     var _require = C.require;
+    var util_file = _require('util').file;
     var electron = require('electron');
     var nativeImage = electron.nativeImage;
     var style2obj = _require('component').util.style2obj;
+    var CONST = _require('const');
 
     var TEXT_TEST = '国';
 
@@ -209,19 +211,27 @@
         }
         var img_style;
         var flag = style.flag;
+        var icon = style.icon;
+        if (!flag && icon) {
+            var icon_const = CONST.FLAG_TEXT[icon];
+            if (icon_const) {
+                flag = icon_const;
+            }
+        }
         if (flag) {
             var src = flag.src;
-            var img = _getImg(src);
-
-            var w = flag.width || img.width,
-                h = flag.height || img.height;
-            img_style = {
-                img: img,
-                width: w,
-                height: h,
-                is_center: flag.center
-            };
-            y_offset += h/2;
+            var img = _getImg(src);console.log(flag, img.width, img.height);
+            if (img) {
+                var w = flag.width || img.width,
+                    h = flag.height || img.height;
+                img_style = {
+                    img: img,
+                    width: w,
+                    height: h,
+                    is_center: flag.center
+                };
+                y_offset += h/2;
+            }
         }
         var shadowBlur = _style['shadowBlur'],
             shadowColor = _style['shadowColor'],
@@ -266,19 +276,18 @@
     var _cache_img = {};
     function _getImg(src) {
         if (typeof src === 'string') {
-            if (_cache_img[src]) {
-                return _cache_img[src];
-            } else {
-                var data = src;
-                if (src.indexOf('data:image') !== 0) {
-                    // 同步处理image
-                    var image = nativeImage.createFromPath(src);
-                    data = image.toDataURL();
+            var data = src;
+            if (src.indexOf('data:image') !== 0) {
+                if (!util_file.exists(src)) {
+                    return null;
                 }
-                img = new Image();
-                img.src = data;
-                return img;
+                // 同步处理image
+                var image = nativeImage.createFromPath(src);
+                data = image.toDataURL();
             }
+            img = new Image();
+            img.src = data;
+            return img;
         } else {
             return src;
         }
@@ -295,29 +304,33 @@
         var is_center = !!style.center;
 
         var img = _getImg(src);
-        if (width && !height) {
-            height = img.height * width/img.width;
-        }
-        if (height && !width) {
-            width = img.width * height/img.height;
-        }
-        width = width || img.width;
-        height = height || img.height;
-
-        var _normal = style.normal;
-        _this.style = {
-            normal: undefined === _normal? true: !!_normal
-        }
-        _this.draw = function(ctx, projection) {
-            var pixel = isNaN(lng) && isNaN(lat)? [x, y]: projection([lng, lat]);
-
-            // 图片居中显示在点上
-            if (is_center) {
-                pixel[0] -= width/2;
-                pixel[1] -= height/2;
+        if (img) {
+            if (width && !height) {
+                height = img.height * width/img.width;
             }
-            ctx.drawImage(img, pixel[0], pixel[1], width, height);
-        }
+            if (height && !width) {
+                width = img.width * height/img.height;
+            }
+            width = width || img.width;
+            height = height || img.height;
+
+            var _normal = style.normal;
+            _this.style = {
+                normal: undefined === _normal? true: !!_normal
+            }
+            _this.draw = function(ctx, projection) {
+                var pixel = isNaN(lng) && isNaN(lat)? [x, y]: projection([lng, lat]);
+
+                // 图片居中显示在点上
+                if (is_center) {
+                    pixel[0] -= width/2;
+                    pixel[1] -= height/2;
+                }
+                ctx.drawImage(img, pixel[0], pixel[1], width, height);
+            }
+        } else {
+            _this.draw = function(ctx, projection) {}
+        }        
     }
     exports.Polygon = Polygon;
     exports.Polyline = Polyline;

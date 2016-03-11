@@ -123,6 +123,7 @@
 		read: read,
 		readJson: readJson,
 		write: write,
+		stat: fs.statSync,
 		exists: exists,
 		rename: rename,
 		rm: rmfileSync,

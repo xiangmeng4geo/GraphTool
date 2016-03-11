@@ -38,6 +38,13 @@
 				type: 'img'
 			}]
 		},
+		FLAG_TEXT: {
+			BLUE_BALL: {
+				width: 5,
+				height: 5,
+				src: path_img_ball
+			}
+		},
 		COLOR: {
 			TRANSPARENT: 'rgba(0,0,0,0)'
 		},

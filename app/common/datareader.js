@@ -30,6 +30,14 @@
             cb(new Error('no support ['+type+'] method of reader!'));
         }
         if (_reader) {
+            // 让文件的修改时间参与缓存
+            var file_path = opt.file;
+            if (file_path && util_file.exists(file_path)) {
+                var stat = util_file.stat(file_path);
+                if (stat) {
+                    opt._mtime = stat.mtime;
+                }
+            }
             var key = util.serialize.md5(opt);
             var cache_path = util_path.join(CONST.PATH.CACHE, key);
 
