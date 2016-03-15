@@ -8,6 +8,7 @@ app/cache/*
 app/output/*
 app/image/*
 shell/testdata/source/data/
+shell/testdata/build/Autosave/*
 shell/testdata/target/
 shell/build/target/*
 shell/build/x64/*
