@@ -28,9 +28,14 @@
 
 		var $log = $('#log'),
 			$logTextarea = $log.find('textarea');
-		function _log(msg) {
-			$logTextarea.val($logTextarea.val()+'\n'+msg);
-			console.log(msg);
+		function _log(msg, is_clear) {
+			if (is_clear) {
+				$logTextarea.val(msg||'');
+			} else {
+				$logTextarea.val($logTextarea.val()+'\n'+msg);
+				$logTextarea.scrollTop($logTextarea.get(0).scrollHeight);
+				console.log(msg);
+			}
 		}
 		function _getNewest(dir, rule){
 			var time_start,time_end;
@@ -125,48 +130,62 @@
 	        }
 	        return getNodes(json);
 		}
-		function _exportProduct() {
+		function _exportProduct(cb) {
 			var result = _getAllChecked(tree_product);
+			var arr_product = [];
 			function _copy(arr) {
 				arr.forEach(function(v) {
 					var children = v.childNodes;
 					if (children) {
 						_copy(children);
 					} else {
-						try {
-							var conf = require(path.join(path_config, v.name));
-						} catch(e){
-						}
-						if (conf) {
-							var conf_val = conf.data.val;
-							conf_val.file = {
-								is_newest: true,
-								val: {
-									newest_days: 999
-								}
-							}
-
-							var file_path = null;
-							try {
-								file_path = _parse(conf.data);
-							} catch(e){}
-							if (util.file.exists(file_path)) {
-								var file_name = path.basename(file_path);
-								util.file.copy(file_path, path.join(PATH_DATA_DATA, file_name));
-
-								_log('\t复制'+file_path);
-
-								conf_val.file_rule.is_common = false;
-								conf_val.file_rule.val_custom = file_name;
-							}
-							conf_val.dir_in = '';
-							_log('成功处理'+v.name);
-						}
+						arr_product.push(v.name);
 					}
 				});
 			}
 			_copy(result);
-			util.file.write(path.join(PATH_DATA_CONFIG, '.tree.json'), JSON.stringify(result));
+			var n_dealed = 0;
+			function _run() {
+				n_dealed++;
+				var name = arr_product.shift();
+				if (!name) {
+					util.file.write(path.join(PATH_DATA_CONFIG, '.tree.json'), JSON.stringify(result));
+					cb && cb();
+					return;
+				}
+				try {
+					var conf = require(path.join(path_config, name));
+				} catch(e){
+				}
+				if (conf) {
+					var conf_val = conf.data.val;
+					conf_val.file = {
+						is_newest: true,
+						val: {
+							newest_days: 999
+						}
+					}
+
+					var file_path = null;
+					try {
+						file_path = _parse(conf.data);
+					} catch(e){}
+					if (util.file.exists(file_path)) {
+						var file_name = path.basename(file_path);
+						util.file.copy(file_path, path.join(PATH_DATA_DATA, file_name));
+
+						_log('\t复制'+file_path);
+
+						conf_val.file_rule.is_common = false;
+						conf_val.file_rule.val_custom = file_name;
+					}
+					conf_val.dir_in = '';
+					_log(n_dealed+' 成功处理'+name);
+				}
+				setTimeout(_run, 0);
+			}
+			_run();
+			
 		}
 		function _exportMap() {
 			var result = _getAllChecked(tree_map);
@@ -296,10 +315,16 @@
 	    }
 	    var treeDataGeo = [{
 	    	text: '全部地图',
+	    	state: {
+                opened: true
+            },
 	    	children: _getGeoChild()
 	    }];
 	    var treeDataLegend = [{
 	    	text: '全部图例',
+	    	state: {
+                opened: true
+            },
 	    	children: _getLegendChild()
 	    }];
 
@@ -346,18 +371,26 @@
 				return _alert('没有要导出的图例！');
 			}
 
-			if (flag_product) {
-				_exportProduct();
-			}
-			if (flag_map) {
+			_log('(1) 正在导出产品配置及相关数据文件');
+			_exportProduct(function() {
+				_log('(2) 正在导出地图配置及相关数据文件');
 				_exportMap();
-			}
-			if (flag_legend) {
+				_log('(3) 正在导出图例配置');
 				_exportLegend();
-			}
-
-			_alert('导出成功！');
+				_log('------------- 导出成功!-------------');
+				$btn_export.val(val_btn_export);
+			});
+			// _alert('导出成功！');
 		}
-		$('#btn_export').click(_export);
+		var $btn_export = $('#btn_export').click(function() {
+			if ($btn_export.val() == val_dealing) {
+				return;
+			}
+			_log('', true);
+			$btn_export.val(val_dealing);
+			setTimeout(_export, 10);
+		});
+		var val_dealing = '正在处理';
+		var val_btn_export = $btn_export.val();
 	});
 }()
