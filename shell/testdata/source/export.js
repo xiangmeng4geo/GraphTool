@@ -6,6 +6,8 @@
 	util.init({
 		name: 'export'
 	}, function() {
+		var electron = require('electron');
+	    var shell = electron.shell;
 		var $ = require('./lib/j');
 		var tree = require('./lib/j.tree');
 
@@ -383,8 +385,10 @@
 				_exportMap();
 				_log('('+(step++)+') 正在导出图例配置');
 				_exportLegend();
+				_log('导出路径为：'+PATH_DATA+', 可以把这个目录下的内容打包发给相关人员！');
 				_log('------------- 导出成功!-------------');
 				$btn_export.val(val_btn_export);
+				shell.showItemInFolder(PATH_DATA);
 			});
 			// _alert('导出成功！');
 		}

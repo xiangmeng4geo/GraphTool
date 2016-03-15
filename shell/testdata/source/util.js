@@ -41,7 +41,24 @@
 		var app = require('app');
 		var electron = require('electron');
 		var BrowserWindow = require('browser-window');
-
+		var shouldQuit = app.makeSingleInstance(function() {
+			var wins = BrowserWindow.getAllWindows();
+			if (wins && wins.length > 0) {
+				var w = wins[0];
+				w.setAlwaysOnTop(true);
+				w.restore();
+				w.focus();
+				w.setAlwaysOnTop(false);
+			}
+			return true;
+		});
+		if (shouldQuit) {
+			app.quit();
+			return;
+		}
+		app.on('window-all-closed', function () {
+			app.quit();
+		});
 		app.on('ready', function() {
 			var win = new BrowserWindow({
 				width: option.width || 1000,
@@ -50,12 +67,12 @@
 				autoHideMenuBar: true
 			});
 			win.loadURL(path.join('file://' , __dirname, name+ '.html'));
+			win.show();
 			var content = win.webContents;
-			content.on('did-finish-load', function() {
+			content.on('dom-ready', function() {
 				var js = 'require("./'+name+'")'
 				content.executeJavaScript(js);
 			})
-			win.show();
 		});
 	}
 	function exists(_p){
@@ -122,6 +139,54 @@
 		fs.closeSync(fdr);
 		fs.closeSync(fdw);
 	}
+	function readdir(dir, attr) {
+		attr || (attr = {});
+		var is_not_recursive = attr.is_not_recursive;
+		if(fs.existsSync(dir)) {
+			var stat = fs.statSync(dir);
+			if(stat.isDirectory()) {
+				var return_val = [];
+				var files = fs.readdirSync(dir);
+				var is_mtime = attr.mtime;
+				files.sort().forEach(function(file) {
+					var fullName = path.join(dir, file);
+					var stat_file = fs.statSync(fullName);
+					var isDir = stat_file.isDirectory();
+					var obj = {name: fullName, isDir: isDir};
+					if(is_mtime){
+						obj.mtime = stat_file.mtime;
+					}
+					if (isDir) {
+						obj.sub = is_not_recursive? []: readdir(fullName);
+					}
+					return_val.push(obj);
+				});
+				return return_val;
+			}
+		}
+	}
+	var copyDirSync = function(fromPath, toPath) {
+		var cache = {};
+		function _init(list) {
+			if (!list || list.length == 0) {
+				return;
+			}
+			list.forEach(function(v) {
+				if (!v.isDir) {
+					cache[v.name] = 1;
+				} else {
+					_init(v.sub);
+				}
+			});
+		}
+		_init(readdir(fromPath));
+		for (var i in cache) {
+			var old_path = i;
+			var new_path = old_path.replace(fromPath, toPath);
+			copyFileSync(old_path, new_path)
+		}
+		return true;
+	}
 	_exports.init = function(name, cb_render) {
 		if (process.type == 'renderer') {
 			cb_render && cb_render();
@@ -173,6 +238,7 @@
 	_exports.file.exists = exists;
 	_exports.file.copy = copyFileSync;
 	_exports.file.rm = rmfileSync;
+	_exports.file.copyDir = copyDirSync;
 
 	var PATH_DATA = path.join(__dirname, 'data');
 	var PATH_DATA_CONFIG = path.join(PATH_DATA, 'config');

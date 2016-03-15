@@ -155,16 +155,7 @@
 			_log('('+(step++)+') 正在备份旧配置文件');
 			if (util_file.exists(PATH_CONFIG_USER)) {
 				var new_dirname = 'config_bak_'+(new Date().getTime());
-				try {
-					fs.renameSync(PATH_CONFIG_USER, path.join(path.dirname(PATH_CONFIG_USER), new_dirname));
-				} catch(e) {
-					var msg = '为了您的数据安全，系统将会备份数据，但操作失败，请确保“'+PATH_CONFIG_USER+'”目录没有打开或被其它程序使用';
-					_log(msg);
-					util.ui.dialog.alert(msg, function() {
-						is_dealing = false;
-					});
-					return;
-				}
+				util_file.copyDir(PATH_CONFIG_USER, path.join(path.dirname(PATH_CONFIG_USER), new_dirname));
 				_log('原数据备份在['+new_dirname+']下');
 			}
 			_log('('+(step++)+') 正在导出产品配置');
