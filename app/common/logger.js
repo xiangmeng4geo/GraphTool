@@ -9,10 +9,10 @@
 	var CONST_LOG = CONST.LOG;
 	var PATH_LOG = CONST_LOG.PATH;
 	var LOG_DELAY = CONST_LOG.DELAY || 10;
+	var LOG_DAYS = CONST_LOG.DAYS || 3; //日志保留天数
 
 	var EOL = require('os').EOL;
 	var EXT_LOGFILE = '.log';
-
 
 	function format_date(date, format){
 		format || (format = 'yyyy-MM-dd hh:mm:ss');

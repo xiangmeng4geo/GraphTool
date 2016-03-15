@@ -31,7 +31,9 @@
 		// 和解耦合
 		require('./command');
 	}
-
+	// 启动处理缓存和日志文件的子进程
+	require('child_process').fork(path.join(__dirname, '../common/cache.js'));
+	
 	// 创建必要的目录
 	util_file_mkdir(CONST.PATH.CACHE);
 

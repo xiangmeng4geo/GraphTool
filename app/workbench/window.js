@@ -73,23 +73,33 @@
 	 */
 	var win_load = function(win, name, param){
 		if(win){
+			var path_core = path.join(PATH.UI, 'action/core').replace(/\\/g, '/');
 			win.loadURL(path.join('file://' , PATH.UI, name+ '.html'));
 			var content = win.webContents;
-			content.on('did-finish-load', function(){
-				var path_core = path.join(PATH.UI, 'action/core').replace(/\\/g, '/');
-				var js = '';
-				if (param) {
-					js = 'var _PARAM_ = '+JSON.stringify(param)+';';
-				}
-				js += 'require("'+path_core+'")';
-				// var js = 'var __src=document.createElement("script");__src.src="'+path_core+'.js";document.body.appendChild(__src)';
-				// console.log(js);
-
+			var js = '';
+			if (param) {
+				js = 'var _PARAM_ = '+JSON.stringify(param)+';';
+			}
+			js += 'require("'+path_core+'")';
+			content.on('dom-ready', function() {
 				content.executeJavaScript(js);
-				// fs.readFile(, function(e, str_js){
-				// 	content.executeJavaScript(str_js.toString());
-				// });
 			});
+			// content.on('did-finish-load', function(){
+			// // 	var js = '';
+			// // 	if (param) {
+			// // 		js = 'var _PARAM_ = '+JSON.stringify(param)+';';
+			// // 	}
+			// // 	js += 'require("'+path_core+'")';
+			// // 	var js = 'var __src=document.createElement("script");__src.src="'+path_core+'.js";document.body.appendChild(__src)';
+			// // 	console.log(js);
+			// // 	js += ';alert(123);console.log(123)';
+			// 	content.executeJavaScript(js, true, function(result) {
+			// 		console.log(result);
+			// 	});
+			// // 	// fs.readFile(, function(e, str_js){
+			// // 	// 	content.executeJavaScript(str_js.toString());
+			// // 	// });
+			// });
 		}
 		return win;
 	}
