@@ -1,0 +1,234 @@
+{
+	"data": {
+		"file": "20160315.txt"
+	},
+	"map": {
+		"maps": [{
+			"is_use": true,
+			"file": "C:\\Users\\技术\\BPA\\GT\\geo\\地市界.shp",
+			"style": {
+				"strokeStyle": "#d2d2d2",
+				"lineWidth": "0.2",
+				"fillStyle": "#000000",
+				"flag_fill": false
+			},
+			"clip": true,
+			"borderStyle": {
+				"flag": false,
+				"strokeStyle": "#000000",
+				"lineWidth": "3",
+				"shadowBlur": "5",
+				"shadowColor": "#000000",
+				"shadowOffsetX": "0",
+				"shadowOffsetY": "0",
+				"flag_shadow": false
+			}
+		}, {
+			"is_use": true,
+			"file": "C:\\Users\\技术\\BPA\\GT\\geo\\省道.shp",
+			"style": {
+				"strokeStyle": "#ff0033",
+				"lineWidth": "0.2",
+				"fillStyle": "#ff0033",
+				"flag_fill": true
+			},
+			"clip": false,
+			"borderStyle": {
+				"flag": true,
+				"strokeStyle": "#ff0033",
+				"lineWidth": "3",
+				"shadowBlur": "5",
+				"shadowColor": "#ff0033",
+				"shadowOffsetX": "0",
+				"shadowOffsetY": "0",
+				"flag_shadow": true
+			}
+		}, {
+			"is_use": true,
+			"file": "C:\\Users\\技术\\BPA\\GT\\geo\\铁路.shp",
+			"style": {
+				"strokeStyle": "#000000",
+				"lineWidth": "0.2",
+				"fillStyle": "#000000",
+				"flag_fill": true
+			},
+			"clip": false,
+			"borderStyle": {
+				"flag": true,
+				"strokeStyle": "#000000",
+				"lineWidth": "3",
+				"shadowBlur": "5",
+				"shadowColor": "#000000",
+				"shadowOffsetX": "0",
+				"shadowOffsetY": "0",
+				"flag_shadow": true
+			}
+		}, {
+			"is_use": true,
+			"file": "C:\\Users\\技术\\BPA\\GT\\geo\\一级河流.shp",
+			"style": {
+				"strokeStyle": "#0033ff",
+				"lineWidth": "0.2",
+				"fillStyle": "#0033ff",
+				"flag_fill": true
+			},
+			"clip": false,
+			"borderStyle": {
+				"flag": true,
+				"strokeStyle": "#0033ff",
+				"lineWidth": "3",
+				"shadowBlur": "5",
+				"shadowColor": "#0033ff",
+				"shadowOffsetX": "0",
+				"shadowOffsetY": "0",
+				"flag_shadow": true
+			}
+		}, {
+			"is_use": true,
+			"file": "C:\\Users\\技术\\BPA\\GT\\geo\\湖泊.shp",
+			"style": {
+				"strokeStyle": "#0099cc",
+				"lineWidth": "0.2",
+				"fillStyle": "#0099cc",
+				"flag_fill": true
+			},
+			"clip": false,
+			"borderStyle": {
+				"flag": true,
+				"strokeStyle": "#0099cc",
+				"lineWidth": "3",
+				"shadowBlur": "5",
+				"shadowColor": "#0099cc",
+				"shadowOffsetX": "0",
+				"shadowOffsetY": "0",
+				"flag_shadow": true
+			}
+		}],
+		"bound": {
+			"wn": [105.487495, 39.585442],
+			"es": [111.23912, 31.706919]
+		},
+		"textStyle": {
+			"city": true,
+			"county": false,
+			"fontSize": 14,
+			"color": "#0a0a0a"
+		},
+		"bg": {
+			"flag": false,
+			"color": "#000000"
+		}
+	},
+	"legend": "湿度",
+	"width": "550",
+	"height": "800",
+	"showLegendRange": true,
+	"texts": [{
+		"txt": "sd",
+		"x": 10,
+		"y": 10,
+		"fontSize": 20,
+		"color": "rgba(255, 0, 0, 0.8)"
+	}, {
+		"txt": "镇坪 52%",
+		"x": 10,
+		"y": 40,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)"
+	}, {
+		"txt": "宁强 51%",
+		"x": 10,
+		"y": 80,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)"
+	}, {
+		"txt": "太白 49%",
+		"x": 10,
+		"y": 120,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)"
+	}, {
+		"txt": "平利 46%",
+		"x": 10,
+		"y": 160,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)"
+	}, {
+		"txt": "华山 44%",
+		"x": 10,
+		"y": 200,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)"
+	}, {
+		"txt": "汉中\n41%",
+		"lng": 107.029998779297,
+		"lat": 33.0699996948242,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)",
+		"icon": "BLUE_BALL"
+	}, {
+		"txt": "安康\n38%",
+		"lng": 109.029998779297,
+		"lat": 32.7200012207031,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)",
+		"icon": "BLUE_BALL"
+	}, {
+		"txt": "宝鸡\n33%",
+		"lng": 107.129997253418,
+		"lat": 34.3499984741211,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)",
+		"icon": "BLUE_BALL"
+	}, {
+		"txt": "延安\n22%",
+		"lng": 109.5,
+		"lat": 36.5999984741211,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)",
+		"icon": "BLUE_BALL"
+	}, {
+		"txt": "咸阳\n21%",
+		"lng": 108.527273,
+		"lat": 34.786504,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)",
+		"icon": "BLUE_BALL"
+	}, {
+		"txt": "商洛\n21%",
+		"lng": 109.970001220703,
+		"lat": 33.8699989318848,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)",
+		"icon": "BLUE_BALL"
+	}, {
+		"txt": "铜川\n21%",
+		"lng": 109.069999694824,
+		"lat": 35.0800018310547,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)",
+		"icon": "BLUE_BALL"
+	}, {
+		"txt": "渭南\n20%",
+		"lng": 109.480003356934,
+		"lat": 34.5200004577637,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)",
+		"icon": "BLUE_BALL"
+	}, {
+		"txt": "榆林\n9%",
+		"lng": 109.699996948242,
+		"lat": 38.2299995422363,
+		"fontSize": 18,
+		"color": "rgba(0, 0, 0, 0.8)",
+		"icon": "BLUE_BALL"
+	}],
+	"imgs": [{
+		"src": "D:\\水印\\shuiyin1.jpg",
+		"x": 500,
+		"y": 750,
+		"width": 30,
+		"height": 30
+	}],
+	"savepath": "d:\\22.png"
+}
