@@ -20,13 +20,13 @@
 		var util_ui_checked = util.ui.checked;
 		var _alert = util.ui.dialog.alert;
 
-		var path_user = path.join(require('os').homedir(), 'BPA', 'GT');
-		var path_config = path.join(path_user, 'config');
+		var CONST = util.CONST;
+		var path_config = CONST.PATH_CONFIG_USER;
 
-		var PATH_DATA = path.join(__dirname, 'data');
-		var PATH_DATA_CONFIG = path.join(PATH_DATA, 'config');
-		var PATH_DATA_DATA = path.join(PATH_DATA, 'data');
-		var PATH_DATA_GEOFILE = path.join(PATH_DATA, 'geo');
+		var PATH_DATA = CONST.PATH_DATA;
+		var PATH_DATA_CONFIG = CONST.PATH_DATA_CONFIG;
+		var PATH_DATA_DATA = CONST.PATH_DATA_DATA;
+		var PATH_DATA_GEOFILE = CONST.PATH_DATA_GEOFILE;
 
 		var $log = $('#log'),
 			$logTextarea = $log.find('textarea');

@@ -4,6 +4,10 @@
 	var util = require('util');
 	var path_user = path.join(require('os').homedir(), 'BPA', 'GT');
 	var path_config = path.join(path_user, 'config');
+	var PATH_DATA = path.join(__dirname, 'data');
+	var PATH_DATA_CONFIG = path.join(PATH_DATA, 'config');
+	var PATH_DATA_DATA = path.join(PATH_DATA, 'data');
+	var PATH_DATA_GEOFILE = path.join(PATH_DATA, 'geo');
 
 	/*时间格式化*/
 	Date.prototype.format = Date.prototype.format || function(format,is_not_second){
@@ -42,7 +46,8 @@
 			var win = new BrowserWindow({
 				width: option.width || 1000,
 				height: option.height || 1000,
-				show: true
+				show: true,
+				autoHideMenuBar: true
 			});
 			win.loadURL(path.join('file://' , __dirname, name+ '.html'));
 			var content = win.webContents;
@@ -139,14 +144,14 @@
 		dialog[method](remote.getCurrentWindow(), param, cb);
 	}
 	_exports.ui.dialog = {
-		alert: function(msg) {
+		alert: function(msg, cb) {
 			_getDialog('showMessageBox', {
 				type: 'info',
 				buttons: ['yes'],
 				title: '系统提示',
 				message: msg,
 				icon: null
-			});
+			}, cb);
 		}
 	}
 	_exports.getProductTree = function() {
@@ -168,6 +173,19 @@
 	_exports.file.exists = exists;
 	_exports.file.copy = copyFileSync;
 	_exports.file.rm = rmfileSync;
+
+	var PATH_DATA = path.join(__dirname, 'data');
+	var PATH_DATA_CONFIG = path.join(PATH_DATA, 'config');
+	var PATH_DATA_DATA = path.join(PATH_DATA, 'data');
+	var PATH_DATA_GEOFILE = path.join(PATH_DATA, 'geo');
+
+	_exports.CONST = {
+		PATH_CONFIG_USER: path_config,
+		PATH_DATA: PATH_DATA,
+		PATH_DATA_CONFIG: PATH_DATA_CONFIG,
+		PATH_DATA_DATA: PATH_DATA_DATA,
+		PATH_DATA_GEOFILE: PATH_DATA_GEOFILE
+	};
 
 	module.exports = _exports;
 }()

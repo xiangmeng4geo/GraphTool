@@ -17,8 +17,11 @@ ul{
     <div class="row">
         <div id="tree_product"></div>
     </div>
-    <div id="log">
-        <textarea style="width: 100%; height: 200px;width:90%;margin: 10px auto;margin-left: 5%;padding: 5px;"></textarea>
+    <div class="row" style="text-align: center;">
+    	<input value="确认导入" type="button" id="btn_yes"/>
+    </div>
+    <div id="log" style="position: absolute;width: auto; height: auto;left:10px;right:10px;top:30px;bottom:10px;">
+        <textarea style="width: calc(100% - 10px);height: calc(100% - 10px);padding: 5px;" placeholder="这里显示处理进度"></textarea>
     </div>
 </body>
 </html>
