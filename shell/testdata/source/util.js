@@ -55,6 +55,32 @@
 	function exists(_p){
 		return fs.existsSync(_p);
 	}
+	/**
+	 * 文件工具类
+	 */
+	function rmfileSync(p, is_not_rmmyself_if_directory) {
+	    //如果文件路径不存在或文件路径不是文件夹则直接返回
+	    try{
+	    	if(exists(p)){
+		    	var stat = fs.statSync(p);
+		    	if(stat.isDirectory()){
+		    		var files = fs.readdirSync(p);
+		    		files.forEach(function(file) {
+			            var fullName = path.join(p, file);
+			            if (fs.statSync(fullName).isDirectory()) {
+			                rmfileSync(fullName);
+			            } else {
+			                fs.unlinkSync(fullName);
+			            }
+			        });
+				    !is_not_rmmyself_if_directory && fs.rmdirSync(p);
+		    	}else{
+		    		fs.unlinkSync(p);
+		    	}
+		    }
+	    	return true;
+	    }catch(e){}
+	}
 	// 同步新建目录
 	function mkdirSync(mkPath) {
 		try{
@@ -123,10 +149,14 @@
 		}
 	}
 	_exports.getProductTree = function() {
-		return require(path.join(path_config, '.sys/sys_product_tree'));
+		try {
+			return require(path.join(path_config, '.sys/sys_product_tree'));
+		} catch(e){}
 	}
 	_exports.getSys = function() {
-		return require(path.join(path_config, '.sys/sys'));
+		try {
+			return require(path.join(path_config, '.sys/sys'));
+		} catch(e){}
 	}
 	_exports.file = {};
 	_exports.file.write = function(file_path, content_str) {
@@ -136,6 +166,7 @@
 	}
 	_exports.file.exists = exists;
 	_exports.file.copy = copyFileSync;
+	_exports.file.rm = rmfileSync;
 
 	module.exports = _exports;
 }()

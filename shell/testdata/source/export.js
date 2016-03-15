@@ -180,6 +180,7 @@
 						conf_val.file_rule.val_custom = file_name;
 					}
 					conf_val.dir_in = '';
+					util.file.write(path.join(PATH_DATA_CONFIG, name+'.json'), JSON.stringify(conf));
 					_log(n_dealed+' 成功处理'+name);
 				}
 				setTimeout(_run, 0);
@@ -236,7 +237,7 @@
 
 		var treeDataProduct = [{
 	        name: '全部产品',
-	        childNodes: util.getProductTree()
+	        childNodes: util.getProductTree() || []
 	    }];
 	    if (treeDataProduct) {
 	        var data = [];
@@ -291,9 +292,9 @@
 
 	    window.$tree = $tree;
 
-	    var data_sys = util.getSys();
-	    var data_sys_geo = data_sys.geo;
-	    var data_sys_legend = data_sys.legend;
+	    var data_sys = util.getSys() || {};
+	    var data_sys_geo = data_sys.geo || [];
+	    var data_sys_legend = data_sys.legend || [];
 
 	    function _getGeoChild() {
 	    	var arr = [];
@@ -371,11 +372,14 @@
 				return _alert('没有要导出的图例！');
 			}
 
-			_log('(1) 正在导出产品配置及相关数据文件');
+			var step = 1;
+			_log('('+(step++)+') 正在删除旧文件');
+			util.file.rm(PATH_DATA);
+			_log('('+(step++)+') 正在导出产品配置及相关数据文件');
 			_exportProduct(function() {
-				_log('(2) 正在导出地图配置及相关数据文件');
+				_log('('+(step++)+') 正在导出地图配置及相关数据文件');
 				_exportMap();
-				_log('(3) 正在导出图例配置');
+				_log('('+(step++)+') 正在导出图例配置');
 				_exportLegend();
 				_log('------------- 导出成功!-------------');
 				$btn_export.val(val_btn_export);
