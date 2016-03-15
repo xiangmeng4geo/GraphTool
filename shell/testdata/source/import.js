@@ -1,6 +1,8 @@
 !function() {
 	var util = require('./util');
-	util.init('import', function() {
+	util.init({
+		name: 'import'
+	}, function() {
 		console.log('render');
 	});
 }()

@@ -31,7 +31,8 @@
 		return format;
 	}
 	var _exports = {};
-	var _start = function(name) {
+	var _start = function(option) {
+		var name = option.name;
 		var path = require('path');
 		var app = require('app');
 		var electron = require('electron');
@@ -39,8 +40,8 @@
 
 		app.on('ready', function() {
 			var win = new BrowserWindow({
-				width: 1000,
-				height: 1000,
+				width: option.width || 1000,
+				height: option.height || 1000,
 				show: true
 			});
 			win.loadURL(path.join('file://' , __dirname, name+ '.html'));

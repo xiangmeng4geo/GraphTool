@@ -3,7 +3,9 @@
 	var fs = require('fs');
 	var util = require('./util');
 
-	util.init('export', function() {
+	util.init({
+		name: 'export'
+	}, function() {
 		var $ = require('./lib/j');
 		var tree = require('./lib/j.tree');
 
