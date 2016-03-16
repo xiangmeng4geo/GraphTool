@@ -68,6 +68,7 @@
 			});
 			win.loadURL(path.join('file://' , __dirname, name+ '.html'));
 			win.show();
+			win.openDevTools();
 			var content = win.webContents;
 			content.on('dom-ready', function() {
 				var js = 'require("./'+name+'")'
@@ -119,6 +120,9 @@
 	}
 	/*同步拷贝文件*/
 	var copyFileSync = function(fromPath, toPath){
+		if (!fs.existsSync(fromPath)) {
+			return;
+		}
 		if(fs.existsSync(toPath)){
 			fs.unlinkSync(toPath);
 		}else{
@@ -217,6 +221,20 @@
 				message: msg,
 				icon: null
 			}, cb);
+		},
+		save: function(default_filepath, callback) {
+			_getDialog('showSaveDialog', {
+				title: '选择保存路径',
+	            defaultPath: default_filepath,
+	            filters: [{
+			        "name": "zip文件",
+			        "extensions": ["zip"]
+			    }]
+			}, function(file_path) {
+				if (file_path) {
+					callback && callback(file_path);
+				}
+			});
 		}
 	}
 	_exports.getProductTree = function() {

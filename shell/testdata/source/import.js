@@ -22,6 +22,14 @@
 		var PATH_CONFIG_GEO = path.join(path.dirname(PATH_CONFIG_USER), 'geo');
 
 		var $textarea = $('textarea');
+		function _write(file_path, content) {
+			try {
+				util_file.write(file_path, JSON.stringify(content));
+			} catch(e){
+
+			}
+			return true;
+		}
 		function _log(msg, is_clear) {
 			if (is_clear) {
 				$textarea.val(msg||'');
@@ -46,8 +54,9 @@
 		}
 		function _dealProduct(cb) {
 			var treeData = _req('.tree', []);
-			util_file.write(path.join(PATH_CONFIG_USER, '.sys', 'sys_product_tree.json'), JSON.stringify(treeData));
-			_log('产品列表导出完成！');
+			if (_write(path.join(PATH_CONFIG_USER, '.sys', 'sys_product_tree.json'), treeData)) {
+				_log('产品列表导出完成！');
+			}
 
 			var arr_product = [];
 			function _copy(arr) {
@@ -64,7 +73,6 @@
 
 			function _run() {
 				var name = arr_product.shift();
-				console.log(name, arr_product);
 				if (!name) {
 					cb && cb();
 					return;
@@ -82,8 +90,9 @@
 					} catch(e){}
 					try {
 						var conffilename = name+'.json';
-						util_file.write(path.join(PATH_CONFIG_USER, conffilename), JSON.stringify(conf));
-						_log('写入 '+conffilename);
+						if (_write(path.join(PATH_CONFIG_USER, conffilename), conf)) {
+							_log('写入 '+conffilename);
+						}
 					} catch(e){}
 				}
 
@@ -96,9 +105,9 @@
 			var confSys = _req(PATH_SYS, {});
 			var legend = _req('.legend', []);
 			confSys.legend = legend;
-			util_file.write(PATH_SYS, JSON.stringify(confSys));
-
-			_log('图例导出完成！');
+			if (_write(PATH_SYS, confSys)) {
+				_log('图例导出完成！');
+			}
 		}
 		function _dealMap(cb) {
 			var confSys = _req(PATH_SYS, {});
@@ -126,8 +135,9 @@
 			function _run() {
 				var item = arr_maps.shift();
 				if (!item) {
-					util_file.write(PATH_SYS, JSON.stringify(confSys));
-					_log('地图导出完成！');
+					if (_write(PATH_SYS, confSys)) {
+						_log('地图导出完成！');
+					}
 
 					cb && cb();
 					return;

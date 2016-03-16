@@ -6,6 +6,9 @@
 	util.init({
 		name: 'export'
 	}, function() {
+		var fs = require('fs');
+		var archiver = require('archiver');
+
 		var electron = require('electron');
 	    var shell = electron.shell;
 		var $ = require('./lib/j');
@@ -134,7 +137,16 @@
 	        }
 	        return getNodes(json);
 		}
-		function _exportProduct(cb) {
+		var PATH_ZIP_RESOURCES = 'resources'
+		var PATH_ZIP_APP = path.join(PATH_ZIP_RESOURCES, 'app');
+		var PATH_ZIP_DATA = path.join(PATH_ZIP_APP, 'data');
+		var PATH_ZIP_DATA_CONFIG = path.join(PATH_ZIP_DATA, 'config');
+		var PATH_ZIP_DATA_DATA = path.join(PATH_ZIP_DATA, 'data');
+		var PATH_ZIP_DATA_GEO = path.join(PATH_ZIP_DATA, 'geo');
+		var TYPE_JSON = 1;
+		var TYPE_PATH = 2;
+		var TYPE_STRING = 3;
+		function _exportProduct(writer, cb) {
 			var result = _getAllChecked(tree_product);
 			var arr_product = [];
 			function _copy(arr) {
@@ -153,7 +165,11 @@
 				n_dealed++;
 				var name = arr_product.shift();
 				if (!name) {
-					util.file.write(path.join(PATH_DATA_CONFIG, '.tree.json'), JSON.stringify(result));
+					// util.file.write(path.join(PATH_DATA_CONFIG, '.tree.json'), JSON.stringify(result));
+					writer(path.join(PATH_ZIP_DATA_CONFIG, '.tree.json'), {
+						type: TYPE_JSON,
+						val: result
+					});
 					cb && cb();
 					return;
 				}
@@ -176,7 +192,11 @@
 					} catch(e){}
 					if (util.file.exists(file_path)) {
 						var file_name = path.basename(file_path);
-						util.file.copy(file_path, path.join(PATH_DATA_DATA, file_name));
+						// util.file.copy(file_path, path.join(PATH_DATA_DATA, file_name));
+						writer(path.join(PATH_ZIP_DATA_DATA, file_name), {
+							type: TYPE_PATH,
+							val: file_path
+						});
 
 						_log('\t复制'+file_path);
 
@@ -184,15 +204,19 @@
 						conf_val.file_rule.val_custom = file_name;
 					}
 					conf_val.dir_in = '';
-					util.file.write(path.join(PATH_DATA_CONFIG, name+'.json'), JSON.stringify(conf));
+					// util.file.write(path.join(PATH_DATA_CONFIG, name+'.json'), JSON.stringify(conf));
+					writer(path.join(PATH_ZIP_DATA_CONFIG, name+'.json'), {
+						type: TYPE_JSON,
+						val: conf
+					});
 					_log(n_dealed+' 成功处理'+name);
 				}
-				setTimeout(_run, 0);
+				setImmediate(_run, 10);
 			}
 			_run();
 			
 		}
-		function _exportMap() {
+		function _exportMap(writer) {
 			var result = _getAllChecked(tree_map);
 			var data_map = [];
 			var cache = {};
@@ -219,10 +243,14 @@
 					}
 				}
 			});
-			util.file.write(path.join(PATH_DATA_CONFIG, '.maps.json'), JSON.stringify(data_map));
+			// util.file.write(path.join(PATH_DATA_CONFIG, '.maps.json'), JSON.stringify(data_map));
+			writer(path.join(PATH_ZIP_DATA_CONFIG, '.maps.json'), {
+				type: TYPE_JSON,
+				val: data_map
+			});
 			_log('成功导出'+data_map.length+'条地图配置！');
 		}
-		function _exportLegend() {
+		function _exportLegend(writer) {
 			var result = _getAllChecked(tree_legend);
 			var data = [];
 			var cache = {};
@@ -235,7 +263,11 @@
 				}
 			});
 
-			util.file.write(path.join(PATH_DATA_CONFIG, '.legend.json'), JSON.stringify(data));
+			// util.file.write(path.join(PATH_DATA_CONFIG, '.legend.json'), JSON.stringify(data));
+			writer(path.join(PATH_ZIP_DATA_CONFIG, '.legend.json'), {
+				type: TYPE_JSON,
+				val: data
+			});
 			_log('成功导出'+data.length+'条地图配置！');
 		}
 
@@ -333,7 +365,39 @@
 	    	children: _getLegendChild()
 	    }];
 
+	    function _zip(save_path) {
+			var archive = archiver('zip');
+			var output = fs.createWriteStream(save_path);
+			output.on('close', function() {
+			  console.log(archive.pointer() + ' total bytes');
+			  _afterExport();
+			});
 
+			archive.on('error', function(err){
+			    throw err;
+			});
+			archive.pipe(output);
+			return archive;
+	    }
+	    var _getWriter = function(zip) {
+	    	return function(file_path, content) {
+	    		var type = content.type;
+	    		var val = content.val;
+    			var source;
+	    		if (type == TYPE_JSON) {
+	    			source = JSON.stringify(val);
+	    		} else if (type == TYPE_PATH) {
+	    			source = fs.createReadStream(val);
+	    		} else if (type == TYPE_STRING) {
+	    			source = val;
+	    		}
+	    		if (source) {
+		    		zip.append(source, {
+		    			name: file_path
+		    		});
+	    		}
+	    	}
+	    }
 	    function _initTree($treeObj, data) {
 	    	var $tree = $treeObj.jstree({
 		        'core': {
@@ -359,8 +423,57 @@
 		    });
 		    return $tree.jstree();
 	    }
+	    function _exportSource(zip) {
+	    	function copy(file_path, name) {
+	    		if (util.file.exists(file_path)) {
+	    			console.log(file_path);
+	    			var stream = fs.createReadStream(file_path);
+	    			zip.append(stream, {
+			    		name: name
+			    	});
+	    		}
+	    	}
+	    	// copy(path.join(__dirname, '../atom.asar'), path.join(PATH_ZIP_RESOURCES, 'atom.asar'));
+	    	zip.bulk({
+	    		cwd: path.join(__dirname, '../../'),
+	    		src: ['*.*']
+	    	});
+	    	zip.bulk({
+	    		cwd: path.join(__dirname, '../../'),
+	    		src: ['locales/**/**']
+	    	}, {
+	    		name: 'locales'
+	    	});
+	    	// zip.bulk({
+	    	// 	cwd: path.join(__dirname, '../../'),
+	    	// 	src: ['resources/atom.asar/**/**']
+	    	// }, {
+	    	// 	name: 'resources/atom.asar'
+	    	// });
+
+	    	zip.append(require('asar').getStream(path.join(__dirname, '../atom.asar')), {
+	    		name: path.join(PATH_ZIP_RESOURCES, 'atom.asar')
+	    	});
+	    	copy(path.join(__dirname, 'import.html'), path.join(PATH_ZIP_APP, 'import.html'));
+	    	copy(path.join(__dirname, 'import.js'), path.join(PATH_ZIP_APP, 'import.js'));
+	    	copy(path.join(__dirname, 'util.js'), path.join(PATH_ZIP_APP, 'util.js'));
+	    	copy(path.join(__dirname, 'lib/j.js'), path.join(PATH_ZIP_APP, 'lib/j.js'));
+	    	_getWriter(zip)(path.join(PATH_ZIP_APP, 'package.json'), {
+	    		type: TYPE_JSON,
+	    		val: {
+	    			main: 'import.js'
+	    		}
+	    	});
+	    }
+	    var file_path_save;
 	    var tree_map = _initTree($('#tree_map'), treeDataGeo);
 	    var tree_legend = _initTree($('#tree_legend'), treeDataLegend);
+	    function _afterExport() {
+	    	$btn_export.val(val_btn_export);
+			_log('------------- 导出成功! -------------');
+			shell.showItemInFolder(file_path_save);
+
+	    }
 		function _export() {
 			var flag_product = _isChecked(tree_product.get_json()[0]);
 			if (!flag_product) {
@@ -376,21 +489,25 @@
 				return _alert('没有要导出的图例！');
 			}
 
-			var step = 1;
-			_log('('+(step++)+') 正在删除旧文件');
-			util.file.rm(PATH_DATA);
-			_log('('+(step++)+') 正在导出产品配置及相关数据文件');
-			_exportProduct(function() {
-				_log('('+(step++)+') 正在导出地图配置及相关数据文件');
-				_exportMap();
-				_log('('+(step++)+') 正在导出图例配置');
-				_exportLegend();
-				_log('导出路径为：'+PATH_DATA+', 可以把这个目录下的内容打包发给相关人员！');
-				_log('------------- 导出成功!-------------');
-				$btn_export.val(val_btn_export);
-				shell.showItemInFolder(PATH_DATA);
+			file_path_save = null;
+			util.ui.dialog.save(path.join('蓝PI制图测试数据_'+(new Date().format('yyyy-MM-dd'))+'.zip'), function(file_path) {
+				file_path_save = file_path;
+				var zip = _zip(file_path_save);
+				var writer = _getWriter(zip);
+				var step = 1;
+				_log('('+(step++)+') 正在导出产品配置及相关数据文件');
+				_exportProduct(writer, function() {
+					_log('('+(step++)+') 正在导出地图配置及相关数据文件');
+					_exportMap(writer);
+					_log('('+(step++)+') 正在导出图例配置');
+					_exportLegend(writer);
+
+					_exportSource(zip);
+					zip.finalize();
+
+					_log('正在处理压缩文件：'+file_path_save);
+				});
 			});
-			// _alert('导出成功！');
 		}
 		var $btn_export = $('#btn_export').click(function() {
 			if ($btn_export.val() == val_dealing) {
