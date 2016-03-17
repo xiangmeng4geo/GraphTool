@@ -201,7 +201,7 @@
 					if (util.file.exists(file_path)) {
 						var file_name = path.basename(file_path);
 						// util.file.copy(file_path, path.join(PATH_DATA_DATA, file_name));
-						writer(path.join(PATH_ZIP_DATA_DATA, file_name), {
+						writer(path.join(PATH_ZIP_DATA_DATA, name, file_name), {
 							type: TYPE_PATH,
 							val: file_path
 						});
@@ -238,9 +238,14 @@
 						var file = map_file.file;
 						var file_name = path.basename(file);
 						if (util.file.exists(file)) {
-							util.file.copy(file, path.join(PATH_DATA_GEOFILE, file_name));
+							var file_name = path.basename(file);
+							writer(path.join(PATH_ZIP_DATA_GEO, file_name), {
+								type: TYPE_PATH,
+								val: file
+							});
 							map_file.file = file_name;
 							maps_new.push(map_file);
+							_log('复制 '+file_name);
 						} else {
 							_log(file+'不存在！');
 						}						
@@ -251,7 +256,6 @@
 					}
 				}
 			});
-			// util.file.write(path.join(PATH_DATA_CONFIG, '.maps.json'), JSON.stringify(data_map));
 			writer(path.join(PATH_ZIP_DATA_CONFIG, '.maps.json'), {
 				type: TYPE_JSON,
 				val: data_map

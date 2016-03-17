@@ -86,11 +86,11 @@
 				var conf = _req(name);
 				if (conf) {
 					try {
-						conf.data.val.dir_in = PATH_CONFIG_DATA;
+						conf.data.val.dir_in = path.join(PATH_CONFIG_DATA, name);
 					} catch(e){}
 					try {
 						var filename = conf.data.val.file_rule.val_custom;
-						util_file.copy(path.join(PATH_DATA_DATA, filename), path.join(PATH_CONFIG_DATA, filename));
+						util_file.copy(path.join(PATH_DATA_DATA, name, filename), path.join(PATH_CONFIG_DATA, name, filename));
 						_log('复制 '+filename);
 					} catch(e){}
 					try {
