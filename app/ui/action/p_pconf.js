@@ -24,7 +24,6 @@ Core.init(function(model) {
 
 	var geo = getSys.getGeo() || [];
 	var legend = getSys.getLegend() || [];
-	var size = getSys.getSize() || [];
 	var assets_sys = getSys.getAssets() || [];
 	var template = getSys.getTemplate() || [];
 
@@ -43,7 +42,6 @@ Core.init(function(model) {
 
 	var s_data_geo = [],
 		s_data_legend = [],
-		s_data_size = [],
 		s_data_template = [];
 	geo.forEach(function(v) {
 		s_data_geo.push({
@@ -56,12 +54,6 @@ Core.init(function(model) {
 		s_data_legend.push({
 			text: name,
 			val: v.blendent? name: ''
-		});
-	});
-	size.forEach(function(v, i) {
-		s_data_size.push({
-			text: v.name+'('+v.width+'X'+v.height+')',
-			val: i
 		});
 	});
 	template.forEach(function(v, i) {
@@ -104,10 +96,6 @@ Core.init(function(model) {
 	var s_legend = UI.select($('#s_legend'), {
 		data: s_data_legend,
 		val: conf_other.legend
-	});
-	var s_size = UI.select($('#s_size'), {
-		data: s_data_size,
-		val: conf_other.size
 	});
 	var s_legend_style = UI.select($('#s_legend_style'), {
 		data: CONST_LEGEND_STYLE,
@@ -441,7 +429,6 @@ Core.init(function(model) {
 			legend: s_legend.val(),
 			legend_style: s_legend_style.val(),
 			is_legend_range: _getChecked($cb_is_show_range_legend),
-			size: s_size.val(),
 			template: s_template.val()
 		};
 		conf.save = {
