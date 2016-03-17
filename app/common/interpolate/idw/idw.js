@@ -13,7 +13,8 @@
 			num = lnglat_arr[0].length,	//获取Y数组大小
 			num3 = SCoords.length,		//获取SCoords二维数组第二维长度
 			numArray = [],
-			num13 = NumberOfNearestNeighbors,
+			// 防止源数据点比较少时数据异常问题
+			num13 = num3 < 10?2: NumberOfNearestNeighbors,
 			numArray2 = new Array(num3),
 			objArray = [[],[]];
 		var cache = {};
@@ -82,7 +83,8 @@
 						if(v < DIS_POINTS){
 							flag = false;
 						}
-						num10 += v * (SCoords[objArray[1][index]]).v;
+						var _sv = SCoords[objArray[1][index]];
+						num10 += v * (_sv? _sv.v: 0);
 						num11 += v;
 					}
 					numArray[num4][num5] = bCalAllGrids || flag? num10 / num11: unDefData;
