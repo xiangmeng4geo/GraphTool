@@ -220,7 +220,7 @@
         }
         if (flag) {
             var src = flag.src;
-            var img = _getImg(src);console.log(flag, img.width, img.height);
+            var img = _getImg(src);
             if (img) {
                 var w = flag.width || img.width,
                     h = flag.height || img.height;

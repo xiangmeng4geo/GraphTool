@@ -49,8 +49,9 @@
 						return geo[i];
 					}
 				}
+			} else{
+				return geo;
 			}
-			return geo;
 		} else {
 			name = name.trim();
 			for (var i = 0, j = geo.length; i<j; i++) {
@@ -106,8 +107,9 @@
 						return template[i];
 					}
 				}
+			} else {
+				return template;
 			}
-			return template;
 		} else {
 			name = name.trim();
 			for (var i = 0, j = template.length; i<j; i++) {
@@ -156,26 +158,6 @@
 			return assets;
 		}
 	}
-	// function _assets(assets, is_use_sys) {
-	// 	if (!is_use_sys) {
-	// 		return assets;
-	// 	} else {
-	// 		var assets_new = [];
-	// 		for (var i = 0, j = assets.length; i<j; i++) {
-	// 			var item = assets[i];
-	// 			if (item.flag) {
-	// 				var key = item.key;
-	// 				if (key) {
-	// 					item = _getSys.getAssets(key);
-	// 				}
-	// 				if (item) {
-	// 					assets_new.push(item);
-	// 				}
-	// 			}
-	// 		}
-	// 		return assets_new;
-	// 	}
-	// }
 	function _assets(assets, conf, option) {
 		option = util_extend({
 			merge: false,
@@ -201,7 +183,7 @@
 				var assets_new = [];
 				for (var i = 0, j = assets.length; i<j; i++) {
 					var asset = assets[i];
-					if (isUseFlag && asset.flag || !isUseFlag) {
+					if ((isUseFlag && asset.flag) || !isUseFlag) {
 						var key = asset.key;
 						if (key) {
 							for (var i_ta = 0; i_ta<len; i_ta++) {
@@ -231,6 +213,17 @@
 				}
 				return assets_new;
 			}
+		} else {
+			var assets_new = [];
+			for (var i = 0, j = assets.length; i<j; i++) {
+				var asset = assets[i];
+				if ((isUseFlag && asset.flag) || !isUseFlag) {
+					if (!asset.key) {
+						assets_new.push(asset);
+					}
+				}
+			}
+			return assets_new;
 		}
 
 		return assets;

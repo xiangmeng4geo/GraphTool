@@ -7,8 +7,11 @@ app/logs/
 app/cache/*
 app/output/*
 app/image/*
-shell/testdata/data/
+shell/testdata/source/data/
+shell/testdata/build/Autosave/*
+shell/testdata/target/
 shell/build/target/*
 shell/build/x64/*
 shell/build/ia32/*
 shell/build/script/Autosave/*
+*/Autosave/*

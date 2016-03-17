@@ -49,4 +49,5 @@ function run(conf_name) {
 // run('tmp.json');
 // run('rain-1.json');
 // run('rain-2.json');
-run('20160310.json');
+// run('20160310.json');
+run('20160315.json');

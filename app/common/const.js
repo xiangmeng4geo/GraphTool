@@ -65,6 +65,9 @@
 			DELAY: 10, // 异步写日志间隔(s)
 			DAYS: 3 // 日志保留天数
 		},
+		CACHE: {
+			NUM: 40
+		},
 		TOOLBAR: (function() {
 			var arr = [
 				[{
