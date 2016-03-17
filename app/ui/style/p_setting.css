@@ -301,5 +301,6 @@ input.txt_sys_size:focus{
 	background-color: white;
 	margin: 10px;
 	position: relative;
+	overflow: hidden;
 }
 /*系统模板 }*/

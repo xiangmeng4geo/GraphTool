@@ -4,5 +4,5 @@
 	"height": 600,
 	"minHeight": 600,
 	"frame": false,
-	"transparent": true
+	"transparent": true,"debug": true
 }

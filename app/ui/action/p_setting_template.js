@@ -56,7 +56,8 @@ Core.init(function(model) {
                         pos: {
                         	left: left + CONST_STEP*i,
                         	top: top + CONST_STEP*i
-                        }
+                        },
+                        edit: true
                     }, {
                     	type: type
                     });
@@ -94,6 +95,17 @@ Core.init(function(model) {
 	}];
 	var menu = Menu.buildFromTemplate(tmplMenu);
 	Menu.setApplicationMenu(menu);
+
+	var COPY_INDEX = -1;
+	var menu_copy = Menu.buildFromTemplate([{
+		label: '复制',
+		click: function() {
+			$template_list.find('li').removeClass('on');
+			_changeTemplate(COPY_INDEX);
+			COPY_INDEX = -1;
+		}
+	}]);
+	Menu.setApplicationMenu(menu_copy);
 
 	var $template_list = $('#template_list');
 	var $txt_template_name = $('#txt_template_name');
@@ -180,6 +192,9 @@ Core.init(function(model) {
 	}).delegate('li', 'click', function() {
 		$(this).addClass('on').siblings().removeClass('on');
 		_changeTemplate($(this).index());
+	}).delegate('li', 'contextmenu', function() {
+		COPY_INDEX = $(this).index();
+		menu_copy.popup(WIN);
 	}).delegate('[type=radio]', 'click', function() {
 		var $item = $(this).parent();
 		var index = $item.index();
@@ -217,7 +232,7 @@ Core.init(function(model) {
 	function _changeTemplate(index) {
 		index = isNaN(index)? -1: index;
 		var data = conf_data_template[index] || {};
-		$txt_template_name.val(data.name || '');
+		$txt_template_name.val((data.name || '') + (COPY_INDEX != -1? ' (复制)': ''));
 		$n_template_height.val(data.height || CONST_SIZE_HEIGHT);
 		$n_template_width.val(data.width || CONST_SIZE_WIDTH);
 

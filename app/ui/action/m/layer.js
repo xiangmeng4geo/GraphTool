@@ -42,7 +42,7 @@ Core.init(function() {
         var rotate_option = option.rotate;
         if (!isLock && rotate_option) {
             $html.rotatable(rotate_option).find('.ui-rotatable-handle').on('dblclick', function() {
-                $html.data('angele', 0).css('transform', 'rotate(0deg)');
+                $html.data('angle', 0).css('transform', 'rotate(0deg)');
             });
         }
 
@@ -169,6 +169,7 @@ Core.init(function() {
                 center: 1
             }
         }, option);
+        var isUseEdit = !!option.edit;
         var isLock = !!option.lock;
         var isLockChange = !!option.lockchange;
         var pos = option.pos;
@@ -244,11 +245,61 @@ Core.init(function() {
                     css.top -= height_to / 2;
                 }
             }
+            var _change;
+            var editImg;
+            if (isUseEdit) {
+                _change = function() {
+                    var css = {};
+                    var pos = $html.position();
+                    var left = pos.left,
+                        top = pos.top;
+                    var $p = $html.parent();
+                    var w = $p.width();
+                    var h = $p.height();
+                    var _w = editImg._w,
+                        _h = editImg._h;
+                    var height_layer = $html.height();
+                    if (w > 0 && h > 0) {
+                        var css = {};
+                        if (left + _w > w && _w > $html.width() || left < 0) {
+                            css.left = 'auto';
+                            css.right = 0;
+                        } else {
+                            css.left = 0;
+                            css.right = 'auto'
+                        }
 
-            var $html = _createLayer($.extend(true, option, {
+                        if (top + height_layer + _h > h) {
+                            css.top = 'auto';
+                            css.bottom = '100%';
+                        } else {
+                            css.top = '100%';
+                            css.bottom = 'auto';
+                        }
+                        editImg.setPos(css);
+                    }
+                    editImg.setSize({
+                        width: $html.width(),
+                        height: $html.height(),
+                        left: left,
+                        top: top,
+                        r: $html.data('angle')
+                    });
+                }
+            }
+            var $html = _createLayer($.extend(true, {
                 css: css,
-                rotate: {}
-            }));
+                rotate: {
+                    rotate: _change
+                },
+                resize: {
+                    resize: _change
+                },
+                drag: {
+                    // handle: 'span.btn_handle',
+                    drag: _change
+                },
+            }, option));
             $html.addClass('layer_img')
                 .append('<img src="' + src_img + '" data-src="'+src+'" class="_img"/>')
                 .data('size', {
@@ -289,6 +340,34 @@ Core.init(function() {
                     }
                 });
 
+
+            if (isUseEdit) {
+                editImg = UI.editImg($html, {
+                    width: width_to,
+                    height: height_to,
+                    left: css.left,
+                    top: css.top,
+                    onchange: function() {
+                        var size = editImg.getSize();
+                        $html.data('angle', size.r||0).css({
+                            width: size.width,
+                            height: size.height,
+                            left: size.left,
+                            top: size.top,
+                            'transform': 'rotate('+(size.r||0)+'deg)'
+                        });
+                    }
+                });
+                
+                _change();
+                $html.on('edit', function(e, flag) {
+                    if (flag) {
+                        editImg.show();
+                    } else {
+                        editImg.hide();
+                    }
+                })
+            }
             return $html;
         }
     }

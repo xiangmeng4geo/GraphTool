@@ -96,6 +96,7 @@
 }
 .map_layer .ui-rotatable-handle{
 	background-color: #00b7ee;
+	z-index: 201;
 }
 .map_layer .ui-rotatable-handle:after{
 	background-color: #00b7ee;

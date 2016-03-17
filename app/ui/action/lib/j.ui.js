@@ -6416,7 +6416,8 @@
 					dis_y = event.pageY - _d.eY;
 				this.helper[0].style.left = _d.left + dis_x + "px";
 				this.helper[0].style.top = _d.top + dis_y + "px";
-				return;
+				// zk add 20160317当有rotate时也触发drag事件
+				// return;
 			}
 			// reset any necessary cached properties (see #5009)
 			if (this.hasFixedAncestor) {
@@ -6436,7 +6437,10 @@
 				}
 				this.position = ui.position;
 			}
-
+			// zk add 20160317当有rotate时也触发drag事件
+			if (this.is_rotate) {
+				return ;
+			}
 			this.helper[0].style.left = this.position.left + "px";
 			this.helper[0].style.top = this.position.top + "px";
 
@@ -7415,7 +7419,7 @@
 
 			for (var i = 0, j = $element.length; i < j; i++) {
 				handle = $($element[i])[0];
-				if (handle === event.target || $.contains(handle, event.target)) {
+				if (handle === event.target || $.contains(handle, event.target)) {console.log(capture);
 					capture = true;
 					break;
 				}

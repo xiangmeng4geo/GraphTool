@@ -446,9 +446,74 @@
 			}
 		}
 	}
+	function editImg($container, options) {
+		options = _extend({
+			width: 30,
+			height: 30,
+			x: 0,
+			y: 0,
+			onchange: null
+		}, options);
+
+		var html = '<div class="editImg">';
+			html += '<div class="row ui-edit-size">'+
+						'<div class="col2"><span>X:</span><input type="number" class="n_x" value="0"/></div>'+
+						'<div class="col2"><span>Y:</span><input type="number" class="n_y" value="0"/></div>'+
+						'<div class="col2"><span>W:</span><input type="number" class="n_w" value="100"/></div>'+
+						'<div class="col2"><span>H:</span><input type="number" class="n_h" value="30"/></div>'+
+						'<div><span>R:</span><input type="number" class="n_r" value="0"/></div>'
+					'</div>';
+		html += '</div>';
+
+		$container.append(html);
+
+		var $editImg = $container.find('.editImg');
+		var $n_x = $container.find('.n_x');
+		var $n_y = $container.find('.n_y');
+		var $n_w = $container.find('.n_w');
+		var $n_h = $container.find('.n_h');
+		var $n_r = $container.find('.n_r');
+		$container.find('.ui-edit-size [type=number]').on('input', options.onchange);
+		function _num(num) {
+			var num = parseFloat(num);
+			return num? num.toFixed(2).replace('.00', ''): 0;
+		}
+		return {
+			_w: $editImg.outerWidth(),
+			_h: $editImg.outerHeight(),
+			show: function() {
+				$editImg.show();
+				this._w = $editImg.outerWidth();
+				this._h = $editImg.outerHeight();
+			},
+			hide: function() {
+				$editImg.hide()
+			},
+			setPos: function(pos) {
+				$editImg.css(pos);
+			},
+			setSize: function(size) {
+				$n_x.val(_num(size.left) || $n_x.val());
+				$n_y.val(_num(size.top) || $n_y.val());
+				$n_w.val(_num(size.width) || $n_w.val());
+				$n_h.val(_num(size.height) || $n_h.val());
+				$n_r.val(_num(size.r) || $n_r.val());
+			},
+			getSize: function() {
+				return {
+					left: _num($n_x.val()),
+					top: _num($n_y.val()),
+					width: _num($n_w.val()),
+					height: _num($n_h.val()),
+					r: _num($n_r.val())
+				}
+			}
+		}
+	}
 	UI.file = file;
 	UI.select = select;
 	UI.edit = editText;
+	UI.editImg = editImg;
 
 	var Util = {
 		UI: UI,
