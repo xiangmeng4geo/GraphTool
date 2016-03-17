@@ -15,5 +15,7 @@ rm -rf $TARGET_SOURCE_PATH/index.js
 
 mkdir -p $TARGET_SOURCE_PATH/node_modules/
 cp -R $SOURCE_PATH/../../../node_modules/archiver $TARGET_SOURCE_PATH/node_modules/
-cp -R $SOURCE_PATH/../../../node_modules/asar $TARGET_SOURCE_PATH/node_modules/
 echo '{"name": "GraphTool-export","version" : "1.0.12","main": "export.js"}' > $TARGET_SOURCE_PATH/package.json
+
+cd $TARGET_PATH;
+$SHELLPATH/zip I:/docs/2015/蓝PI相关/制图/安装包/测试数据工具/蓝PI蚂蚁制图测试数据导出工具 -r -p .

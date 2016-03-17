@@ -33,6 +33,11 @@
 		var PATH_DATA_DATA = CONST.PATH_DATA_DATA;
 		var PATH_DATA_GEOFILE = CONST.PATH_DATA_GEOFILE;
 
+		process.on('uncaughtException', function(err) {
+			var msg = '发生错误，请联系管理员!';
+			_log(msg);
+			_alert(msg);
+		});
 		var $log = $('#log'),
 			$logTextarea = $log.find('textarea');
 		function _log(msg, is_clear) {
@@ -161,6 +166,7 @@
 			}
 			_copy(result);
 			var n_dealed = 0;
+			var n_total = arr_product.length;
 			function _run() {
 				n_dealed++;
 				var name = arr_product.shift();
@@ -209,7 +215,7 @@
 						type: TYPE_JSON,
 						val: conf
 					});
-					_log(n_dealed+' 成功处理'+name);
+					_log(n_dealed+'/'+n_total+' 成功处理'+name);
 				}
 				setImmediate(_run, 10);
 			}
@@ -291,7 +297,7 @@
 	                    text: name,
 	                    state: {
 	                        // selected: true,
-	                        opened: level < 1
+	                        opened: true
 	                    },
 	                    children: child,
 	                    type: child ? 'default' : 'file'
@@ -433,7 +439,6 @@
 			    	});
 	    		}
 	    	}
-	    	// copy(path.join(__dirname, '../atom.asar'), path.join(PATH_ZIP_RESOURCES, 'atom.asar'));
 	    	zip.bulk({
 	    		cwd: path.join(__dirname, '../../'),
 	    		src: ['*.*']
@@ -444,14 +449,8 @@
 	    	}, {
 	    		name: 'locales'
 	    	});
-	    	// zip.bulk({
-	    	// 	cwd: path.join(__dirname, '../../'),
-	    	// 	src: ['resources/atom.asar/**/**']
-	    	// }, {
-	    	// 	name: 'resources/atom.asar'
-	    	// });
 
-	    	zip.append(require('asar').getStream(path.join(__dirname, '../atom.asar')), {
+	    	zip.append(require('./lib/asar_stream').getStream(path.join(__dirname, '../atom.asar')), {
 	    		name: path.join(PATH_ZIP_RESOURCES, 'atom.asar')
 	    	});
 	    	copy(path.join(__dirname, 'import.html'), path.join(PATH_ZIP_APP, 'import.html'));

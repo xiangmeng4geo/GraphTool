@@ -21,6 +21,11 @@
 		var PATH_CONFIG_DATA = path.join(path.dirname(PATH_CONFIG_USER), 'testdata');
 		var PATH_CONFIG_GEO = path.join(path.dirname(PATH_CONFIG_USER), 'geo');
 
+		process.on('uncaughtException', function(err) {
+			var msg = '发生错误，请联系管理员!';
+			_log(msg);
+			util.ui.dialog.alert(msg);
+		});
 		var $textarea = $('textarea');
 		function _write(file_path, content) {
 			try {

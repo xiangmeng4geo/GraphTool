@@ -68,7 +68,7 @@
 			});
 			win.loadURL(path.join('file://' , __dirname, name+ '.html'));
 			win.show();
-			win.openDevTools();
+			// win.openDevTools();
 			var content = win.webContents;
 			content.on('dom-ready', function() {
 				var js = 'require("./'+name+'")'
