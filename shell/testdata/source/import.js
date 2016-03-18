@@ -17,10 +17,16 @@
 		var PATH_DATA_CONFIG = CONST.PATH_DATA_CONFIG;
 		var PATH_DATA_DATA = CONST.PATH_DATA_DATA;
 		var PATH_DATA_GEOFILE = CONST.PATH_DATA_GEOFILE;
+        var PATH_DATA_ASSETS = CONST.PATH_DATA_ASSETS;
 
 		var PATH_CONFIG_DATA = path.join(path.dirname(PATH_CONFIG_USER), 'testdata');
 		var PATH_CONFIG_GEO = path.join(path.dirname(PATH_CONFIG_USER), 'geo');
-
+        var PATH_CONFIG_ASSETS = path.join(path.dirname(PATH_CONFIG_USER), 'assets');
+        
+        var remote = require('electron').remote;
+        var win = remote.getCurrentWindow();
+        win.setTitle(win.getTitle()+' '+remote.app.getVersion());
+        
 		process.on('uncaughtException', function(err) {
 			var msg = '发生错误，请联系管理员!';
 			_log(msg);
@@ -93,6 +99,21 @@
 						util_file.copy(path.join(PATH_DATA_DATA, name, filename), path.join(PATH_CONFIG_DATA, name, filename));
 						_log('复制 '+filename);
 					} catch(e){}
+                    try {
+                        conf.assets.forEach(function(v) {
+                            var src = v.src;
+                            if (src) {
+                                var src_assets = path.join(PATH_DATA_ASSETS, name, src);
+                                if (src_assets && util_file.exists(src_assets)) {
+                                    var src_new = path.join(PATH_CONFIG_ASSETS, name, src);
+                                    util_file.copy(src_assets, src_new);
+                                    
+                                    v.src = src_new;
+                                    _log('复制资源'+src);
+                                }
+                            }
+                        });
+                    } catch(e){}
 					try {
 						var conffilename = name+'.json';
 						if (_write(path.join(PATH_CONFIG_USER, conffilename), conf)) {
@@ -157,6 +178,29 @@
 			}
 			_run();
 		}
+        function _dealTemplate() {
+			var confSys = _req(PATH_SYS, {});
+			var template = _req('.template', []);
+            template.forEach(function(tpl) {
+                tpl.assets.forEach(function(v) {
+                    var src = v.src;
+                    if (src) {
+                        var src_assets = path.join(PATH_DATA_ASSETS, src);
+                        if (src_assets && util_file.exists(src_assets)) {
+                            var src_new = path.join(PATH_CONFIG_ASSETS, src);
+                            util_file.copy(src_assets, src_new);
+                            
+                            v.src = src_new;
+                            _log('复制资源'+src);
+                        }
+                    }
+                });
+            });
+			confSys.template = template;
+			if (_write(PATH_SYS, confSys)) {
+				_log('模板导出完成！');
+			}
+		}
 		var is_dealing = false;
 		$('#btn_yes').click(function() {
 			if (is_dealing) {
@@ -179,7 +223,9 @@
 				_dealMap(function() {
 					_log('('+(step++)+') 正在导出图例配置');
 					_dealLegend();
-
+                    
+                    _log('('+(step++)+') 正在导出模板配置');
+                    _dealTemplate();
 					_log('----------------成功导入！--------------');
 
 					is_dealing = false;

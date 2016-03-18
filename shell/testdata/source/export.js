@@ -35,7 +35,12 @@
 		var PATH_DATA_DATA = CONST.PATH_DATA_DATA;
 		var PATH_DATA_GEOFILE = CONST.PATH_DATA_GEOFILE;
 
+        var remote = electron.remote;
+        var win = remote.getCurrentWindow();
+        var version = remote.app.getVersion();
+        win.setTitle(win.getTitle()+' '+version);
 		process.on('uncaughtException', function(err) {
+            console.log(err);
 			var msg = '发生错误，请联系管理员!';
 			_log(msg);
 			_alert(msg);
@@ -149,6 +154,7 @@
 		var PATH_ZIP_DATA = path.join(PATH_ZIP_APP, 'data');
 		var PATH_ZIP_DATA_CONFIG = path.join(PATH_ZIP_DATA, 'config');
 		var PATH_ZIP_DATA_DATA = path.join(PATH_ZIP_DATA, 'data');
+        var PATH_ZIP_DATA_ASSETS = path.join(PATH_ZIP_DATA, 'assets');
 		var PATH_ZIP_DATA_GEO = path.join(PATH_ZIP_DATA, 'geo');
 		var TYPE_JSON = 1;
 		var TYPE_PATH = 2;
@@ -200,7 +206,6 @@
 					} catch(e){}
 					if (util.file.exists(file_path)) {
 						var file_name = path.basename(file_path);
-						// util.file.copy(file_path, path.join(PATH_DATA_DATA, file_name));
 						writer(path.join(PATH_ZIP_DATA_DATA, name, file_name), {
 							type: TYPE_PATH,
 							val: file_path
@@ -212,7 +217,24 @@
 						conf_val.file_rule.val_custom = file_name;
 					}
 					conf_val.dir_in = '';
-					// util.file.write(path.join(PATH_DATA_CONFIG, name+'.json'), JSON.stringify(conf));
+                    
+                    var assets = conf.assets;
+                    // 对产品的资源文件进行处理
+                    if (assets && assets.length > 0) {
+                        assets.forEach(function(v) {
+                            var src = v.src;
+                            if (src && util.file.exists(src)) {
+                                var file_name = path.basename(src);
+                                writer(path.join(PATH_ZIP_DATA_ASSETS, name, file_name), {
+                                    type: TYPE_PATH,
+                                    val: src
+                                });
+                                _log('\t复制资源'+file_name);
+                                v.src = file_name;
+                            }
+                        });
+                    }
+                    
 					writer(path.join(PATH_ZIP_DATA_CONFIG, name+'.json'), {
 						type: TYPE_JSON,
 						val: conf
@@ -282,7 +304,39 @@
 			});
 			_log('成功导出'+data.length+'条地图配置！');
 		}
-
+        
+        function _exportTemplate(writer) {
+            var template_new = [];
+            var result = _getAllChecked(tree_template);
+            var cache = {};
+			result.forEach(function(template) {
+				cache[template.name] = 1;
+			});
+            data_sys_template.forEach(function(template) {
+                if (cache[template.name]) {
+                    var assets = template.assets;
+                    assets.forEach(function(v) {
+                        var src = v.src;
+                        if (src && util.file.exists(src)) {
+                            var file_name = path.basename(src);
+                            writer(path.join(PATH_ZIP_DATA_ASSETS, file_name), {
+                                type: TYPE_PATH,
+                                val: src
+                            });
+                            
+                            v.src = file_name;
+                            _log('复制'+file_name);
+                        }
+                    });
+                    template_new.push(template);
+                }
+            });
+            writer(path.join(PATH_ZIP_DATA_CONFIG, '.template.json'), {
+				type: TYPE_JSON,
+				val: template_new
+			});
+			_log('成功导出'+template_new.length+'条模板配置！');
+        }
 		var treeDataProduct = [{
 	        name: '全部产品',
 	        childNodes: util.getProductTree() || []
@@ -343,6 +397,7 @@
 	    var data_sys = util.getSys() || {};
 	    var data_sys_geo = data_sys.geo || [];
 	    var data_sys_legend = data_sys.legend || [];
+        var data_sys_template = data_sys.template || [];
 
 	    function _getGeoChild() {
 	    	var arr = [];
@@ -362,6 +417,15 @@
 	    	}
 	    	return arr;
 	    }
+        function _getTemplateChild() {
+	    	var arr = [];
+	    	for (var i = 0, j = data_sys_template.length; i<j; i++) {
+	    		arr.push({
+	    			text: data_sys_template[i].name
+	    		});
+	    	}
+	    	return arr;
+	    }
 	    var treeDataGeo = [{
 	    	text: '全部地图',
 	    	state: {
@@ -375,6 +439,13 @@
                 opened: true
             },
 	    	children: _getLegendChild()
+	    }];
+        treeDataTemplate = [{
+	    	text: '全部模板',
+	    	state: {
+                opened: true
+            },
+	    	children: _getTemplateChild()
 	    }];
 
 	    function _zip(save_path) {
@@ -438,7 +509,6 @@
 	    function _exportSource(zip) {
 	    	function copy(file_path, name) {
 	    		if (util.file.exists(file_path)) {
-	    			console.log(file_path);
 	    			var stream = fs.createReadStream(file_path);
 	    			zip.append(stream, {
 			    		name: name
@@ -466,13 +536,16 @@
 	    	_getWriter(zip)(path.join(PATH_ZIP_APP, 'package.json'), {
 	    		type: TYPE_JSON,
 	    		val: {
-	    			main: 'import.js'
+                    name: 'BPA-import',
+	    			main: 'import.js',
+                    version: version
 	    		}
 	    	});
 	    }
 	    var file_path_save;
 	    var tree_map = _initTree($('#tree_map'), treeDataGeo);
 	    var tree_legend = _initTree($('#tree_legend'), treeDataLegend);
+        var tree_template = _initTree($('#tree_template'), treeDataTemplate);
 	    function _afterExport() {
 	    	$btn_export.val(val_btn_export);
 			_log('------------- 导出成功! -------------');
@@ -495,7 +568,7 @@
 			}
 
 			file_path_save = null;
-			util.ui.dialog.save(path.join('蓝PI制图测试数据_'+(new Date().format('yyyy-MM-dd'))+'.zip'), function(file_path) {
+			util.ui.dialog.save(path.join('蓝PI制图测试数据_'+version+'_'+(new Date().format('yyyy-MM-dd'))+'.zip'), function(file_path) {
 				file_path_save = file_path;
 				var zip = _zip(file_path_save);
 				var writer = _getWriter(zip);
@@ -507,10 +580,14 @@
 					_log('('+(step++)+') 正在导出图例配置');
 					_exportLegend(writer);
 
+                    _log('('+(step++)+') 正在导出模板配置');
+                    _exportTemplate(writer);
+                    
+                    _log('('+(step++)+') 正在导出程序文件');
 					_exportSource(zip);
-					zip.finalize();
-
-					_log('正在处理压缩文件：'+file_path_save);
+                    
+                    _log('('+(step++)+') 正在处理压缩文件：'+file_path_save);
+					zip.finalize();					
 				});
 			});
 		}

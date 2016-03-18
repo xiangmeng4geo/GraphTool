@@ -4,10 +4,6 @@
 	var util = require('util');
 	var path_user = path.join(require('os').homedir(), 'BPA', 'GT');
 	var path_config = path.join(path_user, 'config');
-	var PATH_DATA = path.join(__dirname, 'data');
-	var PATH_DATA_CONFIG = path.join(PATH_DATA, 'config');
-	var PATH_DATA_DATA = path.join(PATH_DATA, 'data');
-	var PATH_DATA_GEOFILE = path.join(PATH_DATA, 'geo');
 
 	/*时间格式化*/
 	Date.prototype.format = Date.prototype.format || function(format,is_not_second){
@@ -262,13 +258,15 @@
 	var PATH_DATA_CONFIG = path.join(PATH_DATA, 'config');
 	var PATH_DATA_DATA = path.join(PATH_DATA, 'data');
 	var PATH_DATA_GEOFILE = path.join(PATH_DATA, 'geo');
+    var PATH_DATA_ASSETS = path.join(PATH_DATA, 'assets');
 
 	_exports.CONST = {
 		PATH_CONFIG_USER: path_config,
 		PATH_DATA: PATH_DATA,
 		PATH_DATA_CONFIG: PATH_DATA_CONFIG,
 		PATH_DATA_DATA: PATH_DATA_DATA,
-		PATH_DATA_GEOFILE: PATH_DATA_GEOFILE
+		PATH_DATA_GEOFILE: PATH_DATA_GEOFILE,
+        PATH_DATA_ASSETS: PATH_DATA_ASSETS
 	};
 
 	module.exports = _exports;
