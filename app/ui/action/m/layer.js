@@ -124,6 +124,7 @@ Core.init(function() {
         $html.on('edit', function(e, flag) {
             if (flag && option.canEdit) {
                 edit.show();
+                _change();
             } else {
                 edit.hide();
             }
@@ -153,6 +154,7 @@ Core.init(function() {
         _change();
         if (option.edit) {
             edit.show();
+            _change();
         }
         return $html;
     }
@@ -359,10 +361,10 @@ Core.init(function() {
                     }
                 });
                 
-                _change();
                 $html.on('edit', function(e, flag) {
                     if (flag) {
                         editImg.show();
+                        _change();
                     } else {
                         editImg.hide();
                     }

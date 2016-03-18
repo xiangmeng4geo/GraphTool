@@ -82,7 +82,8 @@ Core.init(function(model) {
 		click: function() {
 			ImageLayer({
                 src: path.join(CONST.PATH.UI, 'img/placeholder.svg'),
-                pos: pos_contextmenu
+                pos: pos_contextmenu,
+                edit: true
             }, {
             	type: TYPE_PLACEHOLDER
             });
@@ -265,7 +266,8 @@ Core.init(function(model) {
                     pos: pos,
                     width: width,
                     height: height,
-                    style: styleObj
+                    style: styleObj,
+                    edit: true
                 }, v);
 			}
 		});

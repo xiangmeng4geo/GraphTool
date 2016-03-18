@@ -468,15 +468,15 @@
 		$container.append(html);
 
 		var $editImg = $container.find('.editImg');
-		var $n_x = $container.find('.n_x');
-		var $n_y = $container.find('.n_y');
-		var $n_w = $container.find('.n_w');
-		var $n_h = $container.find('.n_h');
+		var $n_x = $container.find('.n_x').val(options.left || 0);
+		var $n_y = $container.find('.n_y').val(options.top || 0);
+		var $n_w = $container.find('.n_w').val(options.width || 0);
+		var $n_h = $container.find('.n_h').val(options.height || 0);
 		var $n_r = $container.find('.n_r');
 		$container.find('.ui-edit-size [type=number]').on('input', options.onchange);
 		function _num(num) {
 			var num = parseFloat(num);
-			return num? num.toFixed(2).replace('.00', ''): 0;
+			return num? parseFloat(num.toFixed(2).replace('.00', '')): 0;
 		}
 		return {
 			_w: $editImg.outerWidth(),
