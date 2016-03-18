@@ -171,7 +171,7 @@ Core.init(function() {
                 center: 1
             }
         }, option);
-        var isUseEdit = !!option.edit;
+        var isUseEdit = !!option.useEdit;
         var isLock = !!option.lock;
         var isLockChange = !!option.lockchange;
         var pos = option.pos;

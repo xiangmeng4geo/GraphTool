@@ -6,6 +6,8 @@
 	 * 这里主要操作窗口
 	 */
 	// var IS_PROCESS_MAIN =  process.type == 'browser';
+    var electron = require('electron');
+    var globalShortcut = electron.globalShortcut;
 	var path = require('path');
 	var fs = require('fs');
 	var CONST = require('../common/const');
@@ -152,12 +154,20 @@
 			}
 		}
 	}
+    // 注册快捷键供开发者调试
+    function registerShortcut() {
+        globalShortcut.register('Alt+Shift+i', function() {
+            var win = BrowserWindow.getFocusedWindow();
+            win.openDevTools();
+        });
+    }
 	module.exports = {
 		getInstance: get_win,
 		load: win_load,
 		open: open,
 		isOpenedUi: _isOpenedUi,
 		setFocusToLast: _focusLastOfUi,
-		setSub: setSub
+		setSub: setSub,
+        shortcut: registerShortcut
 	}
 }()

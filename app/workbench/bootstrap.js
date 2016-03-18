@@ -85,6 +85,7 @@
 		return;
 	}
 	app.on('ready', function() {
+        _window.shortcut();
 		var loginWin = _window.getInstance('login');
 		ipc.on('wait.main', function(e, data){
 			loginWin.send('wait.login', true);

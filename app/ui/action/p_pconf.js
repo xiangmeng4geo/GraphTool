@@ -399,28 +399,40 @@ Core.init(function(model) {
 			var key = $this.data('key');
 			var d = {flag: _getChecked($this.find('[type=checkbox]'))};
 			
-			var $span = $this.find('textarea');
-			if ($span.length > 0) {
-				d.text = $span.val();
-			} else {
-				var $img = $this.find('img');
-				var src = $img.attr('src');
-				if (src != $img.data('src')) {
-					d.src = src;
-				}
-			}
-
-			if (key) {
+            var is_normal = false; //是否是指定资源
+            if (key) {
 				var d_cache = cacheSysAssets[key];
 				if (d_cache) {
+                    is_normal = d_cache.type == TYPE_NORMAL;
 					d.key = key;
+                    delete cacheSysAssets[key];
 				}
 			} else {
 				d.style = $this.data('style');
 			}
+            
+            if (!is_normal) {
+                var $span = $this.find('textarea');
+                if ($span.length > 0) {
+                    d.text = $span.val();
+                } else {
+                    var $img = $this.find('img');
+                    var src = $img.attr('src');
+                    if (src != $img.data('src')) {
+                        d.src = src;
+                    }
+                }
+            }
 			
 			assets.push(d);
 		});
+        
+        var assets_other_tpl = [];
+        for (var i in cacheSysAssets) {
+            assets_other_tpl.push(cacheSysAssets[i]);
+        }
+        assets_other_tpl = product_conf.util.asset.format(assets_other_tpl);
+        assets = assets.concat(assets_other_tpl);
 		conf.assets = assets;
 		conf.data = _conf_data;
 
@@ -494,7 +506,8 @@ Core.init(function(model) {
 			}
 		}, {
 			merge: true,
-			useFlag: false
+			useFlag: false,
+            useOtherTpl: true
 		});
 		var is_use_sys = _getChecked($cb_is_use_sys_assets);
 		var html = '';
@@ -506,7 +519,7 @@ Core.init(function(model) {
 				return;
 			}
 			var key = v.id || '';
-			var isSysAssets = !!key && !!v.type;
+			var isSysAssets = !!key && (!!v.type || v.is_other_tpl);
 			if (!isSysAssets) {
 				index_normal_asset++;
 			} else {
@@ -515,6 +528,10 @@ Core.init(function(model) {
 			if (!is_use_sys && isSysAssets) {
 				return;
 			}
+            // 属于其它模板的资源不显示
+            if (v.is_other_tpl) {
+                return;
+            }
 			var text = v.text;
 			var style = v.style;
 			if (!text) {

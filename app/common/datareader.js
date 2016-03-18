@@ -1,4 +1,4 @@
-!function(){
+!function() {
     var util = require('./util');
     var util_path = util.path;
     var util_file = util.file;
@@ -20,14 +20,14 @@
         _model = model;
         return Reader;
     }
-    Reader.read = function(opt, cb){
+    Reader.read = function(opt, cb) {
         var s_start = new Date();
         var type = opt.type;
         var _reader;
-        try{
-            _reader = require('./datareader/'+type);
-        } catch(e) {
-            cb(new Error('no support ['+type+'] method of reader!'));
+        try {
+            _reader = require('./datareader/' + type);
+        } catch (e) {
+            cb(new Error('no support [' + type + '] method of reader!'));
         }
         if (_reader) {
             // 让文件的修改时间参与缓存
@@ -44,11 +44,11 @@
             var cache_val;
 
             if (!debug && (cache_val = util_file.read(cache_path, true))) {
-                _log ('Reader.read from cache ['+cache_path+']');
+                _log('Reader.read from cache [' + cache_path + ']');
                 cb && cb(null, cache_val);
             } else {
                 _reader(opt, function(err, data) {
-                    var msg = 'Reader.read takes '+(new Date()-s_start)+' ms!';
+                    var msg = 'Reader.read takes ' + (new Date() - s_start) + ' ms!';
                     _log(msg);
 
                     if (!err && data) {
@@ -64,9 +64,9 @@
     Reader.parseConf = function(conf) {
         var s_time = new Date();
         var _parser;
-        try{
-            _parser = require('./datareader/'+conf.data.type+'/parse');
-        } catch(e) {
+        try {
+            _parser = require('./datareader/' + conf.data.type + '/parse');
+        } catch (e) {
             _err(new Error('no support parse method of reader!'));
         }
         if (_parser) {
@@ -81,7 +81,7 @@
         }
         return Reader;
     }
-    Reader.save = function(opt){
+    Reader.save = function(opt) {
     }
     module.exports = Reader;
-}()
+} ()

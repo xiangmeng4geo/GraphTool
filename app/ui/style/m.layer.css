@@ -39,7 +39,7 @@
 .map_layer .ui-resizable-n,
 .map_layer .ui-resizable-s{
 	left: 50%;
-	margin-left: -1px;
+	margin-left: -3px;
 }
 .map_layer .ui-resizable-e,
 .map_layer .ui-resizable-w{
