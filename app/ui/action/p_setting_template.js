@@ -362,7 +362,7 @@ Core.init(function(model) {
             }
         });
         var data = {
-            name: name,
+            name: name.trim(),
             width: width,
             height: height,
             assets: assets
