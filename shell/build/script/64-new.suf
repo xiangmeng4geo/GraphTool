@@ -2780,7 +2780,7 @@ g_HandleSystemReboot();
 <PostBuildProg/>
 <PostBuildCmdLine/>
 <PostBuildWait>0</PostBuildWait>
-<Filename>BPA-GT-64-1.0.12-alpha.exe</Filename>
+<Filename>BPA-GT-64-1.0.12.exe</Filename>
 <OutputFolder>I:\docs\2015\蓝PI相关\制图\安装包</OutputFolder>
 <SegmentSizeMode>0</SegmentSizeMode>
 <CustomSegSize>100</CustomSegSize>
