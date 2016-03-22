@@ -198,6 +198,11 @@
                             if (_cache_asset) {
                                 v.src_t = _cache_asset.src;
                                 v.text_t = _cache_asset.text;
+                                // 防止产品修改指定资源内容
+                                if (_cache_asset.type == TYPE_NORMAL) {
+                                    delete v.text;
+                                    delete v.src;
+                                }
                                 assets_new.push(util_extend(true, _cache_asset, v));
                                 cache_used_template_asset[key] = true;
                             } else if (isUseOtherTpl){
@@ -243,6 +248,10 @@
                     var asset = assets[i];
                     if (asset.key == key) {
                         asset = util_extend(true, asset, asset_new);
+                        if (asset.type == TYPE_NORMAL) {
+                            delete asset.text;
+                            delete asset.src;
+                        }
                         assets[i] = asset;
                         _saveConfig(name, conf);
                         return true;
