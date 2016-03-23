@@ -2722,7 +2722,7 @@ g_HandleSystemReboot();
 </SessionVar>
 <SessionVar>
 <Name>%ProductVer%</Name>
-<Value>1.0.12</Value>
+<Value>1.1.0</Value>
 <Type>1</Type>
 </SessionVar>
 <SessionVar>
@@ -2780,7 +2780,7 @@ g_HandleSystemReboot();
 <PostBuildProg/>
 <PostBuildCmdLine/>
 <PostBuildWait>0</PostBuildWait>
-<Filename>BPA-GT-32-1.0.12.exe</Filename>
+<Filename>BPA-GT-32-1.1.0.exe</Filename>
 <OutputFolder>I:\docs\2015\蓝PI相关\制图\安装包</OutputFolder>
 <SegmentSizeMode>0</SegmentSizeMode>
 <CustomSegSize>0</CustomSegSize>
