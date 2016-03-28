@@ -161,6 +161,56 @@
             win.openDevTools();
         });
     }
+	function _shake(win) {
+		if (win.___shake) {
+			return;
+		}
+		var t = 0,
+			z = 3;
+		var pos = win.getPosition();
+		var left = pos[0],
+			top = pos[1];
+		win.___shake = setInterval(function() {
+			var i = t / 180 * Math.PI,
+				x = Math.sin(i) * z,
+				y = Math.cos(i) * z;
+			win.setPosition(left + x, top + y);
+			if ((t += 90) > 1080) {
+				clearInterval(win.___shake);
+				delete win.___shake;
+			}
+		}, 30);
+	}
+
+	// 实现类alert效果，父窗口得到焦点时子窗口抖动
+	function _sub(name, param) {
+		var win = get_win(name);
+		var win_parent = BrowserWindow.getFocusedWindow();
+		if (win_parent) {
+			function _rmListener() {
+				win_parent.removeListener('focus', _fn_focus);
+			}
+			function _fn_focus() {
+				try {
+					win_parent.blur();
+					
+					win.setAlwaysOnTop(true);
+					win.restore();
+					win.focus();
+					win.setAlwaysOnTop(false);
+					_shake(win);
+				} catch(e) {
+					_rmListener();
+				}
+			}
+			win_parent.on('focus', _fn_focus);
+			win.on('close', _rmListener);
+		}
+		win_load(win, name, param);
+		win.show();
+		return win;
+	}
+	
 	module.exports = {
 		getInstance: get_win,
 		load: win_load,
@@ -168,6 +218,7 @@
 		isOpenedUi: _isOpenedUi,
 		setFocusToLast: _focusLastOfUi,
 		setSub: setSub,
-        shortcut: registerShortcut
+        shortcut: registerShortcut,
+		sub: _sub
 	}
 }()

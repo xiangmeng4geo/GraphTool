@@ -89,7 +89,7 @@ Core.init(function() {
 			_require('store').rm('user_pwd');
 			Win.open('login');
 		});
-		
+
 	});
 	var $btn_close_main = $('.btn_close_main').click(function() {
 		Win.close(true);
