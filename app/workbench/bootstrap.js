@@ -33,7 +33,7 @@
 	}
 	// 启动处理缓存和日志文件的子进程
 	require('child_process').fork(path.join(__dirname, '../common/cache.js'));
-	
+
 	// 创建必要的目录
 	util_file_mkdir(CONST.PATH.CACHE);
 
@@ -74,11 +74,19 @@
 	ipc.on('emit', function(e, data){
 		_emit(data);
 	});
+	function _login() {
+		var loginWin = _window.getInstance('login');
+		ipc.on('wait.main', function(e, data){
+			loginWin.send('wait.login', true);
+		});
+		_window.load(loginWin, 'login');
+	}
 	var shouldQuit = app.makeSingleInstance(function() {
 		if (_window.isOpenedUi()) {
 			_window.setFocusToLast();
+		} else {
+			_login();
 		}
-		return true;
 	});
 	if (shouldQuit) {
 		app.quit();
@@ -86,10 +94,6 @@
 	}
 	app.on('ready', function() {
         _window.shortcut();
-		var loginWin = _window.getInstance('login');
-		ipc.on('wait.main', function(e, data){
-			loginWin.send('wait.login', true);
-		});
-		_window.load(loginWin, 'login');
+		_login();
 	});
 }();
