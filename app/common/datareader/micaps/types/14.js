@@ -13,6 +13,7 @@
         CODE_MORE = 48;     //更高一个等级
 
     var NUM_MIN = 0.00001;
+    var global_relation = {};
     function _parse_file(line_arr, options, cb) {
     	var illegal_index_area = [];
     	var REG_TOW_NUM = /^(-?[\d.]+)\s+([\d.]+)$/,
@@ -260,6 +261,8 @@
         content_info.areas.len = new_items.length;
         content_info.areas.items = new_items;
         _sort_areas(content_info.areas);
+
+        global_relation = {};
         if(content_info.areas.len > 0 && content_info.line_symbols.len > 0){
             _parseArea(content_info);
         }
@@ -402,7 +405,7 @@
         return return_areas;
     }
 
-    var _getLineId = (function() {
+    var _getUId = (function() {
         var _line_id = 1;
         return function() {
             return _line_id++;
@@ -657,7 +660,7 @@
             }
             areas = [new_line_items.concat(add_items), new_line_items.concat(add_items_other)];
         }
-        var id = _getLineId();
+        var id = _getUId();
         // (area_items.line_ids || (area_items.line_ids = [])).push(id);
         var ids = (line_ids || []).slice(0);
         ids.push(id);
@@ -677,6 +680,7 @@
             start_line_index: start_line_index
         };
     }
+
     function _parseArea(content_info) {
     	// 得到所含特殊线的面
         var include_relation = {};
@@ -685,6 +689,9 @@
         });
         var items_area = content_info.areas.items;
         items_area.forEach(function(v, i){
+            var id = _getUId();
+            v.id = id;
+            var is_have_line_in = false;
             var items = v.items;
             line_symbols.forEach(function(v_line,i_line){
                 if(lineIsInsidePolygon(items, v_line.items, true)){
@@ -692,8 +699,12 @@
                         include_relation[i] = [];
                     }
                     include_relation[i].push(i_line);
+                    is_have_line_in = true;
                 }
             });
+            if (is_have_line_in) {
+                global_relation[id] = include_relation[i];
+            }
         });
         // console.log(JSON.stringify(include_relation));
         // include_relation = {"0":[1,2,3]}
@@ -797,8 +808,9 @@
             code_list.sort(function(a, b) {
             	return b.n - a.n;
             });
+            var len = code_list.length;
             var to_code;// = CODE_RAIN;
-            if (code_list.length == 0) {
+            if (len == 0) {
             	for (var i = area_index-1; i>=0; i--) {
             		var area_p = areas[i];
             		var n = polygonIsInsidePolygon(area_p.items, area_items);
@@ -812,8 +824,16 @@
             			}
             		}
             	}
+            } else if (len == 1) {
+                to_code = code_list[0].code;
             } else {
-            	to_code = code_list[0].code;
+                // 有雨雪分界线
+                var id = area.id;
+                if (id !== undefined && !!!global_relation[id]) {
+                    // rr042008.024只没有雨雪分界线，但里面有雪及雨夹雪标识
+                    // 默认处理为没有雨雪分界线，但有多个标识时默认为“雨”
+                    to_code = CODE_RAIN;
+                }
             }
             if (!to_code && area.type == 'add') {
                 to_code = _guessCode(area, area_index, areas);

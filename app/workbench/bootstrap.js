@@ -32,7 +32,7 @@
 		require('./command');
 	}
 	// 启动处理缓存和日志文件的子进程
-	require('child_process').fork(path.join(__dirname, '../common/cache.js'));
+	require('child_process').fork(path.join(__dirname, '../common/cache'));
 
 	// 创建必要的目录
 	util_file_mkdir(CONST.PATH.CACHE);
@@ -74,6 +74,10 @@
 	ipc.on('emit', function(e, data){
 		_emit(data);
 	});
+    ipc.on('emit1', function(e, data){
+        console.log(arguments);
+		_emit(data);
+	});
 	function _login() {
 		var loginWin = _window.getInstance('login');
 		ipc.on('wait.main', function(e, data){
@@ -95,5 +99,13 @@
 	app.on('ready', function() {
         _window.shortcut();
 		_login();
+        
+        require('child_process').fork(path.join(__dirname, './test'), process.execArgv,
+        {
+            cwd : __dirname,
+            // env : process.execPath
+            // env : process.env
+            // env : { "ATOM_SHELL_INTERNAL_RUN_AS_NODE" : "0" }
+        });
 	});
 }();

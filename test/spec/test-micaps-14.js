@@ -160,4 +160,10 @@ describe('micaps 14', function(){
         n_area: 19,
         n_26: 19,
     });
+    _test({
+        desc: '没有雨雪分界线，但有多个标识',
+        file: 'rr042008.024',
+        n_area: 14,
+        n_26: 14,
+    });
 })

@@ -449,6 +449,20 @@
 		}, function(err, data) {
 			if (!err) {
 				render(data);
+
+				var obj = {};
+				var areas = data.areas;
+				if (areas) {
+					areas.forEach(function(v, i) {
+						var code = v.code;
+						if (obj[code]) {
+							obj[code]++;
+						} else {
+							obj[code] = 1;
+						}
+					});
+				}
+				console.log(obj);
 			}
 			console.log(file);
 			console.log(err, data);
