@@ -332,6 +332,7 @@
             delete v.type;
             delete v.line;
             delete v.line_ids;
+            delete v.id;
         });
         content_info.areas = areas_items;
         if(content_info.line_symbols){

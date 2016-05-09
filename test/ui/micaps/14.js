@@ -219,7 +219,7 @@
 						// },i*400);
 					});
 					var color = getLineColor(code);
-					var polygon = new BMap.Polygon(point_arr, {strokeColor: color, fillColor: color,fillOpacity: 1, strokeWeight: 1, strokeOpacity:1});
+					var polygon = new BMap.Polygon(point_arr, {strokeColor: color, fillColor: color,fillOpacity: 0.8, strokeWeight: 1, strokeOpacity:1});
 					map.addOverlay(polygon);
 					
 				}
@@ -292,7 +292,7 @@
 					color = 'url(#rain_snow_'+(color.replace('#', ''))+')';
 				}
 
-				var polygon = new BMap.Polygon(point_arr, {strokeColor: color, fillColor: color,fillOpacity: 1, strokeWeight: 1, strokeOpacity:1});
+				var polygon = new BMap.Polygon(point_arr, {strokeColor: color, fillColor: color,fillOpacity: 0.8, strokeWeight: 1, strokeOpacity:1});
 				polygon.i = i;
 				polygon.addEventListener("click",function(){
 					console.log('index = '+polygon.i); 

@@ -160,11 +160,11 @@ Core.init(function(model) {
         },
         'types': {
             'default': {
-                'icon': 'jstree-themeicon-hidden test'
+                'icon': 'folder'
             },
             'file': {
                 'valid_children': [],
-                'icon': 'jstree-themeicon-hidden test'
+                'icon': 'file'
             }
         },
         "plugins": ["contextmenu", "types", "unique"]
