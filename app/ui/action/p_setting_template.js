@@ -80,7 +80,7 @@ Core.init(function(model) {
                     return function(menuItem) {
                         if (menuItem.checked) {
                             var img_linetype = linetype(conf);
-                            LegendLayer({
+                            $html = LegendLayer({
                                 css: {
                                     left: 20,
                                     top: $template_assets.height() - (len_linetype - i) * (img_linetype.height + 5)

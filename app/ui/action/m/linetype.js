@@ -54,8 +54,6 @@ Core.init(function() {
         var width_wrap = width + width_text + padding + (textPos == 'left'? width_text/2:0),
             height_wrap = Math.max(height + 0, 20);
         
-        // var left_text = width + padding,
-        //     top_text = heigh_wrap/2;
         var canvas_wrap = $('<canvas>').attr({
             height: height_wrap,
             width: width_wrap
