@@ -568,7 +568,7 @@
                     end();
                 }
             }
-            if (isStroked) {
+            if (isStroked && style.flag) {
                 var style_stroke = $.extend({}, style);
                 delete style_stroke['fillStyle'];
                 delete style_stroke['shadowBlur'];
@@ -786,7 +786,7 @@
         var canvas_tmp = _getCanvas(width, height).get(0);
         var ctx = canvas_tmp.getContext('2d');
 
-        var bgcolor = 'rgba(255, 255, 255, 1)';
+        var bgcolor;// = 'rgba(255, 255, 255, 0)';
         if (conf) {
             var _bgColor = conf.bgcolor;
             if (_bgColor) {
