@@ -262,8 +262,8 @@
 				if (points.length >= 2) {
                     points.isObj = true;
                     shapes.push(new Shape.Polyline(points, {
-                        strokeStyle: '#1010FF',
-                        lineWidth: 2
+                        strokeStyle: '#000000',
+                        lineWidth: 4
                     }));
 				}
 				var flags = line.flags;

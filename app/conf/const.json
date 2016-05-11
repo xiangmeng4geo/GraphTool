@@ -181,5 +181,50 @@
     	"HEIGHT": 800,
     	"MINWIDTH": 100,
     	"MINHEIGHT": 100
-    }
+    },
+    "LINE_TYPE": [{
+		"desc": "普通线",
+		"type": "COMMON"
+	}, {
+    	"desc": "河流",
+    	"type": "RIVER",
+    	"outline": {
+    		"lineWidth": 1,
+    		"strokeStyle": "#A9C2DE"
+    	}
+    }, {
+    	"desc": "铁路",
+    	"type": "RAILWAY",
+    	"outline": {
+    		"lineWidth": 2,
+    		"strokeStyle": "#949494"
+    	},
+    	"inline": {
+    		"lineWidth": 2,
+    		"strokeStyle": "#FEFEFE",
+    		"lineDash": [10, 10]
+    	}
+    }, {
+    	"desc": "高速路",
+    	"type": "MOTORWAY",
+    	"outline": {
+    		"lineWidth": 6,
+    		"strokeStyle": "#D7A041"
+    	},
+    	"inline": {
+    		"lineWidth": 4,
+    		"strokeStyle": "#F9C366"
+    	}
+    }, {
+    	"desc": "省道",
+    	"type": "HIGHWAY",
+    	"outline": {
+    		"lineWidth": 4,
+    		"strokeStyle": "#EFD95D"
+    	},
+    	"inline": {
+    		"lineWidth": 2,
+    		"strokeStyle": "#FCF778"
+    	}
+    }]
 }

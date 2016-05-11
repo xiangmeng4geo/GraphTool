@@ -11,11 +11,56 @@ Core.init(function(model) {
 	var CONST = _require('const');
 	var CONST_GEO_FLAGS = CONST.GEO.FLAGS;
 	var CONST_BOUND = CONST.BOUND;
+	var CONST_LINETYPE = CONST.LINE_TYPE;
 
 	var conf_data_sys = product_conf.getSys() || {};
 	var conf_data_geo = conf_data_sys.geo || (conf_data_sys.geo = []);
 	var conf_data_blendent = conf_data_sys.blendent || (conf_data_sys.blendent = []);
 
+	// 初始化线形数据
+	var d_sele_linetype = [];
+	var cache_linetype_img = {};
+	CONST_LINETYPE.forEach(function(v) {
+		var outline = v.outline,
+			inline = v.inline;
+		if (outline || inline) {
+			var width = v.legend_width || 50,
+				height = v.legend_height || 10;
+			var height_middle = height/2;
+			var canvas = $('<canvas>').attr({
+				height: height,
+				width: width
+			}).get(0);
+			var ctx = canvas.getContext('2d');
+			if (outline) {
+				ctx.lineWidth = outline.lineWidth;
+				ctx.strokeStyle = outline.strokeStyle;
+				
+				ctx.moveTo(0, height_middle);
+				ctx.lineTo(width, height_middle);
+				ctx.stroke();
+			}
+			if (inline) {
+				ctx.lineWidth = inline.lineWidth;
+				ctx.strokeStyle = inline.strokeStyle;
+				
+				var lineDash = inline.lineDash;
+				if (lineDash) {
+					ctx.setLineDash(lineDash);
+				}
+				
+				ctx.moveTo(0, height_middle);
+				ctx.lineTo(width, height_middle);
+				ctx.stroke();
+			}
+			
+			cache_linetype_img[v.type] = canvas.toDataURL();
+		}
+		d_sele_linetype.push({
+			val: v.type,
+			text: v.desc
+		});
+	});
 	var $doc = $(document);
 	$doc.delegate('[type=range]', 'input', function() {
 		var $this = $(this);
@@ -161,6 +206,7 @@ Core.init(function(model) {
 
 	var is_can_add_map_file = true;
 	var editting = false;
+	// 清除配置
 	function _clearMapConf() {
 		$map_conf.find('.map_item').remove();
 		$txt_map_name.val('');
@@ -181,6 +227,7 @@ Core.init(function(model) {
 		$txt_es_lng.val(CONST_BOUND.ES[0]);
 		$txt_es_lat.val(CONST_BOUND.ES[1]);
 	}
+	// 保存数据
 	function _saveConfData() {
 		var is_have_default = false;
 		for (var i = 0, j = conf_data_geo.length; i<j; i++) {
@@ -198,6 +245,7 @@ Core.init(function(model) {
 		model.emit('save');
 	}
 
+	// 保存地图配置
 	function _saveMapConf(cb) {
 		var map_name = $txt_map_name.val();
 		if (!map_name) {
@@ -240,19 +288,27 @@ Core.init(function(model) {
 			var shadow_x = $this.find('.c_map_item_shadow_x').val();
 			var shadow_y = $this.find('.c_map_item_shadow_y').val();
 			var cb_map_item_shadow_flag = _getChecked($this.find('.cb_map_item_shadow_flag'));
+			
+			var flag_is_use_stroke = _getChecked($this.find('.cb_map_item_stroke'));
+			var s_linetype = util_ui.select($this.find('.s_linetype')).val();
+			
 			// 对地理数据文件加强验证
 			if (!file) {
 				is_not_have_file = true;
 			}
+			var style = {
+				strokeStyle: strokeStyle,
+				lineWidth: lineWidth,
+				fillStyle: fillStyle,
+				flag_fill: flag_fillStyle,
+				flag_stroke: flag_is_use_stroke,
+				linetype: s_linetype
+			};
+			
 			list.push({
 				is_use: is_use_map,
 				file: file,
-				style: {
-					strokeStyle: strokeStyle,
-					lineWidth: lineWidth,
-					fillStyle: fillStyle,
-					flag_fill: flag_fillStyle
-				},
+				style: style,
 				clip: clip,
 				borderStyle: {
 					flag: is_use_border,
@@ -361,6 +417,10 @@ Core.init(function(model) {
 		util_ui.file($html.find('.ui-file'), {
 			width_minus: 8
 		});
+		util_ui.select($html.find('.s_linetype'), {
+			data: d_sele_linetype
+		});
+		_setChecked($html.find('.cb_map_item_stroke'), true);
 		$map_conf.append($html);
 		model.emit('init_component');
 		// is_can_add_map_file = false;
@@ -372,6 +432,7 @@ Core.init(function(model) {
 
 		var geo = conf_data_geo[index];
 		if (geo) {
+			geo = product_conf.util.geo.format(geo);
 			var name = geo.name;
 			$txt_map_name.val(name);
 
@@ -409,7 +470,23 @@ Core.init(function(model) {
 				$html.find('.c_map_item_fill').val(style.fillStyle);
 				_setChecked($html.find('.cb_map_item_shadow_flag'), borderStyle.flag_shadow);
 				_setChecked($html.find('.cb_map_item_fill'), style.flag_fill);
+				_setChecked($html.find('.cb_map_item_stroke'), style.flag_stroke);
 
+				var $s_linetype = $html.find('.s_linetype');
+				var $line_type_img = $html.find('.line_type_img');
+				util_ui.select($s_linetype, {
+					val: style.linetype,
+					data: d_sele_linetype,
+					onchange: (function ($line_type_img) {
+						return function(e, val) {
+							var img = cache_linetype_img[val];
+							var html = img? '<img src="'+ img+'"/>': '';
+							$line_type_img.html(html);
+							$line_type_img.next()[img? 'hide': 'show']();
+						}
+					})($line_type_img)
+				});
+				
 				var is_use_map = _map_conf.is_use;
 				var $is_use_map = $html.find('.is_use_map');
 				_setChecked($is_use_map, is_use_map);

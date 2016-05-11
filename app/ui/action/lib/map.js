@@ -67,9 +67,19 @@
     }
     var MIN_LEN = _getPixelRatio() > 1 ? 1 : 0.6
     // 画路径
-    function _drawPath(ctx, iter, needClose) {
+    function _drawPath(ctx, iter, options) {
         if (!iter.hasNext()){
             return;
+        }
+        options = $.extend({
+            needClose: false,
+            returnArr: false
+        }, options);
+        var needClose = options.needClose;
+        var is_return_arr_pixel = options.returnArr;
+        
+        if (is_return_arr_pixel) {
+            var arr_return = [];
         }
         var pixel_first = _projection([iter.x, iter.y]);
         var x, xp, y, yp;
@@ -77,42 +87,79 @@
         y = yp = pixel_first[1];
         ctx.moveTo(x, y);
 
+        arr_return && arr_return.push([x,y]);
         while (iter.hasNext()) {
             var pixel = _projection([iter.x, iter.y]);
             x = pixel[0];
             y = pixel[1];
             if (Math.abs(x - xp) > MIN_LEN || Math.abs(y - yp) > MIN_LEN) {
                 ctx.lineTo(x, y);
+                arr_return && arr_return.push([x,y]);
                 xp = x;
                 yp = y;
             }
         }
         if (x != xp || y != yp) {
             ctx.lineTo(x, y);
+            arr_return && arr_return.push([x,y]);
         }
         if (needClose) {
             ctx.lineTo(pixel_first[0], pixel_first[1]);
+            arr_return && arr_return.push([pixel_first[0], pixel_first[1]]);
+        }
+        
+        if (arr_return) {
+            return arr_return;
+        }
+    }
+    // 画完地理点后再次画生成后的像素点
+    function _drawLayerShapePixel(ctx, arr_pixel) {
+        if (arr_pixel && ctx) {
+            arr_pixel.forEach(function(arr) {
+                if (arr.length > 1) {
+                    var p_first = arr[0];
+                    ctx.moveTo(p_first[0], p_first[1]);
+                    arr.forEach(function(p) {
+                        ctx.lineTo(p[0], p[1]);
+                    });
+                }
+            });
         }
     }
     // 画arcs.layer.shape数据
-    function _drawShape(ctx, shp, arcs) {
+    function _drawLayerShape(ctx, shp, arcs, is_return_arr_pixel) {
         if (!shp) {
             return;
+        }
+        if (is_return_arr_pixel) {
+            var arr_return = [];
         }
         var iter = new _ShapeIter(arcs);
         for (var i = 0, j = shp.length; i<j; i++) {
             iter.init(shp[i]);
 
-            _drawPath(ctx, iter, true);
+            var arr = _drawPath(ctx, iter, {
+                needClose: true,
+                returnArr: is_return_arr_pixel
+            });
+            if (arr_return) {
+                arr_return.push(arr);
+            }
+        }
+        if (arr_return) {
+            return arr_return;
         }
     }
     // 画arcs.layers数据
     //
     // 暂时考虑到实际的应用场景，只提供stroke即只画线
     function _drawLayer(_this, layer, arcs, style, is_clip) {
+        style = $.extend({flag_stroke: true}, style);
+        var is_use_stroke = style.flag_stroke;
+        
         var ctx_stroke = _getCtxByPrefix(_this, LAYER_NAME_GEO_STROKE);
         var ctx_fill = _getCtxByPrefix(_this, LAYER_NAME_GEO_FILL);
-
+        
         var type = layer.geometry_type;
         if ('polygon' === type) {
             var is_stroked = style.strokeStyle && style.lineWidth !== 0,
@@ -126,6 +173,9 @@
             }
             if (is_filled && is_clip) {
                 is_filled = false;
+            }
+            if (is_stroked && !is_use_stroke) {
+                is_stroked = false;
             }
             var style_stroke = $.extend({}, style);
             var style_fill = $.extend({}, style);
@@ -143,14 +193,14 @@
             for (var i = 0, j = shapes.length; i<j; i++) {
                 if (is_stroked) {
                     start_stroke();
-                    _drawShape(ctx_stroke, shapes[i], arcs);
+                    _drawLayerShape(ctx_stroke, shapes[i], arcs);
 
                     ctx_stroke.stroke();
                     ctx_stroke.restore();
                 }
                 if (is_filled) {
                     start_fill();
-                    _drawShape(ctx_fill, shapes[i], arcs);
+                    _drawLayerShape(ctx_fill, shapes[i], arcs);
 
                     ctx_fill.fill();
                     ctx_fill.restore();
@@ -161,15 +211,32 @@
             delete style_stroke['fillStyle'];
             var start = _getPathStart(ctx_stroke, style_stroke);
             var end = _getPathEnd(ctx_stroke, style_stroke);
+            
+            var style_inline = style_stroke.inline;
+            if (style_inline) {
+                var start_inline = _getPathStart(ctx_stroke, style_inline);
+                var end_inline = _getPathEnd(ctx_stroke, style_inline);
+                var is_use_dash = style_inline.lineDash;
+            }
             for (var i = 0, j = arcs.size(); i<j; i++){
                 start();
-                _drawPath(ctx_stroke, arcs.getArcIter(i));
+                var arr_pixel = _drawPath(ctx_stroke, arcs.getArcIter(i), {
+                    returnArr: !!style_inline
+                });
                 end();
+                
+                if (arr_pixel) {
+                    is_use_dash && arr_pixel.shift();
+                    start_inline();
+                    _drawLayerShapePixel(ctx_stroke, [arr_pixel]);
+                    end_inline();
+                }
             }
         }
     }
 
     function _getPathStart(ctx, style) {
+        style = $.extend(true, {flag_stroke: true}, style);
         var lineWidth = parseFloat(style.lineWidth) || 0,
             strokeStyle = style.strokeStyle,
             fillStyle = style.fillStyle,
@@ -185,10 +252,16 @@
             ctx.save();
             ctx.beginPath();
             if (stroked) {
-                ctx.lineCap = 'round';
+                // ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
                 ctx.lineWidth = lineWidth;
                 ctx.strokeStyle = strokeStyle || '#d2d2d2';
+                
+                // 设置虚线
+                var style_dash = style.lineDash;
+                if (style_dash) {
+                    ctx.setLineDash(style_dash);
+                }
             }
             //只添加指定属性
             ['shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY',
@@ -450,7 +523,7 @@
         // TIP: this is important
         ctx.beginPath();
         for (var i = 0; i<len; i++) {
-            _drawShape(ctx, [shapes[i]], arcs);
+            _drawLayerShape(ctx, [shapes[i]], arcs);
         }
         ctx.closePath();
 
@@ -491,7 +564,7 @@
                 var end = _getPathEnd(ctx, style_fill);
                 for (var i = 0, j = shapes.length; i<j; i++) {
                     start();
-                    _drawShape(ctx, [shapes[i]], arcs);
+                    _drawLayerShape(ctx, [shapes[i]], arcs);
                     end();
                 }
             }
@@ -508,7 +581,7 @@
                 var end = _getPathEnd(ctx, style_stroke);
                 for (var i = 0, j = shapes.length; i<j; i++) {
                     start();
-                    _drawShape(ctx, [shapes[i]], arcs);
+                    _drawLayerShape(ctx, [shapes[i]], arcs);
                     end();
                 }
             }
@@ -526,9 +599,12 @@
 
         var ctx = _getCtxByPrefix(_this, style.normal?LAYER_NAME_NORMAL: LAYER_NAME_WEATHER);
 
-        _getPathStart(ctx, style)();
-        shape.draw(ctx, _projection);
-        _getPathEnd(ctx, style)();
+        _drawShape(shape, ctx, style, _projection);
+
+        // _getPathStart(ctx, style)();
+        // shape.draw(ctx, _projection);
+        // _getPathEnd(ctx, style)();
+        // shape.afterDraw && shape.afterDraw(ctx);
 
         shape.style = style;
         shapes.push(shape);
@@ -567,7 +643,7 @@
 
             _isArray(data_list) && data_list.forEach(function(data) {
                 var dataset = data.dataset;
-                var style = data.style;
+                var style = data.style;console.log(style);
                 var is_clip = data.clip;
                 if (dataset) {
                     var arcs = dataset.arcs;
@@ -602,9 +678,13 @@
                 var _ctx = is_refresh_normal && _style.normal ? ctx_normal: is_refresh_weather && !_style.normal? ctx: null;
 
                 if (_ctx) {
-                    _getPathStart(_ctx, _style)();
-                    shp.draw(_ctx, _projection);
-                    _getPathEnd(_ctx, _style)();
+                    _drawShape(shp, _ctx, _style, _projection);
+
+                    // _getPathStart(_ctx, _style)();
+                    // shp.draw(_ctx, _projection);
+                    // _getPathEnd(_ctx, _style)();
+
+                    // shp.afterDraw && shp.afterDraw(ctx);
                 }
             }
         }
@@ -729,14 +809,25 @@
                 var shape = shapes[i];
                 var style = shape.style || {};
 
-                _getPathStart(ctx, style)();
-                shape.draw(ctx, _projection);
-                _getPathEnd(ctx, style)();
+                _drawShape(shape, ctx, style, _projection);
+                // _getPathStart(ctx, style)();
+                // shape.draw(ctx, _projection);
+                // _getPathEnd(ctx, style)();
+
+                // shape.afterDraw && shape.afterDraw(ctx);
             }
         }
 
         var result = canvas_tmp.toDataURL(null, bgcolor);
         return result;
+    }
+
+    function _drawShape(shape, ctx, style, projection) {
+        _getPathStart(ctx, style)();
+        shape.draw(ctx, projection);
+        _getPathEnd(ctx, style)();
+
+        shape.afterDraw && shape.afterDraw(ctx);
     }
     module.exports = GeoMap;
 }()

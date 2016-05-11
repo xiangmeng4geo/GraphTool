@@ -9,6 +9,7 @@
     var CONST = require('./const');
     var CONST_PATH_CONFIG = CONST.PATH.CONFIG;
     var CONST_SIZE = CONST.SIZE;
+    var CONST_LINETYPE = CONST.LINE_TYPE;
     var CONST_EXT = '.json';
     var TYPE_PLACEHOLDER = 1,
         TYPE_NORMAL = 2;
@@ -34,6 +35,39 @@
     function _getSys() {
         return _readConfig(CONST_SYSCONF_NAME);
     }
+    var _formatMapStyle = (function(params) {
+        var cache = {};
+        CONST_LINETYPE.forEach(function(conf) {
+            cache[conf.type] = conf;
+        });
+        
+        var type_default = CONST_LINETYPE[0].type;
+        return function(obj_geo) {
+            if (obj_geo) {
+                obj_geo.maps.forEach(function(map) {
+                    map.style = util_extend(true, {
+                        flag_stroke: true,
+                        linetype: type_default
+                    }, map.style);
+                    
+                    var type = map.style.linetype || type_default;
+                    var style_linetype = cache[type];
+                    if (style_linetype) {
+                        var outline = style_linetype.outline;
+                        if (outline) {
+                            map.style = util_extend(true, map.style, {
+                                lineWidth: outline.lineWidth,
+                                strokeStyle: outline.strokeStyle,
+                                outline: outline,
+                                inline: style_linetype.inline
+                            });
+                        }
+                    }
+                });
+            }
+            return obj_geo;
+        }
+    })();
     _getSys.getGeo = function(name) {
         // 命令行传入配置
         if (util.isPlainObject(name)) {
@@ -46,17 +80,20 @@
             if (name === '') {
                 for (var i = 0, j = geo.length; i < j; i++) {
                     if (geo[i].is_default) {
-                        return geo[i];
+                        return _formatMapStyle(geo[i]);
                     }
                 }
             } else {
+                for (var i = 0, j = geo.length; i < j; i++) {
+                    _formatMapStyle(geo[i]);   
+                }
                 return geo;
             }
         } else {
             name = name.trim();
             for (var i = 0, j = geo.length; i < j; i++) {
                 if (name == geo[i].name) {
-                    return geo[i];
+                    return _formatMapStyle(geo[i]);
                 }
             }
         }
@@ -348,7 +385,10 @@
                 modify: _modifyAsset,
                 format: _formatAsset
             },
-            getSize: _getSize
+            getSize: _getSize,
+            geo: {
+                format: _formatMapStyle
+            }
         }
     };
 

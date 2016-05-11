@@ -16,7 +16,17 @@
     }
     var MIN_LEN = _getPixelRatio() > 1 ? 1 : 0.6;
 
-    function _drawPath(ctx, points, projection, needClose) {
+    function _drawPath(ctx, points, projection, option) {
+        option = $.extend(true, {
+            returnArr: false
+        }, option);
+
+        var isReturnArr = option.returnArr;
+        if (isReturnArr) {
+            var arr_return = [];
+        }
+        var needClose = option.needClose;
+        
         var isObj = points.isObj;
         var first = points[0];
         var pixel_first = projection(isObj? [first.x, first.y]: first);
@@ -25,6 +35,7 @@
         y = yp = pixel_first[1];
 
         ctx.moveTo(x, y);
+        arr_return && arr_return.push([x, y]);
 
         for (var i = 1, j = points.length; i<j; i++) {
             var p = points[i];
@@ -33,6 +44,7 @@
             y = pixel[1];
             if (Math.abs(x - xp) > MIN_LEN || Math.abs(y - yp) > MIN_LEN) {
                 ctx.lineTo(x, y);
+                arr_return && arr_return.push([x, y]);
                 xp = x;
                 yp = y;
             }
@@ -40,11 +52,26 @@
 
         if (x != xp || y != yp) {
             ctx.lineTo(x, y);
+            arr_return && arr_return.push([x, y]);
         }
+        if (needClose) {
+            ctx.lineTo(pixel_first[0], pixel_first[1]);
+            arr_return && arr_return.push([pixel_first[0], pixel_first[1]]);
+        }
+        if (isReturnArr) {
+            return arr_return;
+        }
+    }
 
-        // if (needClose) {
-        //     ctx.lineTo(pixel_first[0], pixel_first[1]);
-        // }
+    function _drawArr(ctx, arr_pixel) {
+        if (arr_pixel) {
+            var p_first = arr_pixel[0];
+            ctx.moveTo(p_first[0], p_first[1]);
+            for (var i = 1, j = arr_pixel.length; i<j; i++) {
+                var p = arr_pixel[i];
+                ctx.lineTo(p[0], p[1]);
+            }
+        }
     }
 
     // 霜冻线
@@ -84,10 +111,14 @@
 
         _this.style = style;
         _this.draw = function(ctx, projection) {
-            _drawPath(ctx, points, projection, true);
+            _drawPath(ctx, points, projection, {
+                needClose: true
+            });
             if (sub) {
                 for (var i = 0, j = sub.length; i<j; i++) {
-                    _drawPath(ctx, sub[i], projection, true);
+                    _drawPath(ctx, sub[i], projection, {
+                        needClose: true
+                    });
                 }
             }
             ctx.fill();
@@ -101,8 +132,24 @@
             if (style.type == 38) {
                 _drawLine38(points, style, ctx, projection);
             }
-            _drawPath(ctx, points, projection);
+            var arr_pixel = _drawPath(ctx, points, projection, {
+                returnArr: style.type == 38
+            });
+            // _this.arr_pixel = arr_pixel;
         }
+        // _this.afterDraw = function(ctx) {
+        //     var arr_pixel = _this.arr_pixel;
+        //     if (arr_pixel) {
+        //         ctx.save();
+        //         ctx.lineWidth = 2;
+        //         ctx.setLineDash([3, 16]);
+        //         ctx.strokeStyle = '#ffffff';
+        //         ctx.beginPath();
+        //         _drawArr(ctx, arr_pixel);
+        //         ctx.stroke();
+        //         ctx.restore();
+        //     }
+        // }
     }
     var _ctx_empty = $('<canvas width="100" height="100">').get(0).getContext('2d');
     /**
