@@ -643,7 +643,7 @@
 
             _isArray(data_list) && data_list.forEach(function(data) {
                 var dataset = data.dataset;
-                var style = data.style;console.log(style);
+                var style = data.style;
                 var is_clip = data.clip;
                 if (dataset) {
                     var arcs = dataset.arcs;

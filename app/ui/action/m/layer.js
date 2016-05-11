@@ -373,6 +373,89 @@ Core.init(function() {
             return $html;
         }
     }
+    function LegendLayer(option) {
+        option = $.extend(true, {
+            resize: {
+                resize: _change
+            },
+            drag: {
+                // handle: 'span.btn_handle',
+                drag: _change
+            },
+            canEdit: true
+        }, option);
+        var $html_inner = option.html || '<div class="placeholder_legend"><span>图例占位</span></div>';
+        var $html = _createLayer(option);
+        $html.append($html_inner);
+        // $template_assets.append($html);
+        
+        var pos = $html.position();
+        var width = $html.width(),
+            height = $html.height();
+        var editImg = UI.editImg($html, {
+            width: width,
+            height: height,
+            left: pos.left,
+            top: pos.top,
+            onchange: function() {
+                var size = editImg.getSize();
+                $html.data('angle', size.r||0).css({
+                    width: size.width,
+                    height: size.height,
+                    left: size.left,
+                    top: size.top,
+                    'transform': 'rotate('+(size.r||0)+'deg)'
+                });
+            }
+        });
+        function _change() {
+            var css = {};
+            var pos = $html.position();
+            var left = pos.left,
+                top = pos.top;
+            var $p = $html.parent();
+            var w = $p.width();
+            var h = $p.height();
+            var _w = editImg._w,
+                _h = editImg._h;
+            var height_layer = $html.height();
+            if (w > 0 && h > 0) {
+                var css = {};
+                if (left + _w > w && _w > $html.width() || left < 0) {
+                    css.left = 'auto';
+                    css.right = 0;
+                } else {
+                    css.left = 0;
+                    css.right = 'auto'
+                }
+
+                if (top + height_layer + _h > h) {
+                    css.top = 'auto';
+                    css.bottom = '100%';
+                } else {
+                    css.top = '100%';
+                    css.bottom = 'auto';
+                }
+                editImg.setPos(css);
+            }
+            editImg.setSize({
+                width: $html.width(),
+                height: $html.height(),
+                left: left,
+                top: top,
+                r: $html.data('angle')
+            });
+        }
+        $html.on('edit', function(e, flag) {
+            if (flag) {
+                editImg.show();
+                _change();
+            } else {
+                editImg.hide();
+            }
+        })
+        return $html;
+    }
 
     function _reset() {
 		$('.map_layer').addClass('off').trigger('edit', false);
@@ -391,6 +474,7 @@ Core.init(function() {
     	},
     	base: _createLayer,
     	text: TextLayer,
-    	img: ImageLayer
+    	img: ImageLayer,
+        legend: LegendLayer
     }
 })

@@ -104,3 +104,18 @@
 	left: -4px;
 }
 /*工具添加的图层样式 }*/
+
+.placeholder_legend{
+	background-color: rgba(255, 255, 255, 0.5);
+	font-size: 14px;
+	text-align: center;
+	height: 100%;
+	width: 100%;
+	color: #000;
+    box-shadow: 0px 0px 5px 5px pink inset;
+	display: table;
+}
+.placeholder_legend span{
+	display: table-cell;
+	vertical-align: middle;
+}

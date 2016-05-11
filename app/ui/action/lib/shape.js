@@ -207,20 +207,9 @@
 
         style = style2obj(style);
         var _style = $.extend({}, style);
-        var font = [];
-        var font_style = _style['font-style'] || _style['fontStyle'] || 'normal';
-        font.push(font_style);
-
-        var font_weight = _style['font-weight'] || _style['fontWeight'] || 'normal';
-        font.push(font_weight);
-
-        var font_size = _style['font-size'] || _style['fontSize'] || 14;
-        font.push(parseInt(font_size)+'px');
-
-        var font_family = _style['font-family'] || _style['fontFamily'] || '"Microsoft Yahei"';
-        font.push(font_family);
-
-        font = font.join(' ');
+        
+        
+        var font = _getFont(_style);
 
         // [center|left|right]
         var text_align = _style['text-align'] || _style['textAlign'] || 'left';
@@ -251,7 +240,7 @@
         }
         if (height > 0) {
             if (text_baseline == 'middle') {
-                y += height/2;
+                y += height/2 + lineheight/2;
             } else if (text_baseline == 'bottom') {
                 y += height;
             }
@@ -379,12 +368,29 @@
             _this.draw = function(ctx, projection) {}
         }        
     }
+    function _getFont(_style) {
+        var font = [];
+        var font_style = _style['font-style'] || _style['fontStyle'] || 'normal';
+        font.push(font_style);
+
+        var font_weight = _style['font-weight'] || _style['fontWeight'] || 'normal';
+        font.push(font_weight);
+
+        var font_size = _style['font-size'] || _style['fontSize'] || 14;
+        font.push(parseInt(font_size)+'px');
+
+        var font_family = _style['font-family'] || _style['fontFamily'] || '"Microsoft Yahei"';
+        font.push(font_family);
+
+        return font.join(' ');
+    }
     exports.Polygon = Polygon;
     exports.Polyline = Polyline;
     exports.Text = Text;
     exports.Image = ImageShape;
 
     exports.util = {
+        getFont: _getFont,
         getTextHeight: _getTextHeight,
         getTextWidth: _getTextWidth
     };

@@ -14,6 +14,7 @@ Core.init(function(model) {
     var GeoMap = _require('map');
     var Geo = _require('geo');
     var map_util = _require('m/map_util');
+    var linetype = _require('m/linetype');
     var electron = require('electron');
     var remote = electron.remote;
     var Menu = remote.Menu;
@@ -26,6 +27,7 @@ Core.init(function(model) {
     var CONST_SIZE_MINWIDTH = CONST_SIZE.MINWIDTH;
     var CONST_SIZE_MINHEIGHT = CONST_SIZE.MINHEIGHT;
     var CONST_STEP = 10;
+    var CONST_LINETYPE = CONST.LINE_TYPE;
 
     var TYPE_PLACEHOLDER = 1,
         TYPE_NORMAL = 2;
@@ -42,8 +44,8 @@ Core.init(function(model) {
             text: '占位文字',
             pos: pos_contextmenu
         }, {
-                type: type
-            });
+            type: type
+        });
     }
     function _img(type) {
         dialog.imagesOpen(function(file_paths) {
@@ -66,35 +68,91 @@ Core.init(function(model) {
             }
         });
     }
+    var tmplMenuLine = [];
+    var len_linetype = CONST_LINETYPE.length;
+    CONST_LINETYPE.forEach(function(conf, i) {
+        if (conf.type != 'COMMON') {
+            tmplMenuLine.push({
+                label: conf.desc,
+                type: 'checkbox',
+                click: (function() {
+                    var $html;
+                    return function(menuItem) {
+                        if (menuItem.checked) {
+                            var img_linetype = linetype(conf);
+                            LegendLayer({
+                                css: {
+                                    left: 20,
+                                    top: $template_assets.height() - (len_linetype - i) * (img_linetype.height + 5)
+                                },
+                                html: '<img src="'+img_linetype.src+'"/>'
+                            });
+                        } else {
+                            $html.remove();
+                        }
+                    }
+                })()
+            });
+        }
+    });
     var tmplMenu = [{
         label: '添加占位文字',
         click: function() {
             _text(TYPE_PLACEHOLDER);
         }
     }, {
-            label: '添加指定文字',
-            click: function() {
-                _text(TYPE_NORMAL);
-            }
-        }, {
-            type: 'separator'
-        }, {
-            label: '添加占位图片',
-            click: function() {
-                ImageLayer({
-                    src: path.join(CONST.PATH.UI, 'img/placeholder.svg'),
-                    pos: pos_contextmenu,
-                    useEdit: true
-                }, {
-                        type: TYPE_PLACEHOLDER
+        label: '添加指定文字',
+        click: function() {
+            _text(TYPE_NORMAL);
+        }
+    }, {
+        type: 'separator'
+    }, {
+        label: '添加占位图片',
+        click: function() {
+            ImageLayer({
+                src: path.join(CONST.PATH.UI, 'img/placeholder.svg'),
+                pos: pos_contextmenu,
+                useEdit: true
+            }, {
+                    type: TYPE_PLACEHOLDER
+                });
+        }
+    }, {
+        label: '添加指定图片',
+        click: function() {
+            _img(TYPE_NORMAL);
+        }
+    }, {
+        type: 'separator'
+    }, {
+        label: '添加图例位置',
+        type: 'checkbox',
+        click: (function() {
+            var $html_legend;
+            return function(menuItem) {
+                if (menuItem.checked) {
+                    var width = $template_assets.width() / 2;
+                    var height = $template_assets.height() / 2;
+                    $html_legend = LegendLayer({
+                        css: {
+                            left: width/2,
+                            top: height/2,
+                            width: width,
+                            height: 50
+                        }
                     });
+                } else {
+                    $html_legend.remove();
+                }
             }
-        }, {
-            label: '添加指定图片',
-            click: function() {
-                _img(TYPE_NORMAL);
-            }
-        }];
+        })()
+    }, {
+        type: 'separator'
+    }, {
+        label: '添加线图例',
+        submenu: tmplMenuLine
+    }];
     var menu = Menu.buildFromTemplate(tmplMenu);
     Menu.setApplicationMenu(menu);
 
@@ -175,6 +233,11 @@ Core.init(function(model) {
         var $html = Layer.img(option);
         $html.data('_data', data);
         $template_assets.append($html);
+    }
+    var LegendLayer = function(option) {
+        var $html = Layer.legend(option)
+        $template_assets.append($html);
+        return $html;
     }
     $template_list.delegate('span', 'click', function(e) {
         e.stopPropagation();
