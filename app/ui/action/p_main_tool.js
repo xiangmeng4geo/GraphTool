@@ -248,11 +248,17 @@ Core.init(function(model) {
 
     // 添加文字
     fn_list.text = function() {
+        var width = 100,
+            height = 30;
         TextLayer({
             edit: true,
             css: {
-                width: 100,
-                height: 30
+                width: width,
+                height: height,
+            },
+            pos: {
+                left: ($geomap_container.width() - width) /2,
+                top: ($geomap_container.height() - height)/2
             },
             text: ''
         })

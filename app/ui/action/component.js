@@ -510,10 +510,78 @@
 			}
 		}
 	}
+	
+	function _setColorByContainer($container, color, opacity) {
+		ui_color($ui_color.find('input[type=color]')).setColor(color, opacity);
+	}
+	$doc.delegate('.ui-color input[type=color]', 'change', function() {
+		color($ui_color.find('input[type=color]')).setColor();
+	}).delegate('.ui-color .ui-color-opacity-val', 'change', function() {
+		_setColorByContainer($(this).closest('.ui-color'));
+	}).delegate('.ui-color input[type=range]', 'change', function() {
+		_setColorByContainer($(this).closest('.ui-color'));
+	});
+	var REG_RGBA = /rgba\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d|0\.[\d]+)\s*\)/;
+	function ui_color($container, options) {
+		options = _extend({
+			useOpacity: true, //是否使用透明度
+			opacity: 1, //初始化透明度
+			color: '#000000'
+		}, options);
+		
+		if (!$container.data('inited')) {
+			$container.data('inited', true);
+			
+			if ($container.is('input[type=color]')) {
+				var opacity = options.opacity;
+				var rgb = _getRgba([options.color, opacity]);
+				$container.wrap('<div class="ui-color"></div>').after('<div class="ui-color-show"></div><div class="ui-color-opacity"><input type="text" value="'+opacity+'" class="ui-color-opacity-val"/><input type="range" min=0 max=1 step=0.01 value="'+opacity+'" class="r_opacity"/></div>');
+			}
+		}
+		
+		var $p = $container.parent();
+		var $opacity = $p.find('.ui-color-opacity-val,.r_opacity');
+		var $ui_color_show = $p.find('.ui-color-show');
+		function _getColor() {
+			var color = $container.val();
+			var opacity = $opacity.val();
+			
+			return [color, opacity];
+		}
+		function _getRgba(arr_color) {
+			arr_color = arr_color || _getColor();
+			var color = arr_color[0],
+				opacity = arr_color[1];
+			var arr_c = color_normal2rgb(color, true);
+			
+			return 'rgba('+arr_c[0]+', '+arr_c[1]+', '+arr_c[2]+', '+opacity+')';
+		}
+		function _setColor(color, opacity) {
+			$container.val(color);
+			$opacity.val(opacity);
+			
+			var rgba = _getRgba();
+			$ui_color_show.css('background-color', rgba);
+		}
+		return {
+			getRgba: _getRgba,
+			setRgba: function(rgba) {
+				var m = REG_RGBA.exec(rgba);
+				if (m) {
+					var color = '#'+to16(m[1])+to16(m[2])+to16(m[3]);
+					var opacity = Math.min(Number(m[4]), 1);
+					_setColor(color, opacity);
+				}
+			},
+			setColor: _setColor,
+			getColor: _getColor
+		}
+	}
 	UI.file = file;
 	UI.select = select;
 	UI.edit = editText;
 	UI.editImg = editImg;
+	UI.color = ui_color;
 
 	var Util = {
 		UI: UI,
@@ -525,50 +593,48 @@
 		}
 	};
 	/*颜色转换*/
-	!function(){
-		var REG_RGB = /rgb\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)/;
-		function to16(num){
-			var str16 = Number(num).toString(16);
-			return (str16.length == 1? '0':'')+str16;
-		}
-		function color_rgb2normal(color_rgb){
-			if(color_rgb){
-				var m = REG_RGB.exec(color_rgb);
-				if(m){
-					return '#'+to16(m[1])+to16(m[2])+to16(m[3]);
-				}else if(REG_HTML.test(color_rgb)){
-					return color_rgb;
-				}
+	var REG_RGB = /rgb\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)/;
+	function to16(num){
+		var str16 = Number(num).toString(16);
+		return (str16.length == 1? '0':'')+str16;
+	}
+	function color_rgb2normal(color_rgb){
+		if(color_rgb){
+			var m = REG_RGB.exec(color_rgb);
+			if(m){
+				return '#'+to16(m[1])+to16(m[2])+to16(m[3]);
+			}else if(REG_HTML.test(color_rgb)){
+				return color_rgb;
 			}
 		}
-		var REG_HTML = /#([\da-f]{2})([\da-f]{2})([\da-f]{2})/
-		function color_normal2rgb(color_html,isReturnArray){
-			if(color_html){
-				var m = REG_HTML.exec(color_html);
-				if(m){
-					var arr = [parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)];
+	}
+	var REG_HTML = /#([\da-f]{2})([\da-f]{2})([\da-f]{2})/
+	function color_normal2rgb(color_html,isReturnArray){
+		if(color_html){
+			var m = REG_HTML.exec(color_html);
+			if(m){
+				var arr = [parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)];
 
+				if(isReturnArray){
+					return arr;
+				}
+				return 'rgb('+(arr.join(','))+')';
+			}else{
+				var m = REG_RGB.exec(color_html);
+				if(m){
 					if(isReturnArray){
-						return arr;
-					}
-					return 'rgb('+(arr.join(','))+')';
-				}else{
-					var m = REG_RGB.exec(color_html);
-					if(m){
-						if(isReturnArray){
-							m.shift();
-							return m;
-						}else{
-							return color_html;
-						}
+						m.shift();
+						return m;
+					}else{
+						return color_html;
 					}
 				}
 			}
 		}
-		Util.Color = {
-			toRGB: color_normal2rgb,
-			toHTML: color_rgb2normal
-		}
-	}();
+	}
+	Util.Color = {
+		toRGB: color_normal2rgb,
+		toHTML: color_rgb2normal
+	}
 	module.exports = Util;
 }();

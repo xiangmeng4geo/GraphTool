@@ -108,7 +108,7 @@ button:hover{
 }
 input[disabled]{
     background-color: #444444;
-    color: #99999;
+    color: #999999;
 }
 /*input[type=button].big,
 button.big{
@@ -478,6 +478,53 @@ tr:nth-child(2n+1) td{
 .ui-select li img{
     width: 5px;
     height: 5px;
+}
+
+.ui-color {
+    display: inline-block;
+    position: relative;
+}
+.ui-color .ui-color-show {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+.ui-color input[type=color] {
+    opacity: 0;
+    position: relative;
+    z-index: 101;
+}
+.ui-color .ui-color-opacity {
+    display: none;
+    position: absolute;
+    width: 90px;
+    background-color: #212121;
+    border-radius: 2px;
+    padding: 10px;
+}
+.ui-color .ui-color-opacity:after {
+    position: absolute;
+    transform: rotate(45deg);
+    width: 24px;
+    height: 24px;
+    background-color: #212121;
+    z-index: 0;
+    left: 50%;
+    margin-left: -12px;
+    bottom: -12px;
+}
+.ui-color:hover .ui-color-opacity{
+    display: block;
+}
+.ui-color .ui-color-opacity-val{
+    width: 16px;
+    text-align: center;
+}
+.ui-color .ui-color-opacity .r_opacity{
+    width: 60px;
+    margin-left: 2px;
 }
 
 tab{
