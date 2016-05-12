@@ -147,10 +147,12 @@
                     break;
                 case '-sync':
                     conf['sync'] = true;
+                case '-api':
+                    conf['api'] = val;    
             }
         }
-        if (!conf.name && !conf.file) {
-            cb('command error, use -name or -file');
+        if (!conf.name && !conf.file && !conf.api) {
+            cb('command error, use -name or -file or -api');
         } else {
             _openUi(conf, cb);
         }

@@ -48,6 +48,13 @@ Core.init(function(model) {
 		isDealing = true;
 		var conf = queue.shift();
 		_confCurrent = conf;
+		var api = conf.api;
+		if (api) {
+			if (api == 'getMapCenter') {
+				_getMapCenter(_finish);
+				return;
+			}
+		}
 		var file = conf.file;
 		var name = conf.name;
 		if (file) {
@@ -88,6 +95,29 @@ Core.init(function(model) {
 			model.emit('map.changeconfig', conf);
 		}
 	}
+	function _getMapCenter(cb) {
+		var tt;
+		model.emit('api.getMapCenter', function(point) {
+			clearTimeout(tt);
+			cb && cb({
+				lng: Number(point[0].toFixed(4)),
+				lat: Number(point[1].toFixed(4))
+			})
+		});
+		
+		tt = setTimeout(function() {
+			cb = null;
+			_error('getMapCenter get error!');
+		}, 500);
+	}
+	function _finish(data) {
+		ipc.send('cb', {
+			key: _confCurrent._id,
+			data: data
+		});
+		_end();
+	}
+	window.test = _getMapCenter;
 	model.on('map.afterRender', function(err, time_used) {
 		if (!err) {
 			var conf = _confCurrent.__conf;
@@ -115,14 +145,10 @@ Core.init(function(model) {
 		}
     });
 	model.on('afterExport', function(save_path, time_used){
-		ipc.send('cb', {
-			key: _confCurrent._id,
-			data: {
-				path: save_path,
-				time: time_used
-			}
+		_finish({
+			path: save_path,
+			time: time_used
 		});
-		_end();
 	})
 	model.on('command.conf', function(conf) {
 		queue.push(conf);

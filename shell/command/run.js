@@ -55,10 +55,13 @@ function run(conf_name) {
 	});
 }
 
+command(bin_path+' -sync -api getMapCenter', function(err, result) {
+	console.log(err, result);
+});
 // run('rain.json');
 // run('tmp.json');
 // run('rain-1.json');
 // run('rain-2.json');
 // run('20160310.json');
 // run('20160315.json');
-run('20160512/index.json');
+// run('20160512/index.json');

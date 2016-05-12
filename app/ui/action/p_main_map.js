@@ -45,6 +45,9 @@ Core.init(function(model) {
     }
     var geomap;
     var projection;
+    // $geomap.on('mousemove', function(e) {
+    //     console.log(projection.invert([e.offsetX, e.offsetY]));
+    // });
     var zoom;
     var map_click_type;
     function _init() {
@@ -300,5 +303,11 @@ Core.init(function(model) {
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi-conf'))(_options);
 
         // model.emit('map.changeconfig', 'H:/docs/2015/蓝PI相关/各方需求/陕西/data.json');
+    });
+    
+    model.on('api.getMapCenter', function(cb) {
+        if (cb && projection) {
+            cb(projection.invert([$geomap.width()/2, $geomap.height()/2]));
+        }
     });
 });

@@ -14,6 +14,7 @@
 
 `BIN_FILE -sync -file "C:/Users/技术/BPA/GT/test/0910降水.json"`
 
+`BIN_FILE -sync -api getMapCenter`
 -------------------
 
 ##### 命令行参数说明
@@ -23,6 +24,7 @@
 | -name | 在制图系统里配置好的产品名 |
 | -file | 第三方生成的配置文件路径（配置文件要是json格式）,请参考[配置文件格式说明](./conf.md) |
 | -sync | 是否同步处理（若没有此参数即为异步处理，程序马上返回“{"msg":"dealing..."}”） |
+| -api | 调用内部提供的api,  |
 
 -------------------
 
