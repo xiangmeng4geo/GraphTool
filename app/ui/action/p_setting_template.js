@@ -347,7 +347,7 @@ Core.init(function(model) {
                 }, v);
             }
         });
-        var data_legend = data.legend || {};
+        var data_legend = data.legendConf || {};
         var assets_legend = data_legend.assets;
         assets_legend && $.each(assets_legend, function(i, asset) {
             LegendLineTypeLayer({
@@ -479,7 +479,7 @@ Core.init(function(model) {
             width: width,
             height: height,
             assets: assets,
-            legend: data_legend
+            legendConf: data_legend
         };
 
 

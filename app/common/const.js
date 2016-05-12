@@ -114,13 +114,13 @@
 			text: '默认样式',
 			val: ''
 		}, {
-			text: '右侧（适合单个图例）',
+			text: '上下带刻度（适合单个图例）',
 			val: 'a'
 		}, {
-			text: '左下',
+			text: '上下带范围',
 			val: 'b'
 		}, {
-			text: '下方',
+			text: '左右显示',
 			val: 'c'
 		}],
 		INTEPOLATE: {

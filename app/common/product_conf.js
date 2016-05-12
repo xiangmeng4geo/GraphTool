@@ -161,26 +161,26 @@
         width: CONST_SIZE.WIDTH,
         height: CONST_SIZE.HEIGHT
     };
-    _getSys.getSize = function(index) {
-        var conf = _getSys() || {};
-        var size = conf.size || [];
-        size.unshift(SIZE_DEFAULT);
-        if (index !== undefined) {
-            var val = size[index];
-            if (!val) {
-                for (var i = 0, j = size.length; i < j; i++) {
-                    var v = size[i];
-                    if (v.is_default) {
-                        val = v;
-                        break;
-                    }
-                }
-            }
-            return val;
-        } else {
-            return size;
-        }
-    }
+    // _getSys.getSize = function(index) {
+    //     var conf = _getSys() || {};
+    //     var size = conf.size || [];
+    //     size.unshift(SIZE_DEFAULT);
+    //     if (index !== undefined) {
+    //         var val = size[index];
+    //         if (!val) {
+    //             for (var i = 0, j = size.length; i < j; i++) {
+    //                 var v = size[i];
+    //                 if (v.is_default) {
+    //                     val = v;
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //         return val;
+    //     } else {
+    //         return size;
+    //     }
+    // }
     _getSys.getAssets = function(key) {
         var conf = _getSys() || {};
         var assets = conf.assets || [];
@@ -369,6 +369,22 @@
         }
         return toSize;
     }
+    // 得到模板里的图例尺寸及其它图例相关配置
+    function _getLegendConf(conf) {
+        if (!conf) {
+            return null;
+        }
+        var legend = conf.legendConf;
+        if (legend) {
+            return legend;
+        } else {
+            var template_conf = conf.other && conf.other.template;
+            var template = _getSys.getTemplate(template_conf || '');
+            if (template) {
+                return template.legendConf;       
+            }
+        }
+    }
     var config = {
         read: _readConfig,
         save: _saveConfig,
@@ -386,6 +402,7 @@
                 format: _formatAsset
             },
             getSize: _getSize,
+            getLegendConf: _getLegendConf,
             geo: {
                 format: _formatMapStyle
             }

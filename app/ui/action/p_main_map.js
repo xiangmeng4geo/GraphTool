@@ -18,6 +18,8 @@ Core.init(function(model) {
     var CONST = _require('const');
     var Geo = _require('geo');
     var map_util = _require('m/map_util');
+    var component = _require('component');
+    var style2obj = component.util.style2obj;
     var CONST_BOUND = CONST.BOUND;
     var place_arr = util_file.readJson(CONST.GEO.FILE);
 
@@ -173,22 +175,38 @@ Core.init(function(model) {
         model.emit('log', 'save ['+save_path+'] takes '+time_used+' ms! ');
         model.emit('afterExport', save_path, time_used);
     });
-    model.on('legend', function(blendent, legendStyle, data_filter) {
+    model.on('legend', function(blendent, legendStyle, data_filter, legendConf) {
+        legendConf = $.extend(true, {}, legendConf);
+        var assets = legendConf.assets;
         // 过滤不使用图例的情况
         if (blendent) {
-            var result = _require('legend')({
-                blendent: blendent
-            }, {
+            delete legendConf.assets;
+            var option = $.extend({
                 type: legendStyle || undefined,
                 width: width_map,
                 height: height_map,
                 data_filter: data_filter
-            });
+            }, legendConf);
+            var result = _require('legend')({
+                blendent: blendent
+            }, option);
 
             geomap.addOverlay(new Shape.Image(result.canvas, {
                 x: result.x,
                 y: result.y
             }));
+        }
+        
+        if (assets) {
+            $.each(assets, function(i, asset) {
+                var style = style2obj(asset.style);
+                geomap.addOverlay(new Shape.Image(asset.src, {
+                    x: style.left,
+                    y: style.top,
+                    width: style.width,
+                    height: style.height
+                }));
+            });
         }
     });
     model.on('geo', function(options, cb_afterGeo) {
@@ -255,7 +273,7 @@ Core.init(function(model) {
             Pattern: Pattern
         };
 
-        require('./map_ext/shanxi')(_options);
+        require('./map_ext/common')(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/async-show'))(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-china-conf'))(_options);
         // require(util_path.join(Core.CONST.PATH.BASE, '../test/ui/map-shanxi'))(_options);

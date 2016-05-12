@@ -140,10 +140,25 @@
 		var w = canvas.width;
 		var width_opt = options.width;
 		var height_opt = options.height;
+		var x_opt = options.x;
+		if (isNaN(x_opt)) {
+			x_opt = width_opt - w - 10;
+		} else {
+			// 水平居右
+			x_opt -= w - width_opt;
+		}
+		var y_opt = options.y;
+		if (isNaN(y_opt)) {
+			y_opt = (height_opt - h)/2;
+		} else {
+			// 垂直居中
+			y_opt -= (h - height_opt)/2;
+		}
+		
 		return {
 			canvas: canvas,
-			x: width_opt - w - 10,
-			y: (height_opt - h)/2
+			x: x_opt,
+			y: y_opt
 		};
 	}
 
@@ -164,8 +179,9 @@
 
 		var font_color = '#000';
 		var font = 'bold '+options.fontSize+'px sans-serif';
-
-		var width = Math.max(options.width, 100*legend.length);
+		
+		// var width = Math.max(options.width, 100*legend.length);
+		var width = options.width;
 		var height = options.height;
 		var lineWidth = options.lineWidth || 0;
 		var strokeStyle = options.strokeStyle;
@@ -220,7 +236,6 @@
 			colors.forEach(function(c, ci) {
 				ctx.save();
 				var color = c.color;
-
 				
 				ctx.beginPath();
 				var y = ci*(height_block + 4);
@@ -254,10 +269,24 @@
 		var w = canvas.width;
 		var width_opt = options.width;
 		var height_opt = options.height;
+		var x_opt = options.x;
+		
+		var padding_left_bottom = 10;
+		if (isNaN(x_opt)) {
+			x_opt = padding_left_bottom;
+		}
+		var y_opt = options.y;
+		if (isNaN(y_opt)) {
+			y_opt = height_opt - padding_left_bottom - h
+		} else {
+			// 垂直居底
+			y_opt += height_opt-h;
+		}
+		
 		return {
 			canvas: canvas,
-			x: 10,
-			y: height_opt - 10 - h
+			x: x_opt,
+			y: y_opt
 		};
 	}
 	// 常规左右显示
@@ -316,10 +345,24 @@
 		var w = canvas.width;
 		var width_opt = options.width;
 		var height_opt = options.height;
+		
+		var x_opt = options.x;
+		
+		if (isNaN(x_opt)) {
+			x_opt = 0;
+		}
+		var y_opt = options.y;
+		if (isNaN(y_opt)) {
+			y_opt = height_opt - h
+		} else {
+			// 垂直居底
+			y_opt += height_opt-h;
+		}
+		
 		return {
 			canvas: canvas,
-			x: 0,
-			y: height_opt - h
+			x: x_opt,
+			y: y_opt
 		};
 	}
 
