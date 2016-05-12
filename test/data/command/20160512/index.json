@@ -1,0 +1,92 @@
+{
+    "data": {
+    	"type": "shanxi",
+    	"file": "rain.txt"
+    },
+    "map": "陕西地图",
+    "legend": {
+        "is_stripe": false,
+        "colors": [{
+            "is_checked": true,
+            "color": "#9df085",
+            "color_text": "#ffffff",
+            "val": [1, 1.5],
+            "text": "1~1.5",
+            "order": 0
+        }, {
+            "is_checked": true,
+            "color": "#33b333",
+            "color_text": "#000000",
+            "val": [1.5, 7],
+            "text": "1.5~7",
+            "order": 0
+        }, {
+            "is_checked": true,
+            "color": "#56b1ff",
+            "color_text": "#000000",
+            "val": [7, 15],
+            "text": "7~15",
+            "order": 0
+        }, {
+            "is_checked": true,
+            "color": "#ffffff",
+            "color_text": "#ffffff",
+            "val": [0, 1],
+            "text": "0~1",
+            "order": 0
+        }, {
+            "is_checked": true,
+            "color": "#0000de",
+            "color_text": "#000000",
+            "val": [15, 40],
+            "text": "15~40",
+            "order": 0
+        }, {
+            "is_checked": true,
+            "color": "#f900f9",
+            "color_text": "#000000",
+            "val": [40, 50],
+            "text": "40~50",
+            "order": 0
+        }, {
+            "is_checked": true,
+            "color": "#750036",
+            "color_text": "#000000",
+            "val": [50, 9999],
+            "text": "50以上",
+            "order": 0
+        }]
+    },
+    "texts": [{
+    	"txt": "陕西省2015年09月10日08时-自动站雨量分布图",
+    	"x": 10,
+    	"y": 10,
+    	"fontSize": 20,
+    	"color": "rgba(0, 0, 0, 0.8)"
+    }, {
+    	"txt": "最大：泾河 4.5mm",
+    	"x": 10,
+    	"y": 40,
+    	"fontSize": 18,
+    	"color": "rgba(255, 0, 0, 0.8)"
+    }],
+    "legendConf": {
+        "x": 100,
+        "y": 100,
+        "width": 100,
+        "height": 200,
+        "assets": [{
+            "type": "MOTORWAY",
+            "x": 20,
+            "y": 500
+        }, {
+            "type": "HIGHWAY",
+            "x": 20,
+            "y": 540
+        }, {
+            "type": "RAILWAY",
+            "x": 20,
+            "y": 580
+        }]
+    }
+}

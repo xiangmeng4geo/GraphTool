@@ -18,6 +18,8 @@ Core.init(function(model) {
     var CONST = _require('const');
     var Geo = _require('geo');
     var map_util = _require('m/map_util');
+    var util_product_conf = _require('product_conf').util;
+    var linetype = _require('m/linetype');
     var component = _require('component');
     var style2obj = component.util.style2obj;
     var CONST_BOUND = CONST.BOUND;
@@ -199,6 +201,24 @@ Core.init(function(model) {
         
         if (assets) {
             $.each(assets, function(i, asset) {
+                var type = asset.type;
+                // 从命令行传入配置
+                if (type) {
+                    var conf_linetype =util_product_conf.getLineType(type);
+                    if (!conf_linetype) {
+                        return;
+                    }
+                    var img = linetype(conf_linetype);
+                    asset = {
+                        src: img.src,
+                        style: {
+                            left: asset.x,
+                            top: asset.y,
+                            width: img.width,
+                            height: img.height
+                        }
+                    }
+                }
                 var style = style2obj(asset.style);
                 geomap.addOverlay(new Shape.Image(asset.src, {
                     x: style.left,

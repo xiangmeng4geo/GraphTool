@@ -11,6 +11,7 @@
 | [texts](#Text) | Array | N |  | 附加文字资源 |
 | [imgs](#Image) | Array | N |  | 附加图片资源 |
 | savepath | String | N |  | 保存的图片路径 |
+| legendConf(#) | Object | N | | 对图例位置及大小及线形图例的相关配置([参考示例](#legendConf_example)) |
 
 [代码示例](#code_example)
 ```
@@ -84,7 +85,7 @@
 | offsetX | Number | N | 0 | 文字垂直方向位置 |
 | offsetY | Number | N | 0 | 文字垂直方向位置 |
 | icon | String | N |  | 文字的占位小图标, 值只可以是[BLUE_BALL] |
-| [flag](textFlagObjct) | Object | N |  | 自定义文字的占位小图标和icon的意思一致，两者有配置时忽略icon |
+| [flag](#textFlagObjct) | Object | N |  | 自定义文字的占位小图标和icon的意思一致，两者有配置时忽略icon |
 
 #### <span id="textFlagObjct">textFlagObjct自定义文字占位图标</span>
 | 字段名 | 类型 | 是否必须 | 描述 |
@@ -292,6 +293,46 @@
         "val": [50, 9999],
         "text": "50以上",
         "order": 0
+    }]
+}
+```
+
+#### <span id="legendConf">legendConf(图例位置大小及线形图例相关配置)</span>
+| 字段名 | 类型 | 是否必须 | 默认值 | 描述 |
+|----| :----: | :-----: | :----: | :-----: |
+| x | Number | N |  | 图例坐标X |
+| y | Number | N |  | 图例坐标Y |
+| width | Number | N |  | 图例显示宽度 |
+| height | Number | N |  | 图例显示高度 |
+| assets(#legendConfAssets) | Object | N |  | 线形图例配置 |
+
+#### <span id="legendConfAssets">legendConfAssets(线形图例配置)</span>
+| 字段名 | 类型 | 是否必须 | 默认值 | 描述 |
+|----| :----: | :-----: | :----: | :-----: |
+| type | String | Y |  | 线形图例类型 <br/>只能是[ RIVER、RAILWAY、MOTORWAY、HIGHWAY ]列表中值<br/><br/> RIVER = 河流<br/> RAILWAY = 铁路<br/> MOTORWAY = 高速路<br/>HIGHWAY = 省道|
+| x | Number | Y |  | 线形图例坐标X |
+| y | Number | Y |  | 线形图例坐标Y |
+
+
+#### <span id="legendConf_example">legendConf配置示例</span>
+```
+"legendConf": {
+    "x": 100,
+    "y": 100,
+    "width": 100,
+    "height": 200,
+    "assets": [{
+        "type": "MOTORWAY",
+        "x": 20,
+        "y": 500
+    }, {
+        "type": "HIGHWAY",
+        "x": 20,
+        "y": 540
+    }, {
+        "type": "RAILWAY",
+        "x": 20,
+        "y": 580
     }]
 }
 ```

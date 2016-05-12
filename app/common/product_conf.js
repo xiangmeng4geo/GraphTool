@@ -35,12 +35,17 @@
     function _getSys() {
         return _readConfig(CONST_SYSCONF_NAME);
     }
-    var _formatMapStyle = (function(params) {
+    var _getLineType = (function() {
         var cache = {};
         CONST_LINETYPE.forEach(function(conf) {
             cache[conf.type] = conf;
         });
         
+        return function(type) {
+            return cache[type];
+        }
+    })();
+    var _formatMapStyle = (function(params) {
         var type_default = CONST_LINETYPE[0].type;
         return function(obj_geo) {
             if (obj_geo) {
@@ -51,7 +56,7 @@
                     }, map.style);
                     
                     var type = map.style.linetype || type_default;
-                    var style_linetype = cache[type];
+                    var style_linetype = _getLineType(type);
                     if (style_linetype) {
                         var outline = style_linetype.outline;
                         if (outline) {
@@ -405,7 +410,8 @@
             getLegendConf: _getLegendConf,
             geo: {
                 format: _formatMapStyle
-            }
+            },
+            getLineType: _getLineType
         }
     };
 
