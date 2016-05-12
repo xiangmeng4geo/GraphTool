@@ -80,12 +80,14 @@ Core.init(function(model) {
                     return function(menuItem) {
                         if (menuItem.checked) {
                             var img_linetype = linetype(conf);
-                            $html = LegendLayer({
+                            $html = LegendLineTypeLayer({
                                 css: {
+                                    width: img_linetype.width,
+                                    height: img_linetype.height,
                                     left: 20,
                                     top: $template_assets.height() - (len_linetype - i) * (img_linetype.height + 5)
                                 },
-                                html: '<img src="'+img_linetype.src+'"/>'
+                                img: img_linetype.src
                             });
                         } else {
                             $html.remove();
@@ -239,6 +241,11 @@ Core.init(function(model) {
         $template_assets.append($html);
         return $html;
     }
+    var LegendLineTypeLayer = function(option) {
+        var $html = Layer.legend.linetype(option)
+        $template_assets.append($html);
+        return $html;
+    }
     $template_list.delegate('span', 'click', function(e) {
         e.stopPropagation();
         var $p = $(this).parent();
@@ -340,6 +347,28 @@ Core.init(function(model) {
                 }, v);
             }
         });
+        var data_legend = data.legend || {};
+        var assets_legend = data_legend.assets;
+        assets_legend && $.each(assets_legend, function(i, asset) {
+            LegendLineTypeLayer({
+                css: asset.style,
+                img: asset.src
+            });
+        });
+        var x = data_legend.x,
+            y = data_legend.y,
+            width = data_legend.width,
+            height = data_legend.height;
+        if (!isNaN(x) && !isNaN(y) && !isNaN(width) && !isNaN(height)) {
+            LegendLayer({
+                css: {
+                    left: x,
+                    top: y,
+                    width: width,
+                    height: height
+                }
+            });
+        }
         _changeSize();
     }
 
@@ -394,7 +423,9 @@ Core.init(function(model) {
             $n_template_height.val(CONST_SIZE_MINHEIGHT);
             return _alert('模板高度最小为' + n_template_height + 'px！');
         }
-
+        
+        var data_legend = {};
+        var assets_linetype = [];
         var assets = [];
         $('.map_layer').each(function() {
             var $layer = $(this);
@@ -422,13 +453,33 @@ Core.init(function(model) {
                     src: src,
                     style: $layer.attr('style') || ''
                 });
+            } else if ($layer.is('.layer_linetype')) {
+                var $img = $layer.find('.img_linetype');
+                var src = $img.data('src') || $img.attr('src');
+                assets_linetype.push({
+                    src: src,
+                    style: $layer.attr('style') || ''
+                });
+            } else if ($layer.is('.layer_legend')) {
+                var style = $layer.attr('style') || '';
+                
+                style = style2obj(style);
+                data_legend.x = style.left;
+                data_legend.y = style.top;
+                data_legend.width = style.width;
+                data_legend.height = style.height;
             }
         });
+        if (assets_linetype.length > 0) {
+            data_legend.assets = assets_linetype;
+        }
+        
         var data = {
             name: name.trim(),
             width: width,
             height: height,
-            assets: assets
+            assets: assets,
+            legend: data_legend
         };
 
 

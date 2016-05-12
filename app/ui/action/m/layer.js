@@ -50,10 +50,14 @@ Core.init(function() {
             draggable_option = option.drag;
         $html.css('position', 'absolute');
         if (!isLock) {
-            $html.resizable($.extend({
-                handles: 'all'
-            }, resizable_option))
-            .draggable(draggable_option)
+            if (resizable_option) {
+                $html.resizable($.extend({
+                    handles: 'all'
+                }, resizable_option))
+            }
+            if (draggable_option) {
+                $html.draggable(draggable_option)
+            }
         }
             
         $html.on('mousedown', function(e) {
@@ -375,6 +379,7 @@ Core.init(function() {
     }
     function LegendLayer(option) {
         option = $.extend(true, {
+            cName: 'layer_legend',
             resize: {
                 resize: _change
             },
@@ -382,10 +387,15 @@ Core.init(function() {
                 // handle: 'span.btn_handle',
                 drag: _change
             },
-            canEdit: true
+            canEdit: true,
+            canResize: true
         }, option);
+        if (!option.canResize) {
+            option.resize = false;
+        }
         var $html_inner = option.html || '<div class="placeholder_legend"><span>图例占位</span></div>';
         var $html = _createLayer(option);
+        $html.addClass(option.cName);
         $html.append($html_inner);
         // $template_assets.append($html);
         
@@ -455,6 +465,16 @@ Core.init(function() {
             }
         })
         return $html;
+    }
+    LegendLayer.linetype = function(option) {
+        option = $.extend(true, {
+            canResize: false,
+            cName: 'layer_linetype'
+        }, option);
+        
+        option.html = '<img class="img_linetype" src="'+option.img+'"/>';
+        
+        return LegendLayer(option);
     }
 
     function _reset() {
