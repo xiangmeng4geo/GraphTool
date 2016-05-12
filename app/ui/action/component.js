@@ -533,6 +533,9 @@
 			$container.data('inited', true);
 			
 			if ($container.is('input[type=color]')) {
+				if (options.useOpacity) {
+					$container.add('on');
+				}
 				var opacity = options.opacity;
 				var rgb = _getRgba([options.color, opacity]);
 				$container.wrap('<div class="ui-color"></div>').after('<div class="ui-color-show"></div><div class="ui-color-opacity"><input type="text" value="'+opacity+'" class="ui-color-opacity-val"/><input type="range" min=0 max=1 step=0.01 value="'+opacity+'" class="r_opacity"/></div>');
@@ -542,7 +545,10 @@
 		var $p = $container.parent();
 		var $opacity = $p.find('.ui-color-opacity-val,.r_opacity');
 		var $ui_color_show = $p.find('.ui-color-show');
-		function _getColor() {
+		function _getColor(is_rgba) {
+			if (is_rgba) {
+				return _getRgba();
+			}
 			var color = $container.val();
 			var opacity = $opacity.val();
 			
@@ -557,22 +563,32 @@
 			return 'rgba('+arr_c[0]+', '+arr_c[1]+', '+arr_c[2]+', '+opacity+')';
 		}
 		function _setColor(color, opacity) {
-			$container.val(color);
-			$opacity.val(opacity);
-			
-			var rgba = _getRgba();
-			$ui_color_show.css('background-color', rgba);
+			if (REG_RGBA.test(color)) {
+				_setRgba(color);
+			} else {
+				color && $container.val(color);
+				if (!(opacity >= 0 && opacity <= 1)) {
+					opacity = 1;
+				}
+				$opacity.val(opacity);
+				
+				var rgba = _getRgba();
+				$ui_color_show.css('background-color', rgba);
+			}
+		}
+		function _setRgba(rgba) {
+			var m = REG_RGBA.exec(rgba);
+			if (m) {
+				var color = '#'+to16(m[1])+to16(m[2])+to16(m[3]);
+				var opacity = Math.min(Number(m[4]), 1);
+				_setColor(color, opacity);
+			} else {
+				_setColor.apply(null, arguments);
+			}
 		}
 		return {
 			getRgba: _getRgba,
-			setRgba: function(rgba) {
-				var m = REG_RGBA.exec(rgba);
-				if (m) {
-					var color = '#'+to16(m[1])+to16(m[2])+to16(m[3]);
-					var opacity = Math.min(Number(m[4]), 1);
-					_setColor(color, opacity);
-				}
-			},
+			setRgba: _setRgba,
 			setColor: _setColor,
 			getColor: _getColor
 		}

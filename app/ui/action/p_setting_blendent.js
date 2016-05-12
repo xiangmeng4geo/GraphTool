@@ -12,6 +12,7 @@ Core.init(function(model) {
 	var product_conf = _require('product_conf'); //直接把模块加载到UI进程
 	var component = _require('component');
 	var util_ui = component.UI;
+	var util_ui_color = util_ui.color;
 	var util_color = component.Color;
 	var CONST = _require('const');
 
@@ -56,8 +57,8 @@ Core.init(function(model) {
 			var text_color = v.color_text || '#000';
 			html_table += '<tr>'+
 								'<td class="fn_contextmenu"><div class="checkbox"><input type="checkbox" '+(v.is_checked?'checked':'')+'/><label></label></div></td>'+
-								'<td><input type="color" value="'+v.color+'"/></td>'+
-								'<td><input type="color" value="'+text_color+'"/></td>'+
+								'<td><input type="color" value="'+v.color+'" class="c_legend"/></td>'+
+								'<td><input type="color" value="'+text_color+'" class="c_legend_text"/></td>'+
 								'<td><input type="number" value="'+v.val[0]+'"/>~<input type="number" value="'+v.val[1]+'"/></td>'+
 								'<td contentEditable="true" class="no_outline">'+v.text+'</td>'+
 								'<td><input type="number" value="'+(v.order||0)+'"/></td>'
@@ -69,6 +70,14 @@ Core.init(function(model) {
 			model.emit('init_component');
 		}, 0);
 		return html_table;
+	}
+	function _initColor() {
+		$('.legend_value input[type=color]').each(function() {
+			var $this = $(this);
+			util_ui_color($this, {
+				useOpacity: $this.hasClass('c_legend')
+			});
+		});
 	}
 
 	var $legend_left = $('#blendent_conf');
@@ -124,6 +133,8 @@ Core.init(function(model) {
 
 			$html.find('.legend_value').append(getTable(v.colors));
 		});
+
+		_initColor();
 		return false;
 	});
 	// 添加按钮事件
@@ -263,6 +274,8 @@ Core.init(function(model) {
 		}
 		$legend_value.find('table').remove();
 		$legend_value.append(getTable(color_arr));
+
+		_initColor();
 	});
 	function _getBlendent(){
 		var blendent = [];
@@ -337,6 +350,8 @@ Core.init(function(model) {
 				}
 				$legend_left.append($html_fieldset_color);
 			});
+
+			_initColor();
 		}
 	}
 	function _saveConfData() {

@@ -8,6 +8,7 @@ Core.init(function(model) {
 	var _confirm = dialog.confirm;
 	var product_conf = _require('product_conf'); //直接把模块加载到UI进程
 	var util_ui = _require('component').UI;
+	var util_ui_color = util_ui.color;
 	var CONST = _require('const');
 	var CONST_GEO_FLAGS = CONST.GEO.FLAGS;
 	var CONST_BOUND = CONST.BOUND;
@@ -275,15 +276,15 @@ Core.init(function(model) {
 			// var file = $this.find('.f_map_item').val();
 			var file = util_ui.file($this.find('.ui-file')).val();
 			var lineWidth = $this.find('.n_map_item').val();
-			var strokeStyle = $this.find('.c_map_item').val();
-			var fillStyle = $this.find('.c_map_item_fill').val();
+			var strokeStyle = util_ui_color($this.find('.c_map_item')).getRgba();
+			var fillStyle = util_ui_color($this.find('.c_map_item_fill')).getRgba();
 			var flag_fillStyle = _getChecked($this.find('.cb_map_item_fill'));
 			var clip = _getChecked($this.find('.cb_map_item'));
 			var is_use_border = _getChecked($this.find('.cb_map_item_border'));
 			var b_lineWidth = $this.find('.n_map_item_line').val();
-			var b_strokeStyle = $this.find('.c_map_item_line').val();
+			var b_strokeStyle = util_ui_color($this.find('.c_map_item_line')).getRgba();
 			// var b_fillStyle = $this.find('.c_map_item_fill').val(); //暂时不考虑填充色
-			var shadow_color = $this.find('.c_map_item_shadow').val();
+			var shadow_color = util_ui_color($this.find('.c_map_item_shadow')).getRgba();
 			var shadow_size = $this.find('.c_map_item_shadow_size').val();
 			var shadow_x = $this.find('.c_map_item_shadow_x').val();
 			var shadow_y = $this.find('.c_map_item_shadow_y').val();
@@ -359,12 +360,12 @@ Core.init(function(model) {
 			city: _getChecked($cb_city),
 			county: _getChecked($cb_county),
 			fontSize: parseInt($n_map_text.val()) || 12,
-			color: $c_map_text.val(),
+			color: util_ui_color($c_map_text).getRgba(),
 			flag: util_ui.select($s_map_text).val()
 		}
 		data.bg = {
 			flag: _getChecked($cb_map_bgcolor),
-			color: $c_map_color.val()
+			color: util_ui_color($c_map_color).getRgba()
 		}
 
 		var index = $map_conf_list.find('.on').index();
@@ -458,16 +459,16 @@ Core.init(function(model) {
 
 				// $html.find('.f_map_item').val(file);
 				$html.find('.n_map_item').val(style.lineWidth).next('span').text(style.lineWidth);
-				$html.find('.c_map_item').val(style.strokeStyle);
+				util_ui_color($html.find('.c_map_item')).setRgba(style.strokeStyle);
 				_setChecked($html.find('.cb_map_item'), clip);
 				_setChecked($html.find('.cb_map_item_border'), borderStyle.flag);
 				$html.find('.n_map_item_line').val(borderStyle.lineWidth).next('span').text(borderStyle.lineWidth);;
-				$html.find('.c_map_item_line').val(borderStyle.strokeStyle);
-				$html.find('.c_map_item_shadow').val(borderStyle.shadowColor);
+				util_ui_color($html.find('.c_map_item_line')).setRgba(borderStyle.strokeStyle);
+				util_ui_color($html.find('.c_map_item_shadow')).setRgba(borderStyle.shadowColor);
 				$html.find('.c_map_item_shadow_size').val(borderStyle.shadowBlur).next('span').text(borderStyle.shadowBlur);
 				$html.find('.c_map_item_shadow_x').val(borderStyle.shadowOffsetX).next('span').text(borderStyle.shadowOffsetX);
 				$html.find('.c_map_item_shadow_y').val(borderStyle.shadowOffsetY).next('span').text(borderStyle.shadowOffsetY);
-				$html.find('.c_map_item_fill').val(style.fillStyle);
+				util_ui_color($html.find('.c_map_item_fill')).setRgba(style.fillStyle);
 				_setChecked($html.find('.cb_map_item_shadow_flag'), borderStyle.flag_shadow);
 				_setChecked($html.find('.cb_map_item_fill'), style.flag_fill);
 				_setChecked($html.find('.cb_map_item_stroke'), style.flag_stroke);

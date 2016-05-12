@@ -515,7 +515,7 @@ tr:nth-child(2n+1) td{
     margin-left: -12px;
     bottom: -12px;
 }
-.ui-color:hover .ui-color-opacity{
+.ui-color.on:hover .ui-color-opacity{
     display: block;
 }
 .ui-color .ui-color-opacity-val{
