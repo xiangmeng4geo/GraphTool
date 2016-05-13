@@ -514,13 +514,6 @@
 		}
 	}
 	
-	// function _setColorByContainer($container) {
-	// 	var opacity = $container.find('input[type=range]').val();
-	// 	var $color = $container.find('input[type=color]');
-	// 	var color = $color.val();
-	// 	ui_color($color).setColor(color, opacity);
-	// }
-	
 	function _setColorShow($container, color, opacity) {
 		var arr_c = color_normal2rgb(color, true);
 		$container.find('.ui-color-show').css('background-color', 'rgba('+arr_c[0]+', '+arr_c[1]+', '+arr_c[2]+', '+opacity+')');
@@ -567,7 +560,7 @@
 				if (options.useOpacity) {
 					$div_wrap.addClass('on');
 				}
-				$container.wrap($div_wrap).after('<div class="ui-color-show" style="background-color:'+rgba+'"></div><div class="ui-color-opacity"><input type="text" value="'+opacity+'" class="ui-color-opacity-val"/><input type="range" min=0 max=1 step=0.01 value="'+opacity+'" class="r_opacity"/></div>');
+				$container.wrap($div_wrap).after('<div class="ui-color-show-bg"></div><div class="ui-color-show" style="background-color:'+rgba+'"></div><div class="ui-color-opacity"><input type="text" value="'+opacity+'" class="ui-color-opacity-val"/><input type="range" min=0 max=1 step=0.01 value="'+opacity+'" class="r_opacity"/></div>');
 			}
 		}
 		

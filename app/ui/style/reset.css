@@ -492,10 +492,20 @@ tr:nth-child(2n+1) td{
 }
 .ui-color .ui-color-show {
     position: absolute;
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+    left: 4px;
+    top: 4px;
+    z-index: 2;
+}
+.ui-color .ui-color-show-bg {
+    position: absolute;
     width: 100%;
     height: 100%;
     left: 0;
     top: 0;
+    background-color: #202020;
+    z-index: 1;
 }
 .ui-color input[type=color] {
     opacity: 0;
@@ -506,14 +516,17 @@ tr:nth-child(2n+1) td{
     display: none;
     position: absolute;
     width: 110px;
-    background-color: #212121;
-    border-radius: 2px;
-    padding: 10px;
+    background-color: #464646;
+    padding: 0;
     left: 50%;
     margin-left: -55px;
     z-index: 1001;
+    border: 1px solid #737373;
 }
-.ui-color .ui-color-opacity:after {
+.ui-color .ui-color-opacity input{
+    display: inline-block;
+}
+/*.ui-color .ui-color-opacity:after {
     position: absolute;
     transform: rotate(45deg);
     width: 24px;
@@ -523,22 +536,18 @@ tr:nth-child(2n+1) td{
     left: 50%;
     margin-left: -12px;
     bottom: -12px;
-}
+}*/
 .ui-color.on:hover .ui-color-opacity{
     display: block;
 }
 .ui-color .ui-color-opacity-val{
     width: 36px;
     text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0);
 }
 .ui-color .ui-color-opacity .r_opacity{
     width: 60px;
     margin-left: 2px;
-}
-.ui-color .ui-color-show {
-    border: 1px solid #737373;
-    border-radius: 3px;
-    box-sizing: border-box;
 }
 tab{
     width: 100%;

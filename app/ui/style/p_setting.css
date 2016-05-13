@@ -304,3 +304,11 @@ input.txt_sys_size:focus{
 	overflow: hidden;
 }
 /*系统模板 }*/
+
+
+.line_common .ui-color-opacity-val{
+	margin-left: -4px;
+}
+.map_text input.ui-color-opacity-val{
+	margin-left: 0;
+}

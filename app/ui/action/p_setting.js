@@ -421,6 +421,8 @@ Core.init(function(model) {
 		util_ui.select($html.find('.s_linetype'), {
 			data: d_sele_linetype
 		});
+		util_ui.color($html.find('.c_map_item'));
+		util_ui.color($html.find('.c_map_item_fill'));
 		_setChecked($html.find('.cb_map_item_stroke'), true);
 		$map_conf.append($html);
 		model.emit('init_component');
