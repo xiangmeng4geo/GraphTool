@@ -15,6 +15,7 @@
 `BIN_FILE -sync -file "C:/Users/技术/BPA/GT/test/0910降水.json"`
 
 `BIN_FILE -sync -api getMapCenter`
+
 -------------------
 
 ##### 命令行参数说明

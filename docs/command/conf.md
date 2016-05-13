@@ -11,7 +11,7 @@
 | [texts](#Text) | Array | N |  | 附加文字资源 |
 | [imgs](#Image) | Array | N |  | 附加图片资源 |
 | savepath | String | N |  | 保存的图片路径 |
-| legendConf(#) | Object | N | | 对图例位置及大小及线形图例的相关配置([参考示例](#legendConf_example)) |
+| [legendConf](#legendConf) | Object | N | | 对图例位置及大小及线形图例的相关配置([参考示例](#legendConf_example)) |
 
 [代码示例](#code_example)
 ```
@@ -304,7 +304,7 @@
 | y | Number | N |  | 图例坐标Y |
 | width | Number | N |  | 图例显示宽度 |
 | height | Number | N |  | 图例显示高度 |
-| assets(#legendConfAssets) | Object | N |  | 线形图例配置 |
+| [assets](#legendConfAssets) | Object | N |  | 线形图例配置 |
 
 #### <span id="legendConfAssets">legendConfAssets(线形图例配置)</span>
 | 字段名 | 类型 | 是否必须 | 默认值 | 描述 |
