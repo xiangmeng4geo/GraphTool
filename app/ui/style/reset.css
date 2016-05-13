@@ -234,7 +234,6 @@ table{
     border-spacing: 0;
     width: 90%;
     border-radius: 5px;
-    overflow: hidden;
     border: 1px solid #000;
     /*border-top: 1px solid #999999;*/
 }
@@ -280,10 +279,17 @@ tr:nth-child(2n+1) td{
 .fr{
     float: right;
 }
-.clear{
+/*.clear{
     clear: both;
     overflow: hidden;
-}
+}*/
+.clear:after { 
+    content:"."; 
+    display:block; 
+    height:0; 
+    visibility:hidden; 
+    clear:both; 
+}   
 .mt10{
     margin-top: 10px;
 }
@@ -499,10 +505,13 @@ tr:nth-child(2n+1) td{
 .ui-color .ui-color-opacity {
     display: none;
     position: absolute;
-    width: 90px;
+    width: 110px;
     background-color: #212121;
     border-radius: 2px;
     padding: 10px;
+    left: 50%;
+    margin-left: -55px;
+    z-index: 1001;
 }
 .ui-color .ui-color-opacity:after {
     position: absolute;
@@ -519,14 +528,18 @@ tr:nth-child(2n+1) td{
     display: block;
 }
 .ui-color .ui-color-opacity-val{
-    width: 16px;
+    width: 36px;
     text-align: center;
 }
 .ui-color .ui-color-opacity .r_opacity{
     width: 60px;
     margin-left: 2px;
 }
-
+.ui-color .ui-color-show {
+    border: 1px solid #737373;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
 tab{
     width: 100%;
     float: left;

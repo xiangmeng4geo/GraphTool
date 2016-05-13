@@ -302,8 +302,8 @@ Core.init(function(model) {
 
 					colors.push({
 						'is_checked': $td.eq(0).find('input').prop('checked'),
-						'color': $td.eq(1).find('input').val(),
-						'color_text': $td.eq(2).find('input').val(),
+						'color': util_ui_color($td.eq(1).find('input')).getRgba(),
+						'color_text': util_ui_color($td.eq(2).find('input')).getRgba(),
 						'val': val_arr,
 						'text': $td.eq(4).text(),
 						'order': parseInt($td.eq(5).find('input').val())

@@ -186,17 +186,20 @@
 			}
 			var tmpl = '<span class="ui-select-val" title="'+$val.text()+'">'+$val.html()+'</span>';
 			$container.html(tmpl+html).on('change', onchange);
+			setTimeout(function() {
+				$container.trigger('change', _getVal());
+			}, 0)
 			$container.data('inited', true);
 		}
-
+		function _getVal() {
+			var $val = $container.find('.selected');
+			if ($val.length == 0) {
+				$val = $container.find('li:first');
+			}
+			return $val.data('val');
+		}
 		return {
-			val: function() {
-				var $val = $container.find('.selected');
-				if ($val.length == 0) {
-					$val = $container.find('li:first');
-				}
-				return $val.data('val');
-			},
+			val: _getVal,
 			text: function() {
 				var $val = $container.find('.selected');
 				if ($val.length == 0) {
@@ -511,34 +514,60 @@
 		}
 	}
 	
-	function _setColorByContainer($container, color, opacity) {
-		ui_color($ui_color.find('input[type=color]')).setColor(color, opacity);
+	// function _setColorByContainer($container) {
+	// 	var opacity = $container.find('input[type=range]').val();
+	// 	var $color = $container.find('input[type=color]');
+	// 	var color = $color.val();
+	// 	ui_color($color).setColor(color, opacity);
+	// }
+	
+	function _setColorShow($container, color, opacity) {
+		var arr_c = color_normal2rgb(color, true);
+		$container.find('.ui-color-show').css('background-color', 'rgba('+arr_c[0]+', '+arr_c[1]+', '+arr_c[2]+', '+opacity+')');
 	}
 	$doc.delegate('.ui-color input[type=color]', 'change', function() {
-		color($ui_color.find('input[type=color]')).setColor();
-	}).delegate('.ui-color .ui-color-opacity-val', 'change', function() {
-		_setColorByContainer($(this).closest('.ui-color'));
-	}).delegate('.ui-color input[type=range]', 'change', function() {
-		_setColorByContainer($(this).closest('.ui-color'));
+		var $this = $(this);
+		var $container = $this.closest('.ui-color');
+		var opacity = $container.find('input[type=range]').val()
+		
+		_setColorShow($container, $this.val(), opacity);
+	}).delegate('.ui-color .ui-color-opacity-val', 'keyup', function() {
+		var $this = $(this);
+		var $container = $this.closest('.ui-color');
+		
+		var opacity = $this.val();
+		$container.find('input[type=range]').val(opacity);
+		_setColorShow($container, $container.find('input[type=color]').val(), opacity);
+		// _setColorByContainer($(this).closest('.ui-color'));
+	}).delegate('.ui-color input[type=range]', 'input', function() {
+		// _setColorByContainer($(this).closest('.ui-color'));
+		
+		var $this = $(this);
+		var $container = $this.closest('.ui-color');
+		
+		var opacity = $this.val();
+		$container.find('.ui-color-opacity-val').val(opacity);
+		
+		_setColorShow($container, $container.find('input[type=color]').val(), opacity);
 	});
 	var REG_RGBA = /rgba\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d|0\.[\d]+)\s*\)/;
 	function ui_color($container, options) {
 		options = _extend({
 			useOpacity: true, //是否使用透明度
 			opacity: 1, //初始化透明度
-			color: '#000000'
 		}, options);
 		
 		if (!$container.data('inited')) {
 			$container.data('inited', true);
 			
 			if ($container.is('input[type=color]')) {
-				if (options.useOpacity) {
-					$container.add('on');
-				}
 				var opacity = options.opacity;
-				var rgb = _getRgba([options.color, opacity]);
-				$container.wrap('<div class="ui-color"></div>').after('<div class="ui-color-show"></div><div class="ui-color-opacity"><input type="text" value="'+opacity+'" class="ui-color-opacity-val"/><input type="range" min=0 max=1 step=0.01 value="'+opacity+'" class="r_opacity"/></div>');
+				var rgba = _getRgba([options.color || $container.val(), opacity]);
+				var $div_wrap = $('<div class="ui-color"></div>');
+				if (options.useOpacity) {
+					$div_wrap.addClass('on');
+				}
+				$container.wrap($div_wrap).after('<div class="ui-color-show" style="background-color:'+rgba+'"></div><div class="ui-color-opacity"><input type="text" value="'+opacity+'" class="ui-color-opacity-val"/><input type="range" min=0 max=1 step=0.01 value="'+opacity+'" class="r_opacity"/></div>');
 			}
 		}
 		

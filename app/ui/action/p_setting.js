@@ -507,11 +507,11 @@ Core.init(function(model) {
 			_setChecked($cb_prov, cb_prov);
 			_setChecked($cb_city, cb_city);
 			_setChecked($cb_county, cb_county);
-			$c_map_text.val(color);
+			util_ui_color($c_map_text).setRgba(color);
 			$n_map_text.val(fontSize);
 
 			var style_bg = geo.bg;
-			$c_map_color.val(style_bg.color);
+			util_ui_color($c_map_color).setRgba(style_bg.color);
 			_setChecked($cb_map_bgcolor, style_bg.flag);
 
 			util_ui.select($s_map_text).selected(flag);
