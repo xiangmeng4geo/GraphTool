@@ -203,7 +203,7 @@
 		}
 	}
 	function _getDialog(method, param, cb) {
-		var remote = require('remote');
+		var remote = require('electron').remote;
 		var dialog = remote.require('dialog');
 
 		dialog[method](remote.getCurrentWindow(), param, cb);
