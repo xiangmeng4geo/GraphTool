@@ -1,7 +1,7 @@
 Core.init(function(){
 	var C = Core;
 	var $ = C.$;
-	var app = require('remote').app;
+	var app = require('electron').remote.require('electron').app;
 	$('#version').text(app.getName() + ' ('+app.getVersion()+')');
 	$('.btn_close').click(function() {
 		C.Win.close();

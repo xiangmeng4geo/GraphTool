@@ -14,7 +14,7 @@
 	var util = require('../common/util');
 	var PATH = CONST.PATH;
 	// var BrowserWindow = IS_PROCESS_MAIN? require('browser-window'): require('remote').require('browser-window');
-	var BrowserWindow = require('browser-window');
+	var BrowserWindow = electron.BrowserWindow;//require('browser-window');
 	var win_stack = global.win_stack || (global.win_stack = []);
 	var win_sub = global.win_sub || (global.win_sub = {});
 	/**

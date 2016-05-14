@@ -1,5 +1,6 @@
 Core.init(function(model) {
-	var ipc = require('electron').ipcRenderer;
+	var electron = require('electron');
+	var ipc = electron.ipcRenderer;
 
 	var C = Core;//C.Win.WIN.show();
 	var _require = C.require;
@@ -154,5 +155,5 @@ Core.init(function(model) {
 		queue.push(conf);
 		_deal();
 	});
-	require('remote').getCurrentWindow().webContents.emit('ready');
+	electron.remote.getCurrentWindow().webContents.emit('ready');
 })

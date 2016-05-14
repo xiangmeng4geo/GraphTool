@@ -1,5 +1,5 @@
 {
-  "name"    : "graphtool",
+  "name"    : "GraphTool",
   "version" : "1.1.1",
   "main"    : "workbench/bootstrap.js"
 }

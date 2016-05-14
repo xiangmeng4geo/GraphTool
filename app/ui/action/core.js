@@ -7,8 +7,9 @@
 	var _req = require;
 	var path = _req('path');
 	var fs = _req('fs');
-	var _remote = _req('remote');
-	var ipc = _req('electron').ipcRenderer;
+	var electron = _req('electron');
+	var ipc = electron.ipcRenderer;
+	var _remote = electron.remote;
 
 	var dialog = _req('./dialog');
 	var _alert = dialog.alert;

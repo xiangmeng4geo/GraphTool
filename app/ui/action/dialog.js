@@ -1,8 +1,10 @@
 !function(){
 	'use strict'
-	var remote = require('remote');
+	
+	var electron = require('electron');
+	var remote = electron.remote;
 
-	var dialog = remote.require('dialog');
+	var dialog = remote.require('electron').dialog;
 	var win_instance = remote.getCurrentWindow();
 	var CONST = require('../../common/const');
 	var CONST_FILTER_IMAGE = CONST.FILTER_IMAGE;

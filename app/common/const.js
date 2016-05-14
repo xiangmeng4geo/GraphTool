@@ -8,8 +8,19 @@
 	var path = require('path');
 
 	function format(url) {
-		var arr = url.replace(/\\/g, '/').split(':');
-		return [arr[0].toUpperCase(), arr[1]].join(':');
+		url = url.replace(/\\/g, '/');
+		url = url.replace(/^(\w+):/, function(a, b) {
+			if (b) {
+				return b.toUpperCase();
+			}
+		});
+		return url;
+		// console.log(url);
+		// var arr = url.replace(/\\/g, '/').split(':');
+		// if (arr[0] == '') {
+		// 	return arr[]
+		// }
+		// return [arr[0].toUpperCase(), arr[1]].join(':');
 	}
 	var path_base = format(path.join(__dirname, '..'));
 	var path_ui_conf = format(path.join(path_base, 'conf/ui'));

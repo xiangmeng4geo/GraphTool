@@ -292,7 +292,7 @@ Core.init(function(model) {
                     buttons: [{
                         name: '打开目录',
                         cb: function() {
-                            shell.openItem(CONST_PATH_GALLERY);
+                            shell.showItemInFolder(CONST_PATH_GALLERY);
                         }
                     }, {
                         name: 'yes'

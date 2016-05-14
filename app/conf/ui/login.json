@@ -3,5 +3,6 @@
 	"height": 300,
 	"frame": false,
 	"transparent": true,
-	"show": true
+	"show": true,
+	"resizable": false
 }

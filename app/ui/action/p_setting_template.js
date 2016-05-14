@@ -195,6 +195,9 @@ Core.init(function(model) {
 
         map_name = map_name || '';
         var conf_geo = product_conf.getSys.getGeo(map_name);
+        if (!conf_geo) {
+            return;
+        }
         var bound = conf_geo.bound;
         var projection = map_util.getProjection(bound.wn, bound.es, width_map, height_map);
 
